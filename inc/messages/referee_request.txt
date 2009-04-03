@@ -1,0 +1,29 @@
+%salutation_name_de%,
+
+wir möchten Sie anfragen, ob Sie bereit wären, für KRITIKON, ein Rezensionsjournal für Philosophie (http://www.kritikon.de/), eine Begutachtung einer eingereichten Rezension vorzunehmen.
+
+%bibinfo%
+
+Dabei soll sich die Beurteilung lediglich darauf beschränken, dass Sie uns kurz mitteilen, ob es aus Ihrer Sicht starke inhaltliche Bedenken oder andere Gründe gibt, die gegen eine Veröffentlichung sprechen.
+
+Ich freue mich auf Ihre Nachricht und verbleibe mit freundlichen Grüßen,
+
+
+%name_from%
+
+--
+REDAKTION KRITIKON
+http://www.kritikon.de
+
+Tel: 0341-97 35 820
+eMail: Kritikon@uni-leipzig.de
+
+Universität Leipzig, Institut für Philosophie
+http://www.uni-leipzig.de/~philos/
+
+Postadresse:
+Redaktion Kritikon
+c/o Universität Leipzig
+Zentrum für Höhere Studien
+Emil-Fuchs-Straße 1
+04105 Leipzig

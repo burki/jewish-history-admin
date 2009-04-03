@@ -1,0 +1,30 @@
+%salutation_name_de%,
+
+herzlichen Dank für Ihr Interesse, den Artikel
+
+%title%
+
+für Docupedia-Zeitgeschichte. Begriffe, Methoden und Debatten der zeitgeschichtlichen Forschung zu übernehmen.
+
+Anbei erhalten Sie einige Hinweise zur Publikation Ihres Artikels.
+Wäre eine Fertigstellung des Textes bis %reviewer_deadline% aus Ihrer Sicht realistisch? Falls dieser Termin gar nicht einzuhalten ist, bitte ich Sie um eine kurze Rückmeldung, damit wir unsere Planung darauf einstellen können.
+
+Bitte berücksichtigen Sie, dass der Umfang des Textes ca. 3.500 Wörter bzw. 30.000 Zeichen (ca. 15 A4 Seiten) nicht überschreiten sollte.
+
+Die Redaktion von Docupedia-Zeitgeschichte freut sich auf Ihren Beitrag und steht Ihnen für Rückfragen selbstverständlich gerne zur Verfügung.
+
+Mit freundlichen Grüßen aus Potsdam
+
+%name_from%
+
+--
+Redaktion Docupedia-Zeitgeschichte
+Zentrum für Zeithistorische Forschung
+Am Neuen Markt 1
+D-14467 Potsdam
+Tel.: +49 (0) 331 28991 14 / -12
+      +49 (0) 30 2093 2543
+Fax:  +49 (0) 331 28991 60
+
+eMail: redaktion@docupedia.de
+WWW:   http://www.docupedia.de

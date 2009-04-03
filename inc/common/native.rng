@@ -1,0 +1,708 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  * native.dtd
+  *
+  * Copyright (c) 2003-2005 The Public Knowledge Project
+  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
+  *
+  * DTD for native XML import/export.
+  *
+  * $Id: native.dtd,v 1.13 2005/12/29 04:04:14 alec Exp $
+-->
+<!--
+  * BATCH IMPORTING USING OJS 2.x
+  *  OJS 2.x supports XML import/export using this plugin for a variety of
+  *  base elements:
+  *   - article / articles
+  *   - issue / issues
+  *  Be sure to define the document type appropriately using <!DOCTYPE ...>.
+  *
+  * Conventions:
+  *  - Dates should be specified as YYYY-MM-DD
+-->
+<!-- Top-level collection containers for batch importing -->
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="">
+  <define name="issues">
+    <element name="issues">
+      <ref name="attlist.issues"/>
+      <oneOrMore>
+        <ref name="issue"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="attlist.issues" combine="interleave">
+    <empty/>
+  </define>
+  <define name="articles">
+    <element name="articles">
+      <ref name="attlist.articles"/>
+      <oneOrMore>
+        <ref name="article"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="attlist.articles" combine="interleave">
+    <empty/>
+  </define>
+  <!-- Generic elements -->
+  <define name="href">
+    <element name="href">
+      <ref name="attlist.href"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist.href" combine="interleave">
+    <attribute name="src"/>
+    <attribute name="mime_type"/>
+  </define>
+  <define name="embed">
+    <element name="embed">
+      <ref name="attlist.embed"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.embed" combine="interleave">
+    <optional>
+      <attribute name="encoding" a:defaultValue="base64">
+        <value type="string">base64</value>
+      </attribute>
+    </optional>
+    <attribute name="filename"/>
+    <attribute name="mime_type"/>
+  </define>
+  <define name="externalformat">
+    <choice>
+      <ref name="href"/>
+      <ref name="embed"/>
+    </choice>
+  </define>
+  <define name="subject">
+    <element name="subject">
+      <ref name="attlist.subject"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.subject" combine="interleave">
+    <empty/>
+  </define>
+  <define name="description">
+    <element name="description">
+      <ref name="attlist.description"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.description" combine="interleave">
+    <empty/>
+  </define>
+  <define name="open_access">
+    <element name="open_access">
+      <ref name="attlist.open_access"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist.open_access" combine="interleave">
+    <empty/>
+  </define>
+  <define name="date_published">
+    <element name="date_published">
+      <ref name="attlist.date_published"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.date_published" combine="interleave">
+    <empty/>
+  </define>
+  <define name="date_created">
+    <element name="date_created">
+      <ref name="attlist.date_created"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.date_created" combine="interleave">
+    <empty/>
+  </define>
+  <define name="title">
+    <element name="title">
+      <ref name="attlist.title"/>
+      <text/>
+    </element>
+  </define>
+  <!--
+    Note that the locale attribute is currently only supported for
+    article titles, article abstracts, and section titles.
+  -->
+  <define name="attlist.title" combine="interleave">
+    <optional>
+      <attribute name="locale"/>
+    </optional>
+  </define>
+  <!-- Issue-related elements -->
+  <define name="issue">
+    <element name="issue">
+      <ref name="attlist.issue"/>
+      <ref name="title"/>
+      <optional>
+        <ref name="description"/>
+      </optional>
+      <optional>
+        <ref name="volume"/>
+      </optional>
+      <optional>
+        <ref name="number"/>
+      </optional>
+      <optional>
+        <ref name="year"/>
+      </optional>
+      <optional>
+        <ref name="cover"/>
+      </optional>
+      <optional>
+        <ref name="date_published"/>
+      </optional>
+      <optional>
+        <choice>
+          <ref name="access_date"/>
+          <ref name="open_access"/>
+        </choice>
+      </optional>
+      <oneOrMore>
+        <ref name="section"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="attlist.issue" combine="interleave">
+    <optional>
+      <attribute name="identification" a:defaultValue="title">
+        <choice>
+          <value>title</value>
+          <value>num_vol_year</value>
+          <value>vol_year</value>
+          <value>year</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="published" a:defaultValue="false">
+        <choice>
+          <value>true</value>
+          <value>false</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="current" a:defaultValue="false">
+        <choice>
+          <value>true</value>
+          <value>false</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="public_id"/>
+    </optional>
+  </define>
+  <define name="cover">
+    <element name="cover">
+      <ref name="attlist.cover"/>
+      <ref name="caption"/>
+      <optional>
+        <ref name="image"/>
+      </optional>
+    </element>
+  </define>
+  <define name="attlist.cover" combine="interleave">
+    <empty/>
+  </define>
+  <define name="caption">
+    <element name="caption">
+      <ref name="attlist.caption"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.caption" combine="interleave">
+    <empty/>
+  </define>
+  <define name="volume">
+    <element name="volume">
+      <ref name="attlist.volume"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.volume" combine="interleave">
+    <empty/>
+  </define>
+  <define name="number">
+    <element name="number">
+      <ref name="attlist.number"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.number" combine="interleave">
+    <empty/>
+  </define>
+  <define name="year">
+    <element name="year">
+      <ref name="attlist.year"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.year" combine="interleave">
+    <empty/>
+  </define>
+  <define name="access_date">
+    <element name="access_date">
+      <ref name="attlist.access_date"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.access_date" combine="interleave">
+    <empty/>
+  </define>
+  <!-- Section-related elements -->
+  <define name="section">
+    <element name="section">
+      <ref name="attlist.section"/>
+      <oneOrMore>
+        <ref name="title"/>
+      </oneOrMore>
+      <optional>
+        <ref name="abbrev"/>
+      </optional>
+      <oneOrMore>
+        <ref name="article"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="attlist.section" combine="interleave">
+    <empty/>
+  </define>
+  <define name="abbrev">
+    <element name="abbrev">
+      <ref name="attlist.abbrev"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.abbrev" combine="interleave">
+    <optional>
+      <attribute name="locale"/>
+    </optional>
+  </define>
+  <!--
+    * Article-related elements
+    * NOTES:
+    *  - Although this DTD supports unlimited titles and abstracts, OJS 2.x
+    *    supports a maximum of 3 of each. These must correspond to the journal's
+    *    additional locales, if enabled, otherwise an error will be displayed.
+  -->
+  <define name="article">
+    <element name="article">
+      <ref name="attlist.article"/>
+      <oneOrMore>
+        <ref name="title"/>
+      </oneOrMore>
+      <zeroOrMore>
+        <ref name="abstract"/>
+      </zeroOrMore>
+      <ref name="date_published"/>
+      <optional>
+        <ref name="open_access"/>
+      </optional>
+      <oneOrMore>
+        <ref name="author"/>
+      </oneOrMore>
+      <optional>
+        <ref name="indexing"/>
+      </optional>
+      <optional>
+        <ref name="pages"/>
+      </optional>
+      <oneOrMore>
+        <optional>
+          <ref name="galley"/>
+        </optional>
+        <optional>
+          <ref name="htmlgalley"/>
+        </optional>
+      </oneOrMore>
+      <zeroOrMore>
+        <ref name="supplemental_file"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="attlist.article" combine="interleave">
+    <optional>
+      <attribute name="public_id"/>
+    </optional>
+    <optional>
+      <attribute name="language" a:defaultValue="en"/>
+    </optional>
+  </define>
+  <define name="abstract">
+    <element name="abstract">
+      <ref name="attlist.abstract"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.abstract" combine="interleave">
+    <optional>
+      <attribute name="locale"/>
+    </optional>
+  </define>
+  <define name="pages">
+    <element name="pages">
+      <ref name="attlist.pages"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.pages" combine="interleave">
+    <empty/>
+  </define>
+  <define name="indexing">
+    <element name="indexing">
+      <ref name="attlist.indexing"/>
+      <optional>
+        <ref name="discipline"/>
+      </optional>
+      <optional>
+        <ref name="type"/>
+      </optional>
+      <optional>
+        <ref name="subject_class"/>
+      </optional>
+      <optional>
+        <ref name="subject"/>
+      </optional>
+      <optional>
+        <ref name="coverage"/>
+      </optional>
+    </element>
+  </define>
+  <define name="attlist.indexing" combine="interleave">
+    <empty/>
+  </define>
+  <define name="discipline">
+    <element name="discipline">
+      <ref name="attlist.discipline"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.discipline" combine="interleave">
+    <empty/>
+  </define>
+  <define name="type">
+    <element name="type">
+      <ref name="attlist.type"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.type" combine="interleave">
+    <empty/>
+  </define>
+  <define name="subject_class">
+    <element name="subject_class">
+      <ref name="attlist.subject_class"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.subject_class" combine="interleave">
+    <empty/>
+  </define>
+  <define name="coverage">
+    <element name="coverage">
+      <ref name="attlist.coverage"/>
+      <optional>
+        <ref name="geographical"/>
+      </optional>
+      <optional>
+        <ref name="chronological"/>
+      </optional>
+      <optional>
+        <ref name="sample"/>
+      </optional>
+    </element>
+  </define>
+  <define name="attlist.coverage" combine="interleave">
+    <empty/>
+  </define>
+  <define name="geographical">
+    <element name="geographical">
+      <ref name="attlist.geographical"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.geographical" combine="interleave">
+    <empty/>
+  </define>
+  <define name="chronological">
+    <element name="chronological">
+      <ref name="attlist.chronological"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.chronological" combine="interleave">
+    <empty/>
+  </define>
+  <define name="sample">
+    <element name="sample">
+      <ref name="attlist.sample"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.sample" combine="interleave">
+    <empty/>
+  </define>
+  <define name="firstname">
+    <element name="firstname">
+      <ref name="attlist.firstname"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.firstname" combine="interleave">
+    <empty/>
+  </define>
+  <define name="middlename">
+    <element name="middlename">
+      <ref name="attlist.middlename"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.middlename" combine="interleave">
+    <empty/>
+  </define>
+  <define name="lastname">
+    <element name="lastname">
+      <ref name="attlist.lastname"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.lastname" combine="interleave">
+    <empty/>
+  </define>
+  <define name="affiliation">
+    <element name="affiliation">
+      <ref name="attlist.affiliation"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.affiliation" combine="interleave">
+    <empty/>
+  </define>
+  <define name="email">
+    <element name="email">
+      <ref name="attlist.email"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.email" combine="interleave">
+    <empty/>
+  </define>
+  <define name="biography">
+    <element name="biography">
+      <ref name="attlist.biography"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.biography" combine="interleave">
+    <empty/>
+  </define>
+  <define name="author">
+    <element name="author">
+      <ref name="attlist.author"/>
+      <ref name="firstname"/>
+      <optional>
+        <ref name="middlename"/>
+      </optional>
+      <ref name="lastname"/>
+      <optional>
+        <ref name="affiliation"/>
+      </optional>
+      <optional>
+        <ref name="email"/>
+      </optional>
+      <optional>
+        <ref name="biography"/>
+      </optional>
+    </element>
+  </define>
+  <!--
+    One author should be designated as the primary contact for this
+    article. If no author is designated, the first author with an
+    email address will be used; if multiple authors are designated, the
+    last designated author will be used. The designated author should
+    have a valid email address if possible.
+  -->
+  <define name="attlist.author" combine="interleave">
+    <optional>
+      <attribute name="primary_contact" a:defaultValue="false">
+        <choice>
+          <value>true</value>
+          <value>false</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="label">
+    <element name="label">
+      <ref name="attlist.label"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.label" combine="interleave">
+    <empty/>
+  </define>
+  <define name="file">
+    <element name="file">
+      <ref name="attlist.file"/>
+      <ref name="externalformat"/>
+    </element>
+  </define>
+  <define name="attlist.file" combine="interleave">
+    <empty/>
+  </define>
+  <define name="stylesheet">
+    <element name="stylesheet">
+      <ref name="attlist.stylesheet"/>
+      <ref name="externalformat"/>
+    </element>
+  </define>
+  <define name="attlist.stylesheet" combine="interleave">
+    <empty/>
+  </define>
+  <define name="image">
+    <element name="image">
+      <ref name="attlist.image"/>
+      <ref name="externalformat"/>
+    </element>
+  </define>
+  <define name="attlist.image" combine="interleave">
+    <empty/>
+  </define>
+  <define name="galley">
+    <element name="galley">
+      <ref name="attlist.galley"/>
+      <ref name="label"/>
+      <ref name="file"/>
+    </element>
+  </define>
+  <define name="attlist.galley" combine="interleave">
+    <empty/>
+  </define>
+  <define name="htmlgalley">
+    <element name="htmlgalley">
+      <ref name="attlist.htmlgalley"/>
+      <ref name="label"/>
+      <ref name="file"/>
+      <optional>
+        <ref name="stylesheet"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="image"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="attlist.htmlgalley" combine="interleave">
+    <empty/>
+  </define>
+  <define name="supplemental_file">
+    <element name="supplemental_file">
+      <ref name="attlist.supplemental_file"/>
+      <ref name="title"/>
+      <ref name="creator"/>
+      <optional>
+        <ref name="subject"/>
+      </optional>
+      <optional>
+        <ref name="type_other"/>
+      </optional>
+      <optional>
+        <ref name="description"/>
+      </optional>
+      <optional>
+        <ref name="publisher"/>
+      </optional>
+      <optional>
+        <ref name="sponsor"/>
+      </optional>
+      <optional>
+        <ref name="date_created"/>
+      </optional>
+      <optional>
+        <ref name="source"/>
+      </optional>
+      <ref name="file"/>
+    </element>
+  </define>
+  <define name="attlist.supplemental_file" combine="interleave">
+    <optional>
+      <attribute name="type" a:defaultValue="other">
+        <choice>
+          <value>research_instrument</value>
+          <value>research_materials</value>
+          <value>research_results</value>
+          <value>transcripts</value>
+          <value>data_analysis</value>
+          <value>data_set</value>
+          <value>source_text</value>
+          <value>other</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="language" a:defaultValue="en"/>
+    </optional>
+    <optional>
+      <attribute name="public_id"/>
+    </optional>
+  </define>
+  <define name="creator">
+    <element name="creator">
+      <ref name="attlist.creator"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.creator" combine="interleave">
+    <empty/>
+  </define>
+  <define name="type_other">
+    <element name="type_other">
+      <ref name="attlist.type_other"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.type_other" combine="interleave">
+    <empty/>
+  </define>
+  <define name="publisher">
+    <element name="publisher">
+      <ref name="attlist.publisher"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.publisher" combine="interleave">
+    <empty/>
+  </define>
+  <define name="sponsor">
+    <element name="sponsor">
+      <ref name="attlist.sponsor"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.sponsor" combine="interleave">
+    <empty/>
+  </define>
+  <define name="source">
+    <element name="source">
+      <ref name="attlist.source"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.source" combine="interleave">
+    <empty/>
+  </define>
+  <start>
+    <choice>
+      <ref name="issues"/>
+      <ref name="articles"/>
+    </choice>
+  </start>
+</grammar>

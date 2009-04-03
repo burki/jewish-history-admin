@@ -1,0 +1,32 @@
+Sehr geehrte Damen und Herren,
+
+anbei sende ich Ihnen den Link der%review_date% von Kritikon publizierten Rezension zu.
+
+%bibinfo%
+
+Rezensiert von:
+%reviewer_info%
+
+Die Rezension finden Sie unter folgendem Link:
+%review_url%
+
+Mit herzlichem Dank für die gute Zusammenarbeit und freundlichen Grüßen,
+
+%name_from%
+
+--
+REDAKTION KRITIKON
+http://www.kritikon.de
+
+Tel: 0341-9737860
+eMail: Kritikon@uni-leipzig.de
+
+Universität Leipzig, Institut für Philosophie
+http://www.uni-leipzig.de/~philos/
+
+Postadresse:
+Redaktion Kritikon
+c/o Universität Leipzig
+Zentrum für Höhere Studien
+Emil-Fuchs-Straße 1
+04105 Leipzig

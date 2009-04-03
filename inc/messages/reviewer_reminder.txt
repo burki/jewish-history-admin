@@ -1,0 +1,26 @@
+%salutation_name_de%,
+
+leider ist die Zeit wieder viel zu schnell vergangen, sodass der vereinbarte Termin, zu dem Sie uns den Artikel über
+
+%title%
+
+zusenden wollten, der %reviewer_deadline%, verstrichen ist.
+
+Ich bitte Sie daher um eine kurze Rückmeldung, wann wir mit dem Eingang Ihres Beitrags rechnen können. Auch wenn sich größere Terminprobleme bei Ihnen abzeichnen sollten, geben Sie uns bitte Bescheid.
+
+
+Mit freundlichen Grüßen
+
+%name_from%
+
+--
+Redaktion Docupedia-Zeitgeschichte
+Zentrum für Zeithistorische Forschung
+Am Neuen Markt 1
+D-14467 Potsdam
+Tel.: +49 (0) 331 28991 14 / -12
+      +49 (0) 30 2093 2543
+Fax:  +49 (0) 331 28991 60
+
+eMail: redaktion@docupedia.de
+WWW:   http://www.docupedia.de
