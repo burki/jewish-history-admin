@@ -6,7 +6,7 @@
  *
  * (c) 2007-2009 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2009-01-29 dbu
+ * Version: 2009-05-18 dbu
  *
  * Changes:
  *
@@ -326,9 +326,17 @@ class DisplayMessage extends DisplayBackend
   var $table = 'Message';
   var $fields_listing = array('Message.id AS id', 'subject',
                               "CONCAT(User.lastname, ' ', User.firstname) AS fullname",
+                              "CONCAT(U.lastname, ' ', U.firstname) AS editor",
                               'Message.status AS status', "DATE(published) AS published");
-  var $joins_listing = array('LEFT OUTER JOIN MessageUser ON MessageUser.message_id=Message.id', 'LEFT OUTER JOIN User ON MessageUser.user_id=User.id');
-  var $cols_listing = array('id' => 'ID', 'subject' => 'Title', 'contributor' => 'Contributor', 'status' => 'Status', 'date' => 'Publication');
+  var $joins_listing = array('LEFT OUTER JOIN MessageUser ON MessageUser.message_id=Message.id',
+                             'LEFT OUTER JOIN User ON MessageUser.user_id=User.id',
+                            'LEFT OUTER JOIN User U ON Message.editor=U.id');
+
+  var $cols_listing = array('id' => 'ID', 'subject' => 'Title',
+                            'contributor' => 'Contributor',
+                            'editor' => 'Editor',
+                            'status' => 'Status',
+                            'date' => 'Publication');
   var $idcol_listing = TRUE;
 
   var $search_fulltext = NULL;
@@ -338,7 +346,8 @@ class DisplayMessage extends DisplayBackend
   var $condition = array();
   var $order = array('id' => array('id DESC', 'id'),
                      'subject' => array('subject', 'subject DESC'),
-                     // 'contributor' => array('')
+                     'contributor' => array('fullname', 'fullname DESC'),
+                     'editor' => array('editor', 'editor DESC'),
                      'status' => array('Message.status', 'Message.status DESC'),
                      'date' => array('IF(0 = published + 0, Message.changed, published) DESC', 'IF(0 = published + 0, Message.changed, published)'),
                      );
@@ -785,7 +794,7 @@ EOT;
       $name = $this->workflow->name($action);
       $url_preview = $this->page->buildLink(array('pn' => $this->page->name, $name => $row[0]));
       $val = sprintf('<div style="text-align:right">%s&nbsp;[<a href="%s">%s</a>]</div>',
-                     $row['published'],
+                     $row[sizeof($this->cols_listing) - 1],
                      htmlspecialchars($url_preview),
                      tr($name));
     }

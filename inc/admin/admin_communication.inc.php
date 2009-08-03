@@ -6,7 +6,7 @@
  *
  * (c) 2008-2009 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2009-03-11 dbu
+ * Version: 2009-04-06 dbu
  *
  * Changes:
  *
@@ -172,7 +172,42 @@ class DisplayCommunication extends DisplayTable
     $null = NULL;
     //Write utf-8 encoded text.
     //Text is from file. But you can use another resouce: db, sockets and other
-    $sect->writeText($this->record->get_value('body'), $times12, $null);
+
+    // in office-documents, start with the address
+    $to_id = $this->record->get_value('to_id');
+    if (!empty($to_id)) {
+      $newline = "\r\n";
+      if (0 == $this->record->get_value('type')) {
+        $publisher = $this->fetchPublisher($to_id);
+        if (isset($publisher)) {
+          $address = $publisher['name'] . $newline
+                   . $publisher['name_contact'] . $newline
+                   . $publisher['address'] . $newline
+                   . $publisher['zip'] . ' ' . $publisher['place'];
+        }
+      }
+      else {
+        $user = $this->fetchUser($to_id);
+        if (isset($user)) {
+          $newline = "\r\n";
+          $address = // ('F' == $user['sex'] ? 'Frau' : 'Herr') . " " .
+                     $user['firstname'] . ' ' . $user['lastname'] . $newline
+                   . (!empty($user['address']) ? $user['address'] . $newline : '')
+                   . (!empty($user['zip']) ? $user['zip'] . ' ' : '')
+                   . (!empty($user['place']) ? $user['place'] : '');
+        }
+      }
+      if (!empty($address)) {
+        $parLeft = new ParFormat('left');
+        $sect->writeText($address, $times12, $parLeft, true);
+        $sect->emptyParagraph($times12, $parLeft);
+        $sect->emptyParagraph($times12, $parLeft);
+      }
+    }
+
+
+    // add the rest
+    $sect->writeText($this->record->get_value('body'), $times12, $par);
 
     $rtf->sendRtf();
 
@@ -184,7 +219,9 @@ class DisplayCommunication extends DisplayTable
 
     if (!isset($_users[$id])) {
       $dbconn = & $this->page->dbconn;
-      $dbconn->query(sprintf("SELECT id, email, firstname, lastname, sex, title, institution FROM User WHERE id=%d", $id));
+      $dbconn->query(sprintf("SELECT id, email, firstname, lastname, sex, title, institution, address, zip, place"
+                             . " FROM User WHERE id=%d",
+                             $id));
 
       if ($dbconn->next_record())
         $_users[$id] = $dbconn->Record;

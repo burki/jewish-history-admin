@@ -6,7 +6,7 @@
  *
  * (c) 2009 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2009-03-11 dbu
+ * Version: 2009-05-18 dbu
  *
  * Changes:
  *
@@ -37,7 +37,6 @@ class DisplayArticle extends DisplayMessage
     '-112' => 'abgelehnt Artikel',
   );
   var $status_default = '-99';
-  var $cols_listing = array('id' => 'ID', 'subject' => 'Subject', 'contributor' => 'Contributor', 'status' => 'Status', 'published' => 'Published');
   var $editor_options;
 
   function __construct (&$page) {
@@ -45,6 +44,9 @@ class DisplayArticle extends DisplayMessage
     $this->type = $MESSAGE_ARTICLE;
     $this->messages['item_new'] = 'New Article';
     parent::__construct($page);
+    $this->order['date'] = array('IF(0 = reviewer_deadline + 0, published, reviewer_deadline) DESC', 'IF(0 = reviewer_deadline + 0, published, reviewer_deadline)');
+    $this->fields_listing[sizeof($this->fields_listing) -1 ] = "DATE(reviewer_deadline) AS reviewer_deadline";
+    $this->cols_listing['date'] = 'Author deadline';
   }
 
   function constructFulltextCondition () {

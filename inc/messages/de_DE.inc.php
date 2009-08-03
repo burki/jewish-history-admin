@@ -1,7 +1,7 @@
 <?php
 
 $GETTEXT_MESSAGES = array (
-
+'Subject' => 'Titel',
 'Subscribing to H-ArtHist' => 'Anmeldung',
 'Registration' => 'Anmeldung',
 'Subscription' => 'Abonnement',

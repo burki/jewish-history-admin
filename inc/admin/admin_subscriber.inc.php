@@ -4,9 +4,9 @@
  *
  * Manage the subscribers
  *
- * (c) 2006-2008 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2009 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2008-11-04 dbu
+ * Version: 2009-05-18 dbu
  *
  * TODO: validity of Subscription Status/Hold-Date
  *
@@ -117,7 +117,7 @@ class DisplaySubscriber extends DisplayTable {
   var $order = array('name' => array('lastname, firstname', 'lastname DESC, firstname DESC'),
                      'created' => array('created DESC, User.id desc', 'created, User.id'),
                     );
-  var $cols_listing = array('name' => 'Name', 'email' => 'E-Mail', 'status' => 'Newsletter', 'created' => 'Created');
+  var $cols_listing = array('name' => 'Name', 'email' => 'E-Mail', 'status' => '', 'created' => 'Created');
   var $page_size = 50;
   var $status_deleted;
   var $search_fulltext = NULL;
@@ -419,7 +419,7 @@ EOT;
         break;
       case 4:
           $val = '&nbsp;';
-          if (array_key_exists('status', $this->search)
+          if (FALSE && array_key_exists('status', $this->search)
            && ('' === $this->search['status'] || '0' === $this->search['status']))
             $val = tr(SubscriberListing::$status_list[$row['status']]).' '.$val;
         break;
