@@ -9,7 +9,14 @@
 $server = "127.0.0.1";
 $user = "h0451d5v";
 $pass = "F8-HaS.2";
-$dbase = "h0451d5v"; */
+$dbase = "h0451d5v";
+
+$server = "localhost";
+$user = "cliodb";
+$pass = "mommsen99";
+$dbase = "docupedia-admin";
+
+*/
 
 $server = "localhost";
 $user = "root";

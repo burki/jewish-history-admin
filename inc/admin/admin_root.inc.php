@@ -31,14 +31,17 @@ class DisplayRoot extends PageDisplay
         'name' => 'subscriber',
         'title' => 'Authors'
       ),
-      /*
-      array(
-        'name' => 'publisher',
-        'title' => 'Publishers'
-      ), */
       'communication' => array(
         'name' => 'communication',
         'title' => 'Communication',
+      ),
+      array(
+        'name' => 'publication',
+        'title' => 'Books'
+      ),
+      array(
+        'name' => 'publisher',
+        'title' => 'Publishers'
       ),
       array(
         'name' => 'account',

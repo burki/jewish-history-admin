@@ -4,16 +4,17 @@
  *
  * Simple base class for Ajax-Web Services
  *
- * (c) 2007-2008 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2009 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2008-10-31 dbu
+ * Version: 2009-08-03 dbu
  *
  * Changes:
  *
  */
 
 
-class SearchSimpleParser {
+class SearchSimpleParser
+{
   var $min_length = 1; // only non-empty stuff
   var $output = array();
 
@@ -87,7 +88,8 @@ function split_quoted ($search) {
   return $parser->output;
 }
 
-class WsHandlerFactory {
+class WsHandlerFactory
+{
   // private constructor
   private function __construct(){}
 
@@ -104,7 +106,8 @@ class WsHandlerFactory {
   }
 }
 
-class WsHandler {
+class WsHandler
+{
   var $STRIP_SLASHES = FALSE;
 
   function __construct(){
@@ -127,7 +130,8 @@ class WsHandler {
 
 }
 
-class JsonResponse {
+class JsonResponse
+{
   var $response;
 
   function __construct ($response = NULL) {
@@ -155,7 +159,8 @@ class JsonResponse {
   }
 }
 
-class AutocompleterResponse {
+class AutocompleterResponse
+{
   var $entries;
 
   function __construct ($entries) {

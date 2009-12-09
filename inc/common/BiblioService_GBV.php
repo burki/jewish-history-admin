@@ -4,9 +4,9 @@
  *
  * Class for querying bibliographic information from the GBV
  *
- * (c) 2008 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2009 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2008-10-28 dbu
+ * Version: 2009-11-25 dbu
  *
  * Usage:
  *
@@ -189,6 +189,10 @@ class BiblioService_GBV
                     $this->setResponseFromSubfields($field, $response,
                                 array('d' => 'author_given', 'a' => 'author_surname'));
                     break;
+                case '028B':
+                    $this->setResponseFromSubfields($field, $response,
+                                array('d' => 'authoradditional_given', 'a' => 'authoradditional_surname'));
+                    break;
                 case '028C':
                     $this->setResponseFromSubfields($field, $response,
                                 array('d' => 'editor_given', 'a' => 'editor_surname'));
@@ -219,10 +223,22 @@ class BiblioService_GBV
         }
 
         // postprocessing for author and editor
+
+        // currently use 28B: additional only if 28A is empty
+        if (isset($response['authoradditional_surname'])) {
+            if (!isset($response['author_surname']))
+                $response['author_surname'] = $response['authoradditional_surname'];
+            unset($response['authoradditional_surname']);
+        }
+        if (isset($response['authoradditional_given'])) {
+            if (!isset($response['author_given']))
+                $response['author_given'] = $response['authoradditional_given'];
+            unset($response['authoradditional_given']);
+        }
         foreach (array('author', 'editor') as $prefix) {
             if (isset($response[$prefix.'_surname'])) {
-                if ('array' != gettype($response[$prefix.'_surname']))
-                    $response[$prefix.'_surname'] = array($response[$prefix.'_surname']);
+                if ('array' != gettype($response[$prefix . '_surname']))
+                    $response[$prefix . '_surname'] = array($response[$prefix . '_surname']);
                 if ('array' != gettype($response[$prefix.'_given']))
                     $response[$prefix.'_given'] = array($response[$prefix.'_given']);
                 $persons = array();
@@ -269,7 +285,7 @@ class BiblioService_GBV
     public function searchRetrieve($query, $params = array()) {
         if ('string' == gettype($query)) {
             // TODO: check if it is an isbn
-            $query = 'pica.isb='.preg_replace('/[^0-9X]/', '', $query);
+            $query = 'pica.isb=' . preg_replace('/[^0-9X]/', '', $query);
         }
         else {
             die('Other query-types than isbns not implemented yet');

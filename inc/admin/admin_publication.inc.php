@@ -4,9 +4,9 @@
  *
  * Class for managing publications (books)
  *
- * (c) 2007-2008 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2009 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2008-11-19 dbu
+ * Version: 2009-03-17 dbu
  *
  * Changes:
  *
@@ -309,7 +309,7 @@ EOT;
           'cover' => array(
                         'title' => tr('Cover Image'),
                         'multiple' => FALSE,
-                        'imgparams' => array(/* 'height' => 164, 'scale' => 'both', 'keep' => 'large' */)
+                        'imgparams' => array('height' => 164, 'scale' => 'down', 'keep' => 'large'),
                         ));
 
     return array($TYPE_PUBLICATION, $images);
@@ -437,6 +437,8 @@ EOT;
 
       $ret .= $this->renderView($record, $rows);
 
+      $reviews_found = FALSE; $reviews = '';
+      /*
       // show all reviews related to this publication
       $querystr = sprintf("SELECT Message.id AS id, subject, status"
                           ." FROM Message, MessagePublication"
@@ -457,7 +459,7 @@ EOT;
         $reviews .= sprintf('<li id="item_%d">', $dbconn->Record['id'])
           .sprintf('<a href="%s">'.$this->formatText($dbconn->Record['subject']).'</a>', htmlspecialchars($this->page->buildLink($params_view)))
           .'</li>';
-      }
+      } */
       if ($reviews_found) {
         $reviews .= '</ul>';
       }
@@ -471,8 +473,11 @@ EOT;
                         htmlspecialchars($url_delete),
                         tr('delete publication'));
       }
+      /*
       $url_add = $this->page->buildLink(array('pn' => 'review', 'edit' => -1, 'subject' => $this->buildReviewSubject($record), 'publication' => $this->id));
       $ret .= '<h2>'.tr('Reviews').' <span class="regular">[<a href="'.htmlspecialchars($url_add).'">'.tr('add new').'</a>]</span></h2>'.$reviews;
+      */
+      $ret .= '<tt><pre>' . $this->buildLiteraturTemplate() . '</tt></pre>';
 
       if (isset($uploadHandler))
         $ret .= $this->renderUpload($uploadHandler);
@@ -480,6 +485,60 @@ EOT;
     }
 
     return $ret;
+  }
+
+  function buildLiteraturTemplate () {
+    $values = array();
+    foreach ($this->record->get_fieldnames() as $name)
+      $values[$name] = $this->record->get_value($name);
+    $author_publisher = '';
+    if (!empty($values['author']))
+      $author_publisher = '|Autor=' . $values['author'];
+    if (!empty($values['editor']))
+      $author_publisher .= (!empty($author_publisher) ? "\n" : '')
+        . '|Herausgeber=' . $values['editor'];
+
+    $isbn = $values['isbn'];
+    try { // to pretty print
+      if (!empty($isbn))
+        $url = sprintf('http://xisbn.worldcat.org/webservices/xid/isbn/%s?method=hyphen&format=xml',
+                       $isbn);
+        $client = new Zend_Http_Client($url);
+        $response = $client->request();
+        if (!$response->isError() && preg_match('|<isbn[^>]*>(.*?)</isbn>|s', $response->getBody(), $matches)) {
+          $isbn = $matches[1];
+        }
+
+    }
+    catch (Exception $e) {
+      ; // ignore and use without hyphens
+    }
+
+    $publisher = '';
+    if (!empty($values['publisher_id'])) {
+      $querystr = sprintf("SELECT name"
+                          . " FROM Publisher"
+                          . " WHERE id=%d",
+                          $values['publisher_id']);
+      $dbconn = & $this->page->dbconn;
+      $dbconn->query($querystr);
+      if ($dbconn->next_record())
+        $publisher = $dbconn->Record['name'];
+    }
+    return <<<EOT
+{{literatur
+$author_publisher
+|Titel={$values['title']}
+|Verlag=$publisher
+|Ort={$values['place']}
+|Jahr={$values['publication_date']}
+|ISBN=$isbn
+|cover_image=
+|related_to=
+|seitenname=
+|dzg_artikel=
+}}
+EOT;
   }
 
   function buildListingCell (&$row, $col_index) {

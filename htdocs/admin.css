@@ -1,0 +1,182 @@
+/* content areas */
+html, body, #holder { min-height: 100%; width: 100%; height: 100%;}
+html>body, html>body #holder { height: auto;}
+body { margin: 0; padding:0; }
+#holder { /* position: absolute; top: 0; left: 0; */}
+#header {background: #67939B; padding: 0.5em; color: white; }
+#content {margin-left: 0.5em; padding-top: 1em; padding-bottom: 3em; height: auto;}
+#footer {clear: both;  bottom: 0; background: #c8c8c8;  border: none; width: 100%; }
+/* hide from Mac IE5 */
+/* \*/
+#footer {position: absolute; }
+/* */
+
+/* Change in Opera 5+ (and some others) */
+html>body div#footer {
+  position: static;
+}
+
+/* Change back in everything except Opera 5 and 6, still hiding from Mac IE5 */
+/* \*/
+head:first-child+body div#footer {
+  position: absolute;
+}
+/* */
+
+/* font styles */
+body, p, th, td, div, .regular {
+  font-family:Arial, Helvetica, sans-serif;
+  font-size: 11pt;
+  color: #000000;
+}
+
+.regular {
+  font-weight: normal;
+}
+
+.message, .error, .listingLabel {
+  color: #e01010;
+}
+
+input, textarea {
+  font-family:Arial, Helvetica, sans-serif;
+  font-size: 10pt;
+  color: #000000;
+  border: 1px solid #c8c8c8;
+}
+
+input:focus, textarea:focus {
+  background: #ffffcc;
+  /* border-color: #e0e066; */
+}
+
+input[type="submit"], input.submit { /* see http://www.yourhtmlsource.com/stylesheets/advancedselectors.html */
+  background: #c8c8c8;
+  border-color: #303030;
+}
+
+p.noTopMargin {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+p.noTopMargin + p.noTopMargin {
+  margin-top: 0.3em;
+}
+
+div.container {
+    /* overflow: hidden; - dbu 2007-11-18 remove, since it messes up autocompleter on firefox */
+  clear: left;
+  width: 800px;
+  margin-bottom: 0.3em;
+}
+
+div.left, div.leftFixedWidth {
+  float: left;
+  margin: 0;
+  padding: 0;
+}
+
+div.leftFixedWidth {
+  width: 200px;
+}
+
+.leftSmaller {
+  font-size: 80%;
+}
+
+div.right {
+  /* margin-left: 100px; */
+  padding: 0;
+  min-width: 100px; /* Mindestbreite (der Ueberschrift) verhindert Anzeigefehler in modernen Browsern */
+}
+
+div.rightFixedWidth {
+  margin-left: 210px;
+  padding: 0;
+  min-width: 100px; /* Mindestbreite (der Ueberschrift) verhindert Anzeigefehler in modernen Browsern */
+}
+
+table.listing {
+  border: 1px #c8c8c8 solid;
+}
+
+table.listing {
+  width: 100%;
+  min-width: 800px;
+}
+
+tr.listingHead {
+  background-color: #c8c8c8;
+}
+
+tr.listing {
+  border-top: 1px solid #c8c8c8;
+}
+
+th.listing, td.listing {
+  vertical-align: top;
+  padding: 0.2em;
+  text-align: left;
+}
+
+td.listing, td.form {
+  border-top: 1px #c8c8c8 solid;
+}
+
+/* page elements */
+#menuAccount {
+  float: right;
+  font-size: 9pt;
+  color: white;
+}
+
+a.inverse {
+  color: #c0c0c0;
+}
+
+/* for autocompleter */
+div.autocomplete {
+  position:absolute;
+  z-index: 10;
+  background-color:white;
+  border:1px solid #888;
+  margin:0px;
+  padding:0px;
+  overflow:hidden;
+}
+
+div.autocomplete ul {
+  list-style-type:none;
+  margin:0px;
+  padding:0px;
+}
+
+div.autocomplete ul li.selected { background-color: #ffb;}
+div.autocomplete ul li {
+  font-size: smaller;
+  list-style-type:none;
+  display:block;
+  margin:0;
+  padding:2px;
+  cursor:pointer;
+  /* following: dbu */
+  <!--[if IE]>
+  width:250px;
+  <![endif]-->
+  overflow:hidden;
+  white-space: nowrap;
+}
+
+ul.sortableList {
+    list-style-type: none;
+    padding: 0px;
+    margin: 0px;
+}
+
+ul.sortableList li {
+    cursor: move;
+    padding: 2px 2px;
+    margin: 2px 0px;
+    border: 1px solid #000000;
+}

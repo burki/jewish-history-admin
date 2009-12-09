@@ -6,7 +6,7 @@
  *
  * (c) 2009 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2009-05-18 dbu
+ * Version: 2009-08-03 dbu
  *
  * Changes:
  *
@@ -14,7 +14,6 @@
 
 require_once INC_PATH . 'common/classes.inc.php';
 require_once INC_PATH . 'admin/displaymessage.inc.php';
-
 
 class DisplayArticle extends DisplayMessage
 {
@@ -109,13 +108,17 @@ class DisplayArticle extends DisplayMessage
         new Field(array('name'=>'reviewer_received', 'type'=>'datetime', 'datatype'=>'datetime', 'null' => TRUE)),
         new Field(array('name'=>'referee_sent', 'type'=>'datetime', 'datatype'=>'datetime', 'null' => TRUE)),
         new Field(array('name'=>'referee_deadline', 'type'=>'datetime', 'datatype'=>'datetime', 'null' => TRUE)),
-      ));
+        new Field(array('name'=>'url', 'id' => 'url', 'type'=>'text', 'datatype'=>'char', 'size'=>65, 'maxlength'=>200, 'null' => 1)),
+        new Field(array('name'=>'urn', 'id' => 'urn', 'type'=>'text', 'datatype'=>'char', 'size'=>45, 'maxlength'=>200, 'null' => 1)),
+       ));
 
     return $record;
   }
 
   function getEditRows ($mode = 'edit') {
     if ('edit' == $mode) {
+      $url_ws = $this->page->BASE_PATH . 'admin/admin_ws.php';
+
       $this->script_code .= <<<EOT
   function generateCommunication (url, mode) {
       var form = document.forms['detail'];
@@ -149,6 +152,35 @@ class DisplayArticle extends DisplayMessage
         window.open(url);
       }
   }
+
+  function generateUrn() {
+    var permalink = \$F('url');
+    if ("" == permalink) {
+      alert('Bitte tragen Sie erst eine URL ins Feld "Permanent URL" ein');
+      return;
+    }
+    var url = '{$url_ws}';
+    var pars = 'pn=article&action=generateUrn&url=' + escape(permalink);
+
+    var myAjax = new Ajax.Request(
+          url,
+          {
+              method: 'get',
+              parameters: pars,
+              onComplete: setUrn
+          });
+  }
+
+  function setUrn (originalRequest, obj) {
+    if (obj.status > 0) {
+      var field = \$('urn');
+      if (null != field)
+        field.value = obj.urn;
+    }
+    else
+      alert('ret: ' + obj.msg + ' ' + obj.status);
+  }
+
 EOT;
       $reviewer_request_button = sprintf(' <input type="button" value="%s" onclick="generateCommunication(\'%s\', \'reviewer_request\')" />',
                                     tr('send letter'), htmlspecialchars($this->page->buildLink(array('pn' => 'communication', 'edit' => -1))));
@@ -156,6 +188,8 @@ EOT;
                                     tr('send letter'), htmlspecialchars($this->page->buildLink(array('pn' => 'communication', 'edit' => -1))));
       $reviewer_reminder_button = sprintf(' <input type="button" value="%s" onclick="generateCommunication(\'%s\', \'reviewer_reminder\')" />',
                                     tr('send letter'), htmlspecialchars($this->page->buildLink(array('pn' => 'communication', 'edit' => -1))));
+      $urn_button = sprintf(' <input type="button" value="%s" onclick="generateUrn(\'xx\')" />',
+                                    tr('generate'));
     }
     $rows = parent::getEditRows($mode);
     $rows = array_merge_at($rows,
@@ -191,6 +225,10 @@ EOT;
                   $this->getFormField('referee_deadline') // .$reviewer_reminder_button
                   : $this->record->get_value('referee_deadline')
             ),
+            'url' => array('label' => 'Permanent URL'),
+            'urn' => array('label' => 'URN', 'value' => 'edit' == $mode ?
+                  $this->getFormField('urn').$urn_button
+                  : $this->record->get_value('urn')),
       ), 'published');
 
     return $rows;
