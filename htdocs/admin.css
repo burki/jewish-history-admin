@@ -3,7 +3,12 @@ html, body, #holder { min-height: 100%; width: 100%; height: 100%;}
 html>body, html>body #holder { height: auto;}
 body { margin: 0; padding:0; }
 #holder { /* position: absolute; top: 0; left: 0; */}
-#header {background: #67939B; padding: 0.5em; color: white; }
+#header {padding: 0px; color: black; background-color: white; }
+#languages { font-size: 9pt; color: black; margin-top: 0.3em; padding-top: 0.2em; padding-right: 0.2em; float:right; }
+#languages a:link, #languages a:visited { color: #909090; }
+#breadcrumbs { padding-left: 1em; font-size: 9pt; color: black; margin-top: 0.3em; border-bottom: 1px solid #909090; padding-bottom: 0.2em; }
+#breadcrumbs a:link, #breadcrumbs a:visited { color: #909090; }
+
 #content {margin-left: 0.5em; padding-top: 1em; padding-bottom: 3em; height: auto;}
 #footer {clear: both;  bottom: 0; background: #c8c8c8;  border: none; width: 100%; }
 /* hide from Mac IE5 */

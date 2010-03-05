@@ -438,7 +438,7 @@ EOT;
       if (!$this->is_internal)
         $this->page->site_description['structure']['root']['title'] = 'My Subscription';
     }
-    $ret .= sprintf('<a href="%s"><img src="%s" style="vertical-align:text-bottom; border: 0;" width="482" height="66" alt="Docupedia-Zeitgeschichte" /></a> ',
+    $ret .= sprintf('<a href="%s"><img src="%s" style="vertical-align:text-bottom; border: 0;" width="620" height="200" alt="Docupedia-Zeitgeschichte" /></a> ',
                     $url_main,
                     $this->page->BASE_PATH . 'media/logo.jpg');
     $entries = array();
@@ -463,11 +463,11 @@ EOT;
 
         $languages[] = $label;
       }
-      $ret .= '<div style="font-size: 9pt; color: white; margin-top: 0.3em; padding-top: 0.2em; float:right;">'.implode(' ', $languages).'</div>';
+      $ret .= '<div id="languages">' . implode(' ', $languages) . '</div>';
     }
 
     if (sizeof($entries) > 0) {
-      $ret .= '<div style="font-size: 9pt; color: white; margin-top: 0.3em; border-top: 1px solid white; padding-top: 0.2em;">';
+      $ret .= '<div id="breadcrumbs">';
       $ret .= implode(' / ', $entries);
       $ret .= '</div>';
     }

@@ -487,16 +487,29 @@ EOT;
     return $ret;
   }
 
+  function wikiNormalizeAuthors ($authors) {
+    if (empty($authors))
+      return '';
+    $authors = preg_split('/\s*;\s*/', $authors);
+    $normalized = array();
+    foreach ($authors as $author) {
+      list($last, $first) = preg_split('/\s*,\s*/', $author, 2);
+      $normalized[] = (!empty($first) ? $first . ' ' : '') . $last;
+    }
+    return implode(', ', $normalized);
+  }
+
   function buildLiteraturTemplate () {
     $values = array();
     foreach ($this->record->get_fieldnames() as $name)
       $values[$name] = $this->record->get_value($name);
     $author_publisher = '';
-    if (!empty($values['author']))
-      $author_publisher = '|Autor=' . $values['author'];
+    if (!empty($values['author'])) {
+      $author_publisher = '|Autor=' . $this->wikiNormalizeAuthors($values['author']);
+    }
     if (!empty($values['editor']))
       $author_publisher .= (!empty($author_publisher) ? "\n" : '')
-        . '|Herausgeber=' . $values['editor'];
+        . '|Herausgeber=' . $this->wikiNormalizeAuthors($values['editor']);
 
     $isbn = $values['isbn'];
     try { // to pretty print

@@ -479,17 +479,7 @@ class DisplayCommunication extends DisplayTable
   }
 
   private function sendMessage () {
-    if (PHP_OS == 'WINNT') {
-      require_once LIB_PATH . 'Swift/Connection/SMTP.php';
-      $swift_conn = new Swift_Connection_SMTP('dabase.ch');
-      $swift_conn->setUsername('smtp');
-      $swift_conn->setpassword('xxx');
-    }
-    else {
-      require_once LIB_PATH . 'Swift/Connection/NativeMail.php';
-      $swift_conn = new Swift_Connection_NativeMail();
-    }
-    $swift = new Swift($swift_conn);
+    $swift = MailMessage::getSwift();
 
     // build the message
     $message = new Swift_Message(utf8_decode($this->record->get_value('subject')));
