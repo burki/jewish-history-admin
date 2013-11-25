@@ -340,7 +340,7 @@ class DisplayTable extends PageDisplay
               $required = $row_descr['required'];
             else {
               // query field to find if it is required
-              $field = &$this->form->field($key);
+              $field = $this->form->field($key);
               if (isset($field)) {
                 $null = $field->get('null');
                 $required = !isset($null) || !$null;
@@ -396,7 +396,7 @@ class DisplayTable extends PageDisplay
     $this->workflow->name(TABLEMANAGER_EDIT) => isset($this->id) ? $this->id : -1));
 
     if (!isset($this->form))
-      $this->form = &$this->instantiateHtmlForm($name, $action);
+      $this->form = $this->instantiateHtmlForm($name, $action);
     else
       $this->form->params['action'] = $action;
 

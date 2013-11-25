@@ -4,9 +4,9 @@
  *
  * Class for managing publications (books)
  *
- * (c) 2007-2009 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2013 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2009-03-17 dbu
+ * Version: 2013-11-25 dbu
  *
  * Changes:
  *
@@ -19,7 +19,7 @@ require_once INC_PATH . 'common/biblioservice.inc.php';
 
 class PublicationRecord extends TableManagerRecord
 {
-  function store () {
+  function store ($args = '') {
     // remove dashes and convert x to upper from isbn
     $isbn = $this->get_value('isbn');
     if (!empty($isbn))
@@ -148,7 +148,7 @@ class DisplayPublication extends DisplayTable
   var $cols_listing = array('author' => 'Author/Editor', 'title' => 'Title', 'year' => 'Year', '');
   var $view_after_edit = TRUE;
 
-  function instantiateRecord () {
+  function instantiateRecord ($table = '', $dbconn = '') {
     return new PublicationRecord(array('tables' => $this->table, 'dbconn' => $this->page->dbconn));
   }
 
@@ -171,7 +171,7 @@ class DisplayPublication extends DisplayTable
   }
 
   function buildRecord ($name = '') {
-    $record = &parent::buildRecord($name);
+    $record = parent::buildRecord($name);
 
     if (!isset($record))
       return;
@@ -554,7 +554,7 @@ $author_publisher
 EOT;
   }
 
-  function buildListingCell (&$row, $col_index) {
+  function buildListingCell (&$row, $col_index, $val = NULL) {
     global $ITEM_STATUS;
 
     $val = NULL;

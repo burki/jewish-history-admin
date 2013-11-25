@@ -4,9 +4,9 @@
  *
  * Common stuff for the admin pages
  *
- * (c) 2006-2008 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2013 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2008-12-08 dbu
+ * Version: 2013-11-25 dbu
  *
  * Changes:
  *
@@ -54,7 +54,7 @@ function xml_pack ($tags, $prepend = '') {
 function xml_unpack ($tagnames, $encoded, $prepend = '') {
   $ret = array();
 
-  for($i=0; $i < sizeof($tagnames); $i++) {
+  for($i=0; $i < count($tagnames); $i++) {
     $tag = $prepend.$tagnames[$i];
     if (ereg("<$tag>([^<]*)</$tag>", $encoded, $matches)) {
       $ret[$tag] = XML_Util::reverseEntities($matches[1]);
@@ -207,7 +207,7 @@ function strip_specialchars($txt) {
 
 function format_mailbody ($txt) {
   $paras = preg_split('/\n\s*\n/', $txt);
-  for($i=0; $i < sizeof($paras); $i++)
+  for($i=0; $i < count($paras); $i++)
     $paras[$i] = wordwrap($paras[$i], MAIL_LINELENGTH, "\r\n");
   return strip_specialchars(join("\r\n\r\n", $paras));
 }
@@ -309,11 +309,11 @@ class SubscriberListing
       $url = 'http://'.$url;
 
     // split link into protocol and destination, if available...
-    $url_parts = split(":", $url, 2);
+    $url_parts = preg_split('/\:/', $url, 2);
     if ($show_protocol)
       $name = $url;
     else {
-      $name = sizeof($url_parts) == 1 ? $url_parts[0] : preg_replace('!^/+!', '', $url_parts[1]);
+      $name = count($url_parts) == 1 ? $url_parts[0] : preg_replace('!^/+!', '', $url_parts[1]);
       if (preg_match('!^[^/]+/$!', $name)) // if there is just a '/' after domain, then remove
         $name = preg_replace('!/$!', '', $name);
     }
@@ -451,7 +451,7 @@ class SubscriberListing
         'Status', FALSE); */
     }
 
-    if (sizeof($top) > 0) {
+    if (count($top) > 0) {
       $ret .= '<br />' // $this->buildSection($view, 'Subscription')
         .implode('<br />', $top);
     }
@@ -481,7 +481,7 @@ class SubscriberListing
     $place_with_country = $this->buildPlaceWithZip($this->record, TRUE);
     if (!empty($place_with_country))
       $address[] = $place_with_country;
-    if (sizeof($address) > 0)
+    if (count($address) > 0)
       $contact[] = $this->buildEntry($view, implode("\n", $address), 'Address');
 
     if ('admin' == $mode) {
@@ -493,7 +493,7 @@ class SubscriberListing
       }
     }
 
-    if (sizeof($contact) > 0) {
+    if (count($contact) > 0) {
       $ret .= $this->buildSection($view, 'Contact Info')
         .implode('<br />', $contact).'</p>';
     }
@@ -526,7 +526,7 @@ class SubscriberListing
       }
     }
 
-    if (sizeof($personal) > 0) {
+    if (count($personal) > 0) {
       $ret .= $this->buildSection($view, 'Personal Info').
         implode('<br />', $personal);
     }
@@ -551,7 +551,7 @@ class SubscriberListing
         }
       }
 
-      if (sizeof($review) > 0) {
+      if (count($review) > 0) {
         $ret .= $this->buildSection($view, 'Review Info')
               .implode('<br />', $review);
       }

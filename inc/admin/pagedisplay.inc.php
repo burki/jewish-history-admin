@@ -4,9 +4,9 @@
  *
  * Base Display class for Admin-pages
  *
- * (c) 2006-2008 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2013 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2008-10-24 dbu
+ * Version: 2013-11-25 dbu
  *
  * Changes:
  *
@@ -40,7 +40,7 @@ class PageDisplay extends PageDisplayBase
   // for form-handling
   function getFormField($name, $args = '') {
     $ret = '';
-    $field = &$this->form->field($name);
+    $field = $this->form->field($name);
     if (isset($field)) {
       if (isset($this->invalid[$name])) {
         $error_lang = preg_replace('/\_.*/', '', $this->page->lang());
@@ -329,7 +329,7 @@ EOT;
 
   function getUploadFormField(&$upload_form, $name, $args = '') {
     $ret = '';
-    $field = &$upload_form->field($name);
+    $field = $upload_form->field($name);
     if (isset($field)) {
       if (isset($this->invalid[$name]))
         $ret =  '<div class="error">'.$this->form->error_fulltext($this->invalid[$name], $this->page->lang).'</div>';

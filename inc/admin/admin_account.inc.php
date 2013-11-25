@@ -4,9 +4,9 @@
  *
  * handle accounts
  *
- * (c) 2006-2008 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2013 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2008-12-08 dbu
+ * Version: 2013-11-25 dbu
  *
  *
  * Changes:
@@ -70,8 +70,8 @@ class DisplayAccount extends DisplayTable
                      'created' => array('created DESC, User.id desc', 'created, User.id'),
                     );
 
-  function instantiateRecord () {
-    $record = &parent::instantiateRecord();
+  function instantiateRecord ($table = '', $dbconn = '') {
+    $record = parent::instantiateRecord($table, $dbconn);
 
     $record->add_fields(
         array(new Field(array('name'=>'id', 'type'=>'hidden', 'datatype'=>'int', 'primarykey'=>1)),
@@ -212,7 +212,7 @@ class DisplayAccount extends DisplayTable
     return $fields;
   }
 
-  function buildListingCell (&$row, $col_index) {
+  function buildListingCell (&$row, $col_index, $val = NULL) {
     global $RIGHTS_ADMIN, $RIGHTS_EDITOR;
 
     $val = $row[$col_index];

@@ -411,7 +411,7 @@ class DisplayMessage extends DisplayBackend
     if ('list' == $name)
       return;
 
-    $record = &parent::buildRecord($name);
+    $record = parent::buildRecord($name);
     $record->datetime_style = $this->datetime_style;
 
     $record->add_fields(array(
@@ -479,7 +479,7 @@ class DisplayMessage extends DisplayBackend
     $user_id = $record->get_value('user_id');
 
     if (!empty($user))
-      $user = FormField::htmlspecialchars($user);
+      $user = @FormField::htmlspecialchars($user);
     else
       $user = '';
 

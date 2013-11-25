@@ -4,9 +4,9 @@
  *
  * Class for managing publishers
  *
- * (c) 2008 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2013 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2008-12-08 dbu
+ * Version: 2013-11-25 dbu
  *
  * Changes:
  *
@@ -80,14 +80,14 @@ class DisplayPublisher extends DisplayTable
     return Countries::getAll();
   }
 
-  function instantiateRecord () {
+  function instantiateRecord ($table = '', $dbconn = '') {
     return new PublisherRecord(array('tables' => $this->table, 'dbconn' => $this->page->dbconn));
   }
 
   function buildRecord ($name = '') {
     global $COUNTRIES_FEATURED;
 
-    $record = &parent::buildRecord($name);
+    $record = parent::buildRecord($name);
 
     if (!isset($record))
       return;

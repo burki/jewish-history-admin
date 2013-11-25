@@ -4,9 +4,9 @@
  *
  * Manage the subscribers
  *
- * (c) 2006-2009 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2013 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2009-05-18 dbu
+ * Version: 2013-11-25 dbu
  *
  * TODO: validity of Subscription Status/Hold-Date
  *
@@ -109,7 +109,8 @@ class SubscriberQueryConditionBuilder extends TableManagerQueryConditionBuilder 
 
 }
 
-class DisplaySubscriber extends DisplayTable {
+class DisplaySubscriber extends DisplayTable
+{
   var $table = 'User';
   var $fields_listing = array('User.id AS id', 'lastname', 'firstname', 'email',
     'status', 'UNIX_TIMESTAMP(User.created) AS created', 'comment');
@@ -170,7 +171,7 @@ class DisplaySubscriber extends DisplayTable {
   function setRecordInternal (&$record) {
   }
 
-  function instantiateRecord () {
+  function instantiateRecord ($table = '', $dbconn = '') {
     global $COUNTRIES_FEATURED;
 
     $record =  new SubscriberRecord(array('tables' => $this->table, 'dbconn' => $this->page->dbconn));
@@ -397,9 +398,9 @@ EOT;
     return $ret;
   } // buildSearchBar
 
-  function buildListingCell (&$row, $col_index) {
+  function buildListingCell (&$row, $col_index, $val = NULL) {
     $val = NULL;
-    switch($col_index) {
+    switch ($col_index) {
       case 1:
         $val .= '<a href="'.$this->page->buildLink(array('pn'=>$this->page->name, 'view' => $row['id'])).'">'
             .$this->formatText($row['lastname'].(isset($row['firstname']) ? ' '.$row['firstname']: '')).'</a>';
@@ -548,7 +549,7 @@ EOT;
         if (!$show_form) {
           global $MAIL_SETTINGS;
           // compose the message
-          switch($action) {
+          switch ($action) {
             case 'add':
               $cmd = sprintf('ADD %s %s %s', LIST_NAME, $this->form->get_value('email'), $name_place);
               break;
@@ -580,7 +581,7 @@ EOT;
           if (send_mail($listserv_msg)) {
             $msg = tr('The following message was sent');
             $update = '';
-            switch($action) {
+            switch ($action) {
               case 'add':
                 $update = 'status=1, subscribed=NOW(), unsubscribed=NULL, hold=NULL';
                 break;
@@ -704,7 +705,7 @@ EOT;
 
     $ret = FALSE;
 
-    switch($action) {
+    switch ($action) {
       case 'merge':
         $record_new = $this->instantiateRecord();
         $record_new->get_field('created')->set('datatype', 'date');
@@ -720,7 +721,7 @@ EOT;
           $old = $record->get_field($fieldname)->get('value_internal');
           $new = $record_new->get_field($fieldname)->get('value_internal');
 
-          switch($fieldname) {
+          switch ($fieldname) {
             case 'subscribed':
               $update = FALSE;
 
