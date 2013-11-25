@@ -5,9 +5,9 @@
  * Sitewide settings
  * (put machine dependent stuff like hardwired paths, logins and passwords in inc/local.inc.php)
  *
- * (c) 2009 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2010 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2009-01-29 dbu
+ * Version: 2010-05-31 dbu
  *
  * Changes:
  *
@@ -45,9 +45,6 @@ define('MAIL_LINELENGTH', 72);
 
 $SITE = array(
   'pagetitle' => 'Docupedia-Zeitgeschichte',
-  'root' => 'Administration',
-  'subscriber' => 'Subscriber',
-  'pwd' => 'Password Recovery',
 );
 
 $COUNTRIES_FEATURED = array('DE', 'AT', 'CH', 'UK', 'US', 'CA', 'FR', 'IT', 'ES', 'NL', 'BE', 'DK', 'SE', 'NO', 'FI', 'AU', 'JP');

@@ -16,7 +16,7 @@
  *
  */
 
-require_once(LIB_PATH.'db_forms.php');
+require_once LIB_PATH . 'db_forms.php';
 
 // major modes
 define('TABLEMANAGER_NOACCESS', -1);
@@ -102,8 +102,8 @@ class TableManagerQueryConditionBuilder
     if (preg_match("/[\+\-][\b\"]/", $search))
       return $search;
 
-    $parser = &new MysqlFulltextSimpleParser();
-    $lexer = &new SimpleLexer($parser);
+    $parser = new MysqlFulltextSimpleParser();
+    $lexer = new SimpleLexer($parser);
     $lexer->addPattern("\\s+");
     $lexer->addEntryPattern('"', 'accept', 'writeQuoted');
     $lexer->addPattern("\\s+", 'writeQuoted');
@@ -152,7 +152,7 @@ class TableManagerQueryConditionBuilder
 
 class TableManagerRecord extends RecordSQL
 {
-  function fetch($args, $datetime_style = '') {
+  function fetch ($args, $datetime_style = '') {
     return parent::fetch($args, $datetime_style);
   }
 }
@@ -624,7 +624,7 @@ class DisplayTable extends PageDisplay
     }
     else {
       // just query - the calling method will fetch the rows
-      $this->active_conn = & new DB;
+      $this->active_conn = new DB;
       $this->active_conn->query($querystr);
     }
   }

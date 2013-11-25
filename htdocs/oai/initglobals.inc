@@ -16,11 +16,31 @@
   $FULL_URI = $SERVER_URI.$REQUEST_URI;
   $FULL_URI = rawurlencode($FULL_URI);
 
-  $repositoryName = 'Humboldt University of Berlin, GERMANY, Document Server, OAI inferface for URNs';
+  // settings for identify
+  $repositoryName = 'Humboldt University of Berlin, GERMANY, Docupedia, OAI inferface for URNs';
   $baseURL = $SERVER_URI . $_SERVER['PHP_SELF']; // 'http://edoc1.cms.hu-berlin.de/Administration/oai';
   $adminEmail = 'mailto:oai&#x0040;rz.hu-berlin.de';
   $repositoryIdentifier = 'HUBerlin.de';
   $sampleIdentifier = 'oai:HUBerlin.de:urn:nbn:de:kobv:11-20011';
+  $protocolVersion = '2.0';
+  $earliestDatestamp = '1990-01-01T00:00:00Z';
+  $deletedRecord = 'no';
+  $granularity = 'YYYY-MM-DD';
+
+  $METADATAFORMATS = 	array (
+	/*
+						'oai_dc' => array('metadataPrefix'=>'oai_dc',
+							'schema'=>'http://www.openarchives.org/OAI/2.0/oai_dc.xsd',
+							'metadataNamespace'=>'http://www.openarchives.org/OAI/2.0/oai_dc/',
+							'myhandler'=>'record_dc.php',
+							'record_prefix'=>'dc',
+							'record_namespace' => 'http://purl.org/dc/elements/1.1/'
+						) //, */
+						'epicur' => array('metadataPrefix'=>'epicur',
+						  'schema'=>'http://nbn-resolving.de/urn/resolver.pl?urn=urn:nbn:de:1111-2004033116',
+						  'metadataNamespace'=>'urn:nbn:de:1111-2004033116',
+						),
+					);
 
   // maximale Anzahl der pro Anfrage gelieferten Datens"atze
   // (bei der Anfrage ListRecords)

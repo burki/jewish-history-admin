@@ -180,7 +180,7 @@ class Page {
         self::$lang = $_SESSION['lang'];
       else {
         // default to first available language
-        reset(self::$languages); list($this->lang, $dummy) = each(self::$languages);
+        reset(self::$languages); list(self::$lang, $dummy) = each(self::$languages);
 
         if (FALSE) { // try to get the language from user settings (cookie oder prefs from database
         }

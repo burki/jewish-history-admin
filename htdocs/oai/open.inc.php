@@ -6,22 +6,19 @@
  */
 
 /*
-$server = "127.0.0.1";
-$user = "h0451d5v";
-$pass = "F8-HaS.2";
-$dbase = "h0451d5v";
 
-$server = "localhost";
-$user = "cliodb";
-$pass = "mommsen99";
-$dbase = "docupedia-admin";
-
+$server = "mysql.cms.hu-berlin.de:3306";
+$user = "docupe01";
+$pass = "%aqw%Tg8h";
+$dbase = "docupedia";
 */
 
 $server = "localhost";
 $user = "root";
 $pass = "";
 $dbase = "docupedia";
+
+
 
 $conn = @mysql_connect($server,$user,$pass);
 if ($conn)

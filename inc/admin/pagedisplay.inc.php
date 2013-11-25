@@ -235,6 +235,7 @@ EOT;
     return implode("\n", $tags);
   }
 
+/*
   function buildHtmlStart () {
     // javascript
     $scriptcode = '';
@@ -270,6 +271,7 @@ return <<<EOT
 <body>
 EOT;
   }
+*/
 
   function buildHtmlEnd () {
 return <<<EOT

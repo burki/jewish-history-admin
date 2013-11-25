@@ -4,9 +4,9 @@
  *
  * support-code for docupedia backend
  *
- * (c) 2008-2009 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2010 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2009-08-03 dbu
+ * Version: 2010-06-03 dbu
  *
  * Changes:
  *
@@ -21,7 +21,7 @@ include_once INC_PATH . 'sitesettings.inc.php';
 $response = NULL;
 
 if (array_key_exists('pn', $_REQUEST)
-   && in_array($_REQUEST['pn'], array('user', 'publication', 'article'))) {
+   && in_array($_REQUEST['pn'], array('user', 'publication', 'article', 'feed'))) {
   // here we know that we have a valid $request
   include_once INC_PATH . 'admin/wshandler.inc.php';
   include_once INC_PATH . 'admin/ws_' . $_REQUEST['pn'] . '.inc.php';

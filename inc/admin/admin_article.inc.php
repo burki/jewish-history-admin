@@ -110,6 +110,7 @@ class DisplayArticle extends DisplayMessage
         new Field(array('name'=>'referee_deadline', 'type'=>'datetime', 'datatype'=>'datetime', 'null' => TRUE)),
         new Field(array('name'=>'url', 'id' => 'url', 'type'=>'text', 'datatype'=>'char', 'size'=>65, 'maxlength'=>200, 'null' => 1)),
         new Field(array('name'=>'urn', 'id' => 'urn', 'type'=>'text', 'datatype'=>'char', 'size'=>45, 'maxlength'=>200, 'null' => 1)),
+        new Field(array('name'=>'tags', 'id' => 'urn', 'type'=>'text', 'datatype'=>'char', 'size'=>45, 'maxlength'=>200, 'null' => 1)),
        ));
 
     return $record;
@@ -229,6 +230,7 @@ EOT;
             'urn' => array('label' => 'URN', 'value' => 'edit' == $mode ?
                   $this->getFormField('urn').$urn_button
                   : $this->record->get_value('urn')),
+            'tags' => array('label' => 'Feed Tag(s)'),
       ), 'published');
 
     return $rows;

@@ -4,9 +4,9 @@
  *
  * Base-Class for managing messages
  *
- * (c) 2007-2009 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2013 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2009-05-18 dbu
+ * Version: 2013-11-25 dbu
  *
  * Changes:
  *
@@ -261,8 +261,8 @@ class MessageRecord extends TablemanagerRecord
 {
   var $datetime_style = '';
 
-  function store () {
-    $stored = parent::store();
+  function store ($args = '') {
+    $stored = parent::store($args);
     if ($stored) {
       $message_id = $this->get_value('id');
       $user_id = $this->get_value('user_id');
@@ -281,7 +281,7 @@ class MessageRecord extends TablemanagerRecord
     return $stored;
   }
 
-  function fetch($args, $datetime_style = '') {
+  function fetch ($args, $datetime_style = '') {
     if (empty($datetime_style))
       $datetime_style = $this->datetime_style;
 
@@ -403,7 +403,7 @@ class DisplayMessage extends DisplayBackend
                                'persist' => 'session');
   }
 
-  function instantiateRecord () {
+  function instantiateRecord ($table = '', $dbconn = '') {
     return new MessageRecord(array('tables' => $this->table, 'dbconn' => $this->page->dbconn));
   }
 
@@ -466,7 +466,7 @@ class DisplayMessage extends DisplayBackend
 
   function setInput () {
     parent::setInput();
-    if (isset($this->tinymce_fields) && sizeof($this->tinymce_fields) > 0) {
+    if (isset($this->tinymce_fields) && count($this->tinymce_fields) > 0) {
       foreach ($this->tinymce_fields as $fieldname)
         $this->form->set_value($fieldname, $this->unformatParagraphs($this->form->get_value($fieldname)));
     }
@@ -486,7 +486,7 @@ class DisplayMessage extends DisplayBackend
     if ('edit' == $mode) {
       // build the user-autocompleter
 
-      $url_ws = htmlspecialchars($this->page->BASE_PATH.'admin/admin_ws.php?pn=user&action=matchUser');
+      $url_ws = $this->page->BASE_PATH . 'admin/admin_ws.php?pn=user&action=matchUser';
       $user_value = <<<EOT
 <input type="hidden" name="user_id" value="$user_id" />
 <input type="text" id="user" name="user" style="width:350px; border: 1px solid black;" value="$user" /><div id="autocomplete_choices" class="autocomplete"></div>
@@ -517,15 +517,12 @@ EOT;
   }
 
   function renderEditForm ($rows, $name = 'detail') {
-    // for user-selection
-    $this->script_url[] = $this->page->BASE_PATH
-                          .'script/scriptaculous/prototype.js';
-    $this->script_url[] = $this->page->BASE_PATH
-                          .'script/scriptaculous/scriptaculous.js';
+    // for user-selection and similar stuff
+    $this->script_url[] = 'script/scriptaculous/prototype.js';
+    $this->script_url[] = 'script/scriptaculous/scriptaculous.js';
 
-    if (isset($this->tinymce_fields) && sizeof($this->tinymce_fields) > 0) {
-      $this->script_url[] = $this->page->BASE_PATH
-              .'script/tiny_mce/tiny_mce.js';
+    if (isset($this->tinymce_fields) && count($this->tinymce_fields) > 0) {
+      $this->script_url[] = 'script/tiny_mce/tiny_mce.js';
       $this->script_code .= <<<EOT
 tinyMCE.init({
 	mode : "exact",
@@ -627,7 +624,7 @@ EOT;
             $field_value = $record->get_value($key);
             if (isset($row_descr['options']) && isset($field_value) && '' !== $field_value) {
               $values = preg_split('/,\s*/', $field_value);
-              for($i = 0; $i < sizeof($values); $i++)
+              for($i = 0; $i < count($values); $i++)
                 if (isset($row_descr['options'][$values[$i]]))
                   $values[$i] = $row_descr['options'][$values[$i]];
               $field_value = implode(', ', $values);
@@ -640,7 +637,7 @@ EOT;
         }
       }
     }
-    if (sizeof($fields) > 0)
+    if (count($fields) > 0)
       $ret .= $this->buildContentLineMultiple($fields);
 
     return $ret;
@@ -780,21 +777,21 @@ EOT;
     return $search;
   }
 
-  function buildListingCell (&$row, $col_index) {
+  function buildListingCell (&$row, $col_index, $val = NULL) {
     global $MESSAGE_STATUS;
 
     $val = NULL;
 
-    if (sizeof($this->cols_listing) - 2 == $col_index) {
+    if (count($this->cols_listing) - 2 == $col_index) {
       $val = (isset($row[$col_index]) ? $this->status_options[$row[$col_index]] : '');
     }
-    else if (sizeof($this->cols_listing) - 1 == $col_index) {
+    else if (count($this->cols_listing) - 1 == $col_index) {
       $action = TABLEMANAGER_EDIT == $this->listing_default_action
         ? TABLEMANAGER_VIEW : TABLEMANAGER_EDIT;
       $name = $this->workflow->name($action);
       $url_preview = $this->page->buildLink(array('pn' => $this->page->name, $name => $row[0]));
       $val = sprintf('<div style="text-align:right">%s&nbsp;[<a href="%s">%s</a>]</div>',
-                     $row[sizeof($this->cols_listing) - 1],
+                     $row[count($this->cols_listing) - 1],
                      htmlspecialchars($url_preview),
                      tr($name));
     }

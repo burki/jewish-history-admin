@@ -133,7 +133,7 @@ class PageDisplayBase
   }
 
   function instantiateEncoder ($paragraph_mode = TRUE) {
-    $encoder = Text_Wiki_CmsCode::factory('CmsCode');
+    $encoder = @Text_Wiki_CmsCode::factory('CmsCode');
     $encoder->setFormatConf('Xhtml', 'translate', HTML_SPECIALCHARS); // default HTML_ENTITIES messes up &Zcaron
     if ('utf-8' == $this->charset)
       $encoder->setFormatConf('Xhtml', 'charset', 'UTF-8');
@@ -455,7 +455,7 @@ class PageDisplayBase
       $scriptcode .= '<script language="JavaScript" type="text/javascript">'
                     . '$(document).ready(function(){ ';
       foreach ($this->script_ready as $ready)
-        $scriptcode .= $ready ;
+        $scriptcode .= $ready . "\n" ;
       $scriptcode .= '}); </script>';
     }
 

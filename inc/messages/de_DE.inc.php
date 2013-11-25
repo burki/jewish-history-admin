@@ -1,7 +1,7 @@
 <?php
 
 $GETTEXT_MESSAGES = array (
-'Subject' => 'Titel',
+
 'Subscribing to H-ArtHist' => 'Anmeldung',
 'Registration' => 'Anmeldung',
 'Subscription' => 'Abonnement',
@@ -57,6 +57,7 @@ $GETTEXT_MESSAGES = array (
 'merge' => 'zusammenführen',
 'delete' => 'löschen',
 'upload' => 'hochladen',
+'site preview' => 'Website-Voransicht',
 'Do you want to delete this record (no undo)?' => 'Wollen Sie diesen Datensatz wirklich definitiv löschen?',
 'Are you sure you want to replace\\n%s\\nwith\\n%s?' => 'Sind Sie sicher, dass sie\\n%s\\ndurch\\n%s\\nersetzen wollen?',
 'Replace %s with' => 'Ersetze %s durch',
@@ -172,6 +173,7 @@ $GETTEXT_MESSAGES = array (
 'add new' => 'neu hinzufügen',
 'List price' => 'Listenpreis',
 'Contributor' => 'Beiträger',
+'Additional Contributors' => 'Weitere Beiträger',
 'Editing Status' => 'Bearbeitungsstatus',
 'Review Editor' => 'Rezensions-Redakteur',
 'Article Editor' => 'betreuender Redakteur',
@@ -217,7 +219,8 @@ $GETTEXT_MESSAGES = array (
 'Communication' => 'Kommunikation',
 'Articles' => 'Artikel',
 'set publisher' => 'Verlag zuordnen',
+'Subject' => 'Titel',
+'Convert Quotes' => 'Anführungszeichen konvertieren',
+'convert' => 'konvertieren',
 
 );
-
-?>

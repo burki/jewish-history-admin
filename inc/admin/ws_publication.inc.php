@@ -4,9 +4,9 @@
  *
  * Webservices for managing publications (books)
  *
- * (c) 2007-2008 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2010 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2008-10-28 dbu
+ * Version: 2010-06-15 dbu
  *
  * Changes:
  *
@@ -14,7 +14,7 @@
 
 class WsPublication extends WsHandler
 {
-  // example-call: http://www.kritikon.de/backend/admin/admin_ws.php?pn=publication&action=fetchPublicationByIsbn&isbn=0444503285&_debug=1
+  // example-call: http://localhost/docupedia/admin/admin_ws.php?pn=publication&action=fetchPublicationByIsbn&isbn=0444503285&_debug=1
   function buildResponse () {
     $valid_actions = array('fetchPublicationByIsbn', 'matchPublication');
 

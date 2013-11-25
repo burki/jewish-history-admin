@@ -4,9 +4,9 @@
  *
  * Simple base class for Ajax-Web Services
  *
- * (c) 2007-2009 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2010 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2009-08-03 dbu
+ * Version: 2010-06-03 dbu
  *
  * Changes:
  *
@@ -67,17 +67,17 @@ class SearchSimpleParser
 }
 
 function split_quoted ($search) {
-  require_once(LIB_PATH.'simpletest_parser.php');
+  require_once LIB_PATH . 'simpletest_parser.php';
 
-  $parser = &new SearchSimpleParser();
-  $lexer = &new SimpleLexer($parser);
+  $parser = new SearchSimpleParser();
+  $lexer = new SimpleLexer($parser);
   $lexer->addPattern("\\s*[\\,\\+\\s]\\s*");
   $lexer->addEntryPattern('"', 'accept', 'writeQuoted');
   $lexer->addPattern("\\s+", 'writeQuoted');
   $lexer->addExitPattern('"', 'writeQuoted');
 
   // check if '"' are balanced
-  if (substr_count ($search, '"') % 2 != 0)
+  if (substr_count($search, '"') % 2 != 0)
     $search .= '"';
 
   // do it
@@ -93,7 +93,6 @@ class WsHandlerFactory
   // private constructor
   private function __construct(){}
 
-  //
   private static $class_map = array();
 
   static function getInstance ($name) {
@@ -111,8 +110,47 @@ class WsHandler
   var $STRIP_SLASHES = FALSE;
 
   function __construct(){
-      $this->STRIP_SLASHES = defined('STRIP_SLASHES')
-        ? STRIP_SLASHES :get_magic_quotes_gpc();
+    $this->STRIP_SLASHES = defined('STRIP_SLASHES')
+      ? STRIP_SLASHES :get_magic_quotes_gpc();
+  }
+
+  function initSession () {
+	static $initialized = FALSE;
+
+	if ($initialized)
+	  return;
+
+	if (defined('SESSION_NAME'))
+      session_name (SESSION_NAME);         // set the session name
+
+	// for ie 6.x to take cookies
+	// see also http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnpriv/html/ie6privacyfeature.asp
+	header('P3P: CP="NOI NID ADMa OUR IND UNI COM NAV"');
+
+	session_start();                      // and start it
+	session_cache_limiter('private');
+
+	$initialized = TRUE;
+  }
+
+  function getUser () {
+	$this->initSession();
+	if (isset($_SESSION['user']))
+	  return $_SESSION['user'];
+  }
+
+  function isAllowed ($privs = -1) {
+	// check if the user is logged
+	$user = $this->getUser();
+
+    if (!isset($user))
+      return FALSE;
+
+	// check if he has enough privs
+	if (-1 == $privs)
+	  return TRUE;
+
+	return 0 != ($privs & $user['privs']);
   }
 
   function getParameter ($key) {
@@ -123,9 +161,21 @@ class WsHandler
     if ($this->STRIP_SLASHES)
       $val = is_array($val) ? array_map('stripslashes', $val) : stripslashes($val);
 
-	$val = is_array($val) ? array_map('utf8_decode', $val) : utf8_decode($val);
+	// $val = is_array($val) ? array_map('utf8_decode', $val) : utf8_decode($val);
 
     return $val;
+  }
+
+  function invalidAction () {
+    if (empty($_GET['action'])) {
+      $status = 0;
+      $msg = 'No action specified';
+    }
+    else {
+      $status = -1;
+      $msg = 'Invalid action ' . $_GET['action'];
+    }
+    return new JsonResponse(array('status' => $status, 'msg' => $msg));
   }
 
 }
@@ -140,14 +190,13 @@ class JsonResponse
   }
 
   static function encode ($valueToEncode) {
-	if (function_exists('json_encode')) {
-	  return json_encode($valueToEncode);
-	}
-	require_once LIB_PATH . 'JSON.php';
-	$json = new Services_JSON();
-	return $json->encode($valueToEncode);
+    if (function_exists('json_encode')) {
+      return json_encode($valueToEncode);
+    }
+    require_once LIB_PATH . 'JSON.php';
+    $json = new Services_JSON();
+    return $json->encode($valueToEncode);
   }
-
 
   function sendJson () {
     if (array_key_exists('_debug', $_GET) && $_GET['_debug'] == 1) {
@@ -156,6 +205,19 @@ class JsonResponse
     }
     else
       header('X-JSON:' . self::encode($this->response));
+  }
+}
+
+class HtmlResponse
+{
+  var $response;
+
+  function __construct ($response) {
+    $this->response = $response;
+  }
+
+  function send () {
+    echo $this->response;
   }
 }
 

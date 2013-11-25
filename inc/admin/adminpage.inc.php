@@ -6,7 +6,7 @@
  *
  * (c) 2009 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2009-01-29 dbu
+ * Version: 2009-03-29 dbu
  *
  * Changes:
  *
@@ -80,6 +80,14 @@ $SITE_DESCRIPTION = array(
     ),
     'account' => array(
         'title' => 'Account',
+        'anonymous' => FALSE,
+    ),
+    'convert' => array(
+        'title' => 'Convert Quotes',
+        'anonymous' => TRUE,
+    ),
+    'feed' => array(
+        'title' => 'Feed Tagging',
         'anonymous' => FALSE,
     ),
   )

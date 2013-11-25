@@ -88,7 +88,7 @@
 
       $from = generatelocaltime($from);
       //echo $from;
-      $extquery .= " and date_assigned >= \"$from\"";
+      $extquery .= " and DATE(IFNULL(date_modified, date_assigned)) >= \"$from\"";
     }
 
     if ($set_until) {
@@ -101,7 +101,7 @@
 
       $until = generatelocaltime($until);
       //echo $until;
-      $extquery .= " and date_assigned <= \"$until\"";
+      $extquery .= " and DATE(IFNULL(date_modified, date_assigned)) <= \"$until\"";
     }
 
     if ($set_from && $set_until) {
@@ -126,9 +126,11 @@
 	$query2 = "time(date_assigned), date(date_modified), time(date_modified),";
     $query3 = "date(date_modified), time(date_modified),date(date_disabled), time(date_disabled) from doku_url_urn_list ";
     $query4 =  " where status=1";
+
     //echo $extquery;
     $query = $query1.$query2.$query3.$query4;
     $query = $query.$extquery;
+	// die($query);
     $result= mysql_query($query,$conn);
     $number = mysql_num_rows($result);
     if ($number<=0)
@@ -142,8 +144,7 @@
 // Output: Allgemeiner Teil
 // ########################
 
-  $output = '
-  <ListRecords>';
+  $output = '<' . $verb . '>';
 
 // ###############################
 // Bei Fehler: Abbruch der Ausgabe
@@ -173,28 +174,31 @@
         $datestamp = $tmp_array[10]." ".$tmp_array[11];
       $datestamp = ereg_replace("/", "-", $datestamp);
       $datestamp = generategmtime($datestamp, "stamp");
+
+	  if ($verb=="ListRecords") {
       $output .= '
-    <record>
+    <record>';
+	  }
+	  $output .= '
       <header>
         <identifier>'.$oai_identifier.'</identifier>
         <datestamp>'.$datestamp.'</datestamp>
       </header>';
 
+	  if ($verb=="ListRecords") {
+		if ($metadataPrefix == 'epicur') {
 // ###################
 // Output: Epicur
 // ###################
-
-        if ($metadataPrefix == 'epicur') {
           include("record_epicur.inc.php");
         }
-
 // ###################
 // Output: Record-Ende
 // ###################
 
         $output .= '
       </record>';
-
+	  }
     }
 
 
@@ -202,7 +206,6 @@
 // Output: Ende
 // ############
 
-    $output .= '
-  </ListRecords>';
+    $output .= '</' . $verb . '>';
   }
   mysql_close($conn);

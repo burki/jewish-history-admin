@@ -24,8 +24,19 @@
       include("getrecord.inc");
       // echo "ende getrecord\n";
     }
-    elseif ($verb=="ListRecords") {
+    elseif ($verb=="ListRecords" || $verb=="ListIdentifiers") {
       include("listrecords.inc.php");
+    }
+    elseif ($verb=="Identify") {
+      include("identify.inc.php");
+    }
+    elseif ($verb=="ListMetadataFormats") {
+      include("listmetadataformats.inc.php");
+    }
+    elseif ($verb=="ListSets") {
+      // currently no sets
+      $error = -1;
+      $errors = getError("noSetHierarchy");
     }
     else {
       $error = -1;

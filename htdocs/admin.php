@@ -2,11 +2,11 @@
 /*
  * admin.php
  *
- * admin system for kritikon
+ * admin system for Docupedia
  *
- * (c) 2008 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2010 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2008-11-21 dbu
+ * Version: 2010-05-31 dbu
  *
  * Changes:
  *

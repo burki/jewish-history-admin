@@ -6,10 +6,10 @@
   * Author  : Daniel Burckhardt, daniel.burckhardt@sur-gmbh.ch
   *
   * Version : 2007-04-10 dbu
-  * 
+  *
   * interfaces still not completely finalized,
   * but much better than just plain copy/paste
-  * 
+  *
   */
 
 require_once(LIB_PATH.'img_upload.php');
@@ -17,49 +17,49 @@ require_once(LIB_PATH.'img_upload.php');
 class ImageUploadHandler {
   var $item_id;
   var $type;
-  
+
   function ImageUploadHandler ($item_id, $type) {
     $this->item_id = $item_id;
     $this->type = $type;
   }
-  
+
   // helper function
   static function directory ($item_id, $type, $full_path = FALSE) {
     global $UPLOAD_TRANSLATE;
-    
+
     $folder = ($full_path ? UPLOAD_FILEROOT : '')
               .$UPLOAD_TRANSLATE[$type]
               .sprintf(".%03d/id%05d/", intval($item_id / 32768), intval($item_id % 32768));
-              
+
     return $folder;
   }
-  
+
   private static function parentDirectory($dir) {
     return dirname($dir);
   }
-    
+
   // recursively create the directory
   static function checkDirectory ($dir, $create = TRUE, $mode=0755) {
     if(file_exists($dir))
       return filetype($dir) == 'dir';  // check if it is a directory
-    
+
     if(!$create)                       // doesn't exist, don't want to create
       return FALSE;
-    
+
     // recursively try to create that path
     $parent_dir = self::parentDirectory($dir);
     if(isset($parent_dir) && self::checkDirectory($parent_dir, $create, $mode)) {
       return mkdir($dir, $mode);
     }
-    
+
     return FALSE;
   }
 
-  
+
   // methods
   function delete ($img_name) {
     global $UPLOAD_TRANSLATE;
-    
+
     $dbconn = new DB;
     $querystr = sprintf("SELECT id, name, ord FROM Media WHERE item_id=%d AND type=%d AND name='%s'", $this->item_id, $this->type, $dbconn->escape_string($img_name));
     $dbconn->query($querystr);
@@ -113,9 +113,9 @@ class ImageUploadHandler {
 
   function buildImages ($img_name, $img_params, $max_images = -1) {
     global $UPLOAD_TRANSLATE;
-    
+
     $images = array();
-    
+
     if(isset($this->dbconn))
       $dbconn = & $this->dbconn;
     else
@@ -127,7 +127,7 @@ class ImageUploadHandler {
     $dbconn->query($querystr);
     if($dbconn->next_record())
       $num_imgs = $dbconn->Record['num_imgs'];
-      
+
     for($i=0; $i <= $num_imgs && ($max_images <= 0 || $i < $max_images); $i++) {
       $images[$img_name.sprintf("%02d", $i)] = array(
         'title' => 'Image '.($i + 1),
@@ -135,7 +135,7 @@ class ImageUploadHandler {
 	'imgparams' => $img_params,
       );
     }
-    
+
     return $images;
   }
 
@@ -158,19 +158,19 @@ class ImageUploadHandler {
       ));
     return $img_record;
   }
-  
+
   function buildImgFolder () {
     global $UPLOAD_TRANSLATE;
 
     return sprintf($UPLOAD_TRANSLATE[$this->type].".%03d/id%05d/", intval($this->item_id / 32768), intval($this->item_id % 32768));
   }
-  
+
   function buildUpload(&$images, $action) {
     if(isset($this->dbconn))
       $dbconn = & $this->dbconn;
     else
       $dbconn = new DB;
-    
+
     $id = $this->item_id;
     foreach($images as $key => $value) {
       $this->img_titles[$key] = $images[$key]['title'];
@@ -180,8 +180,8 @@ class ImageUploadHandler {
       $this->img_images[] = new Image(array_merge(array('name' => $key), $images[$key]['imgparams']));
     }
     $folder = $this->buildImgFolder();
-    
-    $img_upload = & new ImageUpload(array(
+
+    $img_upload = new ImageUpload(array(
             'action' => $action,
             'upload_fileroot' => UPLOAD_FILEROOT.$folder,
             'upload_urlroot'  => UPLOAD_URLROOT.$folder,
@@ -189,10 +189,10 @@ class ImageUploadHandler {
             'max_file_size'   => UPLOAD_MAX_FILE_SIZE));
     $img_upload->add_images($this->img_images);
     // var_dump($img_upload);
-    
+
     return $img_upload;
   }
-  
+
   function process (&$img_upload, &$images) {
     $upload_results = array();
     $img_names = array_keys($this->img_forms);
@@ -204,8 +204,8 @@ class ImageUploadHandler {
 
     for($i = 0; $i < sizeof($img_names); $i++) {
       $img_name = $img_names[$i];
-      
-      $img_form = & $this->img_forms[$img_name];      
+
+      $img_form = & $this->img_forms[$img_name];
       $img_form->set_values($_POST, array('prepend' => $img_name.'_'));
 
       if($img_form->validate()) {
@@ -224,7 +224,7 @@ class ImageUploadHandler {
           if($dbconn->next_record()) {
             $img_form->set_value('id', $dbconn->Record['id']);
           }
-          
+
           $img_form->set_values(array('item_id' => $this->item_id, 'ord' => 0));
           $img_form->store();
         }
@@ -233,11 +233,11 @@ class ImageUploadHandler {
         $invalid = $img_form->invalid();
         // var_dump($invalid);
       }
-      
+
     }  // for
     return $upload_results;
   }
-  
+
   function fetchAll () {
     foreach($this->img_titles as $img_name => $title) {
       $img_form = & $this->img_forms[$img_name];

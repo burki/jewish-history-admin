@@ -234,7 +234,7 @@ class DisplayPublication extends DisplayTable
   }
 
   function renderEditForm ($rows, $name = 'detail') {
-    $this->script_url[] = $this->page->BASE_PATH.'script/scriptaculous/prototype.js';
+    $this->script_url[] = 'script/scriptaculous/prototype.js';
 
     $url_ws = $this->page->BASE_PATH . 'admin/admin_ws.php';
     $url_params = isset($this->id) ? '&id_publication=' . $this->id : '';
