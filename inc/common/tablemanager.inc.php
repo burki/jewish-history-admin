@@ -289,7 +289,7 @@ class DisplayTable extends PageDisplay
 
     $minor = TABLEMANAGER_EDIT_SUBMITTED;
 
-    $this->form = &$this->instantiateHtmlForm();
+    $this->form = $this->instantiateHtmlForm();
 
     $this->setInput();
 
