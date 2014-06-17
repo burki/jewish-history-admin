@@ -431,7 +431,7 @@ EOT;
   }
 
   function buildMenu () {
-    $url_main = '../';
+    $url_main = $this->page->buildLink(array('pn' => '')); // '../';
 
     $ret = '<div id="header">';
 

@@ -4,9 +4,9 @@
  *
  * Class for managing communication
  *
- * (c) 2008-2009 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2009-04-06 dbu
+ * Version: 2014-06-06 dbu
  *
  * Changes:
  *
@@ -14,7 +14,6 @@
 
 require_once INC_PATH . 'common/tablemanager.inc.php';
 require_once INC_PATH . 'admin/common.inc.php';
-require_once LIB_PATH . 'Swift.php';
 
 class DisplayCommunication extends DisplayTable
 {
@@ -42,8 +41,9 @@ class DisplayCommunication extends DisplayTable
 
   function init () {
     if (!isset($this->id) && array_key_exists('mode', $_GET)) {
-      if (array_key_exists($_GET['mode'], self::$TYPE_MAP))
+      if (array_key_exists($_GET['mode'], self::$TYPE_MAP)) {
         $this->defaults['type'] = self::$TYPE_MAP[$_GET['mode']];
+      }
 
       $from = $this->fetchUser($this->page->user['id']);
       if (isset($from)) {
@@ -51,11 +51,6 @@ class DisplayCommunication extends DisplayTable
 
         $this->defaults['from_email'] = $from_email = array_key_exists('from_communication', $MAIL_SETTINGS)
           ? $MAIL_SETTINGS['from_communication'] : $from['email'];
-
-        /* $from_address = new Swift_Address($from_email,
-                                (!empty($from['firstname']) ? $from['firstname'] . ' ' : '')
-                                . $from['lastname']);
-        $from_address->build(); */
       }
 
       if (array_key_exists('id_to', $_GET) && intval($_GET['id_to']) > 0) {
@@ -76,18 +71,19 @@ class DisplayCommunication extends DisplayTable
         $publications = preg_split('/\s*,\s*/', $_GET['id_publication']);
       }
 
-      if (sizeof($publications) == 0 && isset($this->defaults['message_id'])) {
+      if (count($publications) == 0 && isset($this->defaults['message_id'])) {
         $dbconn = & $this->page->dbconn;
         $dbconn->query(sprintf("SELECT DISTINCT publication_id FROM MessagePublication WHERE message_id=%d",
                                $this->defaults['message_id']));
 
-        while ($dbconn->next_record())
+        while ($dbconn->next_record()) {
           $publications[] = $dbconn->Record['publication_id'];
+        }
       }
       $this->publications = $publications;
 
       if (in_array($_GET['mode'], array('publisher_request', 'publisher_vouchercopy'))
-          && sizeof($this->publications) > 0) {
+          && count($this->publications) > 0) {
         $dbconn = & $this->page->dbconn;
         $querystr = sprintf("SELECT DISTINCT Publisher.email_contact AS to_email"
                             . " FROM Publisher INNER JOIN Publication ON Publisher.id=Publication.publisher_id"
@@ -100,7 +96,7 @@ class DisplayCommunication extends DisplayTable
           $to_emails[] = $dbconn->Record['to_email'];
         }
 
-        if (sizeof($to_emails) > 0) {
+        if (count($to_emails) > 0) {
           $this->defaults['to_email'] = implode(', ', $to_emails);
         }
       }
@@ -237,8 +233,9 @@ class DisplayCommunication extends DisplayTable
       $dbconn = & $this->page->dbconn;
       $dbconn->query(sprintf("SELECT id, subject, DATE_FORMAT(published, '%%d.%%m.%%Y') AS published_display, DATE_FORMAT(published, '%%Y%%m') AS yearmonth FROM Message WHERE id=%d", $id));
 
-      if ($dbconn->next_record())
+      if ($dbconn->next_record()) {
         $_messages[$id] = $dbconn->Record;
+      }
     }
 
     return isset($_messages[$id]) ? $_messages[$id] : NULL;
@@ -275,7 +272,7 @@ class DisplayCommunication extends DisplayTable
           break;
 
       case 'bibinfo':
-          if (sizeof($this->publications) > 0) {
+          if (count($this->publications) > 0) {
             require_once INC_PATH . 'common/biblioservice.inc.php';
             $biblio_client = BiblioService::getInstance();
             foreach ($this->publications as $id) {
@@ -472,41 +469,41 @@ class DisplayCommunication extends DisplayTable
                                               BASE_PATH));
     }
 
-    if (sizeof($fields) > 0)
+    if (count($fields) > 0)
       $ret .= $this->buildContentLineMultiple($fields);
 
     return $ret;
   }
 
   private function sendMessage () {
-    $swift = MailMessage::getSwift();
+    require_once INC_PATH . 'common/MailMessage.php';
 
     // build the message
-    $message = new Swift_Message(utf8_decode($this->record->get_value('subject')));
-    $plain_part = new Swift_Message_Part($this->record->get_value('body'), 'text/plain', '8bit', $this->charset);
-    $plain_part->setLineWrap(72 + 1); // CR counts as well
-    $message->attach($plain_part);
+    $mail = new MailMessage($this->record->get_value('subject'));
+    $mail->attachPlain($this->record->get_value('body'));
+    $mail->attachHtml($this->formatParagraphs($this->record->get_value('body')));
 
-    $message->attach(new Swift_Message_Part($this->formatParagraphs($this->record->get_value('body')), 'text/html', '8bit', $this->charset));
+    if (0 != (0x02 & $this->record->get_value('flags')) && file_exists($fname_full = BASE_FILEPATH . 'data/formale_hinweise_artikel.pdf')) {
+      $attachment = Swift_Attachment::newInstance(file_get_contents($fname_full), 'formale_hinweise_artikel.pdf', 'application/pdf');
+      $mail->attach($attachment);
+    }
 
-    if (0 != (0x02 & $this->record->get_value('flags')) && file_exists($fname_full = BASE_FILEPATH . 'data/formale_hinweise_artikel.pdf'))
-      $message->attach(new Swift_Message_Attachment(file_get_contents($fname_full), 'formale_hinweise_artikel.pdf', 'application/pdf'));
-
-    $recipients = new Swift_RecipientList();
-    $recipients->addTo($this->record->get_value('to_email'));
+    $mail->addTo($this->record->get_value('to_email'));
 
     $flags = $this->record->get_value('flags');
-    if (($flags & 0x01) != 0)
-      $recipients->addBcc($this->record->get_value('from_email'));
+    if (($flags & 0x01) != 0) {
+      $mail->addBcc($this->record->get_value('from_email'));
+    }
 
     $from = $this->record->get_value('from_email');
     $user = $this->fetchUser($this->record->get_value('from_id'));
-    if (isset($user))
-      $from = new Swift_Address($from,
-                                (!empty($user['firstname']) ? $user['firstname'] . ' ' : '')
-                                . $user['lastname']);
+    if (isset($user)) {
+      $from = array($from => (!empty($user['firstname']) ? $user['firstname'] . ' ' : '')
+                    . $user['lastname']);
+    }
+    $mail->setFrom($from);
 
-    $number_sent = $swift->send($message, $recipients, $from);
+    $number_sent = $mail->send();
     if ($number_sent > 0) {
       $dbconn = & $this->page->dbconn;
       $querystr = "UPDATE Communication SET sent=NOW() WHERE id=" . $this->id;
@@ -583,7 +580,8 @@ class DisplayCommunication extends DisplayTable
 }
 
 $display = new DisplayCommunication($page);
-if (FALSE === $display->init())
+if (FALSE === $display->init()) {
   $page->redirect(array('pn' => ''));
+}
 
 $page->setDisplay($display);

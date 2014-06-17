@@ -1,0 +1,12 @@
+%salutation_name%
+
+This mail was generated because you or someone else requested instructions for password recovery.
+
+If you did not forget your password, please ignore this E-Mail. Your current password will continue to be valid.
+
+To choose a new password, please go to the URL below:
+
+    %url_recover%
+
+This request was made from:
+    IP address: %remote_addr%

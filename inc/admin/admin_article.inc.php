@@ -75,16 +75,18 @@ class DisplayArticle extends DisplayMessage
     $querystr .= " ORDER BY lastname, firstname";
     $dbconn->query($querystr);
     $options = array();
-    while ($dbconn->next_record())
+    while ($dbconn->next_record()) {
       $options[$dbconn->Record['id']] = $dbconn->Record['lastname'].' '.$dbconn->Record['firstname'];
+    }
 
     return $options;
   }
 
   function buildRecord ($name = '') {
     $record = parent::buildRecord($name);
-    if (!isset($record))
+    if (!isset($record)) {
       return;
+    }
 
     // get the options
     $this->editor_options = $this->buildOptions('editor');
@@ -108,9 +110,9 @@ class DisplayArticle extends DisplayMessage
         new Field(array('name'=>'reviewer_received', 'type'=>'datetime', 'datatype'=>'datetime', 'null' => TRUE)),
         new Field(array('name'=>'referee_sent', 'type'=>'datetime', 'datatype'=>'datetime', 'null' => TRUE)),
         new Field(array('name'=>'referee_deadline', 'type'=>'datetime', 'datatype'=>'datetime', 'null' => TRUE)),
-        new Field(array('name'=>'url', 'id' => 'url', 'type'=>'text', 'datatype'=>'char', 'size'=>65, 'maxlength'=>200, 'null' => 1)),
-        new Field(array('name'=>'urn', 'id' => 'urn', 'type'=>'text', 'datatype'=>'char', 'size'=>45, 'maxlength'=>200, 'null' => 1)),
-        new Field(array('name'=>'tags', 'id' => 'urn', 'type'=>'text', 'datatype'=>'char', 'size'=>45, 'maxlength'=>200, 'null' => 1)),
+        // new Field(array('name'=>'url', 'id' => 'url', 'type'=>'text', 'datatype'=>'char', 'size'=>65, 'maxlength'=>200, 'null' => 1)),
+        // new Field(array('name'=>'urn', 'id' => 'urn', 'type'=>'text', 'datatype'=>'char', 'size'=>45, 'maxlength'=>200, 'null' => 1)),
+        // new Field(array('name'=>'tags', 'id' => 'urn', 'type'=>'text', 'datatype'=>'char', 'size'=>45, 'maxlength'=>200, 'null' => 1)),
        ));
 
     return $record;
@@ -226,11 +228,11 @@ EOT;
                   $this->getFormField('referee_deadline') // .$reviewer_reminder_button
                   : $this->record->get_value('referee_deadline')
             ),
-            'url' => array('label' => 'Permanent URL'),
+            /* 'url' => array('label' => 'Permanent URL'),
             'urn' => array('label' => 'URN', 'value' => 'edit' == $mode ?
                   $this->getFormField('urn').$urn_button
                   : $this->record->get_value('urn')),
-            'tags' => array('label' => 'Feed Tag(s)'),
+            'tags' => array('label' => 'Feed Tag(s)'), */
       ), 'published');
 
     return $rows;

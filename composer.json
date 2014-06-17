@@ -1,0 +1,35 @@
+{
+    "config": {
+       "vendor-dir": "lib/"
+    },
+    
+    "repositories": [
+        {
+            "type": "pear",
+            "url": "http://pear.php.net"
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "zend/zend",
+                "version": "1.12.7",
+                "dist": {
+                    "url": "https://packages.zendframework.com/releases/ZendFramework-1.12.7/ZendFramework-1.12.7-minimal.zip",
+                    "type": "zip"
+                },
+                "include-path": ["library/"],
+                "autoload": {
+                    "psr-0" : {
+                        "Zend_" : "library/"
+                    }
+                }
+            }
+        }
+    ],
+
+    "require" : {
+        "swiftmailer/swiftmailer": "5.*",
+        "zend/zend": "1.12.*"
+    }
+
+}

@@ -4,9 +4,9 @@
  *
  * mail out a link to the password-change page
  *
- * (c) 2009-2010 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2010-03-05 dbu
+ * Version: 2014-06-17 dbu
  *
  * Changes:
  *
@@ -52,7 +52,7 @@ class DisplayPasswordRecover extends PageDisplay
       else {
         $keys = array_keys($_GET);
 
-        if (sizeof($keys) >= 2 && !in_array('do_signoff', $keys) && !in_array('do_login', $keys)) {  // check if we are in recovery-mode
+        if (count($keys) >= 2 && !in_array('do_signoff', $keys) && !in_array('do_login', $keys)) {  // check if we are in recovery-mode
           $r = $keys[$keys[0] == 'pn' ? 1 : 0]; // url is of the form ?pn=pwd&$magic=$login
           list($this->mode, $this->msg) = $this->verifyRecoverCode(trim($_GET[$r]), $r);
         }
@@ -61,40 +61,23 @@ class DisplayPasswordRecover extends PageDisplay
     return $this->mode;
   } // init
 
-  function sendRecoverMail($to, $login, $magic) {
+  function sendRecoverMail($to, $to_id, $magic) {
     global $MAIL_SETTINGS;
 
-    $page = &$this->page;
+    require_once INC_PATH . '/common/Message.php';
 
-    $REMOTE_ADDR = $_SERVER['REMOTE_ADDR'];
+    $replace = array('url_recover' => $this->page->buildLinkFull(array('pn' => $this->page->name, $magic => $to_id)),
+                     'remote_addr' => $_SERVER['REMOTE_ADDR']);
 
-    $url = $page->buildLinkFull(array('pn' => $page->name, $magic => $login));
-    $body = wordwrap(tr('You have requested instructions for creating a new password for your docupedia account.'))."\n\n"
-             . wordwrap(tr('In case you do not want to change your password please ignore this message.'))."\n\n"
-             . wordwrap(tr('To choose a new password, please go to the URL below:'))."\n\n"
-             . "$url\n\n"
-             . wordwrap(tr('This request was made from:'))."\n"
-             . "  ".tr('IP address').":     $REMOTE_ADDR\n"
-             . (FALSE && !empty($REMOTE_HOST) && $REMOTE_ADDR != $REMOTE_HOST ? "  ISP host:       $REMOTE_HOST\n\n" : "\n");
-
-
-    $swift = MailMessage::getSwift();
-
-    // build the message
-    $message = new Swift_Message($MAIL_SETTINGS['subject_prepend'] . tr('set your password'));
-    $plain_part = new Swift_Message_Part($body, 'text/plain', '8bit', $this->charset);
-    // $plain_part->setLineWrap(72 + 1); // CR counts as well
-    $message->attach($plain_part);
-
-    $recipients = new Swift_RecipientList();
-    $recipients->addTo($to);
+    $recipients = array('to' => $to);
     if (isset($MAIL_SETTINGS['bcc_passwordrecover']))
-      $recipients->addBcc($MAIL_SETTINGS['bcc_passwordrecover']);
+      $recipients['bcc'] = $MAIL_SETTINGS['bcc_passwordrecover'];
 
-    $from = new Swift_Address($MAIL_SETTINGS['from']);
+    $message = new StyledMessage($this->page, 'pwd_recover', $to_id,
+                                 array('replace' => $replace, 'recipients' => $recipients));
 
-    return $swift->send($message, $recipients, $from);
-  }  // sendRecoverMail
+    return $message->send();
+  } // sendRecoverMail
 
   function processRecoverRequest ($login) {
     global $MAIL_SETTINGS;

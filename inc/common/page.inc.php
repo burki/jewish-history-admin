@@ -4,9 +4,9 @@
  *
  * Functions to initialize the page (browser, session, login-stuff, ...)
  *
- * (c) 2006-2008 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2008-10-21 dbu
+ * Version: 2014-05-01 dbu
  *
  * Changes:
  *
@@ -119,19 +119,19 @@ class Page {
       return;
 
     if ($when == 0) {
-      header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");    // Date in the past
+      header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');    // Date in the past
     }
     else {
-      header("Expires: " . gmdate("D, d M Y H:i:s", $when) . " GMT");
+      header('Expires: ' . gmdate('D, d M Y H:i:s', $when) . ' GMT');
     }
-    header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");  // always modified
+    header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');  // always modified
     if (!$cache) {
-      header("Cache-Control: no-cache, must-revalidate");  // HTTP/1.1
-      header("Cache-Control: post-check=0, pre-check=0");  // to make back-button work on IE for post-pages
-      header("Pragma: no-cache");                          // HTTP/1.0
+      header('Cache-Control: no-cache, must-revalidate');  // HTTP/1.1
+      header('Cache-Control: post-check=0, pre-check=0');  // to make back-button work on IE for post-pages
+      header('Pragma: no-cache');                          // HTTP/1.0
     }
     else {
-      header("Pragma: cache");                          // HTTP/1.0
+      header('Pragma: cache');                          // HTTP/1.0
     }
     $expired = TRUE;
   }
@@ -161,7 +161,7 @@ class Page {
           break;
       } // foreach
     }
-    elseif (isset($AUTH_METHODS['AUTH_LOCAL']) && array_key_exists('do_logout', $_GET) && $_GET['do_logout']) {
+    else if (isset($AUTH_METHODS['AUTH_LOCAL']) && array_key_exists('do_logout', $_GET) && $_GET['do_logout']) {
       $this->clearLogin();
     }
 
@@ -191,9 +191,13 @@ class Page {
             $available_languages = array_keys(self::$languages);
 //          de-ch,de-de;q=0.8,de;q=0.6,en-us;q=0.4,en;q=0.2
             $languages = explode(',', $language_prefs);
-            for($i = 0; $i < sizeof($languages); $i++) {
+            for ($i = 0; $i < count($languages); $i++) {
               $language = preg_replace('/\;.*$/', '', $languages[$i]);
-              $language = preg_replace('/\-(.+)/e', "'_'.strtoupper('\\1')", $language);
+              $language = preg_replace_callback('/\-(.+)/',
+                                                function ($matches) {
+                                                  return '_' . strtoupper($matches[1]);
+                                                },
+                                                $language);
               if (in_array($language, $available_languages)) {
                 self::$lang = $language;
                 break;
@@ -201,7 +205,7 @@ class Page {
               else {
                 $language = preg_replace('/(\_.+)/', '', $language);
                 $language_expression = '/^'.preg_quote($language).'/';
-                for($j = 0; $j < sizeof($available_languages); $j++) {
+                for ($j = 0; $j < count($available_languages); $j++) {
                   if (preg_match($language_expression, $available_languages[$j])) {
                     self::$lang = $available_languages[$j];
                     break 2;
@@ -221,7 +225,7 @@ class Page {
     if (isset($this->site_description) && isset($this->site_description['structure'])) {
       $path = array();
       foreach ($this->site_description['structure'] as $name => $descr) {
-        if (sizeof($path) == 0) {
+        if (count($path) == 0) {
           $path[] = $name;
         }
         if ($name == $pn) {
@@ -372,7 +376,7 @@ class Page {
       while($dbconn->next_record())
         $location_ids[] = $dbconn->Record['id_location'];
     }
-    if (sizeof($location_ids) == 0)
+    if (count($location_ids) == 0)
       return;
 
     $locations = array();
@@ -394,7 +398,7 @@ class Page {
       $locations[] = array('id' => $id_location, 'name' => $name, 'flags' => $flags, 'issue' => $issue);
     }
 
-    return sizeof($locations) == 1 ? $locations[0] : $locations;
+    return count($locations) == 1 ? $locations[0] : $locations;
   }
 
   function getPostValue ($key) {
@@ -513,7 +517,7 @@ class Page {
     }
 
     if (isset($this->path)) {
-      $ignore = sizeof($this->path) > 1 ? $this->path[0] : NULL;
+      $ignore = count($this->path) > 1 ? $this->path[0] : NULL;
       foreach ($this->path as $entry) {
         if (!isset($ignore) || $ignore != $entry)
           $titles[] = $this->buildPageTitle($entry);
@@ -551,9 +555,9 @@ class Page {
         // TODO: ignore a possible leading ?
         $args = split('&', $options);
         $options = array();
-        for ($i=0; $i < sizeof($args); $i++) {
+        for ($i=0; $i < count($args); $i++) {
           $keyval = split('=', $args[$i], 2);
-          $options[$keyval[0]] = sizeof($keyval) == 2 ? $keyval[1] : '';
+          $options[$keyval[0]] = count($keyval) == 2 ? $keyval[1] : '';
         }
       }
 
@@ -611,10 +615,10 @@ class Page {
       }
       return $base
       .($rewrite != '.' ? $rewrite.$separator : '')
-      .(sizeof($prepend) > 0 ? implode('/', $prepend).(!empty($optstring) ? '/' : '') : '')
+      .(count($prepend) > 0 ? implode('/', $prepend).(!empty($optstring) ? '/' : '') : '')
       .($rewrite == '.' && !empty($optstring) ? '?' : '')
       .$optstring
-      .(sizeof($append) > 0 ? (sizeof($prepend) > 0 || !empty($optstring) ? '/' : '')
+      .(count($append) > 0 ? (count($prepend) > 0 || !empty($optstring) ? '/' : '')
           . implode('/', $append) : '')
       .$anchor;
     }
@@ -632,13 +636,24 @@ class Page {
   // void redirect ($options = '')
   // sends HTTP-Redirect-Header to another page in the site
   //------------------------------------------------------------
-  function redirect ($options = '') {
+  function redirect ($options = '', $delay = 0, $base_url = '') {
     if (gettype($options) == 'string' && preg_match('/^(http|https|ftp)\\:\\/\\//', $options)) {
       $url = $options;
     }
     else {
-      $url = $this->buildLinkFull($options);
+      $url = $this->buildLinkFull($options, $base_url);
     }
+
+    if ($delay > 0) {
+      return <<<EOT
+<script type="text/javascript">
+Event.observe(window, 'load', function () {
+  setTimeout( function() { window.location.href = '$url'; }, {$delay}*1000);
+});
+</script>
+EOT;
+    }
+
     session_write_close(); // might not really be needed
     if (!headers_sent())
       header('Location: ' .$url);

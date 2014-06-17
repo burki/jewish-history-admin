@@ -4,9 +4,9 @@
  *
  * Start page
  *
- * (c) 2010 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2010-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2010-06-21 dbu
+ * Version: 2014-06-17 dbu
  *
  * Changes:
  *
@@ -35,6 +35,7 @@ class DisplayRoot extends PageDisplay
         'name' => 'communication',
         'title' => 'Communication',
       ),
+      /*
       'feed' => array(
         'name' => 'feed',
         'title' => 'Feed Tagging',
@@ -51,6 +52,7 @@ class DisplayRoot extends PageDisplay
         'name' => 'convert',
         'title' => 'Convert Quotes'
       ),
+      */
       array(
         'name' => 'account',
         'title' => 'Accounts',

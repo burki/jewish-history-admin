@@ -1,0 +1,12 @@
+%salutation_name%
+
+Jemand, wahrscheinlich Sie selbst, hat ein neues Passwort für die Anmeldung bei "Künstlernachlässe" angefordert.
+
+Um ein neues Passwort zu setzen, öffnen Sie die folgende Adresse in Ihrem Web-Browser:
+    %url_recover%
+
+Ignorieren Sie diese E-Mail, falls Sie Ihr Passwort nicht vergessen haben. Das alte Passwort bleibt weiterhin gültig.
+
+Diese Nachricht wurde vom Computer mit der Internet-Adresse %remote_addr% angefordert.
+
+%signature%

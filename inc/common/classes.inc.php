@@ -200,25 +200,3 @@ class Journal
   }
 
 }
-
-class MailMessage
-{
-  static function getSwift () {
-	require_once LIB_PATH . 'Swift.php';
-
-    if (defined('SMTP_HOST')) {
-      require_once LIB_PATH . 'Swift/Connection/SMTP.php';
-      $swift_conn = new Swift_Connection_SMTP(SMTP_HOST);
-      if (defined('SMTP_USERNAME'))
-        $swift_conn->setUsername(SMTP_USERNAME);
-      if (defined('SMTP_PASSWORD'))
-		$swift_conn->setpassword(SMTP_PASSWORD);
-    }
-    else {
-      require_once LIB_PATH . 'Swift/Connection/NativeMail.php';
-      $swift_conn = new Swift_Connection_NativeMail();
-    }
-    return new Swift($swift_conn);
-  }
-
-}
