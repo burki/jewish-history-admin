@@ -4,9 +4,9 @@
  *
  * handle accounts
  *
- * (c) 2006-2013 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2013-11-25 dbu
+ * Version: 2014-06-22 dbu
  *
  *
  * Changes:
@@ -28,15 +28,16 @@ class AdminOnlyFlow extends TableManagerFlow
   function init ($page) {
     global $RIGHTS_ADMIN;
 
-    if(0 != ($page->user['privs'] & $RIGHTS_ADMIN))
-        return parent::init($page);
+    if (0 != ($page->user['privs'] & $RIGHTS_ADMIN)) {
+      return parent::init($page);
+    }
 
     return TABLEMANAGER_EDIT;
   }
 
   function primaryKey ($id = '') {
     global $RIGHTS_ADMIN;
-    if(0 != ($this->user['privs'] & $RIGHTS_ADMIN))
+    if (0 != ($this->user['privs'] & $RIGHTS_ADMIN))
       return parent::primaryKey($id);
 
     // just edit own stuff
@@ -45,7 +46,7 @@ class AdminOnlyFlow extends TableManagerFlow
 
   function advance ($step) {
     global $RIGHTS_ADMIN;
-    if(0 != ($this->user['privs'] & $RIGHTS_ADMIN))
+    if (0 != ($this->user['privs'] & $RIGHTS_ADMIN))
       return parent::advance($step);
 
     // there is no listing for regular users
@@ -59,7 +60,7 @@ class DisplayAccount extends DisplayTable
   var $fields_listing = array('User.id AS id', 'User.email AS email', 'User.lastname AS lastname', 'User.firstname AS firstname', 'privs', 'UNIX_TIMESTAMP(User.created) AS created');
   var $condition = array(
       "User.status <> -100", // deleted user
-   	  array('name' => 'search', 'method' => 'buildLikeCondition', 'args' => 'email'),
+      array('name' => 'search', 'method' => 'buildLikeCondition', 'args' => 'email'),
   );
   var $page_size = 50;
   var $cols_listing = array('email' => 'E-Mail', 'name' => 'Name', 'privs' => 'Access rights', 'created' => 'Created');
@@ -99,11 +100,11 @@ class DisplayAccount extends DisplayTable
   function validateInput () {
     global $RIGHTS_ADMIN;
 
-    if(0 == ($this->page->user['privs'] & $RIGHTS_ADMIN))
+    if (0 == ($this->page->user['privs'] & $RIGHTS_ADMIN))
       $this->form->set_value('privs', $this->page->user['privs']); // these stay fixed
 
     $res = parent::validateInput ();
-    if(!$res)
+    if (!$res)
       return $res;
 
     $form = & $this->form; // save some typing
@@ -111,17 +112,17 @@ class DisplayAccount extends DisplayTable
 
     $check_login = TRUE;
     $dbconn = &$this->page->dbconn;
-    if(!empty($id)) {
+    if (!empty($id)) {
       // if we have an existing account, check unique login/email only if that one was changed
       $querystr = "SELECT email AS login FROM User WHERE id=$id";
 
       $dbconn->query($querystr);
-      if($dbconn->next_record()) {
+      if ($dbconn->next_record()) {
         $old_login = $dbconn->Record['login'];
         $new_login = $form->get_value('email');
-        if($old_login == $new_login)
+        if ($old_login == $new_login)
           $check_login = FALSE;
-        else if(empty($new_login)) {
+        else if (empty($new_login)) {
           $form->set_value('email', $new_login = $old_login);
           $check_login = FALSE;
         }
@@ -131,16 +132,16 @@ class DisplayAccount extends DisplayTable
         unset($id);
     }
 
-    if($check_login) {
+    if ($check_login) {
       // check email/login and make sure the login is unique
       $new_login = $form->get_value('email');
 
       $querystr = "SELECT COUNT(*) AS countlogin FROM User WHERE LOWER(email)=LOWER('".$dbconn->escape_string($new_login)."')";
       $dbconn->query($querystr);
-      if($dbconn->next_record()) {
-        if($dbconn->Record['countlogin'] > 0) {
+      if ($dbconn->next_record()) {
+        if ($dbconn->Record['countlogin'] > 0) {
           $this->page->msg .= 'The new e-mail you have set is already used for another login. Please choose a different one.';
-          if(!empty($old_login))
+          if (!empty($old_login))
             $form->set_value('email', $old_login); // set back to old value
           return FALSE;
         }
@@ -149,12 +150,12 @@ class DisplayAccount extends DisplayTable
 
     // the password might have changed
     $pwd = $form->get_value('pwd');
-    if(!empty($pwd)) {
+    if (!empty($pwd)) {
       // check if the password is valid and correctly confirmed
 
       $pwd2 = $form->get_value('pwd_confirm');
       $pwd_ok  = $this->page->passwordValid($pwd, $pwd2);
-      if($pwd_ok <= 0) {
+      if ($pwd_ok <= 0) {
         $res = FALSE;
 
         switch($pwd_ok) {
@@ -194,10 +195,10 @@ class DisplayAccount extends DisplayTable
       'pwd_confirm' => array('label' => 'Confirm Password'),
     );
 
-    if($this->page->user['privs'] & $RIGHTS_ADMIN) {
+    if ($this->page->user['privs'] & $RIGHTS_ADMIN) {
       $privs = $this->form->field('privs');
       $rights_mask = $RIGHTS_EDITOR | $RIGHTS_ADMIN | $RIGHTS_REFEREE;
-      if($edit_self) {
+      if ($edit_self) {
         // if i'm admin, i'm at least EDITOR
         $rights_mask &= ~$RIGHTS_EDITOR;
         $fields[] = '<input type="hidden" name="privs[]" value="'.$RIGHTS_EDITOR.'" />'.$privs->show($rights_mask);
@@ -249,6 +250,7 @@ class DisplayAccount extends DisplayTable
 }
 
 $display = new DisplayAccount($page, new AdminOnlyFlow($page));
-if(FALSE === $display->init())
+if (FALSE === $display->init()) {
   $page->redirect(array('pn' => ''));
+}
 $page->setDisplay($display);

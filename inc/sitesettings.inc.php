@@ -5,9 +5,9 @@
  * Sitewide settings
  * (put machine dependent stuff like hardwired paths, logins and passwords in inc/local.inc.php)
  *
- * (c) 2009-2010 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2010-05-31 dbu
+ * Version: 2014-06-22 dbu
  *
  * Changes:
  *
@@ -19,10 +19,12 @@ define('SESSION_NAME', 'sid');
 
 /* CRYPT_PWD stores the length of the salt for encryption which decides which method is used
    CRYPT_PWD = 0 means no encryption takes place */
-if (defined('CRYPT_MD5'))
+if (defined('CRYPT_MD5')) {
     define('CRYPT_PWD', 12);
-else
+}
+else {
     define('CRYPT_PWD', defined('CRYPT_STD_DES') ? 2 : 0);
+}
 
 define('PWDRECOVER_TIMEOUT', 300);       // wait 5 minutes before sending a new recover-mail
 
@@ -44,10 +46,13 @@ define('STATUS_DELETED', -1); // reserved value in the database
 define('MAIL_LINELENGTH', 72);
 
 $SITE = array(
-  'pagetitle' => 'Docupedia-Zeitgeschichte',
+  'pagetitle' => 'Key-Documents of German-Jewish History',
 );
 
-$COUNTRIES_FEATURED = array('DE', 'AT', 'CH', 'UK', 'US', 'CA', 'FR', 'IT', 'ES', 'NL', 'BE', 'DK', 'SE', 'NO', 'FI', 'AU', 'JP');
+$COUNTRIES_FEATURED = array('DE', 'AT', 'CH', 'UK', 'US', 'CA',
+                            'FR', 'IT', 'ES', 'NL', 'BE',
+                            'DK', 'SE', 'NO', 'FI',
+                            'AU', 'JP');
 
 $MAIL_SETTINGS = array(
   'from'                 => 'burckhardtd@geschichte.hu-berlin.de',
@@ -69,7 +74,7 @@ $MAIL_SETTINGS = array(
   'bcc_change_notify'    => 'burckhardtd@geschichte.hu-berlin.de',
 
   // further stuff
-  'subject_prepend'      => 'Docupedia-Zeitgeschichte - ',
+  'subject_prepend'      => 'Key-Documents of German-Jewish History - ',
 );
 
 $MEDIA_EXTENSIONS = array('image/gif' => '.gif', 'image/jpeg' => '.jpg', 'image/png' => '.png');
@@ -93,7 +98,8 @@ $UPLOAD_TRANSLATE = array(
 
 $JAVASCRIPT_CONFIRMDELETE = <<<EOT
     function confirmDelete(txt, url) {
-      if(confirm(txt))
+      if (confirm(txt)) {
         window.location.href = url;
+      }
     }
 EOT;

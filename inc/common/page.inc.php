@@ -15,16 +15,18 @@
 // text translation
 function tr($msg) {
   static $method = -1; // 0: custom, 1: gettext
-  if ($method == -1) // determine method
+  if ($method == -1) {
+    // determine method
     $method = (defined('GETTEXT_AVAILABLE') && !GETTEXT_AVAILABLE) || !function_exists('gettext') ? 0 : 1;
-  if ($method)
-    return gettext($msg);
-  else {
-    return Page::gettext($msg);
   }
+  if ($method) {
+    return gettext($msg);
+  }
+  return Page::gettext($msg);
 }
 
-class Page {
+class Page
+{
   static $languages = array('de_DE' => 'deutsch', 'en_US' => 'english');
   static $lang = 'en_US';
   static $locale = NULL;
@@ -56,8 +58,9 @@ class Page {
   }
 
   static function initGettext ($utf8_encode = FALSE) {
-    if (self::$lang == self::$init_lang)
+    if (self::$lang == self::$init_lang) {
       return TRUE;
+    }
 
     // init-locale
     require_once 'Zend/Locale.php';
@@ -73,9 +76,11 @@ class Page {
       if (file_exists(INC_PATH . 'messages/' . self::$lang . '.inc.php')) {
         global $GETTEXT_MESSAGES;
         require_once INC_PATH . 'messages/' . self::$lang . '.inc.php';
-        if ($utf8_encode)
-          foreach ($GETTEXT_MESSAGES as $key => $msg)
+        if ($utf8_encode) {
+          foreach ($GETTEXT_MESSAGES as $key => $msg) {
             $GETTEXT_MESSAGES[$key] = utf8_encode($msg);
+          }
+        }
       }
     }
     else {
@@ -91,21 +96,22 @@ class Page {
   function __construct ($dbconn, $site_description = '') {
     $this->dbconn = $dbconn;
     $this->STRIP_SLASHES = defined('STRIP_SLASHES') ? STRIP_SLASHES : get_magic_quotes_gpc();
-    if (!empty($site_description))
+    if (!empty($site_description)) {
       $this->site_description = $site_description;
+    }
 
     $this->SERVER_NAME = defined('SERVER_NAME') ? SERVER_NAME : $_SERVER['SERVER_NAME'];
     $this->SERVER_PORT = defined('SERVER_PORT') ? SERVER_PORT : $_SERVER['SERVER_PORT'];
     $this->BASE_PATH = defined('BASE_PATH') ? BASE_PATH : preg_replace('/[^\/]*$/', '', $_SERVER['PHP_SELF']);
     $this->BASE_URL =
-     ($this->SERVER_PORT == '443' ? 'https' : 'http') // Protocoll
-     .'://'.$this->SERVER_NAME.($this->SERVER_PORT != '80' ? ':'.$this->SERVER_PORT : '')
-     .$this->BASE_PATH;
+      ($this->SERVER_PORT == '443' ? 'https' : 'http') // Protocoll
+      . '://' . $this->SERVER_NAME . ($this->SERVER_PORT != '80' ? ':' . $this->SERVER_PORT : '')
+      . $this->BASE_PATH;
 
     $this->PHP_SELF = $_SERVER['PHP_SELF'];
     $this->URL_SELF = ($this->SERVER_PORT == '443' ? 'https' : 'http') // Protocoll
-     .'://'.$this->SERVER_NAME.($this->SERVER_PORT != '80' ? ':'.$this->SERVER_PORT : '')
-     .$this->PHP_SELF;
+      . '://' . $this->SERVER_NAME . ($this->SERVER_PORT != '80' ? ':'.$this->SERVER_PORT : '')
+      . $this->PHP_SELF;
   }
 
   function lang () {
@@ -115,8 +121,9 @@ class Page {
   function expire ($when = 0, $cache = 0) {
     static $expired = FALSE;
 
-    if ($expired || headers_sent())
+    if ($expired || headers_sent()) {
       return;
+    }
 
     if ($when == 0) {
       header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');    // Date in the past
@@ -157,8 +164,9 @@ class Page {
             $done = TRUE;
             break;
         }
-        if ($done)
+        if ($done) {
           break;
+        }
       } // foreach
     }
     else if (isset($AUTH_METHODS['AUTH_LOCAL']) && array_key_exists('do_logout', $_GET) && $_GET['do_logout']) {
@@ -166,8 +174,9 @@ class Page {
     }
 
     // we need to have a user for certain pages
-    if (!empty($_SESSION['user']))
+    if (!empty($_SESSION['user'])) {
       $this->user = $_SESSION['user'];
+    }
   }
 
   function determineLang () {
@@ -176,13 +185,15 @@ class Page {
       self::$lang = $_SESSION['lang'] = $_REQUEST['lang'];
     }
     else {
-      if (isset($_SESSION['lang']) && isset(self::$languages[$_SESSION['lang']]))
+      if (isset($_SESSION['lang']) && isset(self::$languages[$_SESSION['lang']])) {
         self::$lang = $_SESSION['lang'];
+      }
       else {
         // default to first available language
         reset(self::$languages); list(self::$lang, $dummy) = each(self::$languages);
 
-        if (FALSE) { // try to get the language from user settings (cookie oder prefs from database
+        if (FALSE) {
+          // try to get the language from user settings (cookie oder prefs from database
         }
         else if (array_key_exists('HTTP_ACCEPT_LANGUAGE', $_SERVER)) {
           // TODO: get default language either from browser settings
@@ -204,7 +215,7 @@ class Page {
               }
               else {
                 $language = preg_replace('/(\_.+)/', '', $language);
-                $language_expression = '/^'.preg_quote($language).'/';
+                $language_expression = '/^' . preg_quote($language) . '/';
                 for ($j = 0; $j < count($available_languages); $j++) {
                   if (preg_match($language_expression, $available_languages[$j])) {
                     self::$lang = $available_languages[$j];
@@ -217,8 +228,9 @@ class Page {
         }
       }
     }
-    if (!empty(self::$lang))
+    if (!empty(self::$lang)) {
       self::initGettext($this->gettext_utf8_encode);
+    }
   }
 
   function determinePage ($pn) {
@@ -230,13 +242,15 @@ class Page {
         }
         if ($name == $pn) {
           $this->name = $name;
-          if ($name != $path[0])
+          if ($name != $path[0]) {
             $path[] = $name;
+          }
           break;
         }
       }
-      if (empty($this->name))
+      if (empty($this->name)) {
         $this->name = $path[0];
+      }
       $this->path = $path;
     }
     else {
@@ -259,12 +273,13 @@ class Page {
   function setParameters () {
     $parameters = array();
     foreach ($_GET as $name => $value) {
-      if ($name != 'logout' && $name != 'pn' && $name != 'frame')
+      if ($name != 'logout' && $name != 'pn' && $name != 'frame') {
         $parameters[$name] = $value;
-      // TODO: stripslashes if needed
+      }
     }
-    if ($this->STRIP_SLASHES)
+    if ($this->STRIP_SLASHES) {
       $parameters = array_map('stripslashes', $parameters);
+    }
 
     $this->parameters = &$parameters;
   }
@@ -312,8 +327,9 @@ class Page {
     global $RIGHTS_EDITOR;
 
     $login = $this->getPostValue('_login_field');
-    if (empty($login))
+    if (empty($login)) {
       return 0; // empty login
+    }
 
     $dbconn = isset($this->dbconn) ? $this->dbconn : new DB();
 
@@ -331,17 +347,19 @@ class Page {
 
       $success = FALSE;
       while(!$success) {
-	      $login = $dbconn->Record['login'];
+        $login = $dbconn->Record['login'];
         if ($this->passwordCheck($pwd, $dbconn->Record['pwd'])) {
-            $success = TRUE;
-            $this->setLogin($dbconn->Record['id']);
-            return 1;
+          $success = TRUE;
+          $this->setLogin($dbconn->Record['id']);
+          return 1;
         }
-        if (!$dbconn->next_record())
+        if (!$dbconn->next_record()) {
           break;
+        }
       }
-      if (!$success)
+      if (!$success) {
         return -2; // wrong password
+      }
     }
 
     return -1; // wrong login
@@ -371,13 +389,16 @@ class Page {
     $dbconn = isset($this->dbconn) ? $this->dbconn : new DB();
 
     if (isset($_SESSION['user']) && intval($_SESSION['user']['id']) > 0) {
-      $querystr = sprintf("SELECT DISTINCT id_location FROM Subscription, Location WHERE Subscription.id_login=%d AND Subscription.id_location=Location.id AND Location.status >= 0 ORDER BY IFNULL(sortoverride, name)", intval($_SESSION['user']['id']));
+      $querystr = sprintf("SELECT DISTINCT id_location FROM Subscription, Location WHERE Subscription.id_login=%d AND Subscription.id_location=Location.id AND Location.status >= 0 ORDER BY IFNULL(sortoverride, name)",
+                          intval($_SESSION['user']['id']));
       $dbconn->query($querystr);
-      while($dbconn->next_record())
+      while ($dbconn->next_record()) {
         $location_ids[] = $dbconn->Record['id_location'];
+      }
     }
-    if (count($location_ids) == 0)
+    if (count($location_ids) == 0) {
       return;
+    }
 
     $locations = array();
     foreach ($location_ids as $id_location) {
@@ -513,14 +534,14 @@ class Page {
   function title () {
     $titles = array();
     if (isset($this->site_description) && isset($this->site_description['title'])) {
-      $titles[] = $this->site_description['title'];
+      $titles[] = tr($this->site_description['title']);
     }
-
     if (isset($this->path)) {
       $ignore = count($this->path) > 1 ? $this->path[0] : NULL;
       foreach ($this->path as $entry) {
-        if (!isset($ignore) || $ignore != $entry)
+        if (!isset($ignore) || $ignore != $entry) {
           $titles[] = $this->buildPageTitle($entry);
+        }
       }
     }
 

@@ -2,11 +2,11 @@
 /*
  * adminpage.inc.php
  *
- * Page class for docupedia-admin
+ * Page class for admin-section
  *
- * (c) 2009 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2009-03-29 dbu
+ * Version: 2014-06-22 dbu
  *
  * Changes:
  *
@@ -16,15 +16,16 @@ require_once INC_PATH . 'common/page.inc.php';
 
 class AdminPage extends Page
 {
-    protected $gettext_utf8_encode = TRUE;
+    protected $gettext_utf8_encode = FALSE;
     var $display = 'admin';
 
     function init ($pn) {
         $ret = parent::init($pn);
 
         // now get and set the view
-        if (array_key_exists('view', $_GET) && 'xls' == $_GET['view'])
+        if (array_key_exists('view', $_GET) && 'xls' == $_GET['view']) {
           $this->display = 'xls';
+        }
 
         return $ret;
     }
@@ -44,51 +45,51 @@ class AdminPage extends Page
 $URL_REWRITE = array(); // don't do rewrites for the backend
 
 $SITE_DESCRIPTION = array(
-  'title' => 'docupedia',
-  'structure' => array(
-    'root' => array(
-        'title' => 'Administration',
-        'anonymous' => FALSE,
-    ),
-    'pwd' => array(
-        'title' => 'Recover Password',
-        'anonymous' => TRUE,
-    ),
-    'subscriber' => array(
-        'title' => 'Authors',
-        'anonymous' => FALSE,
-    ),
-    'review' => array(
-        'title' => 'Book Reviews',
-        'anonymous' => FALSE,
-    ),
-    'publication' => array(
-        'title' => 'Books',
-        'anonymous' => FALSE,
-    ),
-    'article' => array(
-        'title' => 'Articles',
-        'anonymous' => FALSE,
-    ),
-    'communication' => array(
-        'title' => 'Communication',
-        'anonymous' => FALSE,
-    ),
-    'publisher' => array(
-        'title' => 'Publishers',
-        'anonymous' => FALSE,
-    ),
-    'account' => array(
-        'title' => 'Account',
-        'anonymous' => FALSE,
-    ),
-    'convert' => array(
-        'title' => 'Convert Quotes',
-        'anonymous' => TRUE,
-    ),
-    'feed' => array(
-        'title' => 'Feed Tagging',
-        'anonymous' => FALSE,
-    ),
-  )
+    'title' => 'Key-Documents of German-Jewish History',
+    'structure' => array(
+        'root' => array(
+            'title' => 'Administration',
+            'anonymous' => FALSE,
+        ),
+        'pwd' => array(
+            'title' => 'Recover Password',
+            'anonymous' => TRUE,
+        ),
+        'subscriber' => array(
+            'title' => 'Authors',
+            'anonymous' => FALSE,
+        ),
+        'review' => array(
+            'title' => 'Book Reviews',
+            'anonymous' => FALSE,
+        ),
+        'publication' => array(
+            'title' => 'Books',
+            'anonymous' => FALSE,
+        ),
+        'article' => array(
+            'title' => 'Articles',
+            'anonymous' => FALSE,
+        ),
+        'communication' => array(
+            'title' => 'Communication',
+            'anonymous' => FALSE,
+        ),
+        'publisher' => array(
+            'title' => 'Publishers',
+            'anonymous' => FALSE,
+        ),
+        'account' => array(
+            'title' => 'Account',
+            'anonymous' => FALSE,
+        ),
+        'convert' => array(
+            'title' => 'Convert Quotes',
+            'anonymous' => TRUE,
+        ),
+        'feed' => array(
+            'title' => 'Feed Tagging',
+            'anonymous' => FALSE,
+        ),
+    )
 );

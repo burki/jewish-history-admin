@@ -103,7 +103,7 @@ class WsPublication extends WsHandler
       $dbconn->query($querystr);
 
 
-      while($dbconn->next_record()) {
+      while ($dbconn->next_record()) {
         $publication = (isset($dbconn->Record['author']) ? $dbconn->Record['author'] : $dbconn->Record['editor'])
           .': '.$dbconn->Record['title'];
         $entries[] = array('id' => $dbconn->Record['id'], 'item' => $publication);

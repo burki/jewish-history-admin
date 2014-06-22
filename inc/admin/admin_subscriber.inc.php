@@ -828,7 +828,7 @@ EOT;
         $dbconn->query($querystr);
         $replace = '';
         $params_replace = array('pn' => $this->page->name, 'merge' => $id);
-        while($dbconn->next_record()) {
+        while ($dbconn->next_record()) {
           $params_replace['with'] = $dbconn->Record['id'];
           $replace_confirm = sprintf('%s %s (%s) %s',
                   $dbconn->Record['firstname'],

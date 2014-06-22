@@ -30,7 +30,7 @@ class WsUser extends WsHandler {
 
     $search = $this->getParameter('fulltext');
 
-    if(isset($search) && strlen($search) >= 2) {
+    if (isset($search) && strlen($search) >= 2) {
       $dbconn = new DB;
 
       // build the query
@@ -51,7 +51,7 @@ class WsUser extends WsHandler {
       $dbconn->query($querystr);
 
 
-      while($dbconn->next_record()) {
+      while ($dbconn->next_record()) {
         $user = $dbconn->Record['lastname'].' '.$dbconn->Record['firstname']
           .(!empty($dbconn->Record['email']) ? ' ('.$dbconn->Record['email'].')' : '');
         $entries[] = array('id' => $dbconn->Record['id'], 'item' => $user);

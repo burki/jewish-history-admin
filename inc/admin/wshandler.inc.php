@@ -44,8 +44,8 @@ class SearchSimpleParser
     switch ($state) {
       // Entering the variable reference
       case LEXER_ENTER:
-	$words = array();
-	break;
+        $words = array();
+        break;
 
       // Contents of the variable reference
       case LEXER_MATCHED:
@@ -53,16 +53,16 @@ class SearchSimpleParser
 
       case LEXER_UNMATCHED:
         if (strlen($match) >= $this->min_length)
-	  $words[] = $match;
+          $words[] = $match;
         break;
 
       // Exiting the variable reference
       case LEXER_EXIT:
-        if (sizeof($words) > 0)
-	  $this->output[] = implode(' ', $words);
-	  break;
-	}
-	return TRUE;
+        if (count($words) > 0)
+          $this->output[] = implode(' ', $words);
+        break;
+    }
+    return TRUE;
   }
 }
 
@@ -115,42 +115,42 @@ class WsHandler
   }
 
   function initSession () {
-	static $initialized = FALSE;
+    static $initialized = FALSE;
 
-	if ($initialized)
-	  return;
+    if ($initialized)
+      return;
 
-	if (defined('SESSION_NAME'))
+    if (defined('SESSION_NAME'))
       session_name (SESSION_NAME);         // set the session name
 
-	// for ie 6.x to take cookies
-	// see also http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnpriv/html/ie6privacyfeature.asp
-	header('P3P: CP="NOI NID ADMa OUR IND UNI COM NAV"');
+    // for ie 6.x to take cookies
+    // see also http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnpriv/html/ie6privacyfeature.asp
+    header('P3P: CP="NOI NID ADMa OUR IND UNI COM NAV"');
 
-	session_start();                      // and start it
-	session_cache_limiter('private');
+    session_start();                      // and start it
+    session_cache_limiter('private');
 
-	$initialized = TRUE;
+    $initialized = TRUE;
   }
 
   function getUser () {
-	$this->initSession();
-	if (isset($_SESSION['user']))
-	  return $_SESSION['user'];
+    $this->initSession();
+    if (isset($_SESSION['user']))
+      return $_SESSION['user'];
   }
 
   function isAllowed ($privs = -1) {
-	// check if the user is logged
-	$user = $this->getUser();
+    // check if the user is logged
+    $user = $this->getUser();
 
     if (!isset($user))
       return FALSE;
 
-	// check if he has enough privs
-	if (-1 == $privs)
-	  return TRUE;
+    // check if he has enough privs
+    if (-1 == $privs)
+      return TRUE;
 
-	return 0 != ($privs & $user['privs']);
+    return 0 != ($privs & $user['privs']);
   }
 
   function getParameter ($key) {
@@ -161,7 +161,7 @@ class WsHandler
     if ($this->STRIP_SLASHES)
       $val = is_array($val) ? array_map('stripslashes', $val) : stripslashes($val);
 
-	// $val = is_array($val) ? array_map('utf8_decode', $val) : utf8_decode($val);
+    // $val = is_array($val) ? array_map('utf8_decode', $val) : utf8_decode($val);
 
     return $val;
   }

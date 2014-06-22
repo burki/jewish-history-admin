@@ -525,31 +525,31 @@ EOT;
       $this->script_url[] = 'script/tiny_mce/tiny_mce.js';
       $this->script_code .= <<<EOT
 tinyMCE.init({
-	mode : "exact",
-	elements : "body",
-	theme : "advanced",
-	theme_advanced_buttons1 : "bold,italic,undo,redo,link,unlink",
-	theme_advanced_buttons2 : "",
-	theme_advanced_buttons3 : "",
-	theme_advanced_toolbar_location : "top",
-	theme_advanced_toolbar_align : "left",
-	theme_advanced_path_location : "bottom",
-	insertlink_callback : 'myInsertLink',
-	browsers : "msie,gecko,opera",
+    mode : "exact",
+    elements : "body",
+    theme : "advanced",
+    theme_advanced_buttons1 : "bold,italic,undo,redo,link,unlink",
+    theme_advanced_buttons2 : "",
+    theme_advanced_buttons3 : "",
+    theme_advanced_toolbar_location : "top",
+    theme_advanced_toolbar_align : "left",
+    theme_advanced_path_location : "bottom",
+    insertlink_callback : 'myInsertLink',
+    browsers : "msie,gecko,opera",
     convert_urls : false,
-	extended_valid_elements : "a[href|target|title],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]"
+    extended_valid_elements : "a[href|target|title],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]"
 });
 
 function myInsertLink (href, target, title, onclick, action) {
-	var result = new Array();
+    var result = new Array();
 
-	// Do some custom logic
-	result['href'] = prompt('URL:', href);
-	result['target'] = "_self";
-	result['title'] = "";
-	result['onclick'] = "";
+    // Do some custom logic
+    result['href'] = prompt('URL:', href);
+    result['target'] = "_self";
+    result['title'] = "";
+    result['onclick'] = "";
 
-	return result;
+    return result;
 }
 
 

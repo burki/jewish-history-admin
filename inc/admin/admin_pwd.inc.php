@@ -122,11 +122,14 @@ class DisplayPasswordRecover extends PageDisplay
             // now we are ready to send the mail
             $success = $this->sendRecoverMail($email, $login_id, $magic);
           }
-          if ($success)
+          if ($success) {
             $this->data['email_sent'] = $email;
-          else
-            $msg = "There was an error sending out the e-mail.<br />"
-                 . 'Please contact us for technical assistance at <a href="mailto:'.$MAIL_SETTINGS['technical_assistance'].'">'.$MAIL_SETTINGS['technical_assistance'].'</a>.';
+          }
+          else {
+            $msg = tr('There was an error sending out the e-mail.') . '<br />'
+                 . sprintf(tr('Please <a href="%s">contact us for technical assistance</a>.'),
+                           htmlspecialchars($this->page->buildLink(array('pn' => 'contact', 'email' => $email))));
+          }
         }
       }
       else

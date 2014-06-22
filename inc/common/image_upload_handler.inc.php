@@ -40,15 +40,15 @@ class ImageUploadHandler {
 
   // recursively create the directory
   static function checkDirectory ($dir, $create = TRUE, $mode=0755) {
-    if(file_exists($dir))
+    if (file_exists($dir))
       return filetype($dir) == 'dir';  // check if it is a directory
 
-    if(!$create)                       // doesn't exist, don't want to create
+    if (!$create)                       // doesn't exist, don't want to create
       return FALSE;
 
     // recursively try to create that path
     $parent_dir = self::parentDirectory($dir);
-    if(isset($parent_dir) && self::checkDirectory($parent_dir, $create, $mode)) {
+    if (isset($parent_dir) && self::checkDirectory($parent_dir, $create, $mode)) {
       return mkdir($dir, $mode);
     }
 
@@ -63,28 +63,28 @@ class ImageUploadHandler {
     $dbconn = new DB;
     $querystr = sprintf("SELECT id, name, ord FROM Media WHERE item_id=%d AND type=%d AND name='%s'", $this->item_id, $this->type, $dbconn->escape_string($img_name));
     $dbconn->query($querystr);
-    if($dbconn->next_record()) {
+    if ($dbconn->next_record()) {
       $media_id = $dbconn->Record['id'];
       $name = $dbconn->Record['name'];
-      if(preg_match('/^(.*?)(\d+)$/', $name, $matches)) {
+      if (preg_match('/^(.*?)(\d+)$/', $name, $matches)) {
         $ord_orig = intval($matches[2]);
-	$basename = $matches[1];
+        $basename = $matches[1];
         // update if there are multiple images
         $querystr = sprintf("SELECT id, name, ord FROM Media WHERE item_id=%d AND type=%d", $this->item_id, $this->type)." AND name LIKE '".addslashes($basename)."%' ORDER BY name";
         $dbconn->query($querystr);
-        while($dbconn->next_record()) {
-          if(!preg_match('/(\d+)$/', $dbconn->Record['name'], $matches))
-	    continue;
-	  $ord = $matches[1];
-	  if($ord_orig <= intval($ord)) {
+        while ($dbconn->next_record()) {
+          if (!preg_match('/(\d+)$/', $dbconn->Record['name'], $matches))
+            continue;
+          $ord = $matches[1];
+          if ($ord_orig <= intval($ord)) {
             // rename the entry
             $folder = UPLOAD_FILEROOT.$UPLOAD_TRANSLATE[$this->type]
               .sprintf(".%03d/id%05d/", intval($this->item_id / 32768), intval($this->item_id % 32768));
             // find matching files
             if ($dh = opendir($folder)) {
               while (($fname = readdir($dh)) !== false) {
-                if(preg_match('/^'.$basename.$ord.'/', $fname)) {
-                  if($ord_orig == intval($ord)) {
+                if (preg_match('/^'.$basename.$ord.'/', $fname)) {
+                  if ($ord_orig == intval($ord)) {
                     unlink($folder.$fname);
                   }
                   else {
@@ -116,7 +116,7 @@ class ImageUploadHandler {
 
     $images = array();
 
-    if(isset($this->dbconn))
+    if (isset($this->dbconn))
       $dbconn = & $this->dbconn;
     else
       $dbconn = new DB;
@@ -125,14 +125,14 @@ class ImageUploadHandler {
     ." AND name LIKE '".addslashes($img_name)."%'";
     $num_imgs = 0;
     $dbconn->query($querystr);
-    if($dbconn->next_record())
+    if ($dbconn->next_record())
       $num_imgs = $dbconn->Record['num_imgs'];
 
     for($i=0; $i <= $num_imgs && ($max_images <= 0 || $i < $max_images); $i++) {
       $images[$img_name.sprintf("%02d", $i)] = array(
         'title' => 'Image '.($i + 1),
         'ord' => $i,
-	'imgparams' => $img_params,
+        'imgparams' => $img_params,
       );
     }
 
@@ -166,7 +166,7 @@ class ImageUploadHandler {
   }
 
   function buildUpload(&$images, $action) {
-    if(isset($this->dbconn))
+    if (isset($this->dbconn))
       $dbconn = & $this->dbconn;
     else
       $dbconn = new DB;
@@ -197,31 +197,31 @@ class ImageUploadHandler {
     $upload_results = array();
     $img_names = array_keys($this->img_forms);
 
-    if(isset($this->dbconn))
+    if (isset($this->dbconn))
       $dbconn = & $this->dbconn;
     else
       $dbconn = new DB;
 
-    for($i = 0; $i < sizeof($img_names); $i++) {
+    for($i = 0; $i < count($img_names); $i++) {
       $img_name = $img_names[$i];
 
       $img_form = & $this->img_forms[$img_name];
       $img_form->set_values($_POST, array('prepend' => $img_name.'_'));
 
-      if($img_form->validate()) {
+      if ($img_form->validate()) {
         $res = $img_upload->process(array_merge(array('img_name' => $img_name), $images[$img_name]['imgparams']));
         $upload_results[$img_name] = array_key_exists($img_name, $res) ? $res[$img_name] : array();
 
         $img = $img_upload->image($img_name);
         $imgdata = isset($img) ? $img->find_imgdata() : array();
 
-        if(sizeof($imgdata) > 0) {  // we have an image
+        if (count($imgdata) > 0) {  // we have an image
           $img_form->set_values(array('name'=>$img_name, 'width' => $imgdata[0]['width'], 'height' => $imgdata[0]['height'], 'mimetype'=> $imgdata[0]['mime']));
 
           // find out if we already have an item
           $querystr = sprintf("SELECT id FROM Media WHERE item_id=%d AND type=%d AND name='%s' ORDER BY ord DESC LIMIT 1", $this->item_id, $this->type, $img_name);
           $dbconn->query($querystr);
-          if($dbconn->next_record()) {
+          if ($dbconn->next_record()) {
             $img_form->set_value('id', $dbconn->Record['id']);
           }
 
@@ -249,5 +249,3 @@ class ImageUploadHandler {
     }
   }
 }
-
-?>

@@ -94,7 +94,7 @@ class MysqlFulltextSimpleParser {
 
     // Exiting the variable reference
     case LEXER_EXIT:
-		if (sizeof($words) > 0)
+        if (count($words) > 0)
           $this->output .= '+"'.implode(' ', $words).'"';
         break;
     }
@@ -161,7 +161,7 @@ class Journal
     while ($dbconn->next_record()) {
       $articles[] = $dbconn->Record;
     }
-    return sizeof($articles) > 0 ? array('REVIEWS' => $articles) : array();
+    return count($articles) > 0 ? array('REVIEWS' => $articles) : array();
   }
 
   static function getPublications ($dbconn, $message_id) {

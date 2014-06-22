@@ -245,12 +245,12 @@ class DisplayPublication extends DisplayTable
       var url = '{$url_ws}';
       var pars = 'pn=publication&action=fetchPublicationByIsbn{$url_params}&isbn=' + escape(isbn);
       var myAjax = new Ajax.Request(
-			url,
-			{
-				method: 'get',
-				parameters: pars,
-				onComplete: setPublication
-			});
+            url,
+            {
+                method: 'get',
+                parameters: pars,
+                onComplete: setPublication
+            });
     }
 
     function setPublication (originalRequest, obj) {

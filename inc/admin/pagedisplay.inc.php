@@ -4,9 +4,9 @@
  *
  * Base Display class for Admin-pages
  *
- * (c) 2006-2013 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2013-11-25 dbu
+ * Version: 2014-06-22 dbu
  *
  * Changes:
  *
@@ -45,7 +45,9 @@ class PageDisplay extends PageDisplayBase
       if (isset($this->invalid[$name])) {
         $error_lang = preg_replace('/\_.*/', '', $this->page->lang());
 
-        $ret =  '<div class="error">'.$this->form->error_fulltext($this->invalid[$name], $error_lang).'</div>';
+        $ret = '<div class="error">'
+             . $this->form->error_fulltext($this->invalid[$name], $error_lang)
+             . '</div>';
       }
 
       $ret .= $field->show();
@@ -54,18 +56,20 @@ class PageDisplay extends PageDisplayBase
   }
 
   function buildRequired ($label) {
-    return $label.'*';
+    return $label . '*';
   }
 
   function buildFormRow($left, $right = '') {
-    return $this->buildContentLine($left, $right, array('class_left' => 'form', 'class_right' => 'form'));
+    return $this->buildContentLine($left, $right,
+                                   array('class_left' => 'form', 'class_right' => 'form'));
   }
 
   function buildContentLine($left, $right, $params = array()) {
     $class_left = isset($params['class_left']) ? $params['class_left'] : 'leftFixedWidth';
     $class_right = isset($params['class_right']) ? $params['class_right'] : 'rightFixedWidth';
-    if (empty($right))
+    if (empty($right)) {
       $right = '&nbsp;';
+    }
 
     // span fixes IE 7 bug: http://jaspan.com/ie-inherited-margin-bug-form-elements-and-haslayout
     $ret = <<<EOT
@@ -81,7 +85,7 @@ EOT;
   function buildContentLineMultiple ($lines, $params = array()) {
     $ret = '';
 
-    for ($i=0; $i < sizeof($lines); $i++) {
+    for ($i = 0; $i < count($lines); $i++) {
       $line = &$lines[$i];
 
       $left = isset($line['left']) ? $line['left'] : $line[0];
@@ -102,8 +106,9 @@ EOT;
         $querystr = sprintf("SELECT email FROM User WHERE id=%d", $changed_by);
         $dbconn = & $this->page->dbconn;
         $dbconn->query($querystr);
-        if($dbconn->next_record())
+        if ($dbconn->next_record()) {
           $changed .= sprintf(' by %s', $this->htmlSpecialChars($dbconn->Record['email']));
+        }
       }
       $changed = '<p>' . $changed . '</p>';
     }
@@ -219,8 +224,9 @@ EOT;
 
       $img_tag = $this->buildImgTag($this->buildImgUrl($item_id, $type, $img_name, $img['mimetype'], $append_uid), $params);
 
-      if ($return_caption)
+      if ($return_caption) {
         return array($img_tag, $caption, $copyright);
+      }
 
       return $img_tag;
     }
@@ -228,50 +234,14 @@ EOT;
 
   function buildHtmlLinkTags () {
     $tags = array(); // css, rss
-    if (!empty($this->stylesheet)) //link to stylesheet
+    if (!empty($this->stylesheet)) {
+      //link to stylesheet
       $tags[] =
         sprintf('<link rel="stylesheet" href="%s" type="text/css"></link>',
-          htmlspecialchars($this->page->BASE_PATH.$this->stylesheet));
+                htmlspecialchars($this->page->BASE_PATH . $this->stylesheet));
+    }
     return implode("\n", $tags);
   }
-
-/*
-  function buildHtmlStart () {
-    // javascript
-    $scriptcode = '';
-    if (isset($this->script_url)) {
-      foreach ($this->script_url as $url)
-        $scriptcode .= '<script language="JavaScript" type="text/javascript" src="'.htmlspecialchars($url).'"></script>'."\n";
-    }
-
-    if (!empty($this->script_code)) {
-        $scriptcode .= <<<EOT
-    <script language="JavaScript" type="text/javascript">
-  <!--
-  $this->script_code
-    // -->
-    </script>
-EOT;
-    }
-
-    $link_tags = $this->buildHtmlLinkTags();
-
-    $title = $this->htmlSpecialChars($this->page->title());
-    $charset = !empty($this->charset) ? $this->charset : 'iso-8859-15';
-
-return <<<EOT
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=$charset" />
-    <title>$title</title>
-    $link_tags
-    $scriptcode
-  </head>
-<body>
-EOT;
-  }
-*/
 
   function buildHtmlEnd () {
 return <<<EOT
@@ -455,7 +425,7 @@ EOT;
     if (isset($this->step) && $this->step > 0)
       $entries[] = tr($this->workflow->name($this->step));
 
-    if (sizeof(Page::$languages) > 0) {
+    if (count(Page::$languages) > 0) {
       $languages = array();
       foreach (Page::$languages as $lang => $label) {
         if ($lang != $this->page->lang())
@@ -468,7 +438,7 @@ EOT;
       $ret .= '<div id="languages">' . implode(' ', $languages) . '</div>';
     }
 
-    if (sizeof($entries) > 0) {
+    if (count($entries) > 0) {
       $ret .= '<div id="breadcrumbs">';
       $ret .= implode(' / ', $entries);
       $ret .= '</div>';
