@@ -44,7 +44,7 @@ class MessageQueryConditionBuilder extends TableManagerQueryConditionBuilder
     $fields = func_get_args();
 
     if (isset($this->term) && '' !== $this->term) {
-      $ret = $fields[0].'='.intval($this->term);
+      $ret = $fields[0] . '=' . intval($this->term);
       // build aggregate states
       /* if (0 == intval($this->term)) {
         // also show expired on holds
@@ -55,7 +55,7 @@ class MessageQueryConditionBuilder extends TableManagerQueryConditionBuilder
       return $ret;
     }
     else
-      return  $fields[0].'<>-1';
+      return  $fields[0] . '<>-1';
   }
 
   function buildEditorCondition () {
@@ -65,7 +65,7 @@ class MessageQueryConditionBuilder extends TableManagerQueryConditionBuilder
     $fields = func_get_args();
 
     if (isset($this->term) && '' !== $this->term) {
-      $ret = $fields[0].'='.intval($this->term);
+      $ret = $fields[0] . '=' . intval($this->term);
       return $ret;
     }
     return;
@@ -136,8 +136,9 @@ class DisplayBackend extends DisplayTable
         $max_images = 1;
 
       // check if we need to delete something
-      if (array_key_exists('delete_img', $this->page->parameters))
+      if (array_key_exists('delete_img', $this->page->parameters)) {
         $imageUploadHandler->delete($this->page->parameters['delete_img']);
+      }
 
       $images = $imageUploadHandler->buildImages($img_name, $img_params, $max_images);
       $imageUpload = $imageUploadHandler->buildUpload($images, $action);
@@ -151,7 +152,7 @@ class DisplayBackend extends DisplayTable
 
   function getUploadFormField(&$upload_form, $name, $args = '') {
     $ret = '';
-    $field = &$upload_form->field($name);
+    $field = $upload_form->field($name);
     if (isset($field)) {
       if (isset($this->invalid[$name]))
         $ret =  '<div class="error">'.$this->form->error_fulltext($this->invalid[$name], $this->page->lang).'</div>';
@@ -161,7 +162,7 @@ class DisplayBackend extends DisplayTable
     return $ret;
   }
 
-  function renderUpload (&$imageUploadHandler, $title = 'Image Upload') {
+  function renderUpload (&$imageUploadHandler, $title = 'File Upload') {
     $ret = '<h2>' . $this->formatText(tr($title)) . '</h2>';
 
     $params_self = array('pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_VIEW) => $this->id);
@@ -204,46 +205,59 @@ class DisplayBackend extends DisplayTable
         if (isset($img)) {
           $img_field = '';
           if ($max_images != 1) {
-            if ($count > 0)
+            if ($count > 0) {
               $rows[] = '<hr />';
-            $img_field .= '<h4>'.$title.'</h4>';
+            }
+            $img_field .= '<h4>' . $title . '</h4>';
           }
           ++$count;
 
           $img_form = & $imageUploadHandler->img_forms[$img_name];
           if (isset($upload_results[$img_name]) && isset($upload_results[$img_name]['status']) && $upload_results[$img_name]['status'] < 0) {
-            $img_field .= '<div class="message">'.$upload_results[$img_name]['msg'].'</div>';
+            $img_field .= '<div class="message">'
+                        . $upload_results[$img_name]['msg']
+                        . '</div>';
           }
 
           $url_delete = $this->page->buildLink(array_merge($params_self,
                                                array('delete_img' => $img_name)));
 
-          list($img_tag, $caption, $copyright) = $this->buildImage($imageUploadHandler->message_id, $imageUploadHandler->type, $img_name, TRUE, TRUE, TRUE);
+          list($img_tag, $caption, $copyright) = $this->buildImage($imageUploadHandler->item_id, $imageUploadHandler->type, $img_name, TRUE, TRUE, TRUE);
           // var_dump($img_tag);
           if (!empty($img_tag)) {
-            $img_field .= '<p><div style="margin-right: 2em; margin-bottom: 1em; float: left;">'.$img_tag.'</div>'
-              .(!empty($caption) ? $this->formatText($caption).'<br />&nbsp;<br />' : '')
-              .'[<a href="'.$url_delete.'">delete</a>]<br clear="left" /></p>';
+            $img_field .= '<p>'
+                        . '<div style="margin-right: 2em; margin-bottom: 1em; float: left;">'
+                        . $img_tag
+                        . '</div>'
+                        . (!empty($caption) ? $this->formatText($caption).'<br />&nbsp;<br />' : '')
+                        . '[<a href="' . htmlspecialchars($url_delete) . '">'
+                        . tr('delete') . '</a>]<br clear="left" />'
+                        . '</p>';
           }
 
           $rows[] = $img_field;
 
           $rows[] = array('File', $img->show_upload_field());
-          $rows[] = array('Image Caption', $this->getUploadFormField($img_form, 'caption', array('prepend' => $img_name.'_')));
-          $rows[] = array('Copyright-Notice', $this->getUploadFormField($img_form, 'copyright', array('prepend' => $img_name.'_')));
+          $rows[] = array('Image Caption',
+                          $this->getUploadFormField($img_form, 'caption', array('prepend' => $img_name . '_')));
+          $rows[] = array('Copyright-Notice',
+                          $this->getUploadFormField($img_form, 'copyright', array('prepend' => $img_name . '_')));
 
-          $rows[] = array('', '<input type="submit" value="'.ucfirst(tr('upload')).'" />');
+          $rows[] = array('', '<input type="submit" value="' . ucfirst(tr('upload')) . '" />');
         } // if
       }
       foreach ($rows as $row) {
-        if ('array' == gettype($row))
+        if (is_array($row)) {
           $ret .= $this->buildContentLine(tr($row[0]), $row[1]);
-        else
+        }
+        else {
           $ret .= $row;
+        }
       } // foreach
     } // foreach
-    if (!$first)
+    if (!$first) {
       $ret .= $imageUpload->show_end();
+    }
 
     return $ret;
   }
@@ -273,7 +287,7 @@ class MessageRecord extends TablemanagerRecord
         $dbconn->query($querystr);
 
         $querystr = sprintf("INSERT INTO MessageUser (message_id, user_id) VALUES (%d, %d)",
-                        $message_id, $user_id);
+                            $message_id, $user_id);
         $dbconn->query($querystr);
       }
     }
@@ -370,7 +384,7 @@ class DisplayMessage extends DisplayBackend
 
     $this->condition[] = array('name' => 'status',
                                'method' => 'buildStatusCondition',
-                               'args' => $this->table.'.status',
+                               'args' => $this->table . '.status',
                                'persist' => 'session');
     $this->condition[] = array('name' => 'editor',
                                'method' => 'buildEditorCondition',
@@ -624,7 +638,7 @@ EOT;
             $field_value = $record->get_value($key);
             if (isset($row_descr['options']) && isset($field_value) && '' !== $field_value) {
               $values = preg_split('/,\s*/', $field_value);
-              for($i = 0; $i < count($values); $i++)
+              for ($i = 0; $i < count($values); $i++)
                 if (isset($row_descr['options'][$values[$i]]))
                   $values[$i] = $row_descr['options'][$values[$i]];
               $field_value = implode(', ', $values);
@@ -676,18 +690,21 @@ EOT;
     if ($found = $record->fetch($this->id)) {
       $this->record = &$record;
       $uploadHandler = $this->instantiateUploadHandler();
-      if (isset($uploadHandler))
+      if (isset($uploadHandler)) {
         $this->processUpload($uploadHandler);
+      }
 
       $rows = $this->buildViewRows();
+
       $edit = $this->buildEditButton();
 
-      $ret = '<h2>' . $this->formatText($record->get_value('title')) . ' ' . $edit.'</h2>';
+      $ret = '<h2>' . $this->formatText($record->get_value('title')) . ' ' . $edit . '</h2>';
 
       $ret .= $this->renderView($record, $rows);
 
-      if (isset($uploadHandler))
+      if (isset($uploadHandler)) {
         $ret .= $this->renderUpload($uploadHandler);
+      }
 
     }
     $ret .= $this->buildViewFooter($found);
@@ -719,7 +736,7 @@ EOT;
       }
     }
     return tr('Editing Status')
-      . ': <select name="status">' . implode($status_options) . '</select>';
+         . ': <select name="status">' . implode($status_options) . '</select>';
   }
 
   function buildSearchFields () {

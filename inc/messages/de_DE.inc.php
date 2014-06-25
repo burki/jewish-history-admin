@@ -166,6 +166,7 @@ $GETTEXT_MESSAGES = array (
 'Book Reviews' => 'Buchrezensionen',
 'Image Upload' => 'Bild hochladen',
 'Cover Image' => 'Buchumschlag',
+'File Upload' => 'Datei hochladen',
 'File' => 'Datei',
 'Image Caption' => 'Bildunterschrift',
 'Copyright-Notice' => 'Urheberrechtsnachweis',
@@ -219,10 +220,12 @@ $GETTEXT_MESSAGES = array (
 'delete message' => 'Beitrag löschen',
 'Communication' => 'Kommunikation',
 'Articles' => 'Artikel',
+'New Article' => 'Neuer Artikel',
 'set publisher' => 'Verlag zuordnen',
 'Subject' => 'Titel',
 'Convert Quotes' => 'Anführungszeichen konvertieren',
 'convert' => 'konvertieren',
 'Key-Documents of German-Jewish History' => 'Schlüsseldokumente zur deutsch-jüdischen Geschichte',
+'send letter' => 'Anschreiben erstellen',
 );
 

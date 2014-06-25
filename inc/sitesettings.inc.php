@@ -77,7 +77,9 @@ $MAIL_SETTINGS = array(
   'subject_prepend'      => 'Key-Documents of German-Jewish History - ',
 );
 
-$MEDIA_EXTENSIONS = array('image/gif' => '.gif', 'image/jpeg' => '.jpg', 'image/png' => '.png');
+$MEDIA_EXTENSIONS = array('image/gif' => '.gif', 'image/jpeg' => '.jpg', 'image/png' => '.png',
+                          'application/pdf' => '.pdf',
+                          );
 
 $STATUS_REMOVED = '-1';
 $STATUS_EDIT = '0';

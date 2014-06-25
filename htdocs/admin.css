@@ -1,3 +1,5 @@
+@import url(http://fonts.googleapis.com/css?family=Roboto+Condensed:400,400italic,700,700italic,300,300italic&subset=latin,cyrillic-ext,greek,latin-ext,cyrillic,greek-ext);
+
 @import url('css/jquery.autocomplete.css');
 
 /* content areas */
@@ -5,10 +7,10 @@ html, body, #holder { min-height: 100%; width: 100%; height: 100%;}
 html>body, html>body #holder { height: auto;}
 body { margin: 0; padding:0; }
 #holder { /* position: absolute; top: 0; left: 0; */}
-#header {padding: 0px; color: black; background-color: white; }
-#languages { font-size: 9pt; color: black; margin-top: 0.3em; padding-top: 0.2em; padding-right: 0.2em; float:right; }
-#languages a:link, #languages a:visited { color: #909090; }
-#breadcrumbs { padding-left: 1em; font-size: 9pt; color: black; margin-top: 0.3em; border-bottom: 1px solid #909090; padding-bottom: 0.2em; }
+#header { padding: 0px; color: white; background-color: #4D0F77; }
+#languages { clear: right; font-size: 9pt; color: white; margin-top: 0.3em; padding-top: 0.2em; padding-right: 0.2em; float:right; }
+#languages a:link, #languages a:visited { color: #C1B3D5; }
+#breadcrumbs { background-color: white; padding-left: 1em; font-size: 9pt; color: black; margin-top: 0.3em; border-bottom: 1px solid #909090; padding-top: 0.2em; padding-bottom: 0.2em; }
 #breadcrumbs a:link, #breadcrumbs a:visited { color: #909090; }
 
 #content {margin-left: 0.5em; padding-top: 1em; padding-bottom: 3em; height: auto;}
@@ -138,8 +140,8 @@ td.listing, td.form {
   color: white;
 }
 
-a.inverse {
-  color: #c0c0c0;
+a.inverse:link, a.inverse:visited {
+  color: white; /* #c0c0c0 */;
 }
 
 /* for autocompleter */

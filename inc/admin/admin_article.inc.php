@@ -4,9 +4,9 @@
  *
  * Manage the articles
  *
- * (c) 2009 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2009-08-03 dbu
+ * Version: 2014-06-25 dbu
  *
  * Changes:
  *
@@ -14,6 +14,50 @@
 
 require_once INC_PATH . 'common/classes.inc.php';
 require_once INC_PATH . 'admin/displaymessage.inc.php';
+
+class ArticleQueryConditionBuilder extends MessageQueryConditionBuilder
+{
+  static function buildOverdueExpression () {
+    return 'CASE Message.status'
+         . ' WHEN -85 THEN DATE_ADD(publisher_received, INTERVAL 30 DAY)'
+         . ' WHEN -76 THEN DATE_ADD(reviewer_request, INTERVAL 30 DAY)'
+         . ' WHEN -73 THEN DATE_ADD(reviewer_deadline, INTERVAL 15 DAY)'
+         . ' WHEN -69 THEN DATE_ADD(reviewer_deadline, INTERVAL 15 DAY)'
+         . ' WHEN -68 THEN DATE_ADD(reviewer_deadline, INTERVAL 15 DAY)'
+         . ' WHEN -67 THEN DATE_ADD(reviewer_deadline, INTERVAL 15 DAY)'
+         . ' WHEN -66 THEN DATE_ADD(reviewer_deadline, INTERVAL 15 DAY)'
+         . ' WHEN -59 THEN DATE_ADD(reviewer_received, INTERVAL 30 DAY)'
+         . ' ELSE NULL END';
+  }
+
+  function buildStatusCondition () {
+    $num_args = func_num_args();
+    if ($num_args <= 0) {
+      return;
+    }
+    $fields = func_get_args();
+
+    if (isset($this->term) && '' !== $this->term) {
+      if (100 == $this->term) {
+        // ueberfaellig
+        $ret = 'CURRENT_DATE() >= ' . self::buildOverdueExpression();
+      }
+      else {
+        $ret = $fields[0] . '=' . intval($this->term);
+      }
+      // build aggregate states
+      /* if (0 == intval($this->term)) {
+        // also show expired on holds
+        $ret = "($ret "
+          // ." OR ".$fields[0]. " = -3" // uncomment for open requests
+          ." OR (".$fields[0]." = 2 AND hold <= CURRENT_DATE()))";
+      } */
+      return $ret;
+    }
+
+    return  $fields[0] . '<>-1';
+  }
+}
 
 class DisplayArticle extends DisplayMessage
 {
@@ -40,12 +84,17 @@ class DisplayArticle extends DisplayMessage
 
   function __construct (&$page) {
     global $MESSAGE_ARTICLE;
+
     $this->type = $MESSAGE_ARTICLE;
-    $this->messages['item_new'] = 'New Article';
+    $this->messages['item_new'] = tr('New Article');
     parent::__construct($page);
     $this->order['date'] = array('IF(0 = reviewer_deadline + 0, published, reviewer_deadline) DESC', 'IF(0 = reviewer_deadline + 0, published, reviewer_deadline)');
     $this->fields_listing[sizeof($this->fields_listing) -1 ] = "DATE(reviewer_deadline) AS reviewer_deadline";
     $this->cols_listing['date'] = 'Author deadline';
+  }
+
+  function instantiateQueryConditionBuilder ($term) {
+    return new ArticleQueryConditionBuilder($term);
   }
 
   function constructFulltextCondition () {
@@ -53,6 +102,11 @@ class DisplayArticle extends DisplayMessage
                                'method' => 'buildFulltextCondition',
                                'args' => 'subject,User.firstname,User.lastname,body',
                                'persist' => 'session');
+  }
+
+  function buildStatusOptions ($options = NULL, $show_all = true) {
+    $options = array('100' => '_&#252;berf&#228;llig_') + $this->status_options;
+    return parent::buildStatusOptions($options);
   }
 
   function buildOptions ($type = 'editor') {
@@ -95,24 +149,24 @@ class DisplayArticle extends DisplayMessage
     $this->view_options['referee'] = $this->referee_options;
 
     $record->add_fields(array(
-        new Field(array('name'=>'publication', 'type'=>'hidden', 'datatype'=>'int', 'nodbfield' => 1, 'null' => 1)),
-        new Field(array('name'=>'editor', 'type'=>'select',
+        new Field(array('name' => 'publication', 'type' => 'hidden', 'datatype' => 'int', 'nodbfield' => 1, 'null' => 1)),
+        new Field(array('name' => 'editor', 'type' => 'select',
                         'options' => array_merge(array(''), array_keys($this->editor_options)),
                         'labels' => array_merge(array(tr('-- none --')), array_values($this->editor_options)),
-                        'datatype'=>'int', 'null' => 1)),
-        new Field(array('name'=>'referee', 'type'=>'select',
+                        'datatype' => 'int', 'null' => 1)),
+        new Field(array('name' => 'referee', 'type' => 'select',
                         'options' => array_merge(array(''), array_keys($this->referee_options)),
                         'labels' => array_merge(array(tr('-- none --')), array_values($this->referee_options)),
-                        'datatype'=>'int', 'null' => 1)),
-        new Field(array('name'=>'reviewer_request', 'type'=>'datetime', 'datatype'=>'datetime', 'null' => TRUE)),
-        new Field(array('name'=>'reviewer_sent', 'type'=>'datetime', 'datatype'=>'datetime', 'null' => TRUE)),
-        new Field(array('name'=>'reviewer_deadline', 'type'=>'datetime', 'datatype'=>'datetime', 'null' => TRUE)),
-        new Field(array('name'=>'reviewer_received', 'type'=>'datetime', 'datatype'=>'datetime', 'null' => TRUE)),
-        new Field(array('name'=>'referee_sent', 'type'=>'datetime', 'datatype'=>'datetime', 'null' => TRUE)),
-        new Field(array('name'=>'referee_deadline', 'type'=>'datetime', 'datatype'=>'datetime', 'null' => TRUE)),
-        // new Field(array('name'=>'url', 'id' => 'url', 'type'=>'text', 'datatype'=>'char', 'size'=>65, 'maxlength'=>200, 'null' => 1)),
-        // new Field(array('name'=>'urn', 'id' => 'urn', 'type'=>'text', 'datatype'=>'char', 'size'=>45, 'maxlength'=>200, 'null' => 1)),
-        // new Field(array('name'=>'tags', 'id' => 'urn', 'type'=>'text', 'datatype'=>'char', 'size'=>45, 'maxlength'=>200, 'null' => 1)),
+                        'datatype' => 'int', 'null' => 1)),
+        new Field(array('name' => 'reviewer_request', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
+        new Field(array('name' => 'reviewer_sent', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
+        new Field(array('name' => 'reviewer_deadline', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
+        new Field(array('name' => 'reviewer_received', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
+        new Field(array('name' => 'referee_sent', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
+        new Field(array('name' => 'referee_deadline', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
+        // new Field(array('name' => 'url', 'id' => 'url', 'type' => 'text', 'datatype' => 'char', 'size'=>65, 'maxlength'=>200, 'null' => 1)),
+        // new Field(array('name' => 'urn', 'id' => 'urn', 'type' => 'text', 'datatype' => 'char', 'size'=>45, 'maxlength'=>200, 'null' => 1)),
+        // new Field(array('name' => 'tags', 'id' => 'urn', 'type' => 'text', 'datatype' => 'char', 'size'=>45, 'maxlength'=>200, 'null' => 1)),
        ));
 
     return $record;
@@ -149,8 +203,9 @@ class DisplayArticle extends DisplayMessage
             return;
           }
         }
-        for (var key in params)
+        for (var key in params) {
           url += '&' + key + '=' + params[key];
+        }
 
         window.open(url);
       }
@@ -186,7 +241,7 @@ class DisplayArticle extends DisplayMessage
 
 EOT;
       $reviewer_request_button = sprintf(' <input type="button" value="%s" onclick="generateCommunication(\'%s\', \'reviewer_request\')" />',
-                                    tr('send letter'), htmlspecialchars($this->page->buildLink(array('pn' => 'communication', 'edit' => -1))));
+                                         tr('send letter'), htmlspecialchars($this->page->buildLink(array('pn' => 'communication', 'edit' => -1))));
       $reviewer_sent_button = sprintf(' <input type="button" value="%s" onclick="generateCommunication(\'%s\', \'reviewer_sent\')" />',
                                     tr('send letter'), htmlspecialchars($this->page->buildLink(array('pn' => 'communication', 'edit' => -1))));
       $reviewer_reminder_button = sprintf(' <input type="button" value="%s" onclick="generateCommunication(\'%s\', \'reviewer_reminder\')" />',
@@ -238,6 +293,28 @@ EOT;
     return $rows;
   }
 
+  function getImageDescriptions () {
+    global $TYPE_MESSAGE;
+
+    $images = array(
+          'document' => array(
+                        'title' => tr('Dokumente (Texte, Bilder, ...)'),
+                        'multiple' => TRUE,
+                        'imgparams' => array('max_width' => 300, 'max_height' => 300,
+                                             'scale' => 'down', 'keep' => 'large',
+                                             'pdf' => TRUE,
+                                             'office' => TRUE,
+                                             ),
+                        'labels' => array(
+                                          'source' => 'Source',
+                                          'displaydate' => 'Creation Date',
+                                          ),
+                        ),
+          );
+
+    return array($TYPE_MESSAGE, $images);
+  }
+
   /*
   function buildEditButton () {
     return parent::buildEditButton()
@@ -245,17 +322,10 @@ EOT;
                    htmlspecialchars('./?pn=article&preview=' . $this->id),
                    tr('site preview'));
   } */
-
-/*
-  function buildStatusOptions () {
-    $options = array('100' => '_&#252;berf&#228;llig_') + $this->status_options;
-    return parent::buildStatusOptions($options);
-  }
-*/
-
 }
 
 $display = new DisplayArticle($page);
-if (FALSE === $display->init())
+if (FALSE === $display->init()) {
   $page->redirect(array('pn' => ''));
+}
 $page->setDisplay($display);

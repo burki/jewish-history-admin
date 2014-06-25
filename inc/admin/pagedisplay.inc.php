@@ -11,6 +11,7 @@
  * Changes:
  *
  */
+
 require_once INC_PATH . 'common/pagedisplay.inc.php';
 
 class PageDisplay extends PageDisplayBase
@@ -59,7 +60,7 @@ class PageDisplay extends PageDisplayBase
     return $label . '*';
   }
 
-  function buildFormRow($left, $right = '') {
+  function buildFormRow ($left, $right = '') {
     return $this->buildContentLine($left, $right,
                                    array('class_left' => 'form', 'class_right' => 'form'));
   }
@@ -99,16 +100,17 @@ EOT;
   function buildChangedBy () {
     $changed = '';
     $changed_datetime = $this->form->get_value('changed');
-    if (!empty($changed_datetime)) {
-      $changed = sprintf('Last change: %s', $this->form->get_value('changed'));
+    if (!empty($changed_datetime) && 'NOW()' != $changed_datetime) {
+      $changed = sprintf(tr('Last change: %s'), $changed_datetime);
       $changed_by = $this->form->get_value('changed_by');
       if (isset($changed_by)) {
         $querystr = sprintf("SELECT email FROM User WHERE id=%d", $changed_by);
         $dbconn = & $this->page->dbconn;
         $dbconn->query($querystr);
-        if ($dbconn->next_record()) {
-          $changed .= sprintf(' by %s', $this->htmlSpecialChars($dbconn->Record['email']));
-        }
+        if ($dbconn->next_record())
+          $changed .= sprintf(' %s %s',
+                              tr('by'),
+                              $this->htmlSpecialChars($dbconn->Record['email']));
       }
       $changed = '<p>' . $changed . '</p>';
     }
@@ -133,11 +135,11 @@ EOT;
       $uid = uniqid();
 
     $folder = UPLOAD_URLROOT.$UPLOAD_TRANSLATE[$type]
-              .sprintf(".%03d/id%05d/",
-                       intval($item_id / 32768), intval($item_id % 32768));
+            . sprintf(".%03d/id%05d/",
+                      intval($item_id / 32768), intval($item_id % 32768));
 
-    return $folder.$name.$MEDIA_EXTENSIONS[$mime]
-          .($append_uid ? '?uid='.$uid : '');
+    return $folder . $name . $MEDIA_EXTENSIONS[$mime]
+         . ($append_uid ? '?uid='.$uid : '');
   }
 
 
@@ -153,11 +155,11 @@ EOT;
       $attrs['alt'] = '';
     if ((array_key_exists('enlarge', $attrs) && $attrs['enlarge'])
       || (!isset($attrs['width']) && !isset($attrs['height']))) {
-      $fname = ereg('^'.UPLOAD_URLROOT, $relurl)
-        ? ereg_replace('^'.UPLOAD_URLROOT, UPLOAD_FILEROOT, $relurl)
-        : ereg_replace('^'.BASE_PATH, './', $relurl);
+      $fname = preg_match('/^' . preg_quote(UPLOAD_URLROOT, '/') . '/', $relurl)
+        ? preg_replace('/^' . preg_quote(UPLOAD_URLROOT, '/') . '/', UPLOAD_FILEROOT, $relurl)
+        : preg_replace('/^' . preg_quote(BASE_PATH, '/') . '/', './', $relurl);
       $fname = preg_replace('/\?.*/', '', $fname);
-      $size = @GetImageSize($fname);
+      $size = @getimagesize($fname);
       if (isset($size)) {
         if (!isset($attrs['width']) && !isset($attrs['height'])) {
           $attrs['width'] = $size[0]; $attrs['height'] = $size[1];
@@ -167,7 +169,7 @@ EOT;
           // var_dump($fname_large);
 
           if (file_exists($fname_large)) {
-            $size_large = GetImageSize($fname_large);
+            $size_large = getimagesize($fname_large);
             $url_enlarge = "window.open('".BASE_PATH."img.php?url=".urlencode($relurl)."&width=".$size_large[0]."&height=".$size_large[1]."&caption=".urlencode($attrs['enlarge_caption'])."', '_blank', 'width=".($size_large[0] + $IMG_ENLARGE_ADDWIDTH).",height=".($size_large[1] + $IMG_ENLARGE_ADDHEIGHT).",resizable=yes');";
             $url_enlarge .= 'return false;';
             $attrs['alt'] = 'Click to enlarge';
@@ -217,12 +219,27 @@ EOT;
     if (isset($img)) {
       $caption = $img['caption'];
       $copyright = $img['copyright'];
+      $img_url = $this->buildImgUrl($item_id, $type, $img_name, $img['mimetype'], $append_uid);
 
-      $params = array('width' => $img['width'], 'height' => $img['height'], 'enlarge' => $enlarge, 'enlarge_caption' => $this->formatText($caption), 'border' => 0);
-      if (NULL !== $alt)
-        $params['alt'] = $params['title'] = $alt;
+      if ('application/pdf' == $img['mimetype']) {
+        if (!$append_uid) {
+          $img_tag = $this->buildPdfViewer($img_url, empty($caption) ? 'PDF' : $caption,
+                                           array('thumbnail' => $this->buildThumbnailUrl($item_id, $type, $img_name, $img['mimetype'])));
+        }
+        else {
+          $img_tag = sprintf('<a href="%s" target="_blank">%s</a>',
+                             htmlspecialchars($img_url),
+                             $this->formatText(empty($caption) ? 'PDF' : $caption));
+        }
+      }
+      else {
+        $params = array('width' => $img['width'], 'height' => $img['height'], 'enlarge' => $enlarge, 'enlarge_caption' => $this->formatText($caption), 'border' => 0);
+        if (NULL !== $alt) {
+          $params['alt'] = $params['title'] = $alt;
+        }
 
-      $img_tag = $this->buildImgTag($this->buildImgUrl($item_id, $type, $img_name, $img['mimetype'], $append_uid), $params);
+        $img_tag = $this->buildImgTag($img_url, $params);
+      }
 
       if ($return_caption) {
         return array($img_tag, $caption, $copyright);
@@ -284,8 +301,11 @@ EOT;
         $max_images = 1;
 
       // check if we need to delete something
-      if (array_key_exists('delete_img', $this->page->parameters) && substr($this->page->parameters['delete_img'], 0, strlen($img_basename)) == $img_basename)
+      if (array_key_exists('delete_img', $this->page->parameters)
+          && substr($this->page->parameters['delete_img'], 0, strlen($img_basename)) == $img_basename)
+      {
         $imageUploadHandler->delete($this->page->parameters['delete_img']);
+      }
 
       $images = $imageUploadHandler->buildImages($img_basename, $img_params, $max_images);
       $imageUpload = $imageUploadHandler->buildUpload($images, $action);
@@ -302,7 +322,9 @@ EOT;
     $field = $upload_form->field($name);
     if (isset($field)) {
       if (isset($this->invalid[$name]))
-        $ret =  '<div class="error">'.$this->form->error_fulltext($this->invalid[$name], $this->page->lang).'</div>';
+        $ret = '<div class="error">'
+             . $this->form->error_fulltext($this->invalid[$name], $this->page->lang)
+             . '</div>';
 
       $ret .= $field->show($args);
     }
@@ -310,7 +332,7 @@ EOT;
   }
 
   function renderUpload (&$imageUploadHandler, $title = 'Image Upload') {
-    $ret = '<h2>'.$this->formatText($title).'</h2>';
+    $ret = '<h2>' . $this->formatText($title) . '</h2>';
 
     $params_self = array('pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_VIEW) => $this->id);
     $action = $this->page->buildLink($params_self);
@@ -320,7 +342,7 @@ EOT;
     foreach ($this->images as $img_basename => $img_descr) {
       $rows = array();
       if (isset($img_descr['title']))
-        $ret .= '<h3>'.$img_descr['title'].'</h3>';
+        $ret .= '<h3>' . $img_descr['title'] . '</h3>';
 
       $upload_results = isset($this->upload_results[$img_basename])
         ? $this->upload_results[$img_basename]: array();
@@ -373,9 +395,9 @@ EOT;
           list($img_tag, $caption, $copyright) = $this->buildImage($imageUploadHandler->item_id, $imageUploadHandler->type, $img_name, TRUE, TRUE, TRUE);
           // var_dump($img_tag);
           if (!empty($img_tag)) {
-            $img_field .= '<p><div style="margin-right: 2em; margin-bottom: 1em; float: left;">'.$img_tag.'</div>'
-              .(!empty($caption) ? $this->formatText($caption).'<br />&nbsp;<br />' : '')
-              .'[<a href="'.$url_delete.'">delete</a>]<br clear="left" /></p>';
+            $img_field .= '<p><div style="margin-right: 2em; margin-bottom: 1em; float: left;">' . $img_tag . '</div>'
+                        . (!empty($caption) ? $this->formatText($caption).'<br />&nbsp;<br />' : '')
+                        . '[<a href="' . htmlspecialchars($url_delete) . '">' . tr('delete') . '</a>]<br clear="left" /></p>';
           }
 
           $rows[] = $img_field;
@@ -384,35 +406,42 @@ EOT;
           $rows[] = array('Image Caption', $this->getUploadFormField($img_form, 'caption', array('prepend' => $img_name.'_')));
           $rows[] = array('Copyright-Notice', $this->getUploadFormField($img_form, 'copyright', array('prepend' => $img_name.'_')));
 
-          $rows[] = array('', '<input type="submit" value="Upload" />');
+          $rows[] = array('', '<input type="submit" value="' . ucfirst(tr('upload')) . '" />');
         } // if
       }
       foreach ($rows as $row) {
         if ('array' == gettype($row))
-          $ret .= $this->buildContentLine($row[0], $row[1]);
+          $ret .= $this->buildContentLine(tr($row[0]), $row[1]);
         else
           $ret .= $row;
       } // foreach
     } // foreach
-    if (!$first)
+    if (!$first) {
       $ret .= $imageUpload->show_end();
+    }
 
     return $ret;
   }
 
   function buildMenu () {
+    global $SITE_DESCRIPTION;
+
     $url_main = $this->page->buildLink(array('pn' => '')); // '../';
 
     $ret = '<div id="header">';
 
     if (!empty($this->page->user)) {
-      $ret .= '<div id="menuAccount" style="font-size: 9pt; float: right">'.$this->formatText($this->page->user['login']).' | <a class="inverse" href="'.$this->page->buildLink(array('pn' => 'account', 'edit' => $this->page->user['id'])).'">'.tr('My Account').'</a> | <a class="inverse" href="'.$this->page->buildLink(array('pn' => '', 'do_logout' => 1)).'">'.tr('Sign out').'</a></div>';
-      if (!$this->is_internal)
+      $ret .= '<div id="menuAccount" style="font-size: 9pt; float: right">'
+            . $this->formatText($this->page->user['login'])
+            . ' | <a class="inverse" href="' . $this->page->buildLink(array('pn' => 'account', 'edit' => $this->page->user['id'])).'">'.tr('My Account').'</a> | <a class="inverse" href="'.$this->page->buildLink(array('pn' => '', 'do_logout' => 1)).'">'.tr('Sign out').'</a></div>';
+      if (!$this->is_internal) {
         $this->page->site_description['structure']['root']['title'] = 'My Subscription';
+      }
     }
-    $ret .= sprintf('<a href="%s"><img src="%s" style="vertical-align:text-bottom; border: 0;" width="620" height="200" alt="Docupedia-Zeitgeschichte" /></a> ',
+    $ret .= sprintf('<a href="%s"><img src="%s" style="vertical-align:text-bottom; border: 0;" width="582" height="160" alt="%s" /></a> ',
                     $url_main,
-                    $this->page->BASE_PATH . 'media/logo.jpg');
+                    $this->page->BASE_PATH . 'media/logo.png',
+                    $this->htmlSpecialchars(tr($SITE_DESCRIPTION['title'])));
     $entries = array();
 
     if (isset($this->page->path)) {
@@ -428,10 +457,12 @@ EOT;
     if (count(Page::$languages) > 0) {
       $languages = array();
       foreach (Page::$languages as $lang => $label) {
-        if ($lang != $this->page->lang())
+        if ($lang != $this->page->lang()) {
           $label = '<a class="inverse" href="?lang='.$lang.'">'.$this->formatText($label).'</a>';
-        else
+        }
+        else {
           $label = $this->formatText($label);
+        }
 
         $languages[] = $label;
       }
@@ -463,14 +494,15 @@ EOT;
       exit;
     }
 
-
-    echo $this->buildHtmlStart() . "\n". '<div id="holder">';
+    echo $this->buildHtmlStart()
+       . "\n"
+       . '<div id="holder">';
 
     echo $this->buildMenu();
-    echo '<div id="content">'.$content."</div>\n";
+    echo '<div id="content">' . $content . "</div>\n";
 
     // echo '<div id="footer"><div align="right" style="padding:0.5em; font-size: 9pt;">(c) 2008 - daniel burckhardt</div></div>';
-    echo '</div>';
+    echo '</div><!-- .#holder -->';
 
     echo $this->buildHtmlEnd();
   }

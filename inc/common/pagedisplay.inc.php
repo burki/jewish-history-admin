@@ -4,9 +4,9 @@
  *
  * Abstract Base Display class
  *
- * (c) 2007-2008 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2008-10-24 dbu
+ * Version: 2014-06-25 dbu
  *
  * Changes:
  *
@@ -359,15 +359,17 @@ class PageDisplayBase
       $params = array('width' => $img['width'], 'height' => $img['height'],
                       'enlarge' => $enlarge, 'enlarge_caption' => $this->formatText($caption),
                       'border' => 0);
-      if (NULL !== $alt)
+      if (NULL !== $alt) {
         $params['alt'] = $params['title'] = $alt;
+      }
 
       $img_tag = $this->buildImgTag($this->buildImgUrl($item_id, $type,
                                                        $img_name, $img['mimetype'], $append_uid),
                                     $params);
 
-      if ($return_caption)
+      if ($return_caption) {
         return array($img_tag, $caption, $copyright);
+      }
 
       return $img_tag;
     }

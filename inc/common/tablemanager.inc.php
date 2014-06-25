@@ -246,7 +246,7 @@ class DisplayTable extends PageDisplay
   }
 
   function instantiateHtmlForm ($name = 'detail', $action = '', $method = 'post') {
-    $params = array('method'=>'post', 'name' => $name);
+    $params = array('method' => 'post', 'name' => $name);
     if (!empty($action))
       $params['action'] = $action;
     $params['datetime_style'] = $this->datetime_style;

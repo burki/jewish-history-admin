@@ -2,11 +2,11 @@
 /*
  * admin.php
  *
- * admin system for Docupedia
+ * admin system
  *
- * (c) 2008-2010 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2010-05-31 dbu
+ * Version: 2014-06-26 dbu
  *
  * Changes:
  *
