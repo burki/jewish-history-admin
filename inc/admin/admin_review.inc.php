@@ -59,8 +59,8 @@ class ReviewQueryConditionBuilder extends MessageQueryConditionBuilder
 
 class ReviewRecord extends MessageRecord
 {
-  function store () {
-    $stored = parent::store();
+  function store ($args = '') {
+    $stored = parent::store($args = '');
 
     if ($stored) {
       $publication = $this->get_value('publication');
@@ -115,7 +115,7 @@ class DisplayReview extends DisplayMessage
     global $MESSAGE_REVIEW_PUBLICATION;
     $this->type = $MESSAGE_REVIEW_PUBLICATION;
     $this->messages['item_new'] = 'New Review';
-    $this->fields_listing[sizeof($this->fields_listing) - 1] = sprintf('DATE(%s) AS published',
+    $this->fields_listing[count($this->fields_listing) - 1] = sprintf('DATE(%s) AS published',
                                       ReviewQueryConditionBuilder::buildOverdueExpression());
     parent::__construct($page);
   }
@@ -235,10 +235,12 @@ class DisplayReview extends DisplayMessage
 
     if (!isset($this->workflow->id)) {
       // for new entries, a subject or publication-id may be passed along
-      if (array_key_exists('subject', $_GET))
+      if (array_key_exists('subject', $_GET)) {
         $record->set_value('subject', $_GET['subject']);
-      if (array_key_exists('publication', $_GET) && intval($_GET['publication']) > 0)
+      }
+      if (array_key_exists('publication', $_GET) && intval($_GET['publication']) > 0) {
         $record->set_value('publication', intval($_GET['publication']));
+      }
     }
 
     return $record;
@@ -360,7 +362,6 @@ EOT;
                    htmlspecialchars('./?pn=issue&preview=' . $this->id),
                    tr('site preview'));
   }
-
 
   function buildView () {
     $ret = parent::buildView();

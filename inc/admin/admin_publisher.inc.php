@@ -2,11 +2,11 @@
 /*
  * admin_publisher.inc.php
  *
- * Class for managing publishers
+ * Class for managing holding institutions
  *
- * (c) 2008-2013 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2013-11-25 dbu
+ * Version: 2014-06-30 dbu
  *
  * Changes:
  *
@@ -57,11 +57,11 @@ class DisplayPublisher extends DisplayTable
   var $page_size = 30;
   var $show_xls_export = TRUE;
   var $table = 'Publisher';
-  var $fields_listing = array('id', 'name', 'domicile'); // , 'status');
+  var $fields_listing = array('id', 'name', 'place'); // , 'status');
   var $listing_default_action = TABLEMANAGER_VIEW;
 
   var $condition = array(
-      array('name' => 'search', 'method' => 'buildLikeCondition', 'args' => 'name,domicile'),
+      array('name' => 'search', 'method' => 'buildLikeCondition', 'args' => 'name,place'),
       'Publisher.status>=0',
       // alternative: buildFulltextCondition
   );
@@ -101,36 +101,37 @@ class DisplayPublisher extends DisplayTable
       $countries_ordered['&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;'] = FALSE; // separator
     }
     foreach ($countries as $cc => $name) {
-      if (!isset($countries_ordered[$cc]))
+      if (!isset($countries_ordered[$cc])) {
         $countries_ordered[$cc] = $name;
+      }
     }
 
     $record->add_fields(array(
-      new Field(array('name'=>'id', 'type'=>'hidden', 'datatype'=>'int', 'primarykey'=>1)),
-      new Field(array('name'=>'created', 'type'=>'hidden', 'datatype'=>'function', 'value'=>'NOW()', 'noupdate' => TRUE)),
-      new Field(array('name'=>'created_by', 'type'=>'hidden', 'datatype'=>'int', 'value' => $this->page->user['id'], 'null'=>1, 'noupdate' => TRUE)),
-      new Field(array('name'=>'changed', 'type'=>'hidden', 'datatype'=>'function', 'value'=>'NOW()')),
-      new Field(array('name'=>'changed_by', 'type'=>'hidden', 'datatype'=>'int', 'value' => $this->page->user['id'], 'null'=>1)),
-      new Field(array('name'=>'name', 'type'=>'text', 'size'=>40, 'datatype'=>'char', 'maxlength'=>127)),
-      new Field(array('name'=>'domicile', 'type'=>'text', 'size'=>40, 'datatype'=>'char', 'maxlength'=>127, 'null'=>1)),
-      new Field(array('name'=>'isbn', 'type'=>'text', 'size'=>40, 'datatype'=>'char', 'maxlength'=>127, 'null'=>1)),
+      new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey'=>1)),
+      new Field(array('name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => TRUE)),
+      new Field(array('name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null'=>1, 'noupdate' => TRUE)),
+      new Field(array('name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()')),
+      new Field(array('name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null'=>1)),
+      new Field(array('name' => 'name', 'type' => 'text', 'size'=>40, 'datatype' => 'char', 'maxlength'=>127)),
+      //new Field(array('name' => 'domicile', 'type' => 'text', 'size'=>40, 'datatype' => 'char', 'maxlength'=>127, 'null'=>1)),
+      // new Field(array('name' => 'isbn', 'type' => 'text', 'size'=>40, 'datatype' => 'char', 'maxlength'=>127, 'null'=>1)),
 
-      new Field(array('name'=>'address', 'type'=>'textarea', 'datatype'=>'char', 'cols'=>50, 'rows' => 2, 'null' => TRUE)),
-      new Field(array('name'=>'place', 'type'=>'text', 'size' => 30, 'datatype'=>'char', 'maxlength' => 80, 'null'=>TRUE)),
-      new Field(array('name'=>'zip', 'type'=>'text', 'datatype'=>'char', 'size'=>8, 'maxlength'=>8, 'null'=>TRUE)),
-      new Field(array('name'=>'country', 'type'=>'select', 'datatype'=>'char', 'null' => TRUE,
+      new Field(array('name' => 'address', 'type' => 'textarea', 'datatype' => 'char', 'cols'=>50, 'rows' => 2, 'null' => TRUE)),
+      new Field(array('name' => 'place', 'type' => 'text', 'size' => 30, 'datatype' => 'char', 'maxlength' => 80, 'null'=>TRUE)),
+      new Field(array('name' => 'zip', 'type' => 'text', 'datatype' => 'char', 'size'=>8, 'maxlength'=>8, 'null'=>TRUE)),
+      new Field(array('name' => 'country', 'type' => 'select', 'datatype' => 'char', 'null' => TRUE,
                       'options'=>array_keys($countries_ordered), 'labels'=>array_values($countries_ordered), 'default' => 'DE', 'null' => TRUE)),
 
-      new Field(array('name'=>'phone', 'type'=>'text', 'size'=>40, 'datatype'=>'char', 'maxlength'=>40, 'null'=>TRUE)),
-      new Field(array('name'=>'fax', 'type'=>'text', 'size'=>40, 'datatype'=>'char', 'maxlength'=>40, 'null'=>TRUE)),
-      new Field(array('name'=>'url', 'type'=>'text', 'size'=>40, 'datatype'=>'char', 'maxlength'=>255, 'null'=>TRUE)),
-      new Field(array('name'=>'email', 'type'=>'email', 'size'=>40, 'datatype'=>'char', 'maxlength'=>80, 'null'=>1)),
-      new Field(array('name'=>'url', 'type'=>'text', 'size'=>40, 'datatype'=>'char', 'maxlength'=>255, 'null'=>1)),
-      new Field(array('name'=>'name_contact', 'type'=>'text', 'size'=>40, 'datatype'=>'char', 'maxlength'=>127, 'null'=>1)),
-      new Field(array('name'=>'phone_contact', 'type'=>'text', 'size'=>40, 'datatype'=>'char', 'maxlength'=>80, 'null'=>1)),
-      new Field(array('name'=>'fax_contact', 'type'=>'text', 'size'=>40, 'datatype'=>'char', 'maxlength'=>40, 'null'=>TRUE)),
-      new Field(array('name'=>'email_contact', 'type'=>'email', 'size'=>40, 'datatype'=>'char', 'maxlength'=>80, 'null'=>1)),
-      new Field(array('name'=>'comments_internal', 'type'=>'textarea', 'datatype'=>'char', 'cols'=>50, 'rows' => 4, 'null' => TRUE)),
+      new Field(array('name' => 'phone', 'type' => 'text', 'size'=>40, 'datatype' => 'char', 'maxlength'=>40, 'null'=>TRUE)),
+      new Field(array('name' => 'fax', 'type' => 'text', 'size'=>40, 'datatype' => 'char', 'maxlength'=>40, 'null'=>TRUE)),
+      new Field(array('name' => 'url', 'type' => 'text', 'size'=>40, 'datatype' => 'char', 'maxlength'=>255, 'null'=>TRUE)),
+      new Field(array('name' => 'email', 'type' => 'email', 'size'=>40, 'datatype' => 'char', 'maxlength'=>80, 'null'=>1)),
+      new Field(array('name' => 'url', 'type' => 'text', 'size'=>40, 'datatype' => 'char', 'maxlength'=>255, 'null'=>1)),
+      new Field(array('name' => 'name_contact', 'type' => 'text', 'size'=>40, 'datatype' => 'char', 'maxlength'=>127, 'null'=>1)),
+      new Field(array('name' => 'phone_contact', 'type' => 'text', 'size'=>40, 'datatype' => 'char', 'maxlength'=>80, 'null'=>1)),
+      new Field(array('name' => 'fax_contact', 'type' => 'text', 'size'=>40, 'datatype' => 'char', 'maxlength'=>40, 'null'=>TRUE)),
+      new Field(array('name' => 'email_contact', 'type' => 'email', 'size'=>40, 'datatype' => 'char', 'maxlength'=>80, 'null'=>1)),
+      new Field(array('name' => 'comments_internal', 'type' => 'textarea', 'datatype' => 'char', 'cols'=>50, 'rows' => 4, 'null' => TRUE)),
 
     ));
 
@@ -148,10 +149,10 @@ class DisplayPublisher extends DisplayTable
       'id' => FALSE, 'status' => FALSE, // hidden fields
 
       'name' => array('label' => 'Name'),
-      'domicile' => array('label' => 'Domicile of the publisher'),
-      'isbn' => array('label' => 'ISBN prefix(es)'),
+      // 'domicile' => array('label' => 'Domicile of the publisher'),
+      // 'isbn' => array('label' => 'ISBN prefix(es)'),
 
-      '<hr noshade="noshade" />',
+      // '<hr noshade="noshade" />',
 
       'address' => array('label' => 'Address'),
       array('label' => 'Postcode / Place', 'fields' => array('zip', 'place')),
@@ -161,7 +162,9 @@ class DisplayPublisher extends DisplayTable
       'fax' => array('label' => 'Fax (general)'),
       'url' => array('label' => 'Homepage'),
 
-      '<hr noshade="noshade" /><b>'.tr('Review department').'</b>',
+      '<hr noshade="noshade" />'
+      // . '<b>' . tr('Review department') . '</b>'
+      ,
       'name_contact' => array('label' => 'Contact person(s)'),
       'email_contact' => array('label' => 'E-Mail'),
       'phone_contact' => array('label' => 'Telephone'),
@@ -257,7 +260,7 @@ EOT;
       . sprintf(' <span class="regular">[<a href="%s">%s</a>]</span>',
               htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, 'delete' => $this->id))),
               tr($this->workflow->name(TABLEMANAGER_DELETE)))
-      . sprintf('<script>document.write(null != window.opener && null != window.opener.document.detail ? " <span class=\"regular\">[<a href=\"#\" onclick=\"setPublisher(window.opener.document.detail, %d, \'%s\')\">set publisher</a>]</span>" : "")</script>',
+      . sprintf('<script>document.write(null != window.opener && null != window.opener.document.detail ? " <span class=\"regular\">[<a href=\"#\" onclick=\"setPublisher(window.opener.document.detail, %d, \'%s\')\">set holding institution</a>]</span>" : "")</script>',
                 $this->record->get_value('id'),
                 htmlspecialchars(preg_replace('/\\\\/', "\\\\\\\\", addslashes($this->record->get_value('name')))));
 

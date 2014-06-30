@@ -6,7 +6,7 @@
  *
  * (c) 2008-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-06-06 dbu
+ * Version: 2014-06-30 dbu
  *
  * Changes:
  *

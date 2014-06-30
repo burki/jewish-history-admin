@@ -40,14 +40,16 @@ class DisplayRoot extends PageDisplay
         'name' => 'feed',
         'title' => 'Feed Tagging',
       ),
+      */
       array(
         'name' => 'publication',
-        'title' => 'Books'
+        'title' => 'Sources'
       ),
       array(
         'name' => 'publisher',
-        'title' => 'Publishers'
+        'title' => 'Holding Institutions'
       ),
+      /*
       array(
         'name' => 'convert',
         'title' => 'Convert Quotes'

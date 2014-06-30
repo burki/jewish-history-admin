@@ -190,7 +190,7 @@ class DisplayTable extends PageDisplay
 
   var $id;                // value of the primary key field
   var $search;            // search-fields
-  var $paging;
+  var $paging = array();
   var $order;             // the different orderings of the listing
   var $order_index;
   var $condition;
@@ -585,14 +585,16 @@ class DisplayTable extends PageDisplay
     return array($querystr, $search_terms, $order, $order_index);
   }
 
-  function doListingQuery ($page_size=0, $page_id = 0) {
+  function doListingQuery ($page_size = 0, $page_id = 0) {
     list($querystr, $this->search, $this->order_active, $this->order_index) = $this->buildListingQuery();
 
     if ($page_size > 0) {
-      $this->paging = array();
-      if ($this->sql_calc_found_rows) { // Replace "SELECT" by "SELECT SQL_CALC_FOUND_ROWS"
-        if (!preg_match('/\\bSQL_CALC_FOUND_ROWS\\b/', $querystr))
+      $this->paging = array('page_id' => 0);
+      if ($this->sql_calc_found_rows) {
+        // Replace "SELECT" by "SELECT SQL_CALC_FOUND_ROWS"
+        if (!preg_match('/\\bSQL_CALC_FOUND_ROWS\\b/', $querystr)) {
           $querystr = preg_replace('/SELECT\\b/i', 'SELECT SQL_CALC_FOUND_ROWS', $querystr);
+        }
       }
       $querystr .= ' LIMIT '.($page_id * $page_size).', '.$page_size;
       // fetch those rows
@@ -606,15 +608,17 @@ class DisplayTable extends PageDisplay
       if ($this->sql_calc_found_rows) {
         $querystr = "SELECT FOUND_ROWS() AS found_rows";
         $result = $dbconn->query($querystr);
-        if ($dbconn->next_record())
+        if ($dbconn->next_record()) {
           $count = $dbconn->Record['found_rows'];
+        }
       }
       $dbconn->free();
 
       // calc some stuff for paged resultsets
       $page_count = $count >= 0 ? intval($count / $page_size) + ($count % $page_size > 0 ? 1 : 0) : -1;
-      if ($page_id < $page_count)
+      if ($page_id < $page_count) {
         $this->paging['page_id'] = $page_id;
+      }
       $this->paging['page_count'] = $page_count;
 
       if ($count >= 0 && $page_id + 1 <= $page_count) {
@@ -686,12 +690,16 @@ class DisplayTable extends PageDisplay
                               $page_id + 1);
     $page_select .= '</select>'.'/'.$this->paging['page_count'];
 
-    $row = sprintf('<form action="%s" method="post">', htmlspecialchars($this->page->buildLink($page_params)))
-        .tr('Result Page').': '
-        .($this->paging['page_id'] > 0 ? '<a href="'.$this->page->buildLink(array_merge($page_params, array('page_id' => $this->paging['page_id'] - 1))).'">&lt; '.tr('Previous').'</a> ' : '')
-        .$page_select
-        .($this->paging['page_id'] < $this->paging['page_count'] - 1 ? ' <a href="'.$this->page->buildLink(array_merge($page_params, array('page_id' => $this->paging['page_id'] + 1))).'">'.tr('Next').' &gt;</a>' : '')
-        .'</form>';
+    $row = sprintf('<form action="%s" method="post">',
+                   htmlspecialchars($this->page->buildLink($page_params)))
+         . tr('Result Page') . ': '
+         . ($this->paging['page_id'] > 0
+            ? '<a href="'.$this->page->buildLink(array_merge($page_params, array('page_id' => $this->paging['page_id'] - 1))).'">&lt; '.tr('Previous').'</a> '
+            : '')
+        . $page_select
+        . ($this->paging['page_id'] < $this->paging['page_count'] - 1
+           ? ' <a href="'.$this->page->buildLink(array_merge($page_params, array('page_id' => $this->paging['page_id'] + 1))).'">'.tr('Next').' &gt;</a>' : '')
+         . '</form>';
 
     $colspan = $this->cols_listing_count;
     if ($this->show_xls_export) {

@@ -59,6 +59,30 @@ class ArticleQueryConditionBuilder extends MessageQueryConditionBuilder
   }
 }
 
+class MessageWithPublicationRecord extends MessageRecord
+{
+  function store ($args = '') {
+    $stored = parent::store($args = '');
+
+    if ($stored) {
+      $publication = $this->get_value('publication');
+      if (isset($publication) && intval($publication) > 0) {
+        $dbconn = new DB;
+        // add at the bottom
+        $querystr = sprintf("SELECT MAX(ord) FROM MessagePublication WHERE message_id=%d", intval($publication));
+        $dbconn->query($querystr);
+        $ord = $dbconn->next_record() && isset($dbconn->Record[0])
+          ? $dbconn->Record[0] + 1 : 0;
+        $querystr = sprintf("INSERT INTO MessagePublication (message_id, publication_id, ord) VALUES (%d, %d, %d) ON DUPLICATE KEY UPDATE ord=ord",
+            $this->get_value('id'), intval($publication), $ord);
+        $dbconn->query($querystr);
+      }
+    }
+
+    return $stored;
+  }
+}
+
 class DisplayArticle extends DisplayMessage
 {
   var $status_options = array (
@@ -102,6 +126,49 @@ class DisplayArticle extends DisplayMessage
                                'method' => 'buildFulltextCondition',
                                'args' => 'subject,User.firstname,User.lastname,body',
                                'persist' => 'session');
+  }
+
+  function init () {
+    $ret = parent::init();
+
+    // update publications
+    if (array_key_exists('publication_add', $_POST)) {
+      if (($id_publication = intval($_POST['publication_add'])) > 0) {
+        $dbconn = &$this->page->dbconn;
+        // add at the bottom
+        $querystr = sprintf("SELECT MAX(ord) FROM MessagePublication WHERE message_id=%d", $this->workflow->primaryKey());
+        $dbconn->query($querystr);
+        $ord = $dbconn->next_record() && isset($dbconn->Record[0])
+          ? $dbconn->Record[0] + 1 : 0;
+        $querystr = sprintf("INSERT INTO MessagePublication (message_id, publication_id, ord) VALUES (%d, %d, %d) ON DUPLICATE KEY UPDATE ord=ord",
+            $this->workflow->primaryKey(), $id_publication, $ord);
+        $dbconn->query($querystr);
+      }
+    }
+    else if (array_key_exists('publication_remove', $_GET)) {
+      if (($id_publication = intval($_GET['publication_remove'])) > 0) {
+        $querystr = sprintf("DELETE FROM MessagePublication WHERE message_id=%d AND publication_id=%d", $this->workflow->primaryKey(), $id_publication);
+        $this->page->dbconn->query($querystr);
+      }
+    }
+
+    if (array_key_exists('publication_order', $_POST)) {
+      parse_str($_POST['publication_order'], $order);
+      if (array_key_exists('publications', $order) && 'array' == gettype($order['publications'])) {
+        $dbconn = &$this->page->dbconn;
+        foreach ($order['publications'] as $ord => $id_publication) {
+          $querystr = sprintf("UPDATE MessagePublication SET ord=%d WHERE message_id=%d AND publication_id=%d",
+                              intval($ord), $this->workflow->primaryKey(), intval($id_publication));
+          $dbconn->query($querystr);
+        }
+      }
+    }
+
+    return $ret;
+  }
+
+  function instantiateRecord ($table = '', $dbconn = '') {
+    return new MessageWithPublicationRecord(array('tables' => $this->table, 'dbconn' => $this->page->dbconn));
   }
 
   function buildStatusOptions ($options = NULL, $show_all = true) {
@@ -182,6 +249,16 @@ class DisplayArticle extends DisplayMessage
         // new Field(array('name' => 'urn', 'id' => 'urn', 'type' => 'text', 'datatype' => 'char', 'size'=>45, 'maxlength'=>200, 'null' => 1)),
         // new Field(array('name' => 'tags', 'id' => 'urn', 'type' => 'text', 'datatype' => 'char', 'size'=>45, 'maxlength'=>200, 'null' => 1)),
        ));
+
+    if (!isset($this->workflow->id)) {
+      // for new entries, a subject or publication-id may be passed along
+      if (array_key_exists('subject', $_GET)) {
+        $record->set_value('subject', $_GET['subject']);
+      }
+      if (array_key_exists('publication', $_GET) && intval($_GET['publication']) > 0) {
+        $record->set_value('publication', intval($_GET['publication']));
+      }
+    }
 
     return $record;
   }
@@ -317,6 +394,73 @@ EOT;
       ), 'published');
 
     return $rows;
+  }
+
+  function buildView () {
+    $ret = parent::buildView();
+
+    $dbconn = $this->page->dbconn;
+
+    // publications belonging to this item
+    $this->script_url[] = 'script/scriptaculous/prototype.js';
+    $this->script_url[] = 'script/scriptaculous/scriptaculous.js';
+
+    $url_ws = $this->page->BASE_URL . 'admin/admin_ws.php?pn=publication&action=matchPublication';
+
+    $url_submit = $this->page->buildLink(array('pn' => $this->page->name, 'view' => $this->id));
+    $publication_selector = <<<EOT
+<form name="publicationSelector" action="$url_submit" method="post"><input type="hidden" name="publication_add" /><input type="text" id="publication" name="add_publication" style="width:400px; border: 1px solid black;" value="" /><div id="autocomplete_choices" class="autocomplete"></div><script type="text/javascript">new Ajax.Autocompleter('publication', 'autocomplete_choices', '$url_ws', {paramName: 'fulltext', minChars: 2, afterUpdateElement : function (text, li) { if (li.id != '') { var form = document.forms['publicationSelector']; if (null != form) {form.elements['publication_add'].value = li.id; form.submit(); } } }});</script></form>
+EOT;
+    // fetch the publications
+    $querystr = sprintf("SELECT Publication.id AS id, title, author, editor, YEAR(publication_date) AS year, place, publisher FROM Publication, MessagePublication WHERE MessagePublication.publication_id=Publication.id AND MessagePublication.message_id=%d ORDER BY MessagePublication.ord", $this->id);
+    $dbconn = &$this->page->dbconn;
+    $dbconn->query($querystr);
+    $publications = '';
+    $params_remove = array('pn' => $this->page->name, 'view' => $this->id);
+    $params_view = array('pn' => 'publication');
+    while ($dbconn->next_record()) {
+      if (empty($publications))
+        $publications = '<ul id="publications" class="sortableList">';
+      $params_remove['publication_remove'] = $params_view['view'] = $dbconn->Record['id'];
+      $publisher_place_year = '';
+      if (!empty($dbconn->Record['place']))
+        $publisher_place_year = $dbconn->Record['place'];
+      if (!empty($dbconn->Record['publisher']))
+        $publisher_place_year .= (!empty($publisher_place_year) ? ': ' : '')
+          . $dbconn->Record['publisher'];
+      if (!empty($dbconn->Record['year']))
+        $publisher_place_year .= (!empty($publisher_place_year) ? ', ' : '')
+          . $dbconn->Record['year'];
+
+      $publications .= sprintf('<li id="item_%d">', $dbconn->Record['id'])
+        . (isset($dbconn->Record['author']) ? $dbconn->Record['author'] : $dbconn->Record['editor'])
+        . ': <i>'.$this->formatText($dbconn->Record['title']).'</i>'
+        . (!empty($publisher_place_year) ? ' ' : '')
+        . $this->formatText($publisher_place_year)
+        .sprintf(' [<a href="%s">%s</a>] [<a href="%s">%s</a>]',
+                 htmlspecialchars($this->page->buildLink($params_view)), tr('view'),
+                 htmlspecialchars($this->page->buildLink($params_remove)), tr('remove'))
+        .'</li>';
+    }
+    if (!empty($publications)) {
+      $publications .= '</ul>';
+      $msg_submit = tr('Store updated order');
+      $publications .= <<<EOT
+<form name="publicationOrder" action="$url_submit" method="post" onSubmit="populateHiddenVars();"><input type="hidden" id="publicationsListOrder" name="publication_order" /><input type="submit" value="$msg_submit" /></form>
+<script type="text/javascript">
+Sortable.create('publications',{tag:'li'});
+
+function populateHiddenVars() {
+document.getElementById('publicationsListOrder').value = Sortable.serialize('publications');
+return true;
+}
+</script>
+EOT;
+    }
+    $ret .= '<hr />'
+          . $this->buildContentLine(tr('Covered Source(s)'), $publication_selector . $publications);
+
+    return $ret;
   }
 
   function getImageDescriptions () {

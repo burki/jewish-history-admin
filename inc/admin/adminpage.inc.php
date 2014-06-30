@@ -64,10 +64,11 @@ $SITE_DESCRIPTION = array(
             'title' => 'Book Reviews',
             'anonymous' => FALSE,
         ),
+        */
         'publication' => array(
-            'title' => 'Books',
+            'title' => 'Sources',
             'anonymous' => FALSE,
-        ), */
+        ),
         'article' => array(
             'title' => 'Articles',
             'anonymous' => FALSE,
@@ -76,11 +77,10 @@ $SITE_DESCRIPTION = array(
             'title' => 'Communication',
             'anonymous' => FALSE,
         ),
-        /*
         'publisher' => array(
-            'title' => 'Publishers',
+            'title' => 'Holding Institutions',
             'anonymous' => FALSE,
-        ), */
+        ),
         'term' => array(
             'title' => 'Wertelisten',
             'anonymous' => FALSE,
