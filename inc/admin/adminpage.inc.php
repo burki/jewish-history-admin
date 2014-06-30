@@ -6,7 +6,7 @@
  *
  * (c) 2009-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-06-22 dbu
+ * Version: 2014-06-30 dbu
  *
  * Changes:
  *
@@ -59,6 +59,7 @@ $SITE_DESCRIPTION = array(
             'title' => 'Authors',
             'anonymous' => FALSE,
         ),
+        /*
         'review' => array(
             'title' => 'Book Reviews',
             'anonymous' => FALSE,
@@ -66,7 +67,7 @@ $SITE_DESCRIPTION = array(
         'publication' => array(
             'title' => 'Books',
             'anonymous' => FALSE,
-        ),
+        ), */
         'article' => array(
             'title' => 'Articles',
             'anonymous' => FALSE,
@@ -75,14 +76,20 @@ $SITE_DESCRIPTION = array(
             'title' => 'Communication',
             'anonymous' => FALSE,
         ),
+        /*
         'publisher' => array(
             'title' => 'Publishers',
+            'anonymous' => FALSE,
+        ), */
+        'term' => array(
+            'title' => 'Wertelisten',
             'anonymous' => FALSE,
         ),
         'account' => array(
             'title' => 'Account',
             'anonymous' => FALSE,
         ),
+        /*
         'convert' => array(
             'title' => 'Convert Quotes',
             'anonymous' => TRUE,
@@ -91,5 +98,6 @@ $SITE_DESCRIPTION = array(
             'title' => 'Feed Tagging',
             'anonymous' => FALSE,
         ),
+        */
     )
 );

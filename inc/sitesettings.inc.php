@@ -7,7 +7,7 @@
  *
  * (c) 2009-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-06-22 dbu
+ * Version: 2014-06-30 dbu
  *
  * Changes:
  *
@@ -53,6 +53,11 @@ $COUNTRIES_FEATURED = array('DE', 'AT', 'CH', 'UK', 'US', 'CA',
                             'FR', 'IT', 'ES', 'NL', 'BE',
                             'DK', 'SE', 'NO', 'FI',
                             'AU', 'JP');
+
+$GLOBALS['THESAURI'] =
+    array('section' => 'Section',
+);
+
 
 $MAIL_SETTINGS = array(
   'from'                 => 'burckhardtd@geschichte.hu-berlin.de',

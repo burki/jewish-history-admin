@@ -1,30 +1,19 @@
-%salutation_name_de%,
+﻿%salutation_name_de%,
 
-herzlichen Dank für Ihr Interesse, den Artikel
+wir möchten uns bei Ihnen für die Einsendung eines Vorschlages zur Online-Quellenedition „Schlüsseldokumente der deutsch-jüdischen Geschichte von der frühen Neuzeit bis in die Gegenwart“ herzlich bedanken. Mit großem Interesse haben wir Ihr Abstract gelesen und würden uns sehr freuen, wenn Sie davon ausgehend einen kurzen Quelleninterpretationstext verfassen. Ihr Beitrag wird zunächst der Themenkategorie %section% zugeordnet. Für jede Themenkategorie ist ein Herausgeber/ eine Herausgeberin verantwortlich, der/ die einen einleitenden Überblicksartikel verfasst und zugleich die eingereichten Quelleninterpretationen begutachtet.
 
-%title%
+Der etwa 2-3-seitige Text sollte möglichst eng an der Quelle argumentierend auf die Bedeutung als Schlüsseldokument verweisen und zugleich eine Verbindung vom konkreten Hamburger Fall zu allgemeineren Fragestellungen und Themen der deutsch-jüdischen Geschichte herstellen. In jedem Fall sollte das ausgewählte Dokument interpretiert und in seinen Entstehungskontext eingeordnet werden, es sollte nicht lediglich der Bebilderung dienen. Da es sich um eine digitale Edition handelt, können Sie für weiterführende Informationen etwa zu Personen oder Orten Glossareinträge erstellen bzw. Ideen für mögliche Querverweise auf andere Themenkategorien/Beiträge vermerken.
 
-für Docupedia-Zeitgeschichte. Begriffe, Methoden und Debatten der zeitgeschichtlichen Forschung zu übernehmen.
+Zu den formalen Vorgaben finden Sie in anhängendem Dokument genauere Informationen. Ebenso finden Sie Informationen zum Redaktionsmodell und zum Zeitplan. Die Frist für die Abgabe Ihres Textes ist der %reviewer_deadline%. Sollte der Termin gar nicht einzuhalten sein, bitten wir Sie um eine kurze Rückmeldung, damit wir unsere Planung darauf einstellen können. Wir bitten Sie auch bezüglich des von Ihnen ausgewählten Dokumentes Absprache mit uns zu treffen, bei der Klärung der Rechtefragen unterstützen wir Sie gerne. Insbesondere bitten wir Sie - sofern noch nicht geschehen - uns die genauen Quellenangaben und den Aufbewahrungsort des Dokumentes mitzuteilen.
 
-Anbei erhalten Sie einige Hinweise zur Publikation Ihres Artikels.
-Wäre eine Fertigstellung des Textes bis %reviewer_deadline% aus Ihrer Sicht realistisch? Falls dieser Termin gar nicht einzuhalten ist, bitte ich Sie um eine kurze Rückmeldung, damit wir unsere Planung darauf einstellen können.
+Wir freuen uns auf die Zusammenarbeit mit Ihnen und sind gespannt auf Ihren Beitrag! Schon jetzt möchten wir uns für Ihre Mitarbeit herzlich bedanken. Bei Rückfragen stehen wir Ihnen jederzeit gerne zur Verfügung.
 
-Bitte berücksichtigen Sie, dass der Umfang des Textes ca. 3.500 Wörter bzw. 30.000 Zeichen (ca. 15 A4 Seiten) nicht überschreiten sollte.
-
-Die Redaktion von Docupedia-Zeitgeschichte freut sich auf Ihren Beitrag und steht Ihnen für Rückfragen selbstverständlich gerne zur Verfügung.
-
-Mit freundlichen Grüßen aus Potsdam
+Mit besten Grüßen
 
 %name_from%
 
 --
-Redaktion Docupedia-Zeitgeschichte
-Zentrum für Zeithistorische Forschung
-Am Neuen Markt 1
-D-14467 Potsdam
-Tel.: +49 (0) 331 28991 14 / -12
-      +49 (0) 30 2093 2543
-Fax:  +49 (0) 331 28991 60
-
-eMail: redaktion@docupedia.de
-WWW:   http://www.docupedia.de
+Institut für die Geschichte der deutschen Juden
+Beim Schlump 83, 20144 Hamburg
+E-Mail: anna.menny@public.uni-hamburg.de
+Tel.: +49 (0) 40 428383-8045

@@ -1,27 +1,20 @@
-%salutation_name_de%,
+﻿%salutation_name_de%,
 
-Docupedia-Zeitgeschichte, das elektronische Nachschlagewerk zu den Begriffen, Methoden und Debatten der zeithistorischen Forschung geht in die erste Runde und beginnt, ein umfangreiches Netz von Autoren und Artikeln aufzubauen. Um die Dynamik der Disziplin abzubilden, setzt das Werk auf eine möglichst breite Partizipation aus der Fachöffentlichkeit. Wir möchten Sie daher herzlich dazu einladen, sich mit einem Beitrag am Aufbau von Docupedia-Zeitgeschichte zu beteiligen und einen Artikel zum Thema
+das Institut für die Geschichte der deutschen Juden in Hamburg plant zurzeit eine Online-Quellenedition „Schlüsseldokumente zur deutsch-jüdischen Geschichte von der frühen Neuzeit bis in die Gegenwart“. Am Beispiel von rund 150 Quellen sollen thematische Schlaglichter auf zentrale Aspekte der lokalen, regionalen sowie der allgemeinen deutsch-jüdischen Geschichte geworfen werden. In einer ersten Projektphase, die zum 50-jährigen Instituts-Jubiläum im Jahr 2016 abgeschlossen sein wird, liegt der Fokus zunächst auf dem Hamburger Raum. Interpretations- und Hintergrundtexte werden die Quellen in ihre historischen Kontexte einbetten sowie durch Informationen zur Überlieferung, zur Rezeptionsgeschichte und zu wissenschaftlichen Kontroversen anreichern. Die Quellenedition wird zweisprachig sein (deutsch/englisch) und richtet sich vornehmlich an Studierende und Forschende, aber auch an Schulen und ein allgemeines, interessiertes Publikum.
 
-    %title%
+Ein wissenschaftlicher Beirat unterstützt und begleitet das Projekt. Ein solches Vorhaben lässt sich nur verwirklichen, wenn ausgewiesene Experten aus den unterschiedlichen Bereichen der deutsch-jüdischen Geschichte mitwirken. Aus diesem Grund schreiben wir Ihnen heute. Denn wir würden uns sehr freuen, wenn Sie sich vorstellen könnten, die Online-Quellenedition mit Ihrer Expertise als VerfasserIn einer Quelleninterpretation in der Themenkategorie %section% zu unterstützen, z.B. mit einem Beitrag zu %title%. Sie würden damit einen wichtigen Beitrag zum Gelingen des Projektes leisten.
 
-zu verfassen. Natürlich können Sie auch gerne – in Absprache mit der Docupedia-Redaktion – einen anderen Artikel übernehmen. Im Anhang finden Sie eine Liste mit Vorschlägen. Der Artikel sollte den Umfang von ca. 3500 Wörtern (ca. 30.000 Zeichen, 15 Seiten) nicht übersteigen und nach Möglichkeit innerhalb von drei Monaten bei der Redaktion eingehen. Der Internet-Start von Docupedia-Zeitgeschichte mit den ersten ca. 50 Einträgen ist für Ende 2009 vorgesehen. Genauere Hinweise zur Gestaltung des Artikels schicke ich Ihnen sofort zu, wenn Sie Interesse haben, bei der „ersten Generation“ der Autoren mit dabei zu sein.
+Da es sich um eine digitale Quellenedition handelt, werden die Texte mit 1.500 Zeichen vergleichsweise kurz ausfallen. Als mögliche Quellen sind neben Text- und Bilddokumenten ausdrücklich auch Ton- und audiovisuelle Dokumente erwünscht. Weitere Informationen zu Art und Umfang der Texte sowie zum Redaktionsmodell können Sie den Informationsblättern im Anhang entnehmen.
 
-Über Ihre Mitwirkung würden wir uns sehr freuen.
+Sollten Sie weitere Informationen benötigen oder Rückfragen haben, kontaktieren Sie uns gerne! Wir würden uns wirklich sehr freuen, wenn wir Sie als AutorIn gewinnen könnten! Wenn Sie uns in den nächsten zwei Wochen eine kurze Rückmeldung geben und ggf. Ihren Vorschlag kurz benennen könnten, wäre das für die weitere Planung außerordentlich hilfreich.
 
-Mit besten Grüßen aus Potsdam
+Mit besten Grüßen
 
 
 %name_from%
 
-
 --
-Redaktion Docupedia-Zeitgeschichte
-Zentrum für Zeithistorische Forschung
-Am Neuen Markt 1
-D-14467 Potsdam
-Tel.: +49 (0) 331 28991 14 / -12
-      +49 (0) 30 2093 2543
-Fax:  +49 (0) 331 28991 60
-
-eMail: redaktion@docupedia.de
-WWW:   http://www.docupedia.de
+Institut für die Geschichte der deutschen Juden
+Beim Schlump 83, 20144 Hamburg
+E-Mail: anna.menny@public.uni-hamburg.de
+Tel.: +49 (0) 40 428383-8045

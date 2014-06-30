@@ -4,9 +4,9 @@
  *
  * Base class to administrate Database items
  *
- * (c) 2006-2008 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2008-11-25 dbu
+ * Version: 2014-06-30 dbu
  *
  * TODO:
  *       the models TableManagerRecord->fetch()-method shouldn't need a style
@@ -125,10 +125,10 @@ class TableManagerQueryConditionBuilder
     $fields =  func_get_args();
 
     $parts = preg_split('/\s+/', $this->term);
-    if (sizeof($parts) == 0)
+    if (count($parts) == 0)
       return;
     $and_parts = array();
-    for ($i = 0; $i < sizeof($parts); $i++) {
+    for ($i = 0; $i < count($parts); $i++) {
       $or_parts = array();
       for ($j = 0; $j < $num_args; $j++)
         $or_parts[] = $fields[$j]." LIKE '%".addslashes($parts[$i])."%'";
@@ -247,8 +247,9 @@ class DisplayTable extends PageDisplay
 
   function instantiateHtmlForm ($name = 'detail', $action = '', $method = 'post') {
     $params = array('method' => 'post', 'name' => $name);
-    if (!empty($action))
+    if (!empty($action)) {
       $params['action'] = $action;
+    }
     $params['datetime_style'] = $this->datetime_style;
 
     return new FormHTML($params, $this->record);
@@ -321,7 +322,7 @@ class DisplayTable extends PageDisplay
       foreach ($rows as $key => $row_descr) {
         if (isset($this->invalid[$key])) {
           $error = $this->invalid[$key];
-          $msg = FormHTML::error_fulltext($error, $this->page->lang());
+          $msg = $this->form->error_fulltext($error, $this->page->lang());
         }
         if ('boolean' == gettype($row_descr)) {
           $value = $this->getFormField($key);
@@ -346,25 +347,29 @@ class DisplayTable extends PageDisplay
                 $required = !isset($null) || !$null;
               }
             }
-            if ($required)
+            if ($required) {
               $label = $this->buildRequired($label);
-            if (isset($row_descr['show_datetimestyle']) && $row_descr['show_datetimestyle'])
-              $label .= '<div class="leftSmaller">('.tr($this->formatText($this->datetime_style)).')</div>';
+            }
+            if (isset($row_descr['show_datetimestyle']) && $row_descr['show_datetimestyle']) {
+              $label .= '<div class="leftSmaller">(' . tr($this->formatText($this->datetime_style)) . ')</div>';
+            }
           }
           if (isset($row_descr['fields'])) {
             $value = '';
             foreach ($row_descr['fields'] as $field)
               $value .= (!empty($value) ? ' ' : '').$this->getFormField($field);
           }
-          else if (isset($row_descr['value']))
+          else if (isset($row_descr['value'])) {
             $value = $row_descr['value'];
-          else
+          }
+          else {
             $value = $this->getFormField($key);
+          }
           $fields[] = array($label, $value);
         }
       }
     }
-    if (sizeof($fields) > 0)
+    if (count($fields) > 0)
       $ret .= $this->buildContentLineMultiple($fields);
 
     $ret .= $this->form->show_end();
@@ -410,7 +415,7 @@ class DisplayTable extends PageDisplay
     if (isset($this->record)) {
       $fieldnames = $this->record->get_fieldnames();
 
-      for ($i = 0; $i < sizeof($fieldnames); $i++) {
+      for ($i = 0; $i < count($fieldnames); $i++) {
         $field = & $this->record->get_field($fieldnames[$i]);
         switch($field->get('type')) {
           case 'date':
@@ -434,7 +439,7 @@ class DisplayTable extends PageDisplay
         // query database for fields
         $res = $this->page->dbconn->metadata($this->table);
         $fieldnames = array();
-        for ($i = 0; $i < sizeof($res); $i++) {
+        for ($i = 0; $i < count($res); $i++) {
           $field = &$res[$i];
           $fieldname = $field['name'];
           switch($field['type']) {
@@ -478,7 +483,7 @@ class DisplayTable extends PageDisplay
     $search_terms = array();
     if (isset($this->condition)) {
       $conditions = array();
-      for ($i = 0; $i < sizeof($this->condition); $i++) {
+      for ($i = 0; $i < count($this->condition); $i++) {
         if ('string' == gettype($this->condition[$i]))
           $conditions[] = $this->condition[$i];
         else if ('array' == gettype($this->condition[$i])) {
@@ -523,7 +528,7 @@ class DisplayTable extends PageDisplay
     $order = & $this->order;
 
     $orders = array_keys($order);
-    if (sizeof($orders) == 0)
+    if (count($orders) == 0)
       return;
 
     $current_order = $this->page->getSessionValue('order');
@@ -546,7 +551,7 @@ class DisplayTable extends PageDisplay
     if (isset($_REQUEST['sort']) && isset($order[$_REQUEST['sort']])) {
         // wish for new sort
         if ($current_order == $_REQUEST['sort']
-           && $order_index >= 0 && $order_index + 1 < sizeof($order[$new_order])) {
+           && $order_index >= 0 && $order_index + 1 < count($order[$new_order])) {
             ++$order_index;
         }
         else
@@ -705,7 +710,7 @@ class DisplayTable extends PageDisplay
     $headers = & $this->cols_listing;
     $ret = '<tr>';
     $col_names = array_keys($headers);
-    for ($i = 0; $i < sizeof($col_names); $i++) {
+    for ($i = 0; $i < count($col_names); $i++) {
       $col_name = $col_names[$i];
       $header = $this->formatText(tr($headers[$col_name]));
       if (array_key_exists($col_name, $this->order))
@@ -722,9 +727,9 @@ class DisplayTable extends PageDisplay
 
     if (!isset($this->cols_listing_count)) {
       if (isset($this->cols_listing))
-        $this->cols_listing_count = sizeof($this->cols_listing);
+        $this->cols_listing_count = count($this->cols_listing);
       else if (isset($this->fields_listing))
-        $this->cols_listing_count = sizeof($this->fields_listing) - 1; // subtract one for the primary-key linking
+        $this->cols_listing_count = count($this->fields_listing) - 1; // subtract one for the primary-key linking
     }
 
     $ret .= $this->buildListingTopActions()
@@ -750,7 +755,7 @@ class DisplayTable extends PageDisplay
   function buildListingRow (&$row) {
     if (isset($this->fields_listing)) {
       $ret = '<tr class="listing">';
-      $count = sizeof($this->fields_listing);
+      $count = count($this->fields_listing);
       for ($i = 0; $i < $count; $i++) {
         $ret .= $this->buildListingCell($row, $i);
       }

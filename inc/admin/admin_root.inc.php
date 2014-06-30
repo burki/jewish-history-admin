@@ -6,7 +6,7 @@
  *
  * (c) 2010-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-06-17 dbu
+ * Version: 2014-06-30 dbu
  *
  * Changes:
  *
@@ -53,6 +53,11 @@ class DisplayRoot extends PageDisplay
         'title' => 'Convert Quotes'
       ),
       */
+      array(
+        'name' => 'term',
+        'title' => 'Wertelisten',
+        'privs' => $RIGHTS_ADMIN,
+      ),
       array(
         'name' => 'account',
         'title' => 'Accounts',

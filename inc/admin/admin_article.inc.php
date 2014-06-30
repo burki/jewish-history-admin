@@ -6,7 +6,7 @@
  *
  * (c) 2009-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-06-25 dbu
+ * Version: 2014-06-30 dbu
  *
  * Changes:
  *
@@ -113,24 +113,35 @@ class DisplayArticle extends DisplayMessage
     global $RIGHTS_EDITOR, $RIGHTS_REFEREE;
 
     $dbconn = & $this->page->dbconn;
-    $querystr = "SELECT id, lastname, firstname FROM User";
     switch ($type) {
+      case 'section':
+        $querystr = sprintf("SELECT id, name FROM Term WHERE category='%s' AND status >= 0 ORDER BY ord, name",
+                            addslashes($type));
+        break;
+          break;
       case 'referee':
+          $querystr = "SELECT id, lastname, firstname FROM User";
           $querystr .= sprintf(" WHERE 0 <> (privs & %d) AND id > 1 AND status <> %d",
                                $RIGHTS_REFEREE, STATUS_DELETED);
+          $querystr .= " ORDER BY lastname, firstname";
           break;
       case 'editor':
       default:
+          $querystr = "SELECT id, lastname, firstname FROM User";
           // id > 1 so Daniel Burckhardt doesn't get displayed
           $querystr .= sprintf(" WHERE 0 <> (privs & %d) AND id > 1 AND status <> %d",
                                $RIGHTS_EDITOR, STATUS_DELETED);
+          $querystr .= " ORDER BY lastname, firstname";
           break;
     }
-    $querystr .= " ORDER BY lastname, firstname";
     $dbconn->query($querystr);
     $options = array();
     while ($dbconn->next_record()) {
-      $options[$dbconn->Record['id']] = $dbconn->Record['lastname'].' '.$dbconn->Record['firstname'];
+      $label = 'section' == $type
+        ? $dbconn->Record['name']
+        : $dbconn->Record['lastname'] . ', ' . $dbconn->Record['firstname'];
+
+      $options[$dbconn->Record['id']] = $label;
     }
 
     return $options;
@@ -143,13 +154,16 @@ class DisplayArticle extends DisplayMessage
     }
 
     // get the options
-    $this->editor_options = $this->buildOptions('editor');
-    $this->view_options['editor'] = $this->editor_options;
-    $this->referee_options = $this->buildOptions('referee');
-    $this->view_options['referee'] = $this->referee_options;
+    $this->view_options['section'] = $this->section_options = $this->buildOptions('section');
+    $this->view_options['editor'] = $this->editor_options = $this->buildOptions('editor');
+    $this->view_options['referee'] = $this->referee_options = $this->buildOptions('referee');
 
     $record->add_fields(array(
         new Field(array('name' => 'publication', 'type' => 'hidden', 'datatype' => 'int', 'nodbfield' => 1, 'null' => 1)),
+        new Field(array('name' => 'section', 'type' => 'select',
+                        'options' => array_merge(array(''), array_keys($this->section_options)),
+                        'labels' => array_merge(array(tr('-- please select --')), array_values($this->section_options)),
+                        'datatype' => 'int', 'null' => FALSE)),
         new Field(array('name' => 'editor', 'type' => 'select',
                         'options' => array_merge(array(''), array_keys($this->editor_options)),
                         'labels' => array_merge(array(tr('-- none --')), array_values($this->editor_options)),
@@ -194,6 +208,14 @@ class DisplayArticle extends DisplayMessage
           if ('' == params.title) {
             alert('Please set a Title first');
             return;
+          }
+          if ('' == form.elements['section'].value) {
+            alert('Please select a Section first');
+            return;
+          }
+          else {
+            var elt = form.elements['section'];
+            params.section = elt.options[elt.selectedIndex].text;
           }
         }
         if ('reviewer_sent' == mode || 'reviewer_reminder' == mode) {
@@ -250,6 +272,10 @@ EOT;
                                     tr('generate'));
     }
     $rows = parent::getEditRows($mode);
+    $rows = array_merge_at($rows,
+      array(
+            'section' => array('label' => 'Section'),
+      ), 'user');
     $rows = array_merge_at($rows,
       array(
             'editor' => array('label' => 'Article Editor'),

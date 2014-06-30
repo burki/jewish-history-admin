@@ -216,6 +216,7 @@ $GETTEXT_MESSAGES = array (
 'Contact person(s)' => 'Kontaktperson(en)',
 'Review department' => 'Rezensionsabteilung',
 'Referee' => 'Gutachter',
+'System Editor' => 'Redakteur',
 'add new publisher' => 'neuen Verlag hinzufügen',
 'delete message' => 'Beitrag löschen',
 'Communication' => 'Kommunikation',
@@ -227,5 +228,7 @@ $GETTEXT_MESSAGES = array (
 'convert' => 'konvertieren',
 'Key-Documents of German-Jewish History' => 'Schlüsseldokumente zur deutsch-jüdischen Geschichte',
 'send letter' => 'Anschreiben erstellen',
+'Section' => 'Themenkategorie',
+'Term' => 'Begriff',
 );
 

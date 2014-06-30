@@ -118,9 +118,9 @@ class DisplayCommunication extends DisplayTable
         case 'referee_request':
         case 'publisher_vouchercopy':
             global $SITE;
-            $this->defaults['subject'] = (array_key_exists($_GET['mode'], $SUBJECT)
-              ? $SUBJECT[$_GET['mode']] . ' ' : '')
-              . $SITE['pagetitle'];
+            $this->defaults['subject'] =
+              (array_key_exists($_GET['mode'], $SUBJECT) ? $SUBJECT[$_GET['mode']] . ' ' : '')
+              . tr($SITE['pagetitle']);
             $fname_template = INC_PATH . 'messages/' . $_GET['mode'] . '.txt';
             if (FALSE !== ($template = @file_get_contents($fname_template))) {
               // fill in template
@@ -483,7 +483,9 @@ class DisplayCommunication extends DisplayTable
     $mail->attachPlain($this->record->get_value('body'));
     $mail->attachHtml($this->formatParagraphs($this->record->get_value('body')));
 
-    if (0 != (0x02 & $this->record->get_value('flags')) && file_exists($fname_full = BASE_FILEPATH . 'data/formale_hinweise_artikel.pdf')) {
+    if (0 != (0x02 & $this->record->get_value('flags'))
+        && file_exists($fname_full = BASE_FILEPATH . 'data/formale_hinweise_artikel.pdf'))
+    {
       $attachment = Swift_Attachment::newInstance(file_get_contents($fname_full), 'formale_hinweise_artikel.pdf', 'application/pdf');
       $mail->attach($attachment);
     }
@@ -521,8 +523,9 @@ class DisplayCommunication extends DisplayTable
     if ($found = $record->fetch($this->id)) {
       $this->record = &$record;
       $uploadHandler = $this->instantiateUploadHandler();
-      if (isset($uploadHandler))
+      if (isset($uploadHandler)) {
         $this->processUpload($uploadHandler);
+      }
 
       $rows = $this->buildViewRows();
       $sent = $this->record->get_value('sent');
@@ -534,11 +537,12 @@ class DisplayCommunication extends DisplayTable
       if (!isset($sent)) {
         $edit = $this->buildEditButton();
       }
-      else
+      else {
         $edit = '';
+      }
 
 
-      $ret = '<h2>'.$this->formatText($record->get_value('subject')).' '.$edit.'</h2>';
+      $ret = '<h2>' . $this->formatText($record->get_value('subject')) . ' ' . $edit . '</h2>';
 
       $actions = sprintf('<form action="%s" method="post"><p>',
                          htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, 'view' => $this->id))));

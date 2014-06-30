@@ -1,26 +1,20 @@
-%salutation_name_de%,
+﻿%salutation_name_de%,
 
-leider ist die Zeit wieder viel zu schnell vergangen, sodass der vereinbarte Termin, zu dem Sie uns den Artikel über
+leider ist die Zeit wieder viel zu schnell vergangen, sodass der vereinbarte Termin, zu dem Sie uns Ihren Beitrag zu
 
 %title%
 
 zusenden wollten, der %reviewer_deadline%, verstrichen ist.
 
-Ich bitte Sie daher um eine kurze Rückmeldung, wann wir mit dem Eingang Ihres Beitrags rechnen können. Auch wenn sich größere Terminprobleme bei Ihnen abzeichnen sollten, geben Sie uns bitte Bescheid.
+Wir bitten Sie daher um eine kurze Rückmeldung, wann wir mit dem Eingang Ihres Beitrags rechnen können. Auch wenn sich größere Terminprobleme bei Ihnen abzeichnen sollten, geben Sie uns bitte Bescheid. Für Rückfragen stehe wir Ihnen jederzeit gerne zur Verfügung.
 
 
-Mit freundlichen Grüßen
+Mit besten Grüßen
 
 %name_from%
 
 --
-Redaktion Docupedia-Zeitgeschichte
-Zentrum für Zeithistorische Forschung
-Am Neuen Markt 1
-D-14467 Potsdam
-Tel.: +49 (0) 331 28991 14 / -12
-      +49 (0) 30 2093 2543
-Fax:  +49 (0) 331 28991 60
-
-eMail: redaktion@docupedia.de
-WWW:   http://www.docupedia.de
+Institut für die Geschichte der deutschen Juden
+Beim Schlump 83, 20144 Hamburg
+E-Mail: anna.menny@public.uni-hamburg.de
+Tel.: +49 (0) 40 428383-8045
