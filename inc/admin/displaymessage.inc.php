@@ -4,9 +4,9 @@
  *
  * Base-Class for managing messages
  *
- * (c) 2007-2013 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2013-11-25 dbu
+ * Version: 2014-06-26 dbu
  *
  * Changes:
  *
@@ -17,14 +17,17 @@ require_once INC_PATH . 'common/image_upload_handler.inc.php';
 
 // small helper function
 function array_merge_at ($array1, $array2, $after_field=NULL) {
-  if (empty($after_field))
+  if (empty($after_field)) {
     return array_merge($array1, $array2);
+  }
   $ret = array();
   foreach ($array1 as $key => $val) {
-    if ('integer' == gettype($key))
+    if ('integer' == gettype($key)) {
       $ret[] = $val; // renumber numeric indices
-    else
+    }
+    else {
       $ret[$key] = $val;
+    }
     if (isset($after_field) && $key == $after_field) {
       //var_dump($after_field);
       $ret = array_merge($ret, $array2);
@@ -39,8 +42,9 @@ class MessageQueryConditionBuilder extends TableManagerQueryConditionBuilder
 {
   function buildStatusCondition () {
     $num_args = func_num_args();
-    if ($num_args <= 0)
+    if ($num_args <= 0) {
       return;
+    }
     $fields = func_get_args();
 
     if (isset($this->term) && '' !== $this->term) {
@@ -54,14 +58,16 @@ class MessageQueryConditionBuilder extends TableManagerQueryConditionBuilder
       } */
       return $ret;
     }
-    else
+    else {
       return  $fields[0] . '<>-1';
+    }
   }
 
   function buildEditorCondition () {
     $num_args = func_num_args();
-    if ($num_args <= 0)
+    if ($num_args <= 0) {
       return;
+    }
     $fields = func_get_args();
 
     if (isset($this->term) && '' !== $this->term) {
@@ -86,12 +92,14 @@ class DisplayBackend extends DisplayTable
     $ret = sprintf('<form action="%s" method="post" name="search">',
                    htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, 'page_id' => 0))));
 
-    if (method_exists($this, 'buildSearchFields'))
+    if (method_exists($this, 'buildSearchFields')) {
         $search = $this->buildSearchFields();
-    else
+    }
+    else {
         $search = sprintf('<input type="text" name="search" value="%s" size="40" /><input class="submit" type="submit" value="%s" />',
                           $this->htmlSpecialchars(array_key_exists('search', $this->search) ?  $this->search['search'] : ''),
                           tr('Search'));
+    }
 
     $ret .= sprintf('<tr><td colspan="%d" nowrap="nowrap">%s</td></tr>',
                     $this->cols_listing_count,
@@ -127,13 +135,16 @@ class DisplayBackend extends DisplayTable
     foreach ($this->images as $img_name => $img_descr) {
       $img_params = $img_descr['imgparams'];
       if (isset($img_descr['multiple'])) {
-        if ('boolean' == gettype($img_descr['multiple']))
+        if ('boolean' == gettype($img_descr['multiple'])) {
           $max_images = $img_descr['multiple'] ? -1 : 1;
-        else
+        }
+        else {
           $max_images = intval($img_descr['multiple']);
+        }
       }
-      else
+      else {
         $max_images = 1;
+      }
 
       // check if we need to delete something
       if (array_key_exists('delete_img', $this->page->parameters)) {
@@ -154,8 +165,11 @@ class DisplayBackend extends DisplayTable
     $ret = '';
     $field = $upload_form->field($name);
     if (isset($field)) {
-      if (isset($this->invalid[$name]))
-        $ret =  '<div class="error">'.$this->form->error_fulltext($this->invalid[$name], $this->page->lang).'</div>';
+      if (isset($this->invalid[$name])) {
+        $ret =  '<div class="error">'
+             . $this->form->error_fulltext($this->invalid[$name], $this->page->lang)
+             . '</div>';
+      }
 
       $ret .= $field->show($args);
     }
@@ -172,21 +186,24 @@ class DisplayBackend extends DisplayTable
 
     foreach ($this->images as $img_name => $img_descr) {
       $rows = array();
-      if (isset($img_descr['title']))
-        $ret .= '<h3>'.$img_descr['title'].'</h3>';
+      if (isset($img_descr['title'])) {
+        $ret .= '<h3>' . $img_descr['title'] . '</h3>';
+      }
 
       $upload_results = isset($this->upload_results[$img_name])
         ? $this->upload_results[$img_name]: array();
       // var_dump($upload_results);
 
+      $max_images = 1;
       if (isset($img_descr['multiple'])) {
-        if ('boolean' == gettype($img_descr['multiple']))
+        if ('boolean' == gettype($img_descr['multiple'])) {
           $max_images = $img_descr['multiple'] ? -1 : 1;
-        else
+        }
+        else {
           $max_images = intval($img_descr['multiple']);
+        }
       }
-      else
-        $max_images = 1;
+
       $img_params = $img_descr['imgparams'];
 
       $images = $imageUploadHandler->buildImages($img_name, $img_params, $max_images);
@@ -296,23 +313,26 @@ class MessageRecord extends TablemanagerRecord
   }
 
   function fetch ($args, $datetime_style = '') {
-    if (empty($datetime_style))
+    if (empty($datetime_style)) {
       $datetime_style = $this->datetime_style;
+    }
 
     $fetched = parent::fetch($args, $datetime_style);
     if ($fetched) {
       $dbconn = $this->params['dbconn'];
       $message_id = $this->get_value('id');
       $querystr = sprintf("SELECT user_id, lastname, firstname FROM MessageUser"
-                          ." LEFT OUTER JOIN User ON MessageUser.user_id=User.id"
-                          ." WHERE message_id=%d",
+                          . " LEFT OUTER JOIN User ON MessageUser.user_id=User.id"
+                          . " WHERE message_id=%d",
                           $message_id);
       $dbconn->query($querystr);
       if ($dbconn->next_record()) {
         // var_dump($dbconn->Record);
         $this->set_value('user_id', $dbconn->Record['user_id']);
-        if (isset($dbconn->Record['lastname']))
-          $this->set_value('user', $dbconn->Record['lastname'].' '.$dbconn->Record['firstname']);
+        if (isset($dbconn->Record['lastname'])) {
+          $this->set_value('user',
+                           $dbconn->Record['lastname'] . ' ' . $dbconn->Record['firstname']);
+        }
       }
 
     }
@@ -379,8 +399,9 @@ class DisplayMessage extends DisplayBackend
 
   function __construct (&$page, $workflow = NULL) {
     parent::__construct($page, isset($workflow) ? $workflow : new DisplayMessageFlow($page));
-    if (isset($this->type))
+    if (isset($this->type)) {
       $this->condition[] = sprintf('type=%d', intval($this->type));
+    }
 
     $this->condition[] = array('name' => 'status',
                                'method' => 'buildStatusCondition',
@@ -392,8 +413,9 @@ class DisplayMessage extends DisplayBackend
                                'persist' => 'session');
 
     $this->search_fulltext = $this->page->getPostValue('fulltext');
-    if (!isset($this->search_fulltext))
+    if (!isset($this->search_fulltext)) {
       $this->search_fulltext = $this->page->getSessionValue('fulltext');
+    }
     $this->page->setSessionValue('fulltext', $this->search_fulltext);
 
     if ($this->search_fulltext) {
@@ -406,8 +428,9 @@ class DisplayMessage extends DisplayBackend
                                  'persist' => 'session');
     }
 
-    if ($page->lang() != 'en_US')
+    if ($page->lang() != 'en_US') {
       $this->datetime_style = 'DD.MM.YYYY';
+    }
   }
 
   function constructFulltextCondition () {
@@ -422,29 +445,30 @@ class DisplayMessage extends DisplayBackend
   }
 
   function buildRecord ($name = '') {
-    if ('list' == $name)
+    if ('list' == $name) {
       return;
+    }
 
     $record = parent::buildRecord($name);
     $record->datetime_style = $this->datetime_style;
 
     $record->add_fields(array(
-        new Field(array('name'=>'id', 'type'=>'hidden', 'datatype'=>'int', 'primarykey'=>1)),
-        new Field(array('name'=>'type', 'type'=>'hidden', 'datatype'=>'int', 'value' => $this->type)),
-        new Field(array('name'=>'status', 'type'=>'select',
+        new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => TRUE)),
+        new Field(array('name' => 'type', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->type)),
+        new Field(array('name' => 'status', 'type' => 'select',
                         'options' => array_keys($this->status_options),
                         'labels' => array_values($this->status_options),
-                        'datatype'=>'int', 'default' => $this->status_default)),
-        new Field(array('name'=>'created', 'type'=>'hidden', 'datatype'=>'function', 'value'=>'NOW()', 'noupdate' => TRUE)),
-        new Field(array('name'=>'created_by', 'type'=>'hidden', 'datatype'=>'int', 'value' => $this->page->user['id'], 'null'=>1, 'noupdate' => TRUE)),
-        new Field(array('name'=>'changed', 'type'=>'hidden', 'datatype'=>'function', 'value'=>'NOW()')),
-        new Field(array('name'=>'changed_by', 'type'=>'hidden', 'datatype'=>'int', 'value' => $this->page->user['id'], 'null'=>1)),
-        new Field(array('name'=>'published', 'type'=>'datetime', 'datatype'=>'datetime', 'null' => TRUE)),
-        new Field(array('name'=>'subject', 'type'=>'text', 'size'=>40, 'datatype'=>'char', 'maxlength'=>80)),
-        new Field(array('name'=>'user', 'type'=>'text', 'nodbfield' => TRUE, 'null' => TRUE)),
-        new Field(array('name'=>'user_id', 'type'=>'int', 'nodbfield' => TRUE, 'null' => TRUE)),
-        new Field(array('name'=>'body', 'type'=>'textarea', 'datatype'=>'char', 'cols'=>65, 'rows'=>20, 'null' => TRUE)),
-        new Field(array('name'=>'comment', 'type'=>'textarea', 'datatype'=>'char', 'cols'=>50, 'rows' => 4, 'null' => TRUE)),
+                        'datatype' => 'int', 'default' => $this->status_default)),
+        new Field(array('name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => TRUE)),
+        new Field(array('name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null'=>1, 'noupdate' => TRUE)),
+        new Field(array('name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()')),
+        new Field(array('name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null'=>1)),
+        new Field(array('name' => 'published', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
+        new Field(array('name' => 'subject', 'type' => 'text', 'size'=>40, 'datatype' => 'char', 'maxlength'=>80)),
+        new Field(array('name' => 'user', 'type' => 'text', 'nodbfield' => TRUE, 'null' => TRUE)),
+        new Field(array('name' => 'user_id', 'type' => 'int', 'nodbfield' => TRUE, 'null' => TRUE)),
+        new Field(array('name' => 'body', 'type' => 'textarea', 'datatype' => 'char', 'cols'=>65, 'rows'=>20, 'null' => TRUE)),
+        new Field(array('name' => 'comment', 'type' => 'textarea', 'datatype' => 'char', 'cols'=>50, 'rows' => 4, 'null' => TRUE)),
       ));
 
     return $record;
@@ -481,8 +505,9 @@ class DisplayMessage extends DisplayBackend
   function setInput () {
     parent::setInput();
     if (isset($this->tinymce_fields) && count($this->tinymce_fields) > 0) {
-      foreach ($this->tinymce_fields as $fieldname)
+      foreach ($this->tinymce_fields as $fieldname) {
         $this->form->set_value($fieldname, $this->unformatParagraphs($this->form->get_value($fieldname)));
+      }
     }
   }
 
@@ -492,10 +517,12 @@ class DisplayMessage extends DisplayBackend
     $user = $record->get_value('user');
     $user_id = $record->get_value('user_id');
 
-    if (!empty($user))
+    if (!empty($user)) {
       $user = @FormField::htmlspecialchars($user);
-    else
+    }
+    else {
       $user = '';
+    }
 
     if ('edit' == $mode) {
       // build the user-autocompleter
@@ -590,8 +617,9 @@ EOT;
     $this->view_options['status'] = $status_options;
 
     $rows = $this->getEditRows('view');
-    if (isset($rows['title']))
+    if (isset($rows['title'])) {
       unset($rows['title']);
+    }
 
     $formats = $this->getViewFormats();
 
@@ -599,11 +627,13 @@ EOT;
 
     foreach ($rows as $key => $descr) {
       if ($descr !== FALSE && gettype($key) == 'string') {
-        if (isset($formats[$key]))
+        if (isset($formats[$key])) {
           $descr = array_merge($descr, $formats[$key]);
+        }
         $view_rows[$key] = $descr;
-        if (isset($this->view_options[$key]))
+        if (isset($this->view_options[$key])) {
           $view_rows[$key]['options'] = $this->view_options[$key];
+        }
       }
     }
 
@@ -612,14 +642,16 @@ EOT;
 
   function renderView ($record, $rows) {
     $ret = '';
-    if (!empty($this->page->msg))
+    if (!empty($this->page->msg)) {
       $ret .= '<p class="message">' . $this->page->msg . '</p>';
+    }
 
     $fields = array();
     if ('array' == gettype($rows)) {
       foreach ($rows as $key => $row_descr) {
-        if ('string' == gettype($row_descr))
+        if ('string' == gettype($row_descr)) {
           $fields[] = array('&nbsp;', $row_descr);
+        }
         else {
           $label = isset($row_descr['label']) ? tr($row_descr['label']).':' : '';
           // var_dump($row_descr);
@@ -632,15 +664,18 @@ EOT;
               $value .= (!empty($value) ? ' ' : '').$field_value;
             }
           }
-          else if (isset($row_descr['value']))
+          else if (isset($row_descr['value'])) {
             $value = $row_descr['value'];
+          }
           else {
             $field_value = $record->get_value($key);
             if (isset($row_descr['options']) && isset($field_value) && '' !== $field_value) {
               $values = preg_split('/,\s*/', $field_value);
-              for ($i = 0; $i < count($values); $i++)
-                if (isset($row_descr['options'][$values[$i]]))
+              for ($i = 0; $i < count($values); $i++) {
+                if (isset($row_descr['options'][$values[$i]])) {
                   $values[$i] = $row_descr['options'][$values[$i]];
+                }
+              }
               $field_value = implode(', ', $values);
             }
             $value = isset($row_descr['format']) && 'p' == $row_descr['format']
@@ -651,8 +686,9 @@ EOT;
         }
       }
     }
-    if (count($fields) > 0)
+    if (count($fields) > 0) {
       $ret .= $this->buildContentLineMultiple($fields);
+    }
 
     return $ret;
   }
@@ -665,7 +701,9 @@ EOT;
 
   function buildViewFooter ($found = TRUE) {
     $ret = ($found ? '<hr />' : '')
-        .'[<a href="'.htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name))).'">'.tr('back to overview').'</a>]';
+         . '[<a href="' . htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name))) . '">'
+         . tr('back to overview')
+         . '</a>]';
 
     if ($found && isset($this->record)) {
       $status = $this->record->get_value('status');
@@ -713,8 +751,9 @@ EOT;
   }
 
   function buildStatusOptions ($options = NULL) {
-    if (!isset($options))
+    if (!isset($options)) {
       $options = & $this->status_options;
+    }
 
     $status_options = array('<option value="">' . tr('-- all --') . '</option>');
     foreach ($options as $status => $label) {
@@ -758,7 +797,8 @@ EOT;
         ? ' selected="selected"' : '';
         $editor_options[] = sprintf('<option value="%s"%s>%s</option>', $id, $selected, htmlspecialchars(tr($label)));
       }
-      $search .= ' '.tr('Article Editor').': <select name="editor">'.implode($editor_options).'</select>';
+      $search .= ' ' . tr('Article Editor')
+               . ': <select name="editor">' . implode($editor_options) . '</select>';
     }
 
     // clear the search
@@ -789,7 +829,7 @@ EOT;
       </script>
       <a title="Clear search fields" href="javascript:clear_search();"><img src="$url_clear" border="0" /></a>
 EOT;
-    $search .= ' <input class="submit" type="submit" value="'.tr('Search').'" />';
+    $search .= ' <input class="submit" type="submit" value="' . tr('Search') . '" />';
 
     return $search;
   }
