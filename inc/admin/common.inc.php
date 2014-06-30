@@ -552,7 +552,7 @@ class SubscriberListing
       }
 
       if (count($review) > 0) {
-        $ret .= $this->buildSection($view, 'Review Info')
+        $ret .= $this->buildSection($view, 'Contributor Info')
               .implode('<br />', $review);
       }
     }

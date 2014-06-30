@@ -188,7 +188,7 @@ class DisplayAccount extends DisplayTable
 
     $fields = array(
       'id' => TRUE,
-      'email' => array('label' => $edit_self ? 'Your Subscription E-mail' : 'Subscription E-mail', 'value' => $this->record->get_value('email')),
+      'email' => array('label' => $edit_self ? 'Your Account E-mail' : 'Account E-mail', 'value' => $this->record->get_value('email')),
       'lastname' => array('label' => 'Last Name'),
       'firstname' => array('label' => 'First Name'),
       'pwd' => array('label' => tr('New Password').':<br />('.tr('Must be at least six characters').')'),

@@ -125,8 +125,8 @@ class DisplayCommunication extends DisplayTable
             if (FALSE !== ($template = @file_get_contents($fname_template))) {
               // fill in template
               $this->defaults['body'] = preg_replace_callback('|\%([a-z_0-9]+)\%|',
-                                                      array($this, 'replacePlaceholder'),
-                                                      $template);
+                                                              array($this, 'replacePlaceholder'),
+                                                              $template);
             }
             break;
       }
@@ -215,14 +215,14 @@ class DisplayCommunication extends DisplayTable
 
     if (!isset($_users[$id])) {
       $dbconn = & $this->page->dbconn;
-      $dbconn->query(sprintf("SELECT id, email, firstname, lastname, sex, title, institution, address, zip, place"
+      $dbconn->query(sprintf("SELECT id, email, firstname, lastname, sex, title, institution, phone, address, zip, place"
                              . " FROM User WHERE id=%d",
                              $id));
 
-      if ($dbconn->next_record())
+      if ($dbconn->next_record()) {
         $_users[$id] = $dbconn->Record;
+      }
     }
-
     return isset($_users[$id]) ? $_users[$id] : NULL;
   }
 
@@ -245,10 +245,21 @@ class DisplayCommunication extends DisplayTable
     $ret = '';
     switch ($matches[1]) {
       case 'name_from':
+      case 'email_from':
+      case 'phone_from':
           $user = $this->fetchUser($this->page->user['id']);
           if (isset($user)) {
-            $ret = (!empty($user['firstname']) ? $user['firstname'].' ' : '')
-             . $user['lastname'];
+            switch ($matches[1]) {
+              case 'email_from':
+                $ret = $user['email'];
+                break;
+              case 'phone_from':
+                $ret = $user['phone'];
+                break;
+              default:
+                $ret = (!empty($user['firstname']) ? $user['firstname'].' ' : '')
+                 . $user['lastname'];
+            }
           }
           break;
 
@@ -310,14 +321,16 @@ class DisplayCommunication extends DisplayTable
       case 'review_date':
           if (isset($this->defaults['message_id'])) {
             $message = $this->fetchMessage($this->defaults['message_id']);
-            if (!empty($message['published_display']))
+            if (!empty($message['published_display'])) {
               $ret = ' am ' . $message['published_display'];
+            }
           }
           break;
 
       default:
-          if (array_key_exists($matches[1], $_GET))
+          if (array_key_exists($matches[1], $_GET)) {
             $ret = $_GET[$matches[1]];
+          }
           break;
     }
 

@@ -15,5 +15,5 @@ Mit besten Grüßen
 --
 Institut für die Geschichte der deutschen Juden
 Beim Schlump 83, 20144 Hamburg
-E-Mail: anna.menny@public.uni-hamburg.de
-Tel.: +49 (0) 40 428383-8045
+E-Mail: %email_from%
+Tel.: %phone_from%
