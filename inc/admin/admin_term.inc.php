@@ -4,9 +4,9 @@
  *
  * Class for managing Thesauri-Terms
  *
- * (c) 2013 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2013-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2013-07-29 dbu
+ * Version: 2014-07-11 dbu
  *
  * Changes:
  *
@@ -38,8 +38,9 @@ class DisplayTerm extends DisplayTable
 
     $record = parent::buildRecord($name);
 
-    if (!isset($record))
+    if (!isset($record)) {
       return;
+    }
 
     if (isset($_SESSION['_term']) && isset($_SESSION['_term']['category'])) {
       $category = $_SESSION['_term']['category'];
@@ -71,6 +72,7 @@ class DisplayTerm extends DisplayTable
       ? $this->form->get_value('category')
       : $this->record->get_value('category');
     // var_dump($this->record);
+
     return array(
       'id' => FALSE, 'status' => FALSE, // hidden fields
       'category' => array('label' => 'Thesaurus',

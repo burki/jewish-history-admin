@@ -120,33 +120,58 @@ class TableManagerQueryConditionBuilder
       return;
 
     $num_args = func_num_args();
-    if ($num_args <= 0)
+    if ($num_args <= 0) {
       return;
+    }
     $fields =  func_get_args();
 
     $parts = preg_split('/\s+/', $this->term);
-    if (count($parts) == 0)
+    if (count($parts) == 0) {
       return;
+    }
     $and_parts = array();
     for ($i = 0; $i < count($parts); $i++) {
       $or_parts = array();
-      for ($j = 0; $j < $num_args; $j++)
-        $or_parts[] = $fields[$j]." LIKE '%".addslashes($parts[$i])."%'";
+      for ($j = 0; $j < $num_args; $j++) {
+        $or_parts[] = $fields[$j] . " LIKE '%" . addslashes($parts[$i]) . "%'";
+      }
       $and_parts[] = '('.implode(' OR ', $or_parts).')';
     }
     return implode(' AND ', $and_parts);
   }
 
-  function buildFulltextCondition () {
-    if (empty($this->term))
+  function buildEqualCondition () {
+    if (empty($this->term)) {
       return;
+    }
+
     $num_args = func_num_args();
-    if ($num_args <= 0)
+    if ($num_args <= 0) {
       return;
+    }
+
+    $fields = func_get_args();
+
+    $or_parts = array();
+    for ($j = 0; $j < $num_args; $j++) {
+      $or_parts[] = $fields[$j] . " = '" . addslashes($this->term) . "'";
+    }
+    return count($or_parts) > 1 ? '(' . implode(' OR ', $or_parts) . ')' : $or_parts[0];
+  }
+
+  function buildFulltextCondition () {
+    if (empty($this->term)) {
+      return;
+    }
+    $num_args = func_num_args();
+    if ($num_args <= 0) {
+      return;
+    }
     $fields =  func_get_args();
 
     $fulltext_sql = addslashes(self::mysqlParseFulltextBoolean($this->term));
-    return 'MATCH ('.implode(', ', $fields).") AGAINST ('".$fulltext_sql."' IN BOOLEAN MODE)";
+
+    return 'MATCH (' . implode(', ', $fields) . ") AGAINST ('" . $fulltext_sql . "' IN BOOLEAN MODE)";
   }
 } // class TableManagerQueryConditionBuilder
 
@@ -196,8 +221,9 @@ class DisplayTable extends PageDisplay
   var $condition;
 
   function __construct (&$page, $workflow = '') {
-    if (defined('DATETIME_STYLE'))
+    if (defined('DATETIME_STYLE')) {
       $this->datetime_style = tr(DATETIME_STYLE);
+    }
 
     parent::__construct($page);
     $this->workflow = gettype($workflow) == 'object'
@@ -207,10 +233,12 @@ class DisplayTable extends PageDisplay
 
   function init () {
     $this->step = $this->workflow->init($this->page);
-    if ($this->step == TABLEMANAGER_NOACCESS)
+    if ($this->step == TABLEMANAGER_NOACCESS) {
       return FALSE;
-    if ($this->isPostback())
+    }
+    if ($this->isPostback()) {
       $this->step = TABLEMANAGER_EDIT;
+    }
 
     $this->record = $this->buildRecord($this->workflow->name($this->step));
     list($advance, $this->modeminor) = $this->process();
@@ -218,8 +246,9 @@ class DisplayTable extends PageDisplay
 // echo $this->step.'->'.$this->workflow->advance($this->step);
       $this->clear_postback = TRUE; // force refetch after store
       $this->step = $this->workflow->advance($this->step);
-      if (FALSE !== $this->step)
+      if (FALSE !== $this->step) {
         $this->record = $this->buildRecord($this->workflow->name($this->step));
+      }
     }
 
     return $this->step;
@@ -232,8 +261,9 @@ class DisplayTable extends PageDisplay
   }
 
   function buildRecord ($name = '') {
-    if ('list' == $name)
+    if ('list' == $name) {
       return;
+    }
 
     return $this->instantiateRecord($this->table);
   }
@@ -282,11 +312,13 @@ class DisplayTable extends PageDisplay
 
   function process () {
     // now check if it was submitted
-    if (!$this->isPostback())
+    if (!$this->isPostback()) {
       return array(FALSE, 0);
+    }
 
-    if (!isset($this->record))
+    if (!isset($this->record)) {
       die('TableManagerRecord::record is not set');
+    }
 
     $minor = TABLEMANAGER_EDIT_SUBMITTED;
 
@@ -571,16 +603,20 @@ class DisplayTable extends PageDisplay
     $fields = $this->buildListingFields();
 
     $querystr = "SELECT "
-        .($this->distinct_listing ? 'DISTINCT ' : '')
-        .implode(', ', $fields).' FROM '.implode(', ', $this->buildListingTables());
+              . ($this->distinct_listing ? 'DISTINCT ' : '')
+              . implode(', ', $fields)
+              . ' FROM ' . implode(', ', $this->buildListingTables());
     $joins = $this->buildListingJoins();
-    if (isset($joins))
-      $querystr .= ' '.implode(' ', $joins);
-    if (!empty($where))
-      $querystr .= ' WHERE '.$where;
-    if (!empty($order_by))
-      $querystr .= ' ORDER BY '.$order_by;
- // echo $querystr;
+    if (isset($joins)) {
+      $querystr .= ' ' . implode(' ', $joins);
+    }
+    if (!empty($where)) {
+      $querystr .= ' WHERE ' . $where;
+    }
+    if (!empty($order_by)) {
+      $querystr .= ' ORDER BY ' . $order_by;
+    }
+// echo $querystr;
 
     return array($querystr, $search_terms, $order, $order_index);
   }
@@ -596,7 +632,7 @@ class DisplayTable extends PageDisplay
           $querystr = preg_replace('/SELECT\\b/i', 'SELECT SQL_CALC_FOUND_ROWS', $querystr);
         }
       }
-      $querystr .= ' LIMIT '.($page_id * $page_size).', '.$page_size;
+      $querystr .= ' LIMIT ' . ($page_id * $page_size) . ', ' . $page_size;
       // fetch those rows
       $rows = array();
       $dbconn = &$this->page->dbconn;

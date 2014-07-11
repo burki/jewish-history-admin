@@ -173,6 +173,7 @@ $GETTEXT_MESSAGES = array (
 'File Upload' => 'Datei hochladen',
 'File' => 'Datei',
 'Image Caption' => 'Bildunterschrift',
+'Preview Image' => 'Vorschaubild',
 'Copyright-Notice' => 'Urheberrechtsnachweis',
 'Reviews' => 'Rezensionen',
 'Reviewers' => 'Rezensenten',
@@ -221,6 +222,7 @@ $GETTEXT_MESSAGES = array (
 'Review department' => 'Rezensionsabteilung',
 'Referee' => 'Herausgeber',
 'System Editor' => 'Redakteur',
+'System Administrator' => 'Systemverwalter',
 'add new publisher' => 'neuen Verlag hinzufügen',
 'delete message' => 'Beitrag löschen',
 'Communication' => 'Kommunikation',
@@ -234,5 +236,9 @@ $GETTEXT_MESSAGES = array (
 'send letter' => 'Anschreiben erstellen',
 'Section' => 'Themenkategorie',
 'Term' => 'Begriff',
+'Sources' => 'Quellen',
+'Source Type' => 'Quellenart',
+'Holding Institutions' => 'Bewahrende Institutionen',
+'add new Holding Institution' => 'neue bewahrende Institution hinzufügen',
 );
 

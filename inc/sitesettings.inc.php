@@ -7,7 +7,7 @@
  *
  * (c) 2009-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-06-30 dbu
+ * Version: 2014-07-11 dbu
  *
  * Changes:
  *
@@ -56,7 +56,8 @@ $COUNTRIES_FEATURED = array('DE', 'AT', 'CH', 'UK', 'US', 'CA',
 
 $GLOBALS['THESAURI'] =
     array('section' => 'Section',
-);
+          'sourcetype' => 'Source Type',
+          );
 
 
 $MAIL_SETTINGS = array(

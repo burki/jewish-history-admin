@@ -182,9 +182,8 @@ class DisplayArticle extends DisplayMessage
     $dbconn = & $this->page->dbconn;
     switch ($type) {
       case 'section':
-        $querystr = sprintf("SELECT id, name FROM Term WHERE category='%s' AND status >= 0 ORDER BY ord, name",
-                            addslashes($type));
-        break;
+          $querystr = sprintf("SELECT id, name FROM Term WHERE category='%s' AND status >= 0 ORDER BY ord, name",
+                              addslashes($type));
           break;
       case 'referee':
           $querystr = "SELECT id, lastname, firstname FROM User";

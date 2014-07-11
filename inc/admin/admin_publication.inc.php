@@ -6,7 +6,7 @@
  *
  * (c) 2007-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-06-30 dbu
+ * Version: 2014-07-11 dbu
  *
  * Changes:
  *
@@ -40,13 +40,14 @@ class PublicationRecord extends TableManagerRecord
         $folder = ImageUploadHandler::directory($id, $TYPE_PUBLICATION, TRUE);
         $fname = 'cover00';
         // get the extension from the url - TODO: check mime-type
-        if (preg_match('/(\.[^\.]+)$/', $image_url, $matches))
+        if (preg_match('/(\.[^\.]+)$/', $image_url, $matches)) {
           $ext = $matches[1];
+        }
 
-        $fullname = $folder.$fname.'_large'.$ext;
+        $fullname = $folder . $fname . '_large' . $ext;
 
         if (ImageUploadHandler::checkDirectory($folder, TRUE)) {
-          $handle = fopen($image_url, "rb");
+          $handle = fopen($image_url, 'rb');
           $contents = stream_get_contents($handle);
           fclose($handle);
 
@@ -67,8 +68,9 @@ class PublicationRecord extends TableManagerRecord
                    . ' ' . escapeshellarg($fullname_scaled);
               // var_dump($cmd);
               $ret = exec($cmd, $lines, $retval);
-              if (file_exists($fullname_scaled))
+              if (file_exists($fullname_scaled)) {
                 $fname_store = $fullname_scaled;
+              }
             }
             else {
               copy($fullname, $fullname_scaled);
@@ -128,8 +130,7 @@ class PublicationRecord extends TableManagerRecord
       $dbconn->query($querystr);
       return $dbconn->affected_rows() > 0;
     }
-    else
-      return FALSE;
+    return FALSE;
   }
 }
 
@@ -159,6 +160,11 @@ class DisplayPublication extends DisplayTable
   function buildOptions ($category) {
     $dbconn = & $this->page->dbconn;
     switch ($category) {
+      case 'type':
+          $type = 'sourcetype';
+          $querystr = sprintf("SELECT id, name FROM Term WHERE category='%s' AND status >= 0 ORDER BY ord, name",
+                              addslashes($type));
+          break;
       case 'publisher':
           $querystr = sprintf("SELECT id, name FROM %s WHERE status >= 0 ORDER BY name",
                             $dbconn->escape_string(ucfirst($category)));
@@ -167,8 +173,9 @@ class DisplayPublication extends DisplayTable
     if (isset($querystr)) {
       $dbconn->query($querystr);
       $options = array();
-      while ($dbconn->next_record())
+      while ($dbconn->next_record()) {
         $options[$dbconn->Record['id']] = $dbconn->Record['name'];
+      }
 
       return $options;
     }
@@ -177,34 +184,37 @@ class DisplayPublication extends DisplayTable
   function buildRecord ($name = '') {
     $record = parent::buildRecord($name);
 
-    if (!isset($record))
+    if (!isset($record)) {
       return;
+    }
 
+    $this->view_options['type'] = $type_options = $this->buildOptions('type');
     $publisher_options = $this->buildOptions('publisher');
     $record->add_fields(array(
-        new Field(array('name'=>'id', 'type'=>'hidden', 'datatype'=>'int', 'primarykey'=>1)),
-        new Field(array('name'=>'status', 'type'=>'hidden', 'datatype'=>'int', 'default' => 0)),
-        new Field(array('name'=>'created', 'type'=>'hidden', 'datatype'=>'function', 'value'=>'NOW()', 'noupdate' => TRUE)),
-        new Field(array('name'=>'created_by', 'type'=>'hidden', 'datatype'=>'int', 'value' => $this->page->user['id'], 'null'=>1, 'noupdate' => TRUE)),
-        new Field(array('name'=>'changed', 'type'=>'hidden', 'datatype'=>'function', 'value'=>'NOW()')),
-        new Field(array('name'=>'changed_by', 'type'=>'hidden', 'datatype'=>'int', 'value' => $this->page->user['id'], 'null'=>1)),
-        // new Field(array('name'=>'isbn', 'id' => 'isbn', 'type'=>'text', 'size'=>20, 'datatype'=>'char', 'maxlength'=>17, 'null'=>1)),
-        new Field(array('name'=>'author', 'id' => 'author', 'type'=>'text', 'size'=>60, 'datatype'=>'char', 'maxlength'=>80, 'null'=>1)),
-        new Field(array('name'=>'editor', 'id' => 'editor', 'type'=>'text', 'size'=>60, 'datatype'=>'char', 'maxlength'=>80, 'null'=>1)),
-        new Field(array('name'=>'title', 'id' => 'title', 'type'=>'text', 'size'=>60, 'datatype'=>'char', 'maxlength'=>127)),
-        new Field(array('name'=>'subtitle', 'id' => 'subtitle', 'type'=>'text', 'size'=>60, 'datatype'=>'char', 'maxlength'=>127, 'null'=>1)),
-        new Field(array('name'=>'series', 'id' => 'series', 'type'=>'text', 'size'=>60, 'datatype'=>'char', 'maxlength'=>127, 'null'=>1)),
-        new Field(array('name'=>'place', 'id' => 'place', 'type'=>'text', 'size'=>60, 'datatype'=>'char', 'maxlength'=>127, 'null'=>1)),
-        new Field(array('name'=>'publisher_id', 'id' => 'publisher_id', 'type'=>'select',
+        new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => TRUE)),
+        new Field(array('name' => 'status', 'type' => 'hidden', 'datatype' => 'int', 'default' => 0)),
+        new Field(array('name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => TRUE)),
+        new Field(array('name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null'=>1, 'noupdate' => TRUE)),
+        new Field(array('name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()')),
+        new Field(array('name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null'=>1)),
+        new Field(array('name' => 'type', 'id' => 'type', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($type_options), 'labels' => array_values($type_options))),
+       // new Field(array('name' => 'isbn', 'id' => 'isbn', 'type' => 'text', 'size'=>20, 'datatype' => 'char', 'maxlength'=>17, 'null'=>1)),
+        new Field(array('name' => 'author', 'id' => 'author', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength'=>80, 'null'=>1)),
+        new Field(array('name' => 'editor', 'id' => 'editor', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength'=>80, 'null'=>1)),
+        new Field(array('name' => 'title', 'id' => 'title', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength'=>127)),
+        new Field(array('name' => 'subtitle', 'id' => 'subtitle', 'type' => 'text', 'size'=>60, 'datatype' => 'char', 'maxlength'=>127, 'null'=>1)),
+        new Field(array('name' => 'series', 'id' => 'series', 'type' => 'text', 'size'=>60, 'datatype' => 'char', 'maxlength'=>127, 'null'=>1)),
+        new Field(array('name' => 'place', 'id' => 'place', 'type' => 'text', 'size'=>60, 'datatype' => 'char', 'maxlength'=>127, 'null'=>1)),
+        new Field(array('name' => 'publisher_id', 'id' => 'publisher_id', 'type' => 'select',
                         'options' => array_merge(array(''), array_keys($publisher_options)),
-                        'labels' => array_merge(array('-- select a holding institution --'), array_values($publisher_options)), 'datatype'=>'int')),
-        // new Field(array('name'=>'publisher', 'id' => 'publisher', 'type'=>'text', 'size'=>60, 'datatype'=>'char', 'maxlength'=>127, 'null'=>1)),
-        new Field(array('name'=>'publication_date', 'id' => 'publication_date', 'type'=>'date', 'incomplete' => TRUE, 'datatype'=>'date', 'null' => 1)),
-        new Field(array('name'=>'binding', 'id' => 'binding', 'type'=>'text', 'size'=>60, 'datatype'=>'char', 'maxlength'=>50, 'null'=>1)),
-        new Field(array('name'=>'pages', 'id' => 'pages', 'type'=>'text', 'size'=>60, 'datatype'=>'char', 'maxlength'=>50, 'null'=>1)),
-        new Field(array('name'=>'listprice', 'id' => 'listprice', 'type'=>'text', 'size'=>60, 'datatype'=>'char', 'maxlength'=>50, 'null'=>1)),
-        new Field(array('name'=>'image_url', 'id' => 'image', 'type'=>'hidden', 'datatype'=>'char', 'null'=>1, 'nodbfield'=>1)),
-        new Field(array('name'=>'url', 'id' => 'toc_url', 'type'=>'text', 'size'=>60, 'datatype'=>'char', 'maxlenght'=>255, 'null'=>1)),
+                        'labels' => array_merge(array('-- select a holding institution --'), array_values($publisher_options)), 'datatype' => 'int')),
+        // new Field(array('name' => 'publisher', 'id' => 'publisher', 'type' => 'text', 'size'=>60, 'datatype' => 'char', 'maxlength'=>127, 'null'=>1)),
+        new Field(array('name' => 'publication_date', 'id' => 'publication_date', 'type' => 'date', 'incomplete' => TRUE, 'datatype' => 'date', 'null' => 1)),
+        new Field(array('name' => 'binding', 'id' => 'binding', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength'=>50, 'null'=>1)),
+        new Field(array('name' => 'pages', 'id' => 'pages', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength'=>50, 'null'=>1)),
+        new Field(array('name' => 'listprice', 'id' => 'listprice', 'type' => 'text', 'size' =>60, 'datatype' => 'char', 'maxlength'=>50, 'null'=>1)),
+        new Field(array('name' => 'image_url', 'id' => 'image', 'type' => 'hidden', 'datatype' => 'char', 'null'=>1, 'nodbfield'=>1)),
+        new Field(array('name' => 'url', 'id' => 'toc_url', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlenght'=>255, 'null'=>1)),
       ));
 
     return $record;
@@ -215,6 +225,8 @@ class DisplayPublication extends DisplayTable
                                     tr('add new Holding Institution'), htmlspecialchars($this->page->buildLink(array('pn' => 'publisher', 'edit' => -1))));
     return array(
       'id' => FALSE, 'status' => FALSE, // hidden fields
+
+      'type' => array('label' => 'Source Type'),
 
       /* 'isbn' => array('label' => 'ISBN'),
       '<input type="button" value="' . tr('Get Info') . '" onclick="fetchPublicationByIsbn()" />',
@@ -329,7 +341,8 @@ EOT;
   }
 
   function buildViewRows () {
-    $resolve_options = array('publisher_id' => 'publisher');
+    $resolve_options = array('type' => 'type',
+                             'publisher_id' => 'publisher');
 
     $rows = $this->getEditRows();
     if (isset($rows['title'])) {
@@ -366,8 +379,9 @@ EOT;
     $fields = array();
     if ('array' == gettype($rows)) {
       foreach ($rows as $key => $row_descr) {
-        if ('string' == gettype($row_descr))
+        if ('string' == gettype($row_descr)) {
           $fields[] = array('&nbsp;', $row_descr);
+        }
         else {
           $label = isset($row_descr['label']) ? tr($row_descr['label']).':' : '';
           // var_dump($row_descr);
@@ -380,15 +394,18 @@ EOT;
               $value .= (!empty($value) ? ' ' : '').$field_value;
             }
           }
-          else if (isset($row_descr['value']))
+          else if (isset($row_descr['value'])) {
             $value = $row_descr['value'];
+          }
           else {
             $field_value = $record->get_value($key);
             if (isset($row_descr['options']) && isset($field_value) && '' !== $field_value) {
               $values = preg_split('/,\s*/', $field_value);
-              for ($i = 0; $i < count($values); $i++)
-                if (isset($row_descr['options'][$values[$i]]))
+              for ($i = 0; $i < count($values); $i++) {
+                if (isset($row_descr['options'][$values[$i]])) {
                   $values[$i] = $row_descr['options'][$values[$i]];
+                }
+              }
               $field_value = implode(', ', $values);
             }
             $value = isset($row_descr['format']) && 'p' == $row_descr['format']
@@ -399,8 +416,9 @@ EOT;
         }
       }
     }
-    if (count($fields) > 0)
+    if (count($fields) > 0) {
       $ret .= $this->buildContentLineMultiple($fields);
+    }
 
     return $ret;
   }
@@ -417,19 +435,20 @@ EOT;
       $authors = $record->get_value('editor');
       $editor = TRUE;
     }
+    $author_short = '';
     if (!empty($authors)) {
       // $parts = preg_split('/\s*\;\s/', $authors);
       // list($lastname, $firstname) = preg_split('/\s*,\s*/', $parts[0]);
       // $author_short = (!empty($firstname) ? $firstname[0].'. ' : '').$lastname;
       $author_short = $authors;
-      if ($editor)
+      if ($editor) {
         $author_short .= ' (Hrsg.)';
+      }
       $author_short .= ': ';
     }
-    else
-      $author_short = '';
 
     $subject = $author_short . $this->formatText($record->get_value('title'));
+
     return htmlspecialchars_decode(strip_tags($subject));
   }
 
@@ -492,7 +511,7 @@ EOT;
       $ret .= '<h2>' . tr('Articles')
             . ' <span class="regular">[<a href="' . htmlspecialchars($url_add).'">' . tr('add new') . '</a>]</span></h2>'
             . $reviews;
-      
+
       // $ret .= '<tt><pre>' . $this->buildLiteraturTemplate() . '</tt></pre>';
 
       if (isset($uploadHandler)) {
@@ -505,8 +524,9 @@ EOT;
   }
 
   function wikiNormalizeAuthors ($authors) {
-    if (empty($authors))
+    if (empty($authors)) {
       return '';
+    }
     $authors = preg_split('/\s*;\s*/', $authors);
     $normalized = array();
     foreach ($authors as $author) {
@@ -518,15 +538,17 @@ EOT;
 
   function buildLiteraturTemplate () {
     $values = array();
-    foreach ($this->record->get_fieldnames() as $name)
+    foreach ($this->record->get_fieldnames() as $name) {
       $values[$name] = $this->record->get_value($name);
+    }
     $author_publisher = '';
     if (!empty($values['author'])) {
       $author_publisher = '|Autor=' . $this->wikiNormalizeAuthors($values['author']);
     }
-    if (!empty($values['editor']))
+    if (!empty($values['editor'])) {
       $author_publisher .= (!empty($author_publisher) ? "\n" : '')
         . '|Herausgeber=' . $this->wikiNormalizeAuthors($values['editor']);
+    }
 
     $isbn = $values['isbn'];
     try {
@@ -590,7 +612,8 @@ EOT;
 }
 
 $display = new DisplayPublication($page);
-if (FALSE === $display->init())
+if (FALSE === $display->init()) {
   $page->redirect(array('pn' => ''));
+}
 
 $page->setDisplay($display);

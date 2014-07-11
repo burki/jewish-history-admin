@@ -332,7 +332,7 @@ EOT;
   }
 
   function renderUpload (&$imageUploadHandler, $title = 'Image Upload') {
-    $ret = '<h2>' . $this->formatText($title) . '</h2>';
+    $ret = '<h2>' . $this->formatText(tr($title)) . '</h2>';
 
     $params_self = array('pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_VIEW) => $this->id);
     $action = $this->page->buildLink($params_self);
