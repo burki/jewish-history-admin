@@ -166,6 +166,9 @@ $GETTEXT_MESSAGES = array (
 'Get Info' => 'Abfrage starten',
 'Save' => 'Speichern',
 'save' => 'speichern',
+'Preview' => 'Vorschau',
+'Attachment' => 'Anhang',
+'Attachments' => 'Anhänge',
 'Books' => 'Bücher',
 'Book Reviews' => 'Buchrezensionen',
 'Image Upload' => 'Bild hochladen',
@@ -240,5 +243,8 @@ $GETTEXT_MESSAGES = array (
 'Source Type' => 'Quellenart',
 'Holding Institutions' => 'Bewahrende Institutionen',
 'add new Holding Institution' => 'neue bewahrende Institution hinzufügen',
+'Send Bcc to From' => 'Blindkopie an Absender-Adresse',
+'Attach article guidelines' => 'Artikel-Richtlinien anfügen',
+'Options' => 'Optionen',
 );
 

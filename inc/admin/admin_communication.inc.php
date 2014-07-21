@@ -6,7 +6,7 @@
  *
  * (c) 2008-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-06-30 dbu
+ * Version: 2014-07-21 dbu
  *
  * Changes:
  *
@@ -24,13 +24,13 @@ class DisplayCommunication extends DisplayTable
     'reviewer_reminder' => 30,
     'referee_request' => 40,
     'publisher_vouchercopy' => 50,
-    );
+  );
   var $page_size = 30;
   var $table = 'Communication';
   var $fields_listing = array('id', 'to_email', 'subject', 'IFNULL(sent,changed)'); // , 'status');
 
   var $condition = array(
-      array('name' => 'search', 'method' => 'buildLikeCondition', 'args' => 'to_email'),
+    array('name' => 'search', 'method' => 'buildLikeCondition', 'args' => 'to_email'),
   );
   var $order = array(array('sent DESC'));
   var $view_after_edit = TRUE;
@@ -83,7 +83,8 @@ class DisplayCommunication extends DisplayTable
       $this->publications = $publications;
 
       if (in_array($_GET['mode'], array('publisher_request', 'publisher_vouchercopy'))
-          && count($this->publications) > 0) {
+          && count($this->publications) > 0)
+      {
         $dbconn = & $this->page->dbconn;
         $querystr = sprintf("SELECT DISTINCT Publisher.email_contact AS to_email"
                             . " FROM Publisher INNER JOIN Publication ON Publisher.id=Publication.publisher_id"
@@ -139,8 +140,8 @@ class DisplayCommunication extends DisplayTable
     require_once LIB_PATH . 'rtf/Rtf.php';
 
     // Font
-    $times12 = new Font(12, 'Times new Roman');
-    $times10 = new Font(10, 'Times new Roman');
+    $times12 = @ new Font(12, 'Times new Roman');
+    $times10 = @ new Font(10, 'Times new Roman');
 
     // ParFormat
     $parFormat = new ParFormat();
@@ -155,11 +156,13 @@ class DisplayCommunication extends DisplayTable
     $header->addImage(INC_PATH . 'messages/rtf_header.png', $parRight);
 
     $footer = $rtf->addFooter('first');
-    $footer->writeText(preg_replace('/\n/', "\r\n", file_get_contents(INC_PATH . 'messages/rtf_footer.txt')),
+    @ $footer->writeText(preg_replace('/\n/', "\r\n",
+                                    file_get_contents(INC_PATH . 'messages/rtf_footer.txt')),
                        $times10, $parFormat);
 
     $footer = $rtf->addFooter('all');
-    $footer->writeText(preg_replace('/\n/', "\r\n", file_get_contents(INC_PATH . 'messages/rtf_footer.txt')),
+    @ $footer->writeText(preg_replace('/\n/', "\r\n",
+                                    file_get_contents(INC_PATH . 'messages/rtf_footer.txt')),
                        $times10, $parFormat);
 
 
@@ -193,17 +196,17 @@ class DisplayCommunication extends DisplayTable
                    . (!empty($user['place']) ? $user['place'] : '');
         }
       }
+
       if (!empty($address)) {
         $parLeft = new ParFormat('left');
-        $sect->writeText($address, $times12, $parLeft, true);
+        @ $sect->writeText($address, $times12, $parLeft, true);
         $sect->emptyParagraph($times12, $parLeft);
         $sect->emptyParagraph($times12, $parLeft);
       }
     }
 
-
     // add the rest
-    $sect->writeText($this->record->get_value('body'), $times12, $par);
+    @ $sect->writeText($this->record->get_value('body'), $times12, $par);
 
     $rtf->sendRtf();
 
@@ -258,7 +261,7 @@ class DisplayCommunication extends DisplayTable
                 break;
               default:
                 $ret = (!empty($user['firstname']) ? $user['firstname'].' ' : '')
-                 . $user['lastname'];
+                     . $user['lastname'];
             }
           }
           break;
@@ -268,18 +271,20 @@ class DisplayCommunication extends DisplayTable
             $user = $this->fetchUser($this->defaults['to_id']);
             if (isset($user)) {
               $ret = ('F' == $user['sex'] ? 'Sehr geehrte Frau' : 'Sehr geehrter Herr')
-                . ' ' . $user['lastname'];
+                   . ' ' . $user['lastname'];
             }
           }
-          if (empty($ret))
+          if (empty($ret)) {
             $ret = 'Sehr geehrte/r Herr/Frau';
+          }
           break;
 
       case 'reviewer_sex_de':
-          if (isset($this->defaults['to_id']))
+          if (isset($this->defaults['to_id'])) {
             $user = $this->fetchUser($this->defaults['to_id']);
+          }
           $ret = isset($user) && 'F' == $user['sex']
-            ? ' Rezensentin' : 'n Rezensenten';
+            ? ' Autorin' : 'n Autoren';
           break;
 
       case 'bibinfo':
@@ -297,13 +302,15 @@ class DisplayCommunication extends DisplayTable
           break;
 
       case 'reviewer_info':
-          if (isset($this->defaults['to_id']))
+          if (isset($this->defaults['to_id'])) {
             $user = $this->fetchUser($this->defaults['to_id']);
+          }
           if (isset($user)) {
             $ret = (!empty($user['firstname']) ? $user['firstname'].' ' : '')
-             . $user['lastname'];
-            if (!empty($user['institution']))
+                 . $user['lastname'];
+            if (!empty($user['institution'])) {
               $ret .= ', ' . $user['institution'];
+            }
           }
           break;
 
@@ -342,27 +349,29 @@ class DisplayCommunication extends DisplayTable
 
     $record = parent::buildRecord($name);
 
-    if (!isset($record))
+    if (!isset($record)) {
       return;
+    }
 
     $record->add_fields(array(
-      new Field(array('name'=>'id', 'type'=>'hidden', 'datatype'=>'int', 'primarykey'=>1)),
-      new Field(array('name'=>'sent', 'type'=>'hidden', 'datatype'=>'function', 'null' => 1, 'noupdate' => TRUE)),
-      new Field(array('name'=>'created', 'type'=>'hidden', 'datatype'=>'function', 'value'=>'NOW()', 'noupdate' => TRUE)),
-      new Field(array('name'=>'created_by', 'type'=>'hidden', 'datatype'=>'int', 'value' => $this->page->user['id'], 'null'=>1, 'noupdate' => TRUE)),
-      new Field(array('name'=>'changed', 'type'=>'hidden', 'datatype'=>'function', 'value'=>'NOW()')),
-      new Field(array('name'=>'changed_by', 'type'=>'hidden', 'datatype'=>'int', 'value' => $this->page->user['id'], 'null'=>1)),
-      new Field(array('name'=>'from_email', 'type'=>'email', 'datatype'=>'char', 'default' => array_key_exists('from_email', $this->defaults) ? $this->defaults['from_email'] : '')),
-      new Field(array('name'=>'from_id', 'type'=>'hidden', 'datatype'=>'int', 'value' => $this->page->user['id'], 'null' => TRUE)),
-      new Field(array('name'=>'to_email', 'type'=>'email', 'datatype'=>'char', 'default' => array_key_exists('to_email', $this->defaults) ? $this->defaults['to_email'] : '')),
-      new Field(array('name'=>'to_id', 'type'=>'hidden', 'datatype'=>'int', 'default' => array_key_exists('to_id', $this->defaults) ? $this->defaults['to_id'] : '', 'null' => TRUE)),
-      new Field(array('name'=>'message_id', 'type'=>'hidden', 'datatype'=>'int', 'default' => array_key_exists('message_id', $this->defaults) ? $this->defaults['message_id'] : '', 'null' => TRUE)),
-      new Field(array('name'=>'type', 'type'=>'hidden', 'datatype'=>'int', 'default' => array_key_exists('type', $this->defaults) ? $this->defaults['type'] : 0, 'null' => TRUE, 'noupdate' => TRUE)),
-      new Field(array('name'=>'flags', 'type'=>'checkbox', 'datatype'=>'bitmap', 'null' => TRUE,
-                      'default'=> array_key_exists('type', $this->defaults) && $this->defaults['type'] == self::$TYPE_MAP['reviewer_sent'] ? 0x02 : 0, 'labels'=> array('Send Bcc to From', 'Attach review guidelines'))),
+      new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => TRUE)),
+      new Field(array('name' => 'sent', 'type' => 'hidden', 'datatype' => 'function', 'null' => TRUE, 'noupdate' => TRUE)),
+      new Field(array('name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => TRUE)),
+      new Field(array('name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null'=>1, 'noupdate' => TRUE)),
+      new Field(array('name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()')),
+      new Field(array('name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null'=>1)),
+      new Field(array('name' => 'from_email', 'type' => 'email', 'datatype' => 'char', 'default' => array_key_exists('from_email', $this->defaults) ? $this->defaults['from_email'] : '')),
+      new Field(array('name' => 'from_id', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => TRUE)),
+      new Field(array('name' => 'to_email', 'type' => 'email', 'datatype' => 'char', 'default' => array_key_exists('to_email', $this->defaults) ? $this->defaults['to_email'] : '')),
+      new Field(array('name' => 'to_id', 'type' => 'hidden', 'datatype' => 'int', 'default' => array_key_exists('to_id', $this->defaults) ? $this->defaults['to_id'] : '', 'null' => TRUE)),
+      new Field(array('name' => 'message_id', 'type' => 'hidden', 'datatype' => 'int', 'default' => array_key_exists('message_id', $this->defaults) ? $this->defaults['message_id'] : '', 'null' => TRUE)),
+      new Field(array('name' => 'type', 'type' => 'hidden', 'datatype' => 'int', 'default' => array_key_exists('type', $this->defaults) ? $this->defaults['type'] : 0, 'null' => TRUE, 'noupdate' => TRUE)),
+      new Field(array('name' => 'flags', 'type' => 'checkbox', 'datatype' => 'bitmap', 'null' => TRUE,
+                      'default' => array_key_exists('type', $this->defaults) && $this->defaults['type'] == self::$TYPE_MAP['reviewer_sent'] ? 0x02 : 0,
+                      'labels' => array(tr('Send Bcc to From'), tr('Attach article guidelines')))),
 
-      new Field(array('name'=>'subject', 'type'=>'text', 'size'=>40, 'datatype'=>'char', 'maxlength'=>80, 'default' => array_key_exists('subject', $this->defaults) ? $this->defaults['subject'] : '')),
-      new Field(array('name'=>'body', 'type'=>'textarea', 'datatype'=>'char', 'default' => array_key_exists('body', $this->defaults) ? $this->defaults['body'] : '', 'cols'=>65, 'rows'=>20)),
+      new Field(array('name' => 'subject', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'default' => array_key_exists('subject', $this->defaults) ? $this->defaults['subject'] : '')),
+      new Field(array('name' => 'body', 'type' => 'textarea', 'datatype' => 'char', 'default' => array_key_exists('body', $this->defaults) ? $this->defaults['body'] : '', 'cols' => 65, 'rows' => 20)),
     ));
 
     return $record;
@@ -392,8 +401,9 @@ class DisplayCommunication extends DisplayTable
       'to_id' => FALSE, 'to_email' => array('label' => 'To'),
     );
 
-    if (!empty($flags_value))
+    if (!empty($flags_value)) {
       $rows['flags'] = array('label' => 'Options', 'value' => $flags_value);
+    }
 
     $rows = $rows + array(
       'subject' => array('label' => 'Subject'),
@@ -418,8 +428,9 @@ class DisplayCommunication extends DisplayTable
 
   function buildViewRows () {
     $rows = $this->getEditRows();
-    if (isset($rows['title']))
+    if (isset($rows['title'])) {
       unset($rows['title']);
+    }
 
     $formats = $this->getViewFormats();
 
@@ -427,8 +438,9 @@ class DisplayCommunication extends DisplayTable
 
     foreach ($rows as $key => $descr)
       if ($descr !== FALSE && gettype($key) == 'string') {
-        if (isset($formats[$key]))
+        if (isset($formats[$key])) {
           $descr = array_merge($descr, $formats[$key]);
+        }
         $view_rows[$key] = $descr;
       }
 
@@ -444,14 +456,16 @@ class DisplayCommunication extends DisplayTable
 
 
     $ret = '';
-    if (!empty($this->page->msg))
-      $ret .= '<p class="message">'.$this->page->msg.'</p>';
+    if (!empty($this->page->msg)) {
+      $ret .= '<p class="message">' . $this->page->msg . '</p>';
+    }
 
     $fields = array();
     if ('array' == gettype($rows)) {
       foreach ($rows as $key => $row_descr) {
-        if ('string' == gettype($row_descr))
+        if ('string' == gettype($row_descr)) {
           $fields[] = array('&nbsp;', $row_descr);
+        }
         else {
           $label = isset($row_descr['label']) ? tr($row_descr['label']).':' : '';
           // var_dump($row_descr);
@@ -464,8 +478,9 @@ class DisplayCommunication extends DisplayTable
               $value .= (!empty($value) ? ' ' : '').$field_value;
             }
           }
-          else if (isset($row_descr['value']))
+          else if (isset($row_descr['value'])) {
             $value = $row_descr['value'];
+          }
           else {
             $field_value = $record->get_value($key);
             $value = isset($row_descr['format']) && 'p' == $row_descr['format']
@@ -478,12 +493,14 @@ class DisplayCommunication extends DisplayTable
     }
 
     if (0 != (0x02 & $record->get_value('flags'))) {
-      $fields[] = array('Attachment', sprintf('<a href="%sdata/formale_hinweise_artikel.pdf">formale_hinweise_artikel.pdf</a>',
-                                              BASE_PATH));
+      $fields[] = array('Attachments', sprintf('<a href="%sdata/IGdJ_Schluesseldokumente_Guidelines.pdf">IGdJ_Schluesseldokumente_Guidelines.pdf</a>'
+                                               . '<br /><a href="%sdata/IGdJ_Schluesseldokumente_Redaktionsmodell.pdf">IGdJ_Schluesseldokumente_Redaktionsmodell.pdf</a>',
+                                              BASE_PATH, BASE_PATH));
     }
 
-    if (count($fields) > 0)
+    if (count($fields) > 0) {
       $ret .= $this->buildContentLineMultiple($fields);
+    }
 
     return $ret;
   }
@@ -496,11 +513,16 @@ class DisplayCommunication extends DisplayTable
     $mail->attachPlain($this->record->get_value('body'));
     $mail->attachHtml($this->formatParagraphs($this->record->get_value('body')));
 
-    if (0 != (0x02 & $this->record->get_value('flags'))
-        && file_exists($fname_full = BASE_FILEPATH . 'data/formale_hinweise_artikel.pdf'))
+    foreach (array('IGdJ_Schluesseldokumente_Redaktionsmodell.pdf',
+                   'IGdJ_Schluesseldokumente_Guidelines.pdf',) as $fname)
     {
-      $attachment = Swift_Attachment::newInstance(file_get_contents($fname_full), 'formale_hinweise_artikel.pdf', 'application/pdf');
-      $mail->attach($attachment);
+      if (0 != (0x02 & $this->record->get_value('flags'))
+          && file_exists($fname_full = BASE_FILEPATH . 'data/' . $fname))
+      {
+        $attachment = Swift_Attachment::newInstance(file_get_contents($fname_full),
+                                                    $fname, 'application/pdf');
+        $mail->attach($attachment);
+      }
     }
 
     $mail->addTo($this->record->get_value('to_email'));
@@ -562,8 +584,9 @@ class DisplayCommunication extends DisplayTable
       if (!isset($sent)) {
         $actions .= sprintf('<input type="submit" name="send_email" value="%s" />', tr('Send E-Mail'));
       }
-      else
+      else {
         $actions .= 'Sent on ' . $sent;
+      }
       $actions .= sprintf(' <input type="submit" name="export" value="%s" /></p></form>',
                           tr('Show Word-file'));
 
@@ -571,8 +594,9 @@ class DisplayCommunication extends DisplayTable
 
       $ret .= $this->renderView($record, $rows);
 
-      if (isset($uploadHandler))
+      if (isset($uploadHandler)) {
         $ret .= $this->renderUpload($uploadHandler);
+      }
 
     }
 
