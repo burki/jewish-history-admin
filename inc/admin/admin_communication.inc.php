@@ -103,7 +103,7 @@ class DisplayCommunication extends DisplayTable
       }
 
       $SUBJECT = array(
-        'publisher_request' => 'Bestellung eines Rezensionsexemplars f&#252;r',
+        'publisher_request' => 'Anfrage Quelle f&#252;r',
         'reviewer_request' => 'Artikel f&#252;r',
         'reviewer_sent' => 'Artikel f&#252;r',
         'reviewer_reminder' => 'Erinnerung Artikel f&#252;r',

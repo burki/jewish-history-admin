@@ -1,39 +1,22 @@
 Sehr geehrte Damen und Herren,
 
-hiermit bitte ich Sie um die Zusendung eines Rezensionsexemplars folgender Publikation:
+das Institut für die Geschichte der deutschen Juden in Hamburg plant zurzeit eine Online-Quellenedition „Schlüsseldokumente zur deutsch-jüdischen Geschichte von der frühen Neuzeit bis in die Gegenwart“. Am Beispiel von rund 150 Quellen sollen thematische Schlaglichter auf zentrale Aspekte der lokalen, regionalen sowie der allgemeinen deutsch-jüdischen Geschichte geworfen werden. In einer ersten Projektphase, die zum 50-jährigen Instituts-Jubiläum im Jahr 2016 abgeschlossen sein wird, liegt der Fokus zunächst auf dem Hamburger Raum.
 
-%bibinfo%
+Interpretations- und Hintergrundtexte werden die Quellen in ihre historischen Kontexte einbetten sowie durch Informationen zur Überlieferung, zur Rezeptionsgeschichte und zu wissenschaftlichen Kontroversen anreichern.
 
-für unser Rezensionsjournal KRITIKON http://www.kritikon.de/.
+Die Quellenedition wird zweisprachig sein (deutsch/englisch) und richtet sich vornehmlich an Studierende und Forschende, aber auch an Schulen und ein allgemeines, interessiertes Publikum.
 
-Nach Veröffentlichung der Rezension schicken wir Ihnen den Link zu, unter dem Sie die Rezension abrufen können.
+Einer unserer Autoren, %name_from%, möchte einen Beitrag zu folgender Quelle, %title%, verfassen. Dies würde bedeuten, dass wir die Quelle oder Auszüge daraus im Rahmen der Online-Quellenedition veröffentlichen würden, vorgesehen ist sowohl ein Transkript als auch die Bereitstellung eines Digitalisats als Download. Die Idee ist, die Quellen digital anzubieten und sie zugleich durch begleitende Texte zu interpretieren und kontextualisieren. Die Quelle befindet sich in Ihren Beständen.
 
-Die Lieferadresse ist:
+Wäre eine solche Nutzung, insbesondere die langfristige Einbindung in ein Online-Portal rechtlich möglich? Und falls ja, unter welchen Bedingungen? In einem zweiten Schritt wäre dann ggf. noch zu klären, wie die Digitalisierung der entsprechenden Quelle erfolgen könnte. In jedem Fall möchte ich bei Ihnen bereits jetzt sehr herzlich für Ihre Unterstützung danken. Ich würde mich freuen von Ihnen zu hören und stehe Ihnen jederzeit für Rückfragen zur Verfügung.
 
-Redaktion Kritikon
-c/o Universität Leipzig
-Zentrum für Höhere Studien
-Emil-Fuchs-Straße 1
-04105 Leipzig
+Mit besten Grüßen
 
-
-Mit bestem Dank und freundlichen Grüßen,
 
 %name_from%
 
 --
-REDAKTION KRITIKON
-http://www.kritikon.de
-
-Tel: 0341-9737860
-eMail: Kritikon@uni-leipzig.de
-
-Universität Leipzig, Institut für Philosophie
-http://www.uni-leipzig.de/~philos/
-
-Postadresse:
-Redaktion Kritikon
-c/o Universität Leipzig
-Zentrum für Höhere Studien
-Emil-Fuchs-Straße 1
-04105 Leipzig
+Institut für die Geschichte der deutschen Juden
+Beim Schlump 83, 20144 Hamburg
+E-Mail: %email_from%
+Tel.: %phone_from%

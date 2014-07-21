@@ -6,7 +6,7 @@
  *
  * (c) 2009-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-05-01 dbu
+ * Version: 2014-07-21 dbu
  *
  * Changes:
  *
@@ -152,8 +152,9 @@ class Page
         switch ($method) {
           case 'AUTH_LOCAL':
             $status = $this->processLoginAuthLocal();
-            if ($status < 0)
-              $this->msg = 'Sorry, the e-mail or password you entered is incorrect. Please try again.';
+            if ($status < 0) {
+              $this->msg = tr('Sorry, the e-mail or password you entered is incorrect. Please try again.');
+            }
             $done = TRUE;
             break;               // failed - go to next method
           case 'AUTH_FORCE':
@@ -304,9 +305,9 @@ class Page
 
     $this->expire();
 
-    $this->identify();
-
     $this->determineLang();
+
+    $this->identify();
 
     if (defined('LOCALE_DEFAULT')) {
       // TODO: we might override this in the future with settings that depend on

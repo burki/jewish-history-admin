@@ -6,7 +6,7 @@
  *
  * (c) 2009-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-06-30 dbu
+ * Version: 2014-07-21 dbu
  *
  * Changes:
  *
@@ -100,6 +100,7 @@ class DisplayArticle extends DisplayMessage
     '-45' => 'formal ok',
     '1'   => 'ver&#246;ffentlicht',
     '-100' => 'abgebrochen Redakteur',
+    '-103' => 'abgebrochen bewahrende Institution',
     '-106' => 'abgebrochen Autor',
     '-112' => 'abgelehnt Artikel',
   );
@@ -225,7 +226,7 @@ class DisplayArticle extends DisplayMessage
     $this->view_options['referee'] = $this->referee_options = $this->buildOptions('referee');
 
     $record->add_fields(array(
-        new Field(array('name' => 'publication', 'type' => 'hidden', 'datatype' => 'int', 'nodbfield' => 1, 'null' => 1)),
+        new Field(array('name' => 'publication', 'type' => 'hidden', 'datatype' => 'int', 'nodbfield' => 1, 'null' => TRUE)),
         new Field(array('name' => 'section', 'type' => 'select',
                         'options' => array_merge(array(''), array_keys($this->section_options)),
                         'labels' => array_merge(array(tr('-- please select --')), array_values($this->section_options)),
@@ -233,21 +234,26 @@ class DisplayArticle extends DisplayMessage
         new Field(array('name' => 'editor', 'type' => 'select',
                         'options' => array_merge(array(''), array_keys($this->editor_options)),
                         'labels' => array_merge(array(tr('-- none --')), array_values($this->editor_options)),
-                        'datatype' => 'int', 'null' => 1)),
+                        'datatype' => 'int', 'null' => TRUE)),
         new Field(array('name' => 'referee', 'type' => 'select',
                         'options' => array_merge(array(''), array_keys($this->referee_options)),
                         'labels' => array_merge(array(tr('-- none --')), array_values($this->referee_options)),
-                        'datatype' => 'int', 'null' => 1)),
+                        'datatype' => 'int', 'null' => TRUE)),
+
         new Field(array('name' => 'reviewer_request', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
         new Field(array('name' => 'reviewer_sent', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
         new Field(array('name' => 'reviewer_deadline', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
         new Field(array('name' => 'reviewer_received', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
         new Field(array('name' => 'referee_sent', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
         new Field(array('name' => 'referee_deadline', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
-        // new Field(array('name' => 'url', 'id' => 'url', 'type' => 'text', 'datatype' => 'char', 'size'=>65, 'maxlength'=>200, 'null' => 1)),
-        // new Field(array('name' => 'urn', 'id' => 'urn', 'type' => 'text', 'datatype' => 'char', 'size'=>45, 'maxlength'=>200, 'null' => 1)),
-        // new Field(array('name' => 'tags', 'id' => 'urn', 'type' => 'text', 'datatype' => 'char', 'size'=>45, 'maxlength'=>200, 'null' => 1)),
-       ));
+
+        new Field(array('name' => 'publisher_request', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
+        new Field(array('name' => 'publisher_received', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
+
+        // new Field(array('name' => 'url', 'id' => 'url', 'type' => 'text', 'datatype' => 'char', 'size'=>65, 'maxlength'=>200, 'null' => TRUE)),
+        // new Field(array('name' => 'urn', 'id' => 'urn', 'type' => 'text', 'datatype' => 'char', 'size'=>45, 'maxlength'=>200, 'null' => TRUE)),
+        // new Field(array('name' => 'tags', 'id' => 'urn', 'type' => 'text', 'datatype' => 'char', 'size'=>45, 'maxlength'=>200, 'null' => TRUE)),
+    ));
 
     if (!isset($this->workflow->id)) {
       // for new entries, a subject or publication-id may be passed along
@@ -338,6 +344,8 @@ class DisplayArticle extends DisplayMessage
   }
 
 EOT;
+      $publisher_request_button = sprintf(' <input type="button" value="%s" onclick="generateCommunication(\'%s\', \'publisher_request\')" />',
+                                    tr('send letter'), htmlspecialchars($this->page->buildLink(array('pn' => 'communication', 'edit' => -1))));
       $reviewer_request_button = sprintf(' <input type="button" value="%s" onclick="generateCommunication(\'%s\', \'reviewer_request\')" />',
                                          tr('send letter'), htmlspecialchars($this->page->buildLink(array('pn' => 'communication', 'edit' => -1))));
       $reviewer_sent_button = sprintf(' <input type="button" value="%s" onclick="generateCommunication(\'%s\', \'reviewer_sent\')" />',
@@ -385,6 +393,13 @@ EOT;
                   $this->getFormField('referee_deadline') // .$reviewer_reminder_button
                   : $this->record->get_value('referee_deadline')
             ),
+            'publisher_request' => array(
+                'label' => 'Holding Institution request',
+                'value' => 'edit' == $mode ?
+                  $this->getFormField('publisher_request') . $publisher_request_button
+                  : $this->record->get_value('publisher_request')
+            ),
+            'publisher_received' => array('label' => 'Holding Institution response'),
             /* 'url' => array('label' => 'Permanent URL'),
             'urn' => array('label' => 'URN', 'value' => 'edit' == $mode ?
                   $this->getFormField('urn').$urn_button
@@ -422,14 +437,17 @@ EOT;
         $publications = '<ul id="publications" class="sortableList">';
       $params_remove['publication_remove'] = $params_view['view'] = $dbconn->Record['id'];
       $publisher_place_year = '';
-      if (!empty($dbconn->Record['place']))
+      if (!empty($dbconn->Record['place'])) {
         $publisher_place_year = $dbconn->Record['place'];
-      if (!empty($dbconn->Record['publisher']))
+      }
+      if (!empty($dbconn->Record['publisher'])) {
         $publisher_place_year .= (!empty($publisher_place_year) ? ': ' : '')
           . $dbconn->Record['publisher'];
-      if (!empty($dbconn->Record['year']))
+      }
+      if (!empty($dbconn->Record['year'])) {
         $publisher_place_year .= (!empty($publisher_place_year) ? ', ' : '')
           . $dbconn->Record['year'];
+      }
 
       $publications .= sprintf('<li id="item_%d">', $dbconn->Record['id'])
         . (isset($dbconn->Record['author']) ? $dbconn->Record['author'] : $dbconn->Record['editor'])
