@@ -177,6 +177,7 @@ CREATE TABLE Publication (
   url           VARCHAR(511) NULL,              # link to TOC and similar things
 
   # Common
+  comment       TEXT NULL,                      # internal comment
   changed       TIMESTAMP NULL,                 # last changed
   changed_by    INT NULL,                       # ref to User.id: who created the entry
   created       TIMESTAMP,                      # when it was created

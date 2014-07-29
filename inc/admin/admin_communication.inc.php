@@ -6,7 +6,7 @@
  *
  * (c) 2008-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-07-21 dbu
+ * Version: 2014-07-29 dbu
  *
  * Changes:
  *
@@ -367,7 +367,10 @@ class DisplayCommunication extends DisplayTable
       new Field(array('name' => 'message_id', 'type' => 'hidden', 'datatype' => 'int', 'default' => array_key_exists('message_id', $this->defaults) ? $this->defaults['message_id'] : '', 'null' => TRUE)),
       new Field(array('name' => 'type', 'type' => 'hidden', 'datatype' => 'int', 'default' => array_key_exists('type', $this->defaults) ? $this->defaults['type'] : 0, 'null' => TRUE, 'noupdate' => TRUE)),
       new Field(array('name' => 'flags', 'type' => 'checkbox', 'datatype' => 'bitmap', 'null' => TRUE,
-                      'default' => array_key_exists('type', $this->defaults) && $this->defaults['type'] == self::$TYPE_MAP['reviewer_sent'] ? 0x02 : 0,
+                      'default' => array_key_exists('type', $this->defaults)
+                      && in_array($this->defaults['type'],
+                                  array(self::$TYPE_MAP['reviewer_request'], self::$TYPE_MAP['reviewer_sent']))
+                      ? 0x02 : 0,
                       'labels' => array(tr('Send Bcc to From'), tr('Attach article guidelines')))),
 
       new Field(array('name' => 'subject', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'default' => array_key_exists('subject', $this->defaults) ? $this->defaults['subject'] : '')),
@@ -380,9 +383,12 @@ class DisplayCommunication extends DisplayTable
   function getEditRows () {
     if (isset($this->form)) {
       $show_mask = 0x01;
-      if (($this->form->get_value('type') == NULL ? $this->defaults['type'] : $this->form->get_value('type'))
-            == self::$TYPE_MAP['reviewer_sent'])
+      if (in_array($this->form->get_value('type') == NULL
+                   ? $this->defaults['type'] : $this->form->get_value('type'),
+                   array(self::$TYPE_MAP['reviewer_request'], self::$TYPE_MAP['reviewer_sent'])))
+      {
         $show_mask |= 0x02;
+      }
 
       $flags = $this->form->field('flags');
       $flags_value = TABLEMANAGER_VIEW == $this->step
@@ -575,7 +581,6 @@ class DisplayCommunication extends DisplayTable
       else {
         $edit = '';
       }
-
 
       $ret = '<h2>' . $this->formatText($record->get_value('subject')) . ' ' . $edit . '</h2>';
 

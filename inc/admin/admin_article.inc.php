@@ -6,7 +6,7 @@
  *
  * (c) 2009-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-07-21 dbu
+ * Version: 2014-07-29 dbu
  *
  * Changes:
  *
@@ -69,12 +69,13 @@ class MessageWithPublicationRecord extends MessageRecord
       if (isset($publication) && intval($publication) > 0) {
         $dbconn = new DB;
         // add at the bottom
-        $querystr = sprintf("SELECT MAX(ord) FROM MessagePublication WHERE message_id=%d", intval($publication));
+        $querystr = sprintf("SELECT MAX(ord) FROM MessagePublication WHERE message_id=%d",
+                            intval($publication));
         $dbconn->query($querystr);
         $ord = $dbconn->next_record() && isset($dbconn->Record[0])
           ? $dbconn->Record[0] + 1 : 0;
         $querystr = sprintf("INSERT INTO MessagePublication (message_id, publication_id, ord) VALUES (%d, %d, %d) ON DUPLICATE KEY UPDATE ord=ord",
-            $this->get_value('id'), intval($publication), $ord);
+                            $this->get_value('id'), intval($publication), $ord);
         $dbconn->query($querystr);
       }
     }

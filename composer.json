@@ -2,7 +2,7 @@
     "config": {
        "vendor-dir": "lib/"
     },
-    
+
     "repositories": [
         {
             "type": "pear",

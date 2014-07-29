@@ -249,5 +249,8 @@ $GETTEXT_MESSAGES = array (
 'Send Bcc to From' => 'Blindkopie an Absender-Adresse',
 'Attach article guidelines' => 'Artikel-Richtlinien anfügen',
 'Options' => 'Optionen',
+'Article suggestion' => 'Artikel-Vorschlag',
+'Internal notes and comment' => 'Interne Bemerkungen und Kommentare',
+'Contribution areas' => 'Beitrags-Schwerpunkte',
 );
 

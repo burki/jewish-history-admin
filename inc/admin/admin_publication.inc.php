@@ -6,7 +6,7 @@
  *
  * (c) 2007-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-07-11 dbu
+ * Version: 2014-07-29 dbu
  *
  * Changes:
  *
@@ -194,27 +194,28 @@ class DisplayPublication extends DisplayTable
         new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => TRUE)),
         new Field(array('name' => 'status', 'type' => 'hidden', 'datatype' => 'int', 'default' => 0)),
         new Field(array('name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => TRUE)),
-        new Field(array('name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null'=>1, 'noupdate' => TRUE)),
+        new Field(array('name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => TRUE, 'noupdate' => TRUE)),
         new Field(array('name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()')),
-        new Field(array('name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null'=>1)),
+        new Field(array('name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => TRUE)),
         new Field(array('name' => 'type', 'id' => 'type', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($type_options), 'labels' => array_values($type_options))),
-       // new Field(array('name' => 'isbn', 'id' => 'isbn', 'type' => 'text', 'size'=>20, 'datatype' => 'char', 'maxlength'=>17, 'null'=>1)),
-        new Field(array('name' => 'author', 'id' => 'author', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength'=>80, 'null'=>1)),
-        new Field(array('name' => 'editor', 'id' => 'editor', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength'=>80, 'null'=>1)),
-        new Field(array('name' => 'title', 'id' => 'title', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength'=>127)),
-        new Field(array('name' => 'subtitle', 'id' => 'subtitle', 'type' => 'text', 'size'=>60, 'datatype' => 'char', 'maxlength'=>127, 'null'=>1)),
-        new Field(array('name' => 'series', 'id' => 'series', 'type' => 'text', 'size'=>60, 'datatype' => 'char', 'maxlength'=>127, 'null'=>1)),
-        new Field(array('name' => 'place', 'id' => 'place', 'type' => 'text', 'size'=>60, 'datatype' => 'char', 'maxlength'=>127, 'null'=>1)),
+       // new Field(array('name' => 'isbn', 'id' => 'isbn', 'type' => 'text', 'size' => 20, 'datatype' => 'char', 'maxlength' => 17, 'null' => TRUE)),
+        new Field(array('name' => 'author', 'id' => 'author', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+        new Field(array('name' => 'editor', 'id' => 'editor', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+        new Field(array('name' => 'title', 'id' => 'title', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 127)),
+        new Field(array('name' => 'subtitle', 'id' => 'subtitle', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 127, 'null' => TRUE)),
+        new Field(array('name' => 'series', 'id' => 'series', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 127, 'null' => TRUE)),
+        new Field(array('name' => 'place', 'id' => 'place', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 127, 'null' => TRUE)),
         new Field(array('name' => 'publisher_id', 'id' => 'publisher_id', 'type' => 'select',
                         'options' => array_merge(array(''), array_keys($publisher_options)),
                         'labels' => array_merge(array('-- select a holding institution --'), array_values($publisher_options)), 'datatype' => 'int')),
-        // new Field(array('name' => 'publisher', 'id' => 'publisher', 'type' => 'text', 'size'=>60, 'datatype' => 'char', 'maxlength'=>127, 'null'=>1)),
+        // new Field(array('name' => 'publisher', 'id' => 'publisher', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 127, 'null' => TRUE)),
         new Field(array('name' => 'publication_date', 'id' => 'publication_date', 'type' => 'date', 'incomplete' => TRUE, 'datatype' => 'date', 'null' => 1)),
-        new Field(array('name' => 'binding', 'id' => 'binding', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength'=>50, 'null'=>1)),
-        new Field(array('name' => 'pages', 'id' => 'pages', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength'=>50, 'null'=>1)),
-        new Field(array('name' => 'listprice', 'id' => 'listprice', 'type' => 'text', 'size' =>60, 'datatype' => 'char', 'maxlength'=>50, 'null'=>1)),
-        new Field(array('name' => 'image_url', 'id' => 'image', 'type' => 'hidden', 'datatype' => 'char', 'null'=>1, 'nodbfield'=>1)),
-        new Field(array('name' => 'url', 'id' => 'toc_url', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlenght'=>255, 'null'=>1)),
+        new Field(array('name' => 'binding', 'id' => 'binding', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 50, 'null' => TRUE)),
+        new Field(array('name' => 'pages', 'id' => 'pages', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 50, 'null' => TRUE)),
+        new Field(array('name' => 'listprice', 'id' => 'listprice', 'type' => 'text', 'size' =>60, 'datatype' => 'char', 'maxlength' => 50, 'null' => TRUE)),
+        new Field(array('name' => 'image_url', 'id' => 'image', 'type' => 'hidden', 'datatype' => 'char', 'null' => TRUE, 'nodbfield' => TRUE)),
+        new Field(array('name' => 'url', 'id' => 'toc_url', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlenght' => 255, 'null' => TRUE)),
+        new Field(array('name' => 'comment', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
       ));
 
     return $record;
@@ -247,6 +248,8 @@ class DisplayPublication extends DisplayTable
       // 'listprice' => array('label' => 'List price'),
       'url' => array('label' => 'URL'),
       'image_url' => FALSE, // hidden field
+      
+      'comment' => array('label' => 'Internal notes and comments'),
 
       isset($this->form) ? $this->form->show_submit(ucfirst(tr('save'))) : 'FALSE'
     );
