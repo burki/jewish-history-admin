@@ -173,6 +173,7 @@ $GETTEXT_MESSAGES = array (
 'Books' => 'Bücher',
 'Book Reviews' => 'Buchrezensionen',
 'Image Upload' => 'Bild hochladen',
+'Image' => 'Bild',
 'Cover Image' => 'Buchumschlag',
 'File Upload' => 'Datei hochladen',
 'File' => 'Datei',

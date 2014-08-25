@@ -125,17 +125,20 @@ class ImageUploadHandler
 
     $images = array();
 
-    if (isset($this->dbconn))
+    if (isset($this->dbconn)) {
       $dbconn = & $this->dbconn;
-    else
+    }
+    else {
       $dbconn = new DB;
+    }
 
     $querystr = sprintf("SELECT COUNT(*) AS num_imgs FROM Media WHERE item_id=%d AND type=%d", $this->item_id, $this->type)
                       . " AND name LIKE '" . addslashes($img_name) . "%'";
     $num_imgs = 0;
     $dbconn->query($querystr);
-    if ($dbconn->next_record())
+    if ($dbconn->next_record()) {
       $num_imgs = $dbconn->Record['num_imgs'];
+    }
 
     for ($i = 0; $i <= $num_imgs && ($max_images <= 0 || $i < $max_images); $i++) {
       $images[$img_name . sprintf("%02d", $i)] = array(

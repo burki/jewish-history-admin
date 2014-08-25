@@ -6,7 +6,7 @@
  *
  * (c) 2006-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-06-22 dbu
+ * Version: 2014-08-25 dbu
  *
  * Changes:
  *
@@ -341,21 +341,23 @@ EOT;
 
     foreach ($this->images as $img_basename => $img_descr) {
       $rows = array();
-      if (isset($img_descr['title']))
+      if (isset($img_descr['title'])) {
         $ret .= '<h3>' . $img_descr['title'] . '</h3>';
+      }
 
       $upload_results = isset($this->upload_results[$img_basename])
         ? $this->upload_results[$img_basename]: array();
       // var_dump($upload_results);
 
+      $max_images = 1;
       if (isset($img_descr['multiple'])) {
-        if ('boolean' == gettype($img_descr['multiple']))
+        if ('boolean' == gettype($img_descr['multiple'])) {
           $max_images = $img_descr['multiple'] ? -1 : 1;
-        else
+        }
+        else {
           $max_images = intval($img_descr['multiple']);
+        }
       }
-      else
-        $max_images = 1;
 
       $img_params = $img_descr['imgparams'];
 
@@ -371,8 +373,9 @@ EOT;
 
       $count = 0;
       foreach ($imageUploadHandler->img_titles as $img_name => $title) {
-        if (substr($img_name, 0, strlen($img_basename)) != $img_basename)
+        if (substr($img_name, 0, strlen($img_basename)) != $img_basename) {
           continue;
+        }
 
         $img = $imageUpload->image($img_name);
         if (isset($img)) {
@@ -380,7 +383,7 @@ EOT;
           if ($max_images != 1) {
             if ($count > 0)
               $rows[] = '<hr />';
-            $img_field .= '<h4>'.$title.'</h4>';
+            $img_field .= '<h4>' . $title . '</h4>';
           }
           ++$count;
 
@@ -403,19 +406,22 @@ EOT;
           $rows[] = $img_field;
 
           $rows[] = array('File', $img->show_upload_field());
-          $rows[] = array('Image Caption', $this->getUploadFormField($img_form, 'caption', array('prepend' => $img_name.'_')));
-          $rows[] = array('Copyright-Notice', $this->getUploadFormField($img_form, 'copyright', array('prepend' => $img_name.'_')));
+          $rows[] = array('Image Caption', $this->getUploadFormField($img_form, 'caption', array('prepend' => $img_name . '_')));
+          $rows[] = array('Copyright-Notice', $this->getUploadFormField($img_form, 'copyright', array('prepend' => $img_name . '_')));
 
           $rows[] = array('', '<input type="submit" value="' . ucfirst(tr('upload')) . '" />');
         } // if
       }
       foreach ($rows as $row) {
-        if ('array' == gettype($row))
+        if ('array' == gettype($row)) {
           $ret .= $this->buildContentLine(tr($row[0]), $row[1]);
-        else
+        }
+        else {
           $ret .= $row;
+        }
       } // foreach
     } // foreach
+
     if (!$first) {
       $ret .= $imageUpload->show_end();
     }
@@ -447,18 +453,21 @@ EOT;
     if (isset($this->page->path)) {
       foreach ($this->page->path as $entry) {
         $url = $this->page->buildLink(array('pn' => $entry));
-        $entries[] = '<a class="inverse" href="'.$url.'">'.$this->htmlSpecialchars($this->page->buildPageTitle($entry)).'</a>';
+        $entries[] = '<a class="inverse" href="' . $url . '">'
+                   . $this->htmlSpecialchars($this->page->buildPageTitle($entry))
+                   . '</a>';
 
       }
     }
-    if (isset($this->step) && $this->step > 0)
+    if (isset($this->step) && $this->step > 0) {
       $entries[] = tr($this->workflow->name($this->step));
+    }
 
     if (count(Page::$languages) > 0) {
       $languages = array();
       foreach (Page::$languages as $lang => $label) {
         if ($lang != $this->page->lang()) {
-          $label = '<a class="inverse" href="?lang='.$lang.'">'.$this->formatText($label).'</a>';
+          $label = '<a class="inverse" href="?lang=' . $lang . '">' . $this->formatText($label) . '</a>';
         }
         else {
           $label = $this->formatText($label);
