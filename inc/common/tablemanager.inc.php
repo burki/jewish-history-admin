@@ -449,7 +449,7 @@ class DisplayTable extends PageDisplay
 
       for ($i = 0; $i < count($fieldnames); $i++) {
         $field = & $this->record->get_field($fieldnames[$i]);
-        switch($field->get('type')) {
+        switch ($field->get('type')) {
           case 'date':
           case 'datetime':
               $format = $field->get('format');
@@ -750,7 +750,7 @@ class DisplayTable extends PageDisplay
 
   function buildListingColHeaders() {
     if (!isset($this->cols_listing))
-        return '';
+      return '';
     $headers = & $this->cols_listing;
     $ret = '<tr>';
     $col_names = array_keys($headers);
@@ -793,7 +793,7 @@ class DisplayTable extends PageDisplay
     if (1 == $col_index)
       $cell = sprintf('<a href="%s">%s</a>', $this->page->buildLink(array('pn' => $this->page->name, $this->workflow->name(isset($this->listing_default_action) ? $this->listing_default_action : TABLEMANAGER_EDIT) => $row[0])), $cell);
 
-    return '<td class="listing">'.$cell.'</td>';
+    return '<td class="listing">' . $cell . '</td>';
   }
 
   function buildListingRow (&$row) {
