@@ -503,13 +503,6 @@ EOT;
     return array($TYPE_MESSAGE, $images);
   }
 
-  /*
-  function buildEditButton () {
-    return parent::buildEditButton()
-      . sprintf(' <span class="regular">[<a href="%s" target="_blank">%s</a>]</span>',
-                   htmlspecialchars('./?pn=article&preview=' . $this->id),
-                   tr('site preview'));
-  } */
 }
 
 $display = new DisplayArticle($page);

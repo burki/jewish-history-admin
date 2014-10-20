@@ -428,7 +428,7 @@ class DisplayCommunication extends DisplayTable
   }
 
   function buildEditButton () {
-    return sprintf(' <span class="regular">[<a href="%s">edit</a>]</span>',
+    return sprintf(' <span class="regular">[<a href="%s">' . tr('edit') . '</a>]</span>',
                    htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_EDIT) => $this->id))));
   }
 
@@ -575,11 +575,9 @@ class DisplayCommunication extends DisplayTable
         $sent = $this->sendMessage();
       }
 
+      $edit = '';
       if (!isset($sent)) {
         $edit = $this->buildEditButton();
-      }
-      else {
-        $edit = '';
       }
 
       $ret = '<h2>' . $this->formatText($record->get_value('subject')) . ' ' . $edit . '</h2>';
@@ -587,7 +585,8 @@ class DisplayCommunication extends DisplayTable
       $actions = sprintf('<form action="%s" method="post"><p>',
                          htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, 'view' => $this->id))));
       if (!isset($sent)) {
-        $actions .= sprintf('<input type="submit" name="send_email" value="%s" />', tr('Send E-Mail'));
+        $actions .= sprintf('<input type="submit" name="send_email" value="%s" />',
+                            tr('Send E-Mail'));
       }
       else {
         $actions .= 'Sent on ' . $sent;

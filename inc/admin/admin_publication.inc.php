@@ -2,7 +2,7 @@
 /*
  * admin_publication.inc.php
  *
- * Class for managing publications (books)
+ * Class for managing publications (sources)
  *
  * (c) 2007-2014 daniel.burckhardt@sur-gmbh.ch
  *
@@ -248,7 +248,7 @@ class DisplayPublication extends DisplayTable
       // 'listprice' => array('label' => 'List price'),
       'url' => array('label' => 'URL'),
       'image_url' => FALSE, // hidden field
-      
+
       'comment' => array('label' => 'Internal notes and comments'),
 
       isset($this->form) ? $this->form->show_submit(ucfirst(tr('save'))) : 'FALSE'
@@ -331,9 +331,12 @@ EOT;
 
     $images = array(
           'cover' => array(
-                        'title' => tr('Preview Image'),
+                        'title' => tr('Digitized Media'),
                         'multiple' => FALSE,
-                        'imgparams' => array('height' => 164, 'scale' => 'down', 'keep' => 'large'),
+                        'imgparams' => array('height' => 164,
+                                             'scale' => 'down', 'keep' => 'large',
+                                             'pdf' => TRUE,
+                                             ),
                         ));
 
     return array($TYPE_PUBLICATION, $images);
@@ -427,8 +430,9 @@ EOT;
   }
 
   function buildEditButton () {
-    return sprintf(' <span class="regular">[<a href="%s">edit</a>]</span>',
-                   htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_EDIT) => $this->id))));
+    return sprintf(' <span class="regular">[<a href="%s">%s</a>]</span>',
+                   htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_EDIT) => $this->id))),
+                   tr('edit'));
   }
 
   function buildReviewSubject (&$record) {

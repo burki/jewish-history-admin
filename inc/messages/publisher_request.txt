@@ -1,14 +1,18 @@
 Sehr geehrte Damen und Herren,
 
-das Institut für die Geschichte der deutschen Juden in Hamburg plant zurzeit eine Online-Quellenedition „Schlüsseldokumente zur deutsch-jüdischen Geschichte von der frühen Neuzeit bis in die Gegenwart“. Am Beispiel von rund 150 Quellen sollen thematische Schlaglichter auf zentrale Aspekte der lokalen, regionalen sowie der allgemeinen deutsch-jüdischen Geschichte geworfen werden. In einer ersten Projektphase, die zum 50-jährigen Instituts-Jubiläum im Jahr 2016 abgeschlossen sein wird, liegt der Fokus zunächst auf dem Hamburger Raum.
+das Institut für die Geschichte der deutschen Juden in Hamburg plant eine Online-Quellenedition „Schlüsseldokumente zur deutsch-jüdischen Geschichte von der frühen Neuzeit bis in die Gegenwart“. Das Institut ist eine außeruniversitäre Forschungseinrichtung, die von der Stadt Hamburg gefördert wird und sich seit bald 50 Jahren der Erforschung und Vermittlung der deutsch-jüdischen Geschichte widmet.
 
-Interpretations- und Hintergrundtexte werden die Quellen in ihre historischen Kontexte einbetten sowie durch Informationen zur Überlieferung, zur Rezeptionsgeschichte und zu wissenschaftlichen Kontroversen anreichern.
+Am Beispiel von rund 150 Quellen sollen thematische Schlaglichter auf zentrale Aspekte der lokalen, regionalen sowie der allgemeinen deutsch-jüdischen Geschichte geworfen werden. In einer ersten Projektphase, die zum 50-jährigen Instituts-Jubiläum im Jahr 2016 abgeschlossen sein wird, liegt der Fokus zunächst auf dem Hamburger Raum. 
+Interpretations- und Hintergrundtexte werden die Quellen in ihre historischen Kontexte einbetten sowie durch Informationen zur Überlieferung, zur Rezeptionsgeschichte und zu wissenschaftlichen Kontroversen anreichern. Die Quellenedition wird zweisprachig sein (deutsch/englisch) und richtet sich vornehmlich an Studierende und Forschende, aber auch an Schulen und ein allgemeines, interessiertes Publikum.
 
-Die Quellenedition wird zweisprachig sein (deutsch/englisch) und richtet sich vornehmlich an Studierende und Forschende, aber auch an Schulen und ein allgemeines, interessiertes Publikum.
+Eine/r unsere/r Autor/innenen, %name_from%, hat einen Beitrag zu einer Quelle aus Ihren Beständen verfasst, nämlich zu %title%. Die Idee ist, auf der späteren Website sowohl den Interpretationstext als auch die Quelle, bzw. einen Auszug des Dokuments (1-2 Seiten) als Digitalisat bereitzustellen.
 
-Einer unserer Autoren, %name_from%, möchte einen Beitrag zu folgender Quelle, %title%, verfassen. Dies würde bedeuten, dass wir die Quelle oder Auszüge daraus im Rahmen der Online-Quellenedition veröffentlichen würden, vorgesehen ist sowohl ein Transkript als auch die Bereitstellung eines Digitalisats als Download. Die Idee ist, die Quellen digital anzubieten und sie zugleich durch begleitende Texte zu interpretieren und kontextualisieren. Die Quelle befindet sich in Ihren Beständen.
+Wir möchten Sie hiermit höflich bitten, uns die Rechte für eine dauerhafte Nutzung des o.g. Digitalisats im Rahmen der Online-Quellenedition „Schlüsseldokumente zur deutsch-jüdischen Geschichte von der frühen Neuzeit bis in die Gegenwart“ zu gewähren. Sofern Sie einverstanden sein sollten, würden wir Ihnen eine entsprechende Erklärung zukommen lassen.
+Selbstverständlich wird Ihre Institution deutlich erkennbar als Rechteinhaberin aufgeführt.
 
-Wäre eine solche Nutzung, insbesondere die langfristige Einbindung in ein Online-Portal rechtlich möglich? Und falls ja, unter welchen Bedingungen? In einem zweiten Schritt wäre dann ggf. noch zu klären, wie die Digitalisierung der entsprechenden Quelle erfolgen könnte. In jedem Fall möchte ich bei Ihnen bereits jetzt sehr herzlich für Ihre Unterstützung danken. Ich würde mich freuen von Ihnen zu hören und stehe Ihnen jederzeit für Rückfragen zur Verfügung.
+Sollte eine Nutzung möglich sein, würden wir uns über die Bereitstellung der entsprechenden Quelle als hoch auflösender Scan (tiff oder jpeg, Textdokumente: mind. 300 dpi, Bilder: 1200 dpi) freuen, sofern Sie dies wünschen, übernehmen wir selbstverständlich die Digitalisierung.
+
+Sollten Sie weitere Informationen benötigen, stehen wir Ihnen sehr gerne für Rückfragen zur Verfügung. Bereits jetzt möchten wir Ihnen herzlich danken.
 
 Mit besten Grüßen
 
