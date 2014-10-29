@@ -6,7 +6,7 @@
  *
  * (c) 2006-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-08-25 dbu
+ * Version: 2014-10-29 dbu
  *
  * Changes:
  *
@@ -125,14 +125,15 @@ EOT;
               .sprintf(".%03d/id%05d/",
                        intval($item_id / 32768), intval($item_id % 32768));
 
-    return $folder.$name.$MEDIA_EXTENSIONS[$mime];
+    return $folder . $name . $MEDIA_EXTENSIONS[$mime];
   }
 
   function buildImgUrl ($item_id, $type, $name, $mime, $append_uid = FALSE) {
     global $MEDIA_EXTENSIONS, $UPLOAD_TRANSLATE;
     static $uid;
-    if (empty($uid))
+    if (empty($uid)) {
       $uid = uniqid();
+    }
 
     $folder = UPLOAD_URLROOT.$UPLOAD_TRANSLATE[$type]
             . sprintf(".%03d/id%05d/",
@@ -149,12 +150,15 @@ EOT;
 
     $url_enlarge = '';
 
-    if ($attrs == '')
+    if ($attrs == '') {
       $attrs = array();
-    if (!isset($attrs['alt']))
+    }
+    if (!isset($attrs['alt'])) {
       $attrs['alt'] = '';
+    }
     if ((array_key_exists('enlarge', $attrs) && $attrs['enlarge'])
-      || (!isset($attrs['width']) && !isset($attrs['height']))) {
+      || (!isset($attrs['width']) && !isset($attrs['height'])))
+    {
       $fname = preg_match('/^' . preg_quote(UPLOAD_URLROOT, '/') . '/', $relurl)
         ? preg_replace('/^' . preg_quote(UPLOAD_URLROOT, '/') . '/', UPLOAD_FILEROOT, $relurl)
         : preg_replace('/^' . preg_quote(BASE_PATH, '/') . '/', './', $relurl);
@@ -177,7 +181,6 @@ EOT;
           else if (isset($attrs['enlarge_only'])) {
             $url_enlarge = "window.open('".BASE_PATH."img.php?url=".urlencode($relurl)."&large=0&width=".$size[0]."&height=".$size[1]."&caption=".urlencode($attrs['enlarge_caption'])."', '_blank', 'width=".($size[0] + $IMG_ENLARGE_ADDWIDTH).",height=".($size[1] + $IMG_ENLARGE_ADDHEIGHT).",resizable=yes');";
             $url_enlarge .= 'return false;';
-
           }
         }
       }
@@ -185,8 +188,9 @@ EOT;
 
     $attrstr = '';
     foreach ($attrs as $attr => $value) {
-      if ($attr != 'enlarge' && $attr != 'enlarge_only' && $attr != 'enlarge_caption' && $attr != 'anchor')
+      if ($attr != 'enlarge' && $attr != 'enlarge_only' && $attr != 'enlarge_caption' && $attr != 'anchor') {
         $attrstr .= ($attr.'="'.$value.'" ');
+      }
     }
     if (isset($attrs['enlarge_only']) && (!empty($url_enlarge))) {
       $img_tag = $attrs['enlarge_only'];
@@ -194,25 +198,31 @@ EOT;
     else if (isset($relurl))
       $img_tag = '<img src="'.$relurl.'" '.$attrstr.'/>';
 
-    if (isset($attrs['caption']) && !empty($attrs['caption']))
+    if (isset($attrs['caption']) && !empty($attrs['caption'])) {
       $img_tag .= $attrs['caption'];
-    if (!empty($url_enlarge))
-      $img_tag = '<a href="#'.(isset($attrs['anchor']) ? $attrs['anchor'] : '').'" onclick="'.$url_enlarge.'"'.(isset($attrs['anchor']) ? ' name="'.$attrs['anchor'].'"' : '').'>'.$img_tag.'</a>';
-    else if (isset($attrs['anchor']))
-      $img_tag = '<a name="'.$attrs['anchor'].'">'.$img_tag.'</a>';
+    }
+    if (!empty($url_enlarge)) {
+      $img_tag = '<a href="#' . (isset($attrs['anchor']) ? $attrs['anchor'] : '').'" onclick="'.$url_enlarge.'"'.(isset($attrs['anchor']) ? ' name="'.$attrs['anchor'].'"' : '') . '>' . $img_tag . '</a>';
+    }
+    else if (isset($attrs['anchor'])) {
+      $img_tag = '<a name="' . $attrs['anchor'] . '">' . $img_tag . '</a>';
+    }
     return $img_tag;
   }
 
   function fetchImage (&$dbconn, $item_id, $type, $img_name) {
     $querystr = sprintf("SELECT item_id, caption, copyright, width, height, mimetype FROM Media WHERE item_id=%d AND type=%d AND name='%s'",
-      $item_id, $type, $dbconn->escape_string($img_name));
+                        $item_id, $type, $dbconn->escape_string($img_name));
 
     $dbconn->query($querystr);
-    if ($dbconn->next_record())
+    if ($dbconn->next_record()) {
       return $dbconn->Record;
+    }
   }
 
-  function buildImage($item_id, $type, $img_name, $enlarge = FALSE, $append_uid = FALSE, $return_caption = FALSE, $alt = NULL) {
+  function buildImage($item_id, $type, $img_name,
+                      $enlarge = FALSE, $append_uid = FALSE, $return_caption = FALSE, $alt = NULL)
+  {
     $dbconn = new DB;
 
     $img = $this->fetchImage($dbconn, $item_id, $type, $img_name);
@@ -221,7 +231,15 @@ EOT;
       $copyright = $img['copyright'];
       $img_url = $this->buildImgUrl($item_id, $type, $img_name, $img['mimetype'], $append_uid);
 
-      if ('application/pdf' == $img['mimetype']) {
+      if (in_array($img['mimetype'], array('text/rtf',
+                                           'application/vnd.oasis.opendocument.text',
+                                           'application/msword',
+                                           'application/vnd.openxmlformats-officedocument.wordprocessingml.document'))) {
+        $img_tag = sprintf('<a href="%s" target="_blank">%s</a>',
+                           htmlspecialchars($img_url),
+                           $this->formatText(empty($caption) ? 'Office-Datei' : $caption));
+      }
+      else if ('application/pdf' == $img['mimetype']) {
         if (!$append_uid) {
           $img_tag = $this->buildPdfViewer($img_url, empty($caption) ? 'PDF' : $caption,
                                            array('thumbnail' => $this->buildThumbnailUrl($item_id, $type, $img_name, $img['mimetype'])));
@@ -292,13 +310,16 @@ EOT;
     foreach ($this->images as $img_basename => $img_descr) {
       $img_params = $img_descr['imgparams'];
       if (isset($img_descr['multiple'])) {
-        if ('boolean' == gettype($img_descr['multiple']))
+        if ('boolean' == gettype($img_descr['multiple'])) {
           $max_images = $img_descr['multiple'] ? -1 : 1;
-        else
+        }
+        else {
           $max_images = intval($img_descr['multiple']);
+        }
       }
-      else
+      else {
         $max_images = 1;
+      }
 
       // check if we need to delete something
       if (array_key_exists('delete_img', $this->page->parameters)

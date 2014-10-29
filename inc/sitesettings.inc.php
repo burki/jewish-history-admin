@@ -7,7 +7,7 @@
  *
  * (c) 2009-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-07-11 dbu
+ * Version: 2014-10-29 dbu
  *
  * Changes:
  *
@@ -85,6 +85,10 @@ $MAIL_SETTINGS = array(
 
 $MEDIA_EXTENSIONS = array('image/gif' => '.gif', 'image/jpeg' => '.jpg', 'image/png' => '.png',
                           'application/pdf' => '.pdf',
+                          'text/rtf' => '.rtf',
+                          'application/vnd.oasis.opendocument.text' => '.odt',
+                          'application/msword' => '.doc',
+                          'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => '.docx',
                           );
 
 $STATUS_REMOVED = '-1';

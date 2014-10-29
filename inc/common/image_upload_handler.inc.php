@@ -5,7 +5,7 @@
   *
   * Author  : Daniel Burckhardt, daniel.burckhardt@sur-gmbh.ch
   *
-  * Version : 2013-08-29 dbu
+  * Version : 2014-10-29 dbu
   *
   * interfaces still not completely finalized,
   * but much better than just plain copy/paste
@@ -179,10 +179,12 @@ class ImageUploadHandler
   }
 
   function buildUpload (&$images, $action) {
-    if (isset($this->dbconn))
+    if (isset($this->dbconn)) {
       $dbconn = & $this->dbconn;
-    else
+    }
+    else {
       $dbconn = new DB;
+    }
 
     $id = $this->item_id;
     foreach ($images as $key => $value) {
@@ -195,11 +197,15 @@ class ImageUploadHandler
     $folder = $this->buildImgFolder();
 
     $img_upload = new ImageUpload(array(
-            'action' => $action,
-            'upload_fileroot' => UPLOAD_FILEROOT . $folder,
-            'upload_urlroot'  => UPLOAD_URLROOT . $folder,
-            'imagemagick'     => defined('UPLOAD_PATH2MAGICK') ? UPLOAD_PATH2MAGICK : NULL,
-            'max_file_size'   => UPLOAD_MAX_FILE_SIZE));
+                                    'action' => $action,
+                                    'upload_fileroot' => UPLOAD_FILEROOT . $folder,
+                                    'upload_urlroot'  => UPLOAD_URLROOT . $folder,
+                                    'imagemagick'     => defined('UPLOAD_PATH2MAGICK') ? UPLOAD_PATH2MAGICK : NULL,
+                                    'max_file_size'   => UPLOAD_MAX_FILE_SIZE,
+                                    )
+                                  );
+
+
     $img_upload->add_images($this->img_images);
     // var_dump($img_upload);
 
@@ -228,11 +234,20 @@ class ImageUploadHandler
         $upload_results[$img_name] = array_key_exists($img_name, $res) ? $res[$img_name] : array();
 
         $img = $img_upload->image($img_name);
-        if (isset($images[$img_name]['imgparams']['pdf']) && $images[$img_name]['imgparams']['pdf'])
+        if (isset($images[$img_name]['imgparams']['pdf']) && $images[$img_name]['imgparams']['pdf']) {
           $img->extensions['application/pdf'] = '.pdf';
+        }
+
+        if (isset($images[$img_name]['imgparams']['office']) && $images[$img_name]['imgparams']['office']) {
+          $img->extensions['text/rtf'] = '.rtf';
+          $img->extensions['application/vnd.oasis.opendocument.text'] = '.odt';
+          $img->extensions['application/msword'] = '.doc';
+          $img->extensions['application/vnd.openxmlformats-officedocument.wordprocessingml.document'] = '.docx';
+        }
 
         $imgdata = isset($img) ? $img->find_imgdata() : array();
-        if (count($imgdata) > 0) {  // we have an image
+        if (count($imgdata) > 0) {
+          // we have an image
           $img_form->set_values(array('name' => $img_name, 'width' => isset($imgdata[0]['width']) ? $imgdata[0]['width'] : -1,
                                       'height' => isset($imgdata[0]['height']) ? $imgdata[0]['height'] : -1,
                                       'mimetype' => $imgdata[0]['mime']));
@@ -262,9 +277,11 @@ class ImageUploadHandler
       $img_form = & $this->img_forms[$img_name];
       $ord = $img_form->get_value('ord');
       $img_form->fetch(array(
-        'where' => sprintf("item_id=%d AND type=%d AND name='%s'",
-                    $this->item_id, $this->type, addslashes($img_name))
-                  .(isset($ord) ? " AND ord=$ord" : '')));
+                             'where' => sprintf("item_id=%d AND type=%d AND name='%s'",
+                                                $this->item_id, $this->type, addslashes($img_name))
+                                      . (isset($ord) ? " AND ord=$ord" : '')
+                                      )
+                       );
     }
   }
 }
