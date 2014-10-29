@@ -11,7 +11,8 @@
     ],
 
     "require" : {
-        "swiftmailer/swiftmailer": "5.*",
-        "zendframework/zendframework1": "1.12.*"
+        "swiftmailer/swiftmailer": "~5.0",
+        "zendframework/zendframework1": "1.12.*",
+        "cocur/slugify": "v0.10.2"
     }
 }
