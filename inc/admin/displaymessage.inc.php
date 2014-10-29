@@ -206,7 +206,12 @@ class DisplayBackend extends DisplayTable
 
       $img_params = $img_descr['imgparams'];
 
-      $images = $imageUploadHandler->buildImages($img_name, $img_params, $max_images);
+      $options = array();
+      if (isset($img_params['title'])) {
+        $options['title'] = $img_params['title'];
+      }
+
+      $images = $imageUploadHandler->buildImages($img_name, $img_params, $max_images, $options);
       $imageUpload = $imageUploadHandler->buildUpload($images, $action);
 
       if ($first) {

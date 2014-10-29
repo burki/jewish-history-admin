@@ -41,11 +41,14 @@ class ImageUploadHandler
 
   // recursively create the directory
   static function checkDirectory ($dir, $create = TRUE, $mode=0755) {
-    if (file_exists($dir))
+    if (file_exists($dir)) {
       return filetype($dir) == 'dir';  // check if it is a directory
+    }
 
-    if (!$create)                       // doesn't exist, don't want to create
+    if (!$create) {
+      // doesn't exist, don't want to create
       return FALSE;
+    }
 
     // recursively try to create that path
     $parent_dir = self::parentDirectory($dir);
@@ -70,15 +73,18 @@ class ImageUploadHandler
         $ord_orig = intval($matches[2]);
         $basename = $matches[1];
         // update if there are multiple images
-        $querystr = sprintf("SELECT id, name, ord FROM Media WHERE item_id=%d AND type=%d", $this->item_id, $this->type)." AND name LIKE '".addslashes($basename)."%' ORDER BY name";
+        $querystr = sprintf("SELECT id, name, ord FROM Media WHERE item_id=%d AND type=%d",
+                            $this->item_id, $this->type)
+                  . " AND name LIKE '" . addslashes($basename) . "%' ORDER BY name";
         $dbconn->query($querystr);
         while ($dbconn->next_record()) {
-          if (!preg_match('/(\d+)$/', $dbconn->Record['name'], $matches))
+          if (!preg_match('/(\d+)$/', $dbconn->Record['name'], $matches)) {
             continue;
+          }
           $ord = $matches[1];
           if ($ord_orig <= intval($ord)) {
             // rename the entry
-            $folder = UPLOAD_FILEROOT.$UPLOAD_TRANSLATE[$this->type]
+            $folder = UPLOAD_FILEROOT . $UPLOAD_TRANSLATE[$this->type]
                     . sprintf('.%03d/id%05d/',
                               intval($this->item_id / 32768), intval($this->item_id % 32768));
             // find matching files
@@ -89,7 +95,9 @@ class ImageUploadHandler
                     unlink($folder.$fname);
                   }
                   else {
-                    $fname_new = preg_replace("/^{$basename}$ord/", $basename.sprintf("%02d", intval($ord)-1), $fname);
+                    $fname_new = preg_replace("/^{$basename}$ord/",
+                                              $basename . sprintf("%02d", intval($ord) - 1),
+                                              $fname);
                     /* var_dump($fname);
                     var_dump($fname_new); */
                     rename($folder . $fname, $folder . $fname_new);
@@ -101,7 +109,8 @@ class ImageUploadHandler
             // update the name of the Media
             $dbsub = new DB;
             $querystr = sprintf("UPDATE Media SET name='%s' WHERE id=%d",
-                                $dbconn->escape_string($basename.sprintf("%02d", intval($ord)-1)), $dbconn->Record['id']);
+                                $dbconn->escape_string($basename . sprintf("%02d", intval($ord) - 1)),
+                                $dbconn->Record['id']);
             $dbsub->query($querystr);
           }
         }
@@ -122,6 +131,8 @@ class ImageUploadHandler
       ? $options['append_number'] : $max_images != 1;
     $legacy = array_key_exists('legacy', $options)
       ? $options['legacy'] : FALSE;
+    $img_title = array_key_exists('title', $options)
+		? $options['title'] : NULL;
 
     $images = array();
 
@@ -216,15 +227,19 @@ class ImageUploadHandler
     $upload_results = array();
     $img_names = array_keys($this->img_forms);
 
-    if (isset($this->dbconn))
+    if (isset($this->dbconn)) {
       $dbconn = & $this->dbconn;
-    else
+    }
+    else {
       $dbconn = new DB;
+    }
 
     for ($i = 0; $i < count($img_names); $i++) {
       $img_name = $img_names[$i];
-      if (!isset($images[$img_name])) // dbu 2007-09-02 not sure if correct
+      if (!isset($images[$img_name])) {
+        // dbu 2007-09-02 not sure if correct
         continue;
+      }
 
       $img_form = & $this->img_forms[$img_name];
       $img_form->set_values($_POST, array('prepend' => $img_name . '_'));

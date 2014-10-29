@@ -6,7 +6,7 @@
  *
  * (c) 2007-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-06-25 dbu
+ * Version: 2014-10-29 dbu
  *
  * Changes:
  *
@@ -31,7 +31,7 @@ class PageDisplayBase
   }
 
   function htmlSpecialchars ($txt) {
-    $match   = array('/&(?!\#\d+;)/s', '/</s', '/>/s', '/"/s');
+    $match = array('/&(?!\#\d+;)/s', '/</s', '/>/s', '/"/s');
     $replace = array('&amp;', '&lt;', '&gt;', '&quot;');
     return preg_replace($match, $replace, $txt, -1);
   }
@@ -50,17 +50,21 @@ class PageDisplayBase
             $this->buildImage($this->image['item_id'], $this->image['type'],
                               $img_name, TRUE, FALSE, TRUE);
 
-          if (!isset($tag))
+          if (!isset($tag)) {
             return '';
+          }
 
           if (isset($this->image_caption_setleft) || $this->image_caption_setwidth) {
-            if (preg_match('/width="(\d+)"/', $tag, $matches))
+            if (preg_match('/width="(\d+)"/', $tag, $matches)) {
               $img_width = $matches[1];
-            else
+            }
+            else {
               $img_width = 400;
+            }
 
-            if (isset($this->image_caption_setleft))
+            if (isset($this->image_caption_setleft)) {
               $left = $img_width + $this->image_caption_setleft;
+            }
           }
 
           $style = '';
@@ -73,47 +77,51 @@ class PageDisplayBase
           // build the caption
           if ($this->image_caption_class !== FALSE && (!empty($caption) || !empty($copyright))) {
             $caption_style = '';
-            if (isset($this->image_caption_setleft))
-              $caption_style .= 'left:'.$left.'px;';
-            if ($this->image_caption_setwidth)
-              $caption_style .= 'width:'.$img_width.'px;';
+            if (isset($this->image_caption_setleft)) {
+              $caption_style .= 'left:' . $left . 'px;';
+            }
+            if ($this->image_caption_setwidth) {
+              $caption_style .= 'width:' . $img_width . 'px;';
+            }
 
-            $ret .=  '<div class="'.$this->image_caption_class.'"'
-                      .(!empty($caption_style) ? ' style="'.$caption_style.'"' : '')
-                      .'>'
-                      .(!empty($caption) ? $this->formatParagraphs($caption) : '')
-                      .(!empty($copyright) ? $this->formatText($copyright) : '')
-                      .'</div>';
+            $ret .= '<div class="' . $this->image_caption_class . '"'
+                  . (!empty($caption_style) ? ' style="' . $caption_style . '"' : '')
+                  . '>'
+                  . (!empty($caption) ? $this->formatParagraphs($caption) : '')
+                  . (!empty($copyright) ? $this->formatText($copyright) : '')
+                  . '</div>';
           }
 
           if (!empty($this->image_wrap_div_class) || !empty($style)) {
             $class = !empty($this->image_wrap_div_class)
               ? ' class="'.$this->image_wrap_div_class.'"' : '';
             if (preg_match('/float\:\s*(left|right)/', $style, $matches)) {
-              $padding = 'padding-'.('left' == $matches[1] ? 'right' : 'left')
-                          .': 10px';
-              $style = preg_replace("/;?(\"|')$/", '; '.$padding.';\1', $style);
+              $padding = 'padding-' . ('left' == $matches[1] ? 'right' : 'left')
+                       . ': 10px';
+              $style = preg_replace("/;?(\"|')$/", '; ' . $padding . ';\1', $style);
             }
 
-            $ret = '<div'.$class.$style.'>'.$ret.'</div>';
+            $ret = '<div' . $class . $style . '>' . $ret . '</div>';
           }
 
           return $ret;
         }
       }
     }
-    return '<img '.$attrs.' />';
+    return '<img '. $attrs . ' />';
   }
 
   function adjustCharacters ($txt) {
-    $match   = array('/\-\-/s'); // , '/—/s', '/’/s', '/[“”]/s', '/&amp;(\#\d+;)/s');
+    $match = array('/\-\-/s'); // , '/—/s', '/’/s', '/[“”]/s', '/&amp;(\#\d+;)/s');
     $replace = array('&#8212;'); // , '&#8212;', "'", '"', '&\1');
     $ret = preg_replace($match, $replace, $txt, -1);
 
     $ret = preg_replace_callback('/<img\s*([^>]*)\/?>/s',
                                 array(&$this, 'placeImages'), $ret);
+
     if (isset($this->span_range)) {
-      $ret = preg_replace('/('.$this->span_range.'+)/us', '<span class="'.$this->span_class.'">\1</span>', $ret);
+      $ret = preg_replace('/('.$this->span_range.'+)/us',
+                          '<span class="'.$this->span_class.'">\1</span>', $ret);
     }
 
     return $ret;
@@ -125,18 +133,20 @@ class PageDisplayBase
     }
     else {
       $url = sprintf($this->page->BASE_URL . '?pn=info&id=%d%s',
-                  $options['page'],
-                  '#' != $options['anchor'] ? $options['anchor'] : '');
+                     $options['page'],
+                     '#' != $options['anchor'] ? $options['anchor'] : '');
     }
 
-    return sprintf('<a href="%s">%s</a>', $url, $this->formatText($options['text']));
+    return sprintf('<a href="%s">%s</a>',
+                   $url, $this->formatText($options['text']));
   }
 
   function instantiateEncoder ($paragraph_mode = TRUE) {
     $encoder = @Text_Wiki_CmsCode::factory('CmsCode');
     $encoder->setFormatConf('Xhtml', 'translate', HTML_SPECIALCHARS); // default HTML_ENTITIES messes up &Zcaron
-    if ('utf-8' == $this->charset)
+    if ('utf-8' == $this->charset) {
       $encoder->setFormatConf('Xhtml', 'charset', 'UTF-8');
+    }
 
     $encoder->addPath('render', $encoder->fixPath(LIB_PATH . 'CmsCode'));
 
@@ -162,8 +172,9 @@ class PageDisplayBase
 
   function convertToPlain ($txt) {
     $encoder = Text_Wiki_CmsCode::factory('CmsCode');
-    if ('utf-8' == $this->charset)
+    if ('utf-8' == $this->charset) {
       $encoder->setFormatConf('Plain', 'charset', 'UTF-8');
+    }
     $encoder->addPath('render', $encoder->fixPath(LIB_PATH.'CmsCode'));
 
     return $encoder->transform($txt, 'Plain');
@@ -187,13 +198,16 @@ class PageDisplayBase
           break;
     }
 
-    if ($enable_list)
+    if ($enable_list) {
       $encoder->enableRule('List');
-    else
+    }
+    else {
       $encoder->disableRule('List');
+    }
 
-    if (!empty($class))
+    if (!empty($class)) {
       $encoder->setRenderConf('Xhtml', 'Paragraph', 'css', $class);
+    }
 
     // transform the wiki text.
     return $this->adjustCharacters($encoder->transform($txt, 'Xhtml'));
@@ -258,11 +272,11 @@ class PageDisplayBase
       $uid = uniqid();
 
     $folder = UPLOAD_URLROOT.$UPLOAD_TRANSLATE[$type]
-              .sprintf(".%03d/id%05d/",
-                       intval($item_id / 32768), intval($item_id % 32768));
+            . sprintf(".%03d/id%05d/",
+                      intval($item_id / 32768), intval($item_id % 32768));
 
-    return $folder.$name.$MEDIA_EXTENSIONS[$mime]
-          .($append_uid ? '?uid='.$uid : '');
+    return $folder . $name . $MEDIA_EXTENSIONS[$mime]
+         . ($append_uid ? '?uid=' . $uid : '');
   }
 
 
@@ -272,18 +286,22 @@ class PageDisplayBase
 
     $url_enlarge = '';
 
-    if ($attrs == '')
+    if ($attrs == '') {
       $attrs = array();
-    if (!isset($attrs['alt']))
+    }
+    if (!isset($attrs['alt'])) {
       $attrs['alt'] = '';
+    }
+
     if ((array_key_exists('enlarge', $attrs) && $attrs['enlarge'])
-      || (!isset($attrs['width']) && !isset($attrs['height']))) {
-      $fname = ereg('^'.UPLOAD_URLROOT, $relurl)
-        ? ereg_replace('^'.UPLOAD_URLROOT, UPLOAD_FILEROOT, $relurl)
-        : ereg_replace('^'.BASE_PATH, './', $relurl);
+      || (!isset($attrs['width']) && !isset($attrs['height'])))
+    {
+      $fname = ereg('^' . UPLOAD_URLROOT, $relurl)
+        ? ereg_replace('^' . UPLOAD_URLROOT, UPLOAD_FILEROOT, $relurl)
+        : ereg_replace('^' . BASE_PATH, './', $relurl);
       $fname = preg_replace('/\?.*/', '', $fname);
       // var_dump($fname);
-      $size = @GetImageSize($fname);
+      $size = @getimagesize($fname);
       if (isset($size)) {
         if (!isset($attrs['width']) && !isset($attrs['height'])) {
           $attrs['width'] = $size[0]; $attrs['height'] = $size[1];
@@ -293,21 +311,21 @@ class PageDisplayBase
           // var_dump($fname_large);
 
           if (file_exists($fname_large)) {
-            $size_large = @GetImageSize($fname_large);
-            $url_enlarge = "window.open('".BASE_PATH."img.php?url=".urlencode($relurl)
-              ."&width=".$size_large[0]."&height=".$size_large[1]
-              ."&caption=".urlencode($attrs['enlarge_caption'])
-              ."', '_blank', 'width=".($size_large[0] + $IMG_ENLARGE_ADDWIDTH)
-              .",height=".($size_large[1] + $IMG_ENLARGE_ADDHEIGHT).",resizable=yes');";
+            $size_large = @getimagesize($fname_large);
+            $url_enlarge = "window.open('" . BASE_PATH . "img.php?url=" . urlencode($relurl)
+                         . "&width=".$size_large[0]."&height=".$size_large[1]
+                         . "&caption=".urlencode($attrs['enlarge_caption'])
+                         . "', '_blank', 'width=".($size_large[0] + $IMG_ENLARGE_ADDWIDTH)
+                         . ",height=".($size_large[1] + $IMG_ENLARGE_ADDHEIGHT).",resizable=yes');";
             $url_enlarge .= 'return false;';
             $attrs['alt'] = 'Click to enlarge';
           }
           else if (isset($attrs['enlarge_only'])) {
-            $url_enlarge = "window.open('".BASE_PATH."img.php?url=".urlencode($relurl)
-              ."&large=0&width=".$size[0]."&height=".$size[1]
-              ."&caption=".urlencode($attrs['enlarge_caption'])
-              ."', '_blank', 'width=".($size[0] + $IMG_ENLARGE_ADDWIDTH)
-              .",height=".($size[1] + $IMG_ENLARGE_ADDHEIGHT).",resizable=yes');";
+            $url_enlarge = "window.open('" . BASE_PATH . "img.php?url=" . urlencode($relurl)
+                         . "&large=0&width=".$size[0]."&height=".$size[1]
+                         . "&caption=".urlencode($attrs['enlarge_caption'])
+                         . "', '_blank', 'width=".($size[0] + $IMG_ENLARGE_ADDWIDTH)
+                         . ",height=".($size[1] + $IMG_ENLARGE_ADDHEIGHT).",resizable=yes');";
             $url_enlarge .= 'return false;';
           }
         }
@@ -316,35 +334,44 @@ class PageDisplayBase
 
     $attrstr = '';
     foreach ($attrs as $attr => $value) {
-      if ($attr != 'enlarge' && $attr != 'enlarge_only' && $attr != 'enlarge_caption' && $attr != 'anchor')
-        $attrstr .= ($attr.'="'.$value.'" ');
+      if ($attr != 'enlarge' && $attr != 'enlarge_only' && $attr != 'enlarge_caption' && $attr != 'anchor') {
+        $attrstr .= ($attr . '="' . $value . '" ');
+      }
     }
     if (isset($attrs['enlarge_only']) && (!empty($url_enlarge))) {
       $img_tag = $attrs['enlarge_only'];
     }
-    else if (isset($relurl))
-      $img_tag = '<img src="'.$relurl.'" '.$attrstr.'/>';
+    else if (isset($relurl)) {
+      $img_tag = '<img src="' . $relurl . '" ' . $attrstr . '/>';
+    }
 
-    if (isset($attrs['caption']) && !empty($attrs['caption']))
+    if (isset($attrs['caption']) && !empty($attrs['caption'])) {
       $img_tag .= $attrs['caption'];
-    if (!empty($url_enlarge))
-      $img_tag = '<a href="#'.(isset($attrs['anchor']) ? $attrs['anchor'] : '')
-        .'" onclick="'.$url_enlarge.'"'.(isset($attrs['anchor']) ? ' name="'.$attrs['anchor'].'"' : '')
-        .'>'.$img_tag.'</a>';
-    else if (isset($attrs['anchor']))
-      $img_tag = '<a name="'.$attrs['anchor'].'">'.$img_tag.'</a>';
+    }
+    if (!empty($url_enlarge)) {
+      $img_tag = '<a href="#' . (isset($attrs['anchor']) ? $attrs['anchor'] : '')
+               . '" onclick="' . $url_enlarge . '"'
+               . (isset($attrs['anchor']) ? ' name="' . $attrs['anchor'] . '"' : '')
+               .'>'
+               . $img_tag
+               . '</a>';
+    }
+    else if (isset($attrs['anchor'])) {
+      $img_tag = '<a name="' . $attrs['anchor'] . '">' . $img_tag . '</a>';
+    }
     return $img_tag;
   }
 
   function fetchImage (&$dbconn, $item_id, $type, $img_name) {
     $querystr =
       sprintf("SELECT item_id, caption, copyright, width, height, mimetype"
-              ." FROM Media WHERE item_id=%d AND type=%d AND name='%s'",
+              . " FROM Media WHERE item_id=%d AND type=%d AND name='%s'",
               $item_id, $type, $dbconn->escape_string($img_name));
 
     $dbconn->query($querystr);
-    if ($dbconn->next_record())
+    if ($dbconn->next_record()) {
       return $dbconn->Record;
+    }
   }
 
   function buildImage($item_id, $type, $img_name,
@@ -384,6 +411,7 @@ class PageDisplayBase
       list($width, $height, $type, $attr) = @getimagesize($fname_full);
       if (isset($type)) {
         global $MEDIA_EXTENSIONS;
+
         $mime_type = image_type_to_mime_type($type);
 
         switch ($mime_type) {
@@ -424,14 +452,16 @@ class PageDisplayBase
 
   function buildHtmlLinkTags () {
     $tags = array(); // css, rss
-    if (!empty($this->stylesheet)) { //link to stylesheet
-      if (!is_array($this->stylesheet))
+    if (!empty($this->stylesheet)) {
+      // link to stylesheet
+      if (!is_array($this->stylesheet)) {
         $this->stylesheet = array($this->stylesheet);
+      }
 
       foreach ($this->stylesheet as $src) {
         $tags[] =
           sprintf('<link rel="stylesheet" href="%s" type="text/css" />',
-            htmlspecialchars($this->page->BASE_PATH . $src));
+                  htmlspecialchars($this->page->BASE_PATH . $src));
       }
     }
     return implode("\n", $tags);
@@ -448,16 +478,17 @@ class PageDisplayBase
     if (!empty($this->script_url_ie)) {
       foreach($this->script_url_ie as $url_ie)
         $scriptcode .= sprintf('<!--[if lt IE 7]>'
-                               .'<script defer type="text/javascript" src="%s"></script>'
-                               .'<![endif]-->'."\n",
+                               . '<script defer type="text/javascript" src="%s"></script>'
+                               . '<![endif]-->' . "\n",
                                htmlspecialchars($this->page->BASE_PATH . $url_ie));
     }
 
     if (!empty($this->script_ready)) {
       $scriptcode .= '<script language="JavaScript" type="text/javascript">'
-                    . '$(document).ready(function(){ ';
-      foreach ($this->script_ready as $ready)
+                   . '$(document).ready(function(){ ';
+      foreach ($this->script_ready as $ready) {
         $scriptcode .= $ready . "\n" ;
+      }
       $scriptcode .= '}); </script>';
     }
 
@@ -529,30 +560,32 @@ EOT;
   function setOutputCompression () {
     static $compress_set = FALSE;  // only send the header once
 
-    if (headers_sent() || $compress_set)
+    if (headers_sent() || $compress_set) {
       return $compress_set;
+    }
 
     // Check if the browser supports gzip encoding, HTTP_ACCEPT_ENCODING
     if (array_key_exists('HTTP_ACCEPT_ENCODING', $_SERVER)
-        && strstr($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip')) {
-
+        && strstr($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip'))
+    {
       // Start output buffering
       ob_start('ob_gzhandler', 4096);
 
       // Tell the browser the content is compressed with gzip
       header("Content-Encoding: gzip");
       return $compress_set = TRUE;
-
     }
 
     return FALSE;
   }
 
   function setHttpHeaders () {
-    if (headers_sent())
+    if (headers_sent()) {
       return;
-    if (defined('OUTPUT_COMPRESS') && OUTPUT_COMPRESS)
+    }
+    if (defined('OUTPUT_COMPRESS') && OUTPUT_COMPRESS) {
       $this->setOutputCompression();
+    }
   }
 
   function show () {

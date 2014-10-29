@@ -551,6 +551,7 @@ EOT;
                         'multiple' => TRUE,
                         'imgparams' => array('max_width' => 300, 'max_height' => 300,
                                              'scale' => 'down', 'keep' => 'large',
+                                             'title' => 'File',
                                              'pdf' => TRUE,
                                              'office' => TRUE,
                                              ),
