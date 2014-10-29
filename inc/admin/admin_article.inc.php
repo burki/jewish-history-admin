@@ -6,7 +6,7 @@
  *
  * (c) 2009-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-07-29 dbu
+ * Version: 2014-10-29 dbu
  *
  * Changes:
  *
@@ -115,7 +115,7 @@ class DisplayArticle extends DisplayMessage
     $this->messages['item_new'] = tr('New Article');
     parent::__construct($page);
     $this->order['date'] = array('IF(0 = reviewer_deadline + 0, published, reviewer_deadline) DESC', 'IF(0 = reviewer_deadline + 0, published, reviewer_deadline)');
-    $this->fields_listing[sizeof($this->fields_listing) -1 ] = "DATE(reviewer_deadline) AS reviewer_deadline";
+    $this->fields_listing[count($this->fields_listing) -1 ] = "DATE(reviewer_deadline) AS reviewer_deadline";
     $this->cols_listing['date'] = 'Author deadline';
   }
 
@@ -127,7 +127,8 @@ class DisplayArticle extends DisplayMessage
     $this->condition[] = array('name' => 'search',
                                'method' => 'buildFulltextCondition',
                                'args' => 'subject,User.firstname,User.lastname,body',
-                               'persist' => 'session');
+                               'persist' => 'session',
+                               );
   }
 
   function init () {
@@ -138,18 +139,20 @@ class DisplayArticle extends DisplayMessage
       if (($id_publication = intval($_POST['publication_add'])) > 0) {
         $dbconn = &$this->page->dbconn;
         // add at the bottom
-        $querystr = sprintf("SELECT MAX(ord) FROM MessagePublication WHERE message_id=%d", $this->workflow->primaryKey());
+        $querystr = sprintf("SELECT MAX(ord) FROM MessagePublication WHERE message_id=%d",
+                            $this->workflow->primaryKey());
         $dbconn->query($querystr);
         $ord = $dbconn->next_record() && isset($dbconn->Record[0])
           ? $dbconn->Record[0] + 1 : 0;
         $querystr = sprintf("INSERT INTO MessagePublication (message_id, publication_id, ord) VALUES (%d, %d, %d) ON DUPLICATE KEY UPDATE ord=ord",
-            $this->workflow->primaryKey(), $id_publication, $ord);
+                            $this->workflow->primaryKey(), $id_publication, $ord);
         $dbconn->query($querystr);
       }
     }
     else if (array_key_exists('publication_remove', $_GET)) {
       if (($id_publication = intval($_GET['publication_remove'])) > 0) {
-        $querystr = sprintf("DELETE FROM MessagePublication WHERE message_id=%d AND publication_id=%d", $this->workflow->primaryKey(), $id_publication);
+        $querystr = sprintf("DELETE FROM MessagePublication WHERE message_id=%d AND publication_id=%d",
+                            $this->workflow->primaryKey(), $id_publication);
         $this->page->dbconn->query($querystr);
       }
     }
@@ -251,9 +254,10 @@ class DisplayArticle extends DisplayMessage
         new Field(array('name' => 'publisher_request', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
         new Field(array('name' => 'publisher_received', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
 
-        // new Field(array('name' => 'url', 'id' => 'url', 'type' => 'text', 'datatype' => 'char', 'size'=>65, 'maxlength'=>200, 'null' => TRUE)),
-        // new Field(array('name' => 'urn', 'id' => 'urn', 'type' => 'text', 'datatype' => 'char', 'size'=>45, 'maxlength'=>200, 'null' => TRUE)),
-        // new Field(array('name' => 'tags', 'id' => 'urn', 'type' => 'text', 'datatype' => 'char', 'size'=>45, 'maxlength'=>200, 'null' => TRUE)),
+        new Field(array('name' => 'slug', 'id' => 'slug', 'type' => 'text', 'datatype' => 'char', 'size' => 45, 'maxlength' => 200, 'null' => TRUE)),
+        // new Field(array('name' => 'url', 'id' => 'url', 'type' => 'text', 'datatype' => 'char', 'size' => 65, 'maxlength' => 200, 'null' => TRUE)),
+        // new Field(array('name' => 'urn', 'id' => 'urn', 'type' => 'text', 'datatype' => 'char', 'size' => 45, 'maxlength' => 200, 'null' => TRUE)),
+        // new Field(array('name' => 'tags', 'id' => 'urn', 'type' => 'text', 'datatype' => 'char', 'size' => 45, 'maxlength' => 200, 'null' => TRUE)),
     ));
 
     if (!isset($this->workflow->id)) {
@@ -316,6 +320,55 @@ class DisplayArticle extends DisplayMessage
       }
   }
 
+  function generateSlug() {
+    var subject = \$('subject');
+    if (null === subject) {
+      return;
+    }
+
+    title = subject.value;
+    if ("" == title) {
+      alert('Bitte tragen Sie erst einen Titel ein');
+      return;
+    }
+
+
+    var url = '{$url_ws}';
+    var pars = 'pn=article&action=generateSlug&title=' + encodeURIComponent(title);
+
+    var form = document.forms['detail'];
+    if (null != form && null != form.elements['user_id']) {
+      var user_id = form.elements['user_id'].value;
+      if ("" != user_id) {
+        user_id = + user_id;
+        if (!isNaN(user_id)) {
+          pars += '&user_id=' + user_id;
+        }
+      }
+    }
+
+
+    var myAjax = new Ajax.Request(
+          url,
+          {
+              method: 'get',
+              parameters: pars,
+              onComplete: setSlug
+          });
+  }
+
+  function setSlug (originalRequest, obj) {
+    if (obj.status > 0) {
+      var field = \$('slug');
+      if (null != field) {
+        field.value = obj.title_slug;
+      }
+    }
+    else {
+      alert('ret: ' + obj.msg + ' ' + obj.status);
+    }
+  }
+
   function generateUrn() {
     var permalink = \$F('url');
     if ("" == permalink) {
@@ -337,24 +390,28 @@ class DisplayArticle extends DisplayMessage
   function setUrn (originalRequest, obj) {
     if (obj.status > 0) {
       var field = \$('urn');
-      if (null != field)
+      if (null != field) {
         field.value = obj.urn;
+      }
     }
-    else
+    else {
       alert('ret: ' + obj.msg + ' ' + obj.status);
+    }
   }
 
 EOT;
       $publisher_request_button = sprintf(' <input type="button" value="%s" onclick="generateCommunication(\'%s\', \'publisher_request\')" />',
-                                    tr('send letter'), htmlspecialchars($this->page->buildLink(array('pn' => 'communication', 'edit' => -1))));
+                                          tr('send letter'), htmlspecialchars($this->page->buildLink(array('pn' => 'communication', 'edit' => -1))));
       $reviewer_request_button = sprintf(' <input type="button" value="%s" onclick="generateCommunication(\'%s\', \'reviewer_request\')" />',
                                          tr('send letter'), htmlspecialchars($this->page->buildLink(array('pn' => 'communication', 'edit' => -1))));
       $reviewer_sent_button = sprintf(' <input type="button" value="%s" onclick="generateCommunication(\'%s\', \'reviewer_sent\')" />',
-                                    tr('send letter'), htmlspecialchars($this->page->buildLink(array('pn' => 'communication', 'edit' => -1))));
+                                      tr('send letter'), htmlspecialchars($this->page->buildLink(array('pn' => 'communication', 'edit' => -1))));
       $reviewer_reminder_button = sprintf(' <input type="button" value="%s" onclick="generateCommunication(\'%s\', \'reviewer_reminder\')" />',
-                                    tr('send letter'), htmlspecialchars($this->page->buildLink(array('pn' => 'communication', 'edit' => -1))));
+                                          tr('send letter'), htmlspecialchars($this->page->buildLink(array('pn' => 'communication', 'edit' => -1))));
       $urn_button = sprintf(' <input type="button" value="%s" onclick="generateUrn(\'xx\')" />',
-                                    tr('generate'));
+                            tr('generate'));
+      $slug_button = sprintf(' <input type="button" value="%s" onclick="generateSlug()" />',
+                             tr('generate'));
     }
     $rows = parent::getEditRows($mode);
     $rows = array_merge_at($rows,
@@ -363,6 +420,10 @@ EOT;
       ), 'user');
     $rows = array_merge_at($rows,
       array(
+            'slug' => array('label' => 'Ordnername',
+                            'value' => 'edit' == $mode
+                            ? $this->getFormField('slug') . $slug_button
+                            : $this->record->get_value('slug')),
             'editor' => array('label' => 'Article Editor'),
             'referee' => array('label' => 'Referee'),
       ), 'status');

@@ -6,7 +6,7 @@
  *
  * (c) 2009-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-06-17 dbu
+ * Version: 2014-10-29 dbu
  *
  * Changes:
  *
@@ -157,23 +157,26 @@ class DisplayPasswordRecover extends PageDisplay
         $magic     = $dbconn->Record['recover'];
         $email     = $dbconn->Record['email'];
 
-        $params = array('pn'=>$page->name);
-        if (!empty($magic)) // only set this if there is a recover-request to avoid e-mail grabbing
+        $params = array('pn' => $page->name);
+        if (!empty($magic)) {
+          // only set this if there is a recover-request to avoid e-mail grabbing
           $params['login'] = $email;
+        }
 
         $url_request = $page->buildLink($params);
 
         if (empty($magic)) {
-          $msg = '<p>'.tr('You are using an outdated recover-code.').'<br />'
-               . tr('Please') . ' <a href="'.$url_request.'">'
-               . tr('request a new code').'</a>.</p>';
+          $msg = '<p>' . tr('You are using an outdated recover-code.') . '<br />'
+               . tr('Please') . ' <a href="' . $url_request . '">'
+               . tr('request a new code') . '</a>.</p>';
         }
         else if ($magic != $recover_code) {
-          $msg = '<p>' .tr('The URL you entered contains an invalid or outdated recover-code.')
-               . ' '.tr('Please make sure you entered the URL exactly as specified in your e-mail.')
-               . ' '.tr("If it still doesn't work, please")
-               . ' <a href="'.$url_request.'">'
-               . tr('request a new code').'</a>.</p>';
+          $msg = '<p>'
+               . tr('The URL you entered contains an invalid or outdated recover-code.')
+               . ' ' . tr('Please make sure you entered the URL exactly as specified in your e-mail.')
+               . ' ' . tr("If it still doesn't work, please")
+               . ' <a href="' . $url_request . '">'
+               . tr('request a new code') . '</a>.</p>';
         }
         else {
           $mode = SHOW_PWDFORM;
@@ -181,7 +184,8 @@ class DisplayPasswordRecover extends PageDisplay
           $this->data['recover_code'] = $recover_code;
           $this->data['login_id'] = $login_id;
 
-          if (isset($pwd) && trim($pwd) != '') { // check the password
+          if (isset($pwd) && trim($pwd) != '') {
+            // check the password
             $pwd_ok  = $page->passwordValid($pwd, $pwd_confirm);
 
             if ($pwd_ok <= 0) {
@@ -217,12 +221,13 @@ class DisplayPasswordRecover extends PageDisplay
     }
 
      if (!$valid) {
-      $url_request = $page->buildLink(array('pn'=>$page->name)); // we don't have a valid login-info to preset mail
-        $msg = '<p>'.tr('The URL you entered contains an invalid or outdated recover-code.')
-             . ' '.tr('Please make sure you entered the URL exactly as specified in your e-mail.')
-             . ' '.tr("If it still doesn't work, please")
-             . ' <a href="'.$url_request.'">'
-             . tr('request a new code').'</a>.</p>';
+      $url_request = $page->buildLink(array('pn' => $page->name)); // we don't have a valid login-info to preset mail
+        $msg = '<p>'
+             . tr('The URL you entered contains an invalid or outdated recover-code.')
+             . ' ' . tr('Please make sure you entered the URL exactly as specified in your e-mail.')
+             . ' ' . tr("If it still doesn't work, please")
+             . ' <a href="' . $url_request . '">'
+             . tr('request a new code') . '</a>.</p>';
     }
     return array($mode, $msg);
   }
@@ -267,7 +272,7 @@ EOT;
       case SHOW_PWDFORM:
         $msg_line = '<p class="message">'.(!empty($this->msg) ? $this->msg : tr('You can now pick a new password')).'</p>';
 
-        $action = $page->buildLink(array('pn'=>$page->name));
+        $action = $page->buildLink(array('pn' => $page->name));
         $recover_code = $this->data['recover_code'];
         $login_id = $this->data['login_id'];
 
@@ -291,14 +296,15 @@ EOT;
       default:
         $email_assistance = $MAIL_SETTINGS['technical_assistance'];
 
-        $action = $page->buildLink(array('pn'=>$page->name));
+        $action = $page->buildLink(array('pn' => $page->name));
 
-        $content = '<p>'.tr("In case you forgot your password or haven't set one yet, we will immediatly send out e-mail instructions on how to create a new password. Your current (forgotten) password will remain active until you respond to that mail.").'</p>';
+        $content = '<p>' . tr("In case you forgot your password or haven't set one yet, we will immediatly send out e-mail instructions on how to create a new password. Your current (forgotten) password will remain active until you respond to that mail.") . '</p>';
 
         $content .= '<form action="'.htmlspecialchars($action).'" method="post">';
 
-        if (!empty($this->msg))
-          $content .= '<p class="message">'.$this->msg.'</p>';
+        if (!empty($this->msg)) {
+          $content .= '<p class="message">' . $this->msg . '</p>';
+        }
 
         $this_login = !empty($_REQUEST['login']) ? $_REQUEST['login'] : '';
 

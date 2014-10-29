@@ -4,9 +4,9 @@
  *
  * Webservices for managing publications (books)
  *
- * (c) 2007-2010 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2010-06-15 dbu
+ * Version: 2014-10-29 dbu
  *
  * Changes:
  *
@@ -85,14 +85,14 @@ class WsPublication extends WsHandler
       $words = split_quoted($search);
       $fields = array('title', 'subtitle', 'author', 'editor');
 
-      for($i = 0; $i < sizeof($words); $i++) {
+      for ($i = 0; $i < count($words); $i++) {
         $parts = array();
 
         /* if (IS_A_VALID_ISBN($words[$i])
           $parts[] = "isbn = '$normalized_isbn';
           else */
 
-        for($j = 0; $j < sizeof($fields); $j++)
+        for ($j = 0; $j < count($fields); $j++)
           $parts[$j] = $fields[$j]
           .sprintf(" REGEXP '[[:<:]]%s'", $dbconn->escape_string($words[$i]));
 

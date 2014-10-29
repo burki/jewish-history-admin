@@ -75,20 +75,21 @@ class DisplayAccount extends DisplayTable
     $record = parent::instantiateRecord($table, $dbconn);
 
     $record->add_fields(
-        array(new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey'=>1)),
-              new Field(array('name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => 1)),
+        array(new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => TRUE)),
+              new Field(array('name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => TRUE)),
               new Field(array('name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()')),
-              new Field(array('name' => 'email', 'type' => 'email', 'size'=>30, 'datatype' => 'char', 'maxlength'=>80, 'noupdate' => 1, 'null'=> 1)),
-              new Field(array('name' => 'lastname', 'type' => 'text', 'size'=>40, 'datatype' => 'char', 'maxlength'=>80)),
-              new Field(array('name' => 'firstname', 'type' => 'text', 'size'=>40, 'datatype' => 'char', 'maxlength'=>80, 'null' => TRUE)),
-              new Field(array('name' => 'pwd', 'type' => 'password', 'size'=>10, 'datatype' => 'char', 'maxlength'=>40, 'nodbfield'=>1, 'null' => 1)),
-              new Field(array('name' => 'pwd_confirm', 'type' => 'password', 'size'=>10, 'maxlength'=>40, 'nodbfield'=>1, 'null' => 1)),
-              new Field(array('name' => 'privs', 'type' => 'checkbox', 'datatype' => 'bitmap', 'null'=>1, 'default'=> 0,
-                              'labels'=> array('',
-                              tr('System Editor'),
-                              tr('System Administrator'),
-                              '',
-                              tr('Referee'),)
+              new Field(array('name' => 'email', 'type' => 'email', 'size' => 30, 'datatype' => 'char', 'maxlength' => 80, 'noupdate' => TRUE, 'null' => TRUE)),
+              new Field(array('name' => 'lastname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80)),
+              new Field(array('name' => 'firstname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+              new Field(array('name' => 'pwd', 'type' => 'password', 'size' => 10, 'datatype' => 'char', 'maxlength' => 40, 'nodbfield' => TRUE, 'null' => 1)),
+              new Field(array('name' => 'pwd_confirm', 'type' => 'password', 'size' => 10, 'maxlength' => 40, 'nodbfield' => TRUE, 'null' => TRUE)),
+              new Field(array('name' => 'privs', 'type' => 'checkbox', 'datatype' => 'bitmap', 'null' => TRUE, 'default' => 0,
+                              'labels' => array('',
+                                                tr('System Editor'),
+                                                tr('System Administrator'),
+                                                '',
+                                                tr('Referee'),
+                                                ),
                              )
                        ),
         )
@@ -220,11 +221,13 @@ class DisplayAccount extends DisplayTable
     switch($col_index) {
       case 1:
         $val = sprintf('<a href="%s">%s</a>',
-                        htmlspecialchars($this->page->buildLink(array('pn'=>$this->page->name, 'edit' => $row['id']))),
+                        htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, 'edit' => $row['id']))),
                         $this->formatText($row['email']));
         break;
       case 2: // lastname
-        $val = $this->formatText($row['lastname'].(isset($row['firstname']) ? ' '.$row['firstname']: ''));
+        $val = $this->formatText($row['lastname']
+                                 . (isset($row['firstname'])
+                                    ? ' ' . $row['firstname']: ''));
         break;
       case 3:
         return FALSE; // skip firstname

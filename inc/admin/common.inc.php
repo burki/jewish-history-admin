@@ -4,16 +4,16 @@
  *
  * Common stuff for the admin pages
  *
- * (c) 2006-2013 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2013-11-25 dbu
+ * Version: 2014-10-29 dbu
  *
  * Changes:
  *
  */
 
 require_once 'XML/Util.php';
-require_once INC_PATH.'common/classes.inc.php';
+require_once INC_PATH . 'common/classes.inc.php';
 
 function send_mail ($msg) {
   if (!defined('MAIL_SEND') || !MAIL_SEND) {
@@ -34,33 +34,12 @@ Subject: <?php echo $msg['subject'] ?>
 }
 
 function is_associative($array) {
-  if (!is_array($array) || empty($array))
+  if (!is_array($array) || empty($array)) {
    return false;
+  }
 
   $keys = array_keys($array);
   return array_keys($keys) !== $keys;
-}
-
-function xml_pack ($tags, $prepend = '') {
-  $ret = '';
-  foreach($tags as $tag => $value) {
-    $name = $prepend.$tag;
-    if (!empty($value))
-      $ret .= sprintf('<%s>%s</%s>', $name, XML_Util::replaceEntities($value), $name)."\n";
-  }
-  return $ret;
-}
-
-function xml_unpack ($tagnames, $encoded, $prepend = '') {
-  $ret = array();
-
-  for($i=0; $i < count($tagnames); $i++) {
-    $tag = $prepend.$tagnames[$i];
-    if (ereg("<$tag>([^<]*)</$tag>", $encoded, $matches)) {
-      $ret[$tag] = XML_Util::reverseEntities($matches[1]);
-    }
-  }
-  return $ret;
 }
 
 function native_to_utf8 ($str) {
@@ -72,7 +51,7 @@ function translit_7bit ($str) {
         // var_dump($str);
 
   if (TRUE) {
-    $str = mb_convert_encoding($str,'HTML-ENTITIES', 'UTF-8');
+    $str = mb_convert_encoding($str, 'HTML-ENTITIES', 'UTF-8');
     // var_dump($str);
     $str = preg_replace(
        array('/&szlig;/','/&(..)lig;/',
@@ -207,8 +186,9 @@ function strip_specialchars($txt) {
 
 function format_mailbody ($txt) {
   $paras = preg_split('/\n\s*\n/', $txt);
-  for($i=0; $i < count($paras); $i++)
+  for ($i=0; $i < count($paras); $i++) {
     $paras[$i] = wordwrap($paras[$i], MAIL_LINELENGTH, "\r\n");
+  }
   return strip_specialchars(join("\r\n\r\n", $paras));
 }
 

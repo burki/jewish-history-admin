@@ -4,15 +4,16 @@
  *
  * Export page
  *
- * (c) 2006-2008 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2008-07-10 dbu
+ * Version: 2014-10-29 dbu
  *
  * Changes:
  *
  */
 
-class OjsPage extends Page {
+class OjsPage extends Page
+{
   // we use this class so links and title are set correctly
   function __construct ($dbconn, $record) {
     $this->record = $record;
@@ -24,7 +25,8 @@ class OjsPage extends Page {
   }
 }
 
-class OjsDisplay extends PageDisplay {
+class OjsDisplay extends PageDisplay
+{
   // use this class to customize the html-code of the exported article
   var $stylesheet = NULL;
 }
@@ -40,10 +42,10 @@ class DisplayExport extends PageDisplay
 
       $issue = intval($_POST['issue']);
       $querystr = "SELECT Message.id AS id, subject, body, date_format(published, '%Y%m') AS yearmonth, DATE(published) AS published, User.* FROM Message"
-        . " LEFT OUTER JOIN MessageUser ON Message.id=MessageUser.message_id LEFT OUTER JOIN User ON User.id=MessageUser.user_id"
-        . sprintf(" WHERE Message.type=%d AND Message.status > 0 AND YEAR(published) = %d AND MONTH(published) = %d",
-                  $MESSAGE_REVIEW_PUBLICATION, $issue / 100, $issue % 100)
-        . " ORDER BY published";
+               . " LEFT OUTER JOIN MessageUser ON Message.id=MessageUser.message_id LEFT OUTER JOIN User ON User.id=MessageUser.user_id"
+               . sprintf(" WHERE Message.type=%d AND Message.status > 0 AND YEAR(published) = %d AND MONTH(published) = %d",
+                         $MESSAGE_REVIEW_PUBLICATION, $issue / 100, $issue % 100)
+              . " ORDER BY published";
 
       $dbconn = & $this->page->dbconn;
       $dbconn->query($querystr);
@@ -64,7 +66,7 @@ class DisplayExport extends PageDisplay
           $doc = new DOMDocument();
           $doc->loadXML($issue_xml);
           // $validated = $doc->validate(); // don't know how to set to local copy of dtd
-          $validated = @ $doc->relaxNGValidate(INC_PATH.'common/native.rng');
+          $validated = @ $doc->relaxNGValidate(INC_PATH . 'common/native.rng');
         }
 
         if ($validated) {
@@ -73,8 +75,9 @@ class DisplayExport extends PageDisplay
           echo $issue_xml;
           return FALSE;
         }
-        else
+        else {
           $this->message = 'Validation of the exported issue failed. Please contact the system administrator.';
+        }
       }
     }
     return TRUE;
@@ -194,9 +197,9 @@ class DisplayExport extends PageDisplay
     $dbconn = & $this->page->dbconn;
 
     $querystr = "SELECT DISTINCT date_format(published, '%Y%m') AS yearmonth FROM Message"
-      . sprintf(" WHERE type=%d AND status > 0",
-                $MESSAGE_REVIEW_PUBLICATION)
-      . " ORDER BY yearmonth DESC";
+              . sprintf(" WHERE type=%d AND status > 0",
+                        $MESSAGE_REVIEW_PUBLICATION)
+              . " ORDER BY yearmonth DESC";
 
     $dbconn->query($querystr);
     $issues = array();
@@ -204,15 +207,16 @@ class DisplayExport extends PageDisplay
       $issues[] = $dbconn->Record['yearmonth'];
     }
 
-    $ret = !empty($this->message) ? '<p class="error">'.$this->message.'</p>' : '';
-    if (sizeof($issues) > 0) {
+    $ret = !empty($this->message) ? '<p class="error">' . $this->message . '</p>' : '';
+    if (count($issues) > 0) {
       $issue_select = '<select name="issue">';
       foreach ($issues as $issue) {
-        $issue_select .= sprintf('<option value="%d">%d-%02d</option>', $issue, $issue / 100, $issue % 100);
+        $issue_select .= sprintf('<option value="%d">%d-%02d</option>',
+                                 $issue, $issue / 100, $issue % 100);
       }
       $issue_select .= '</select>';
       $ret .= sprintf('<form action="%s" method="post">Issue: %s<input type="submit" value="%s" /></form>',
-                    htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name))), $issue_select, tr('export'));
+                      htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name))), $issue_select, tr('export'));
     }
 
     return $ret;
@@ -221,6 +225,7 @@ class DisplayExport extends PageDisplay
 }
 
 $display = new DisplayExport($page);
-if (FALSE == $display->init())
+if (FALSE == $display->init()) {
   exit();
+}
 $page->setDisplay($display);

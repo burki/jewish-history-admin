@@ -37,14 +37,14 @@ class BiblioService_Amazon
     static function buildTitleSubtitle ($fulltitle) {
         $parts = preg_split('/(\:|\.)\s+/', $fulltitle, 2);
 
-        if (sizeof($parts) == 2)
+        if (count($parts) == 2)
             return $parts;
 
         return array($parts[0], '');
     }
 
     function __construct ($stores = array()) {
-        if (0 == sizeof($stores))
+        if (0 == count($stores))
             $stores = array('DE', 'US');
         $this->stores = $stores;
     }
@@ -77,7 +77,7 @@ class BiblioService_Amazon
                     if (!empty($result->$field)) {
                         $value = $result->$field;
                         if ('array' == gettype($value)) {
-                            for($i = 0; $i < sizeof($value); $i++) {
+                            for ($i = 0; $i < count($value); $i++) {
                                 list($surname, $given) = BiblioService::buildSurnameGiven($value[$i]);
                                 $value[$i] = $surname.(!empty($given) ? ', '.$given : '');
                             }
@@ -169,25 +169,25 @@ class BiblioService
         $parts = preg_split('/\s+/', trim($name));
 
         # if the last part is roman numeral, append to but last
-        if (sizeof($parts) > 1
-                && (preg_match('/^[IVX]+$/', $parts[sizeof($parts) - 1])
-                || preg_match('/^(Jr|Sr)\.$/', $parts[sizeof($parts) - 1]))) {
-                $parts[sizeof($parts) - 2] .=  ' '.$parts[sizeof($parts) - 1];
+        if (count($parts) > 1
+                && (preg_match('/^[IVX]+$/', $parts[count($parts) - 1])
+                || preg_match('/^(Jr|Sr)\.$/', $parts[count($parts) - 1]))) {
+                $parts[count($parts) - 2] .=  ' ' . $parts[count($parts) - 1];
                 array_pop($parts);
         }
 
-        if (sizeof($parts) == 1)
+        if (count($parts) == 1)
             return array($name);
 
         // exactly two parts, that's the easy case
-        if (2 == sizeof($parts))
+        if (2 == count($parts))
             return array($parts[1], $parts[0]);
 
         // 3 or more parts - decide which are given names
         $given = array($parts[0]); // the first is always given
-        $surname = array($parts[sizeof($parts) -1]); // and the last surname
+        $surname = array($parts[count($parts) -1]); // and the last surname
         // decide where we file the others
-        for($i = 1; $i < sizeof($parts) -1; $i++) {
+        for ($i = 1; $i < count($parts) -1; $i++) {
             if (!self::isGiven($parts[$i])) {
                 $surname = array_slice($parts, $i);
                 break;
@@ -327,7 +327,7 @@ class BiblioService
         if ($options['from_external']) {
             $ws_gbv = new BiblioService_GBV();
             $results = $ws_gbv->searchRetrieve($isbn);
-            if (isset($results) && sizeof($results) > 0) {
+            if (isset($results) && count($results) > 0) {
                 $response = $results[0];
             }
             else {
@@ -362,7 +362,7 @@ class BiblioService
                         }
                         if (FALSE !== $update) {
                             $querystr = "UPDATE Publication SET ";
-                            for($i = 0; $i < sizeof($fields); $i++) {
+                            for ($i = 0; $i < count($fields); $i++) {
                                 if ($i > 0)
                                     $querystr .= ', ';
                                 $querystr .= $fields[$i].'='.$values[$i];

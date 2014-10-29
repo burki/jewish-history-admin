@@ -65,6 +65,7 @@ CREATE TABLE Message (
   subject       VARCHAR(255) NULL,              # Title of the node
   body          LONGTEXT NULL,                  # the entry in plain txt, XML, binary,
   published     DATETIME NULL,                  #
+  slug           VARCHAR(255) NULL,             # slug
   url           VARCHAR(255) NULL,              # Permanent-Link
   urn           VARCHAR(255) NULL,              # URL
   tags          VARCHAR(255) NULL,              #

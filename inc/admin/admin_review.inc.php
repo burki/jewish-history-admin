@@ -213,24 +213,24 @@ class DisplayReview extends DisplayMessage
     $this->view_options['referee'] = $this->referee_options;
 
     $record->add_fields(array(
-        new Field(array('name'=>'publication', 'type'=>'hidden', 'datatype'=>'int', 'nodbfield' => 1, 'null' => 1)),
-        new Field(array('name'=>'editor', 'type'=>'select',
+        new Field(array('name' => 'publication', 'type' => 'hidden', 'datatype' => 'int', 'nodbfield' => 1, 'null' => 1)),
+        new Field(array('name' => 'editor', 'type' => 'select',
                         'options' => array_merge(array(''), array_keys($this->editor_options)),
                         'labels' => array_merge(array(tr('-- none --')), array_values($this->editor_options)),
-                        'datatype'=>'int', 'null' => 1)),
-        new Field(array('name'=>'referee', 'type'=>'select',
+                        'datatype' => 'int', 'null' => 1)),
+        new Field(array('name' => 'referee', 'type' => 'select',
                         'options' => array_merge(array(''), array_keys($this->referee_options)),
                         'labels' => array_merge(array(tr('-- none --')), array_values($this->referee_options)),
-                        'datatype'=>'int', 'null' => 1)),
-        new Field(array('name'=>'publisher_request', 'type'=>'datetime', 'datatype'=>'datetime', 'null' => TRUE)),
-        new Field(array('name'=>'publisher_received', 'type'=>'datetime', 'datatype'=>'datetime', 'null' => TRUE)),
-        new Field(array('name'=>'reviewer_request', 'type'=>'datetime', 'datatype'=>'datetime', 'null' => TRUE)),
-        new Field(array('name'=>'reviewer_sent', 'type'=>'datetime', 'datatype'=>'datetime', 'null' => TRUE)),
-        new Field(array('name'=>'reviewer_deadline', 'type'=>'datetime', 'datatype'=>'datetime', 'null' => TRUE)),
-        new Field(array('name'=>'reviewer_received', 'type'=>'datetime', 'datatype'=>'datetime', 'null' => TRUE)),
-        new Field(array('name'=>'referee_sent', 'type'=>'datetime', 'datatype'=>'datetime', 'null' => TRUE)),
-        new Field(array('name'=>'referee_deadline', 'type'=>'datetime', 'datatype'=>'datetime', 'null' => TRUE)),
-        new Field(array('name'=>'publisher_vouchercopy', 'type'=>'datetime', 'datatype'=>'datetime', 'null' => TRUE)),
+                        'datatype' => 'int', 'null' => 1)),
+        new Field(array('name' => 'publisher_request', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
+        new Field(array('name' => 'publisher_received', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
+        new Field(array('name' => 'reviewer_request', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
+        new Field(array('name' => 'reviewer_sent', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
+        new Field(array('name' => 'reviewer_deadline', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
+        new Field(array('name' => 'reviewer_received', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
+        new Field(array('name' => 'referee_sent', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
+        new Field(array('name' => 'referee_deadline', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
+        new Field(array('name' => 'publisher_vouchercopy', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
       ));
 
     if (!isset($this->workflow->id)) {
@@ -439,6 +439,7 @@ EOT;
 }
 
 $display = new DisplayReview($page);
-if (FALSE === $display->init())
+if (FALSE === $display->init()) {
   $page->redirect(array('pn' => ''));
+}
 $page->setDisplay($display);

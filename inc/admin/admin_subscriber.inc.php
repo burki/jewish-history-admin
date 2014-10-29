@@ -180,7 +180,7 @@ class DisplaySubscriber extends DisplayTable
     $countries = $this->getCountries();
     $countries_ordered = array('' => tr('-- not available --'));
     if (isset($COUNTRIES_FEATURED)) {
-      for($i = 0; $i < sizeof($COUNTRIES_FEATURED); $i++) {
+      for ($i = 0; $i < count($COUNTRIES_FEATURED); $i++) {
         $countries_ordered[$COUNTRIES_FEATURED[$i]] = $countries[$COUNTRIES_FEATURED[$i]];
       }
       $countries_ordered['&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;'] = FALSE; // separator

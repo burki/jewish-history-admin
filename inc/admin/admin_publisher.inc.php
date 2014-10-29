@@ -6,7 +6,7 @@
  *
  * (c) 2008-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-06-30 dbu
+ * Version: 2014-10-29 dbu
  *
  * Changes:
  *
@@ -95,7 +95,7 @@ class DisplayPublisher extends DisplayTable
     $countries = $this->getCountries();
     $countries_ordered = array('' => tr('-- not available --'));
     if (isset($COUNTRIES_FEATURED)) {
-      for ($i = 0; $i < sizeof($COUNTRIES_FEATURED); $i++) {
+      for ($i = 0; $i < count($COUNTRIES_FEATURED); $i++) {
         $countries_ordered[$COUNTRIES_FEATURED[$i]] = $countries[$COUNTRIES_FEATURED[$i]];
       }
       $countries_ordered['&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;'] = FALSE; // separator
@@ -107,32 +107,32 @@ class DisplayPublisher extends DisplayTable
     }
 
     $record->add_fields(array(
-      new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey'=>1)),
+      new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => TRUE)),
       new Field(array('name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => TRUE)),
-      new Field(array('name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null'=>1, 'noupdate' => TRUE)),
+      new Field(array('name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => TRUE, 'noupdate' => TRUE)),
       new Field(array('name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()')),
-      new Field(array('name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null'=>1)),
-      new Field(array('name' => 'name', 'type' => 'text', 'size'=>40, 'datatype' => 'char', 'maxlength'=>127)),
-      //new Field(array('name' => 'domicile', 'type' => 'text', 'size'=>40, 'datatype' => 'char', 'maxlength'=>127, 'null'=>1)),
-      // new Field(array('name' => 'isbn', 'type' => 'text', 'size'=>40, 'datatype' => 'char', 'maxlength'=>127, 'null'=>1)),
+      new Field(array('name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => TRUE)),
+      new Field(array('name' => 'name', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 127)),
+      //new Field(array('name' => 'domicile', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 127, 'null' => TRUE)),
+      // new Field(array('name' => 'isbn', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 127, 'null' => TRUE)),
 
-      new Field(array('name' => 'address', 'type' => 'textarea', 'datatype' => 'char', 'cols'=>50, 'rows' => 2, 'null' => TRUE)),
-      new Field(array('name' => 'place', 'type' => 'text', 'size' => 30, 'datatype' => 'char', 'maxlength' => 80, 'null'=>TRUE)),
-      new Field(array('name' => 'zip', 'type' => 'text', 'datatype' => 'char', 'size'=>8, 'maxlength'=>8, 'null'=>TRUE)),
+      new Field(array('name' => 'address', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 2, 'null' => TRUE)),
+      new Field(array('name' => 'place', 'type' => 'text', 'size' => 30, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+      new Field(array('name' => 'zip', 'type' => 'text', 'datatype' => 'char', 'size' => 8, 'maxlength' => 8, 'null' => TRUE)),
       new Field(array('name' => 'country', 'type' => 'select', 'datatype' => 'char', 'null' => TRUE,
-                      'options'=>array_keys($countries_ordered), 'labels'=>array_values($countries_ordered), 'default' => 'DE', 'null' => TRUE)),
+                      'options' => array_keys($countries_ordered),
+                      'labels' => array_values($countries_ordered), 'default' => 'DE', 'null' => TRUE)),
 
-      new Field(array('name' => 'phone', 'type' => 'text', 'size'=>40, 'datatype' => 'char', 'maxlength'=>40, 'null'=>TRUE)),
-      new Field(array('name' => 'fax', 'type' => 'text', 'size'=>40, 'datatype' => 'char', 'maxlength'=>40, 'null'=>TRUE)),
-      new Field(array('name' => 'url', 'type' => 'text', 'size'=>40, 'datatype' => 'char', 'maxlength'=>255, 'null'=>TRUE)),
-      new Field(array('name' => 'email', 'type' => 'email', 'size'=>40, 'datatype' => 'char', 'maxlength'=>80, 'null'=>1)),
-      new Field(array('name' => 'url', 'type' => 'text', 'size'=>40, 'datatype' => 'char', 'maxlength'=>255, 'null'=>1)),
-      new Field(array('name' => 'name_contact', 'type' => 'text', 'size'=>40, 'datatype' => 'char', 'maxlength'=>127, 'null'=>1)),
-      new Field(array('name' => 'phone_contact', 'type' => 'text', 'size'=>40, 'datatype' => 'char', 'maxlength'=>80, 'null'=>1)),
-      new Field(array('name' => 'fax_contact', 'type' => 'text', 'size'=>40, 'datatype' => 'char', 'maxlength'=>40, 'null'=>TRUE)),
-      new Field(array('name' => 'email_contact', 'type' => 'email', 'size'=>40, 'datatype' => 'char', 'maxlength'=>80, 'null'=>1)),
-      new Field(array('name' => 'comments_internal', 'type' => 'textarea', 'datatype' => 'char', 'cols'=>50, 'rows' => 4, 'null' => TRUE)),
-
+      new Field(array('name' => 'phone', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 40, 'null' => TRUE)),
+      new Field(array('name' => 'fax', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 40, 'null' => TRUE)),
+      new Field(array('name' => 'url', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => TRUE)),
+      new Field(array('name' => 'email', 'type' => 'email', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+      new Field(array('name' => 'url', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => TRUE)),
+      new Field(array('name' => 'name_contact', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 127, 'null' => TRUE)),
+      new Field(array('name' => 'phone_contact', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+      new Field(array('name' => 'fax_contact', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 40, 'null' => TRUE)),
+      new Field(array('name' => 'email_contact', 'type' => 'email', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+      new Field(array('name' => 'comments_internal', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
     ));
 
     return $record;
@@ -235,7 +235,7 @@ class DisplayPublisher extends DisplayTable
         }
       }
     }
-    if (sizeof($fields) > 0)
+    if (count($fields) > 0)
       $ret .= $this->buildContentLineMultiple($fields);
 
     return $ret;

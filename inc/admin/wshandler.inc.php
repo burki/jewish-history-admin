@@ -27,14 +27,18 @@ class SearchSimpleParser
 
   function accept($match, $state) {
     // echo "$state: -$match-<br />";
-    if ($state == LEXER_UNMATCHED && strlen($match) < $this->min_length)
+    if ($state == LEXER_UNMATCHED && strlen($match) < $this->min_length) {
       return TRUE;
+    }
 
-    if ($state == LEXER_MATCHED)
+    if ($state == LEXER_MATCHED) {
       return TRUE;
+    }
 
-    if (preg_match('/\S/', $match))
+    if (preg_match('/\S/', $match)) {
       $this->output[] = $match;
+    }
+
     return TRUE;
   }
 
@@ -52,14 +56,16 @@ class SearchSimpleParser
         break;
 
       case LEXER_UNMATCHED:
-        if (strlen($match) >= $this->min_length)
+        if (strlen($match) >= $this->min_length) {
           $words[] = $match;
+        }
         break;
 
       // Exiting the variable reference
       case LEXER_EXIT:
-        if (count($words) > 0)
+        if (count($words) > 0) {
           $this->output[] = implode(' ', $words);
+        }
         break;
     }
     return TRUE;
@@ -77,8 +83,9 @@ function split_quoted ($search) {
   $lexer->addExitPattern('"', 'writeQuoted');
 
   // check if '"' are balanced
-  if (substr_count($search, '"') % 2 != 0)
+  if (substr_count($search, '"') % 2 != 0) {
     $search .= '"';
+  }
 
   // do it
   $lexer->parse($search);
@@ -96,8 +103,9 @@ class WsHandlerFactory
   private static $class_map = array();
 
   static function getInstance ($name) {
-    if (array_key_exists($name, self::$class_map))
+    if (array_key_exists($name, self::$class_map)) {
       return new self::$class_map[$name];
+    }
   }
 
   static function registerClass ($name, $class_name) {
@@ -117,11 +125,13 @@ class WsHandler
   function initSession () {
     static $initialized = FALSE;
 
-    if ($initialized)
+    if ($initialized) {
       return;
+    }
 
-    if (defined('SESSION_NAME'))
+    if (defined('SESSION_NAME')) {
       session_name (SESSION_NAME);         // set the session name
+    }
 
     // for ie 6.x to take cookies
     // see also http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnpriv/html/ie6privacyfeature.asp
@@ -135,31 +145,36 @@ class WsHandler
 
   function getUser () {
     $this->initSession();
-    if (isset($_SESSION['user']))
+    if (isset($_SESSION['user'])) {
       return $_SESSION['user'];
+    }
   }
 
   function isAllowed ($privs = -1) {
     // check if the user is logged
     $user = $this->getUser();
 
-    if (!isset($user))
+    if (!isset($user)) {
       return FALSE;
+    }
 
     // check if he has enough privs
-    if (-1 == $privs)
+    if (-1 == $privs) {
       return TRUE;
+    }
 
     return 0 != ($privs & $user['privs']);
   }
 
   function getParameter ($key) {
-    if (!isset($_REQUEST[$key]))
+    if (!isset($_REQUEST[$key])) {
       return;
+    }
 
     $val = $_REQUEST[$key];
-    if ($this->STRIP_SLASHES)
+    if ($this->STRIP_SLASHES) {
       $val = is_array($val) ? array_map('stripslashes', $val) : stripslashes($val);
+    }
 
     // $val = is_array($val) ? array_map('utf8_decode', $val) : utf8_decode($val);
 
@@ -185,14 +200,16 @@ class JsonResponse
   var $response;
 
   function __construct ($response = NULL) {
-    if (isset($response))
+    if (isset($response)) {
       $this->response = $response;
+    }
   }
 
   static function encode ($valueToEncode) {
     if (function_exists('json_encode')) {
       return json_encode($valueToEncode);
     }
+
     require_once LIB_PATH . 'JSON.php';
     $json = new Services_JSON();
     return $json->encode($valueToEncode);
@@ -203,8 +220,9 @@ class JsonResponse
       header("Content-type: text/plain; charset=UTF-8");
       echo self::encode($this->response);
     }
-    else
+    else {
       header('X-JSON:' . self::encode($this->response));
+    }
   }
 }
 
@@ -240,8 +258,8 @@ class AutocompleterResponse
     $ret = '<ul>';
     foreach ($this->entries as $entry) {
       $ret .= isset($entry['id'])
-      ? sprintf('<li id="%s">', $this->htmlEncode($entry['id']))
-      : '<li>';
+        ? sprintf('<li id="%s">', $this->htmlEncode($entry['id']))
+        : '<li>';
       $ret .= $this->htmlEncode($entry['item']);
       $ret .= '</li>';
     }

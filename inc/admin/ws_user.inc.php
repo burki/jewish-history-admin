@@ -4,15 +4,16 @@
  *
  * Webservices for managing users
  *
- * (c) 2007-2008 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2008-01-29 dbu
+ * Version: 2014-10-29 dbu
  *
  * Changes:
  *
  */
 
-class WsUser extends WsHandler {
+class WsUser extends WsHandler
+{
   // example-call: http://arthist.net/admin/admin_ws.php5?pn=user&action=matchUser&fulltext=burckhardt&_debug=1
   function buildResponse () {
     $valid_actions = array('matchUser');
@@ -37,23 +38,26 @@ class WsUser extends WsHandler {
       $words = split_quoted($search);
       $fields = array('lastname', 'firstname', 'email');
 
-      for($i = 0; $i < sizeof($words); $i++) {
+      for ($i = 0; $i < count($words); $i++) {
         $parts = array();
 
-        for($j = 0; $j < sizeof($fields); $j++)
+        for ($j = 0; $j < count($fields); $j++) {
           $parts[$j] = $fields[$j]
-          .sprintf(" REGEXP '[[:<:]]%s'", $dbconn->escape_string($words[$i]));
+                     . sprintf(" REGEXP '[[:<:]]%s'",
+                               $dbconn->escape_string($words[$i]));
+        }
 
         $words[$i] = '('.implode(' OR ', $parts).')';
       }
-      $querystr = sprintf("SELECT id, lastname, firstname, email FROM User WHERE status <> %d AND %s", STATUS_DELETED, implode(' AND ', $words))
-        ." ORDER BY lastname, firstname";
+      $querystr = sprintf("SELECT id, lastname, firstname, email FROM User WHERE status <> %d AND %s",
+                          STATUS_DELETED, implode(' AND ', $words))
+                . " ORDER BY lastname, firstname";
       $dbconn->query($querystr);
 
-
       while ($dbconn->next_record()) {
-        $user = $dbconn->Record['lastname'].' '.$dbconn->Record['firstname']
-          .(!empty($dbconn->Record['email']) ? ' ('.$dbconn->Record['email'].')' : '');
+        $user = $dbconn->Record['lastname'] . ' ' . $dbconn->Record['firstname']
+              . (!empty($dbconn->Record['email'])
+                 ? ' (' . $dbconn->Record['email'] . ')' : '');
         $entries[] = array('id' => $dbconn->Record['id'], 'item' => $user);
       }
     }
@@ -62,5 +66,3 @@ class WsUser extends WsHandler {
 }
 
 WsHandlerFactory::registerClass('user', 'WsUser');
-
-?>

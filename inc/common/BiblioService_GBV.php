@@ -4,9 +4,9 @@
  *
  * Class for querying bibliographic information from the GBV
  *
- * (c) 2008-2009 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2009-11-25 dbu
+ * Version: 2014-10-29 dbu
  *
  * Usage:
  *
@@ -242,10 +242,11 @@ class BiblioService_GBV
                 if ('array' != gettype($response[$prefix.'_given']))
                     $response[$prefix.'_given'] = array($response[$prefix.'_given']);
                 $persons = array();
-                for ($i = 0; $i < sizeof($response[$prefix.'_surname']); $i++) {
+                for ($i = 0; $i < count($response[$prefix.'_surname']); $i++) {
                     $fullname = trim($response[$prefix.'_surname'][$i]);
-                    if (!empty($response[$prefix.'_given'][$i]))
-                        $fullname .= ', ' . trim($response[$prefix.'_given'][$i]);
+                    if (!empty($response[$prefix.'_given'][$i])) {
+                        $fullname .= ', ' . trim($response[$prefix . '_given'][$i]);
+                    }
                     $persons[] = $fullname;
                 }
                 $response[$prefix] = implode('; ', $persons);
@@ -260,14 +261,14 @@ class BiblioService_GBV
             // take lowest for older books, highest (hopefully isbn-13) for newer
             $response['isbn'] = array_key_exists('publication_date', $response)
                 && $response['publication_date'] < 2007
-                ? $isbns[0] : $isbns[sizeof($isbns) - 1];
+                ? $isbns[0] : $isbns[count($isbns) - 1];
         }
         if (array_key_exists('isbn', $response))
             $response['isbn'] = BiblioService::normalizeIsbn($response['isbn']);
         if (array_key_exists('binding', $response) && is_array($response['binding'])) {
-            $count_before = sizeof($response['binding']);
+            $count_before = count($response['binding']);
             $response['binding'] = array_unique($response['binding']);
-            if (sizeof($response['binding']) != $count_before
+            if (count($response['binding']) != $count_before
                 && array_key_exists('listprice', $response) && is_array($response['listprice'])) {
                 $response['listprice'] = array_unique($response['listprice']);
             }

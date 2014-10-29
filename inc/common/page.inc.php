@@ -6,7 +6,7 @@
  *
  * (c) 2009-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-07-21 dbu
+ * Version: 2014-10-29 dbu
  *
  * Changes:
  *
@@ -324,6 +324,28 @@ class Page
     $this->setParameters();
   } // init
 
+  function findUserById ($id, $additional_fields = array()) {
+    if (empty($id)) {
+      // immediately return on empty $id
+      return;
+    }
+
+    $dbconn = isset($this->dbconn) ? $this->dbconn : new DB();
+
+    if (!empty(self::$USER_TABLE_ADDITIONAL)) {
+      $additional_fields = array_merge(self::$USER_TABLE_ADDITIONAL, $additional_fields);
+    }
+
+    $querystr = sprintf("SELECT id, firstname, lastname, email, privs%s FROM User WHERE id=%d",
+                        !empty($additional_fields) ? ', ' . join(', ', $additional_fields) : '',
+                        intval($id));
+    $dbconn->query($querystr);
+    if ($dbconn->next_record()) {
+      return $dbconn->Record;
+    }
+  }
+
+
   function processLoginAuthLocal () {
     global $RIGHTS_EDITOR;
 
@@ -443,11 +465,13 @@ class Page
     }
 
     $val = $_REQUEST[$key];
-    if ($this->STRIP_SLASHES)
+    if ($this->STRIP_SLASHES) {
       $val = is_array($val) ? array_map('stripslashes', $val) : stripslashes($val);
+    }
 
-    if ($persist_session)
+    if ($persist_session) {
       $this->setSessionValue($key, $val);
+    }
 
     return $val;
   }
@@ -456,8 +480,9 @@ class Page
     static $PREPEND = '_';
 
     $key = $thispage_only ? $PREPEND . $this->name : $PREPEND . $name;
-    if (!isset($_SESSION[$key]))
+    if (!isset($_SESSION[$key])) {
       return;
+    }
 
     return $thispage_only
       ? (isset($_SESSION[$key][$name]) ? $_SESSION[$key][$name] : NULL)
@@ -469,22 +494,27 @@ class Page
 
     $key = $thispage_only ? $PREPEND . $this->name : $PREPEND . $name;
 
-    if ($this->use_session_register && !session_is_registered($key))
+    if ($this->use_session_register && !session_is_registered($key)) {
       session_register($key);
+    }
 
-    if ($thispage_only)
+    if ($thispage_only) {
       $_SESSION[$key][$name] = $value;
-    else
+    }
+    else {
       $_SESSION[$key] = $value;
+    }
 
     return $value;
   }
 
   function passwordValid ($pwd, $pwd_confirm) {
-    if (strlen($pwd) < 6)
+    if (strlen($pwd) < 6) {
       return -1;
-    if ($pwd != $pwd_confirm)
+    }
+    if ($pwd != $pwd_confirm) {
       return -2;
+    }
     return 1;
   }
 
@@ -496,7 +526,7 @@ class Page
       $salt = md5(uniqid(rand()));     // generate a salt
       if (CRYPT_PWD == 2 || CRYPT_PWD == 12) {
         $salt = CRYPT_PWD == 12
-          ? '$1$'.substr($salt, 0, 8).'$' // MD5 encryption with a twelve character salt starting with $1$
+          ? '$1$' . substr($salt, 0, 8) . '$' // MD5 encryption with a twelve character salt starting with $1$
           : substr($salt, 0, 2);          // Standard DES encryption with a 2-char SALT
 
         $pwd_crypted = crypt($pwd_plain, $salt);
@@ -509,24 +539,25 @@ class Page
   }
 
   function passwordCheck ($pwd_plain, $pwd_encoded) {
-    if (!isset($pwd_encoded))
+    if (!isset($pwd_encoded)) {
       return 0;
+    }
 
     if (defined('CRYPT_PWD') && CRYPT_PWD > 0) {
       $salt = substr($pwd_encoded, 0, CRYPT_PWD);
       return crypt($pwd_plain, $salt) == $pwd_encoded;
     }
-    else
-      return $pwd_plain == $pwd_encoded; // no encryption
 
+    return $pwd_plain == $pwd_encoded; // no encryption
   }
 
   function buildPageTitle ($name) {
     $title = $name;
 
     if (isset($this->site_description) && isset($this->site_description['structure'])) {
-      if (isset($this->site_description['structure'][$name]['title']))
+      if (isset($this->site_description['structure'][$name]['title'])) {
         $title = tr($this->site_description['structure'][$name]['title']);
+      }
     }
 
     return $title;
@@ -556,8 +587,9 @@ class Page
   function display () {
     if (isset($this->renderer)) {
       $res = $this->renderer->show();
-      if (FALSE === $res)
+      if (FALSE === $res) {
         $this->redirect();
+      }
     }
     else
       echo 'no renderer set';
@@ -597,22 +629,27 @@ class Page
               $rewrite = $URL_REWRITE[$val];
               if (preg_match('/^http(s?)\:/', $rewrite))
                 $base = '';
-            } else {
+            }
+            else {
               $rewrite = $val;
-              if (isset($URL_REWRITE['host']))
-                $base = $URL_REWRITE['host'].'/';
+              if (isset($URL_REWRITE['host'])){
+                $base = $URL_REWRITE['host'] . '/';
+              }
               if ('array' == gettype($URL_REWRITE[$val])) {
                 foreach (array('prepend', 'append') as $mode) {
                   if (isset($URL_REWRITE[$val][$mode])) {
                     $keys = $URL_REWRITE[$val][$mode];
-                    if ('array' != gettype($keys))
+                    if ('array' != gettype($keys)) {
                       $keys = array($keys);
+                    }
                     foreach ($keys as $name) {
                       if (isset($options[$name])) {
-                        if ('prepend' == $mode)
+                        if ('prepend' == $mode) {
                           $prepend[] = rawurlencode($options[$name]);
-                        else
+                        }
+                        else {
                           $append[] = rawurlencode($options[$name]);
+                        }
                         $skip[$name] = TRUE;
                       }
                     }
@@ -622,8 +659,8 @@ class Page
             }
           }
           else if (!isset($skip[$key])) {
-            $optstring = ($optstring == '' ? '' : $optstring.'&')
-                       .$key.'='.rawurlencode($val);
+            $optstring = ($optstring == '' ? '' : $optstring . '&')
+                       . $key . '=' . rawurlencode($val);
           }
         }
 
@@ -636,22 +673,27 @@ class Page
         $separator = !empty($opstring) ? '&' : '';
       }
       return $base
-      .($rewrite != '.' ? $rewrite.$separator : '')
-      .(count($prepend) > 0 ? implode('/', $prepend).(!empty($optstring) ? '/' : '') : '')
-      .($rewrite == '.' && !empty($optstring) ? '?' : '')
-      .$optstring
-      .(count($append) > 0 ? (count($prepend) > 0 || !empty($optstring) ? '/' : '')
-          . implode('/', $append) : '')
-      .$anchor;
+        . ($rewrite != '.' ? $rewrite.$separator : '')
+        . (count($prepend) > 0 ? implode('/', $prepend).(!empty($optstring) ? '/' : '') : '')
+        . ($rewrite == '.' && !empty($optstring) ? '?' : '')
+        . $optstring
+        . (count($append) > 0
+           ? (count($prepend) > 0 || !empty($optstring) ? '/'
+              : '') . implode('/', $append)
+           : '')
+        . $anchor;
     }
 
-    return $this->PHP_SELF.($optstring != '' ? '?'.$optstring : '').$anchor;
+    return $this->PHP_SELF
+        . ($optstring != '' ? '?' . $optstring : '')
+        . $anchor;
   } // buildLink()
 
   function buildLinkFull ($options = '') {
     $prot = $this->SERVER_PORT == '443' ? 'https' : 'http';
-    return $prot.'://'.$this->SERVER_NAME.($this->SERVER_PORT != '80' ? ':'.$this->SERVER_PORT : '')
-             .$this->buildLink($options);
+    return $prot . '://' . $this->SERVER_NAME
+         . ($this->SERVER_PORT != '80' ? ':' . $this->SERVER_PORT : '')
+         . $this->buildLink($options);
   }
 
   //------------------------------------------------------------
@@ -677,8 +719,9 @@ EOT;
     }
 
     session_write_close(); // might not really be needed
-    if (!headers_sent())
+    if (!headers_sent()) {
       header('Location: ' .$url);
+    }
 
     echo <<<EOT
   <html>

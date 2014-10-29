@@ -6,7 +6,7 @@
  *
  * (c) 2007-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-08-25 dbu
+ * Version: 2014-10-29 dbu
  *
  * Changes:
  *
@@ -16,7 +16,7 @@ require_once INC_PATH . 'common/tablemanager.inc.php';
 require_once INC_PATH . 'common/image_upload_handler.inc.php';
 
 // small helper function
-function array_merge_at ($array1, $array2, $after_field=NULL) {
+function array_merge_at ($array1, $array2, $after_field = NULL) {
   if (empty($after_field)) {
     return array_merge($array1, $array2);
   }
@@ -365,10 +365,13 @@ class MessageRecord extends TablemanagerRecord
           $this->set_value('user_id', $dbconn->Record['user_id']);
           // $this->set_value('user_email', $dbconn->Record['user_email']);
           // $this->set_value('user_institution', $dbconn->Record['user_institution']);
-          if (!empty($dbconn->Record['user_name']))
+          if (!empty($dbconn->Record['user_name'])) {
             $this->set_value('user', $dbconn->Record['user_name']);
-          else if (isset($dbconn->Record['lastname']))
-            $this->set_value('user', $dbconn->Record['lastname'] . ' ' . $dbconn->Record['firstname']);
+          }
+          else if (isset($dbconn->Record['lastname'])) {
+            $this->set_value('user',
+                             $dbconn->Record['lastname'] . ' ' . $dbconn->Record['firstname']);
+          }
 
           $first = FALSE;
         }
@@ -508,7 +511,7 @@ class DisplayMessage extends DisplayBackend
         new Field(array('name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()')),
         new Field(array('name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => TRUE)),
         new Field(array('name' => 'published', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
-        new Field(array('name' => 'subject', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80)),
+        new Field(array('name' => 'subject', 'id' => 'subject', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80)),
         new Field(array('name' => 'user', 'type' => 'text', 'nodbfield' => TRUE, 'null' => TRUE)),
         new Field(array('name' => 'user_id', 'type' => 'int', 'nodbfield' => TRUE, 'null' => TRUE)),
         new Field(array('name' => 'users', 'type' => 'select', 'multiple' => TRUE, 'nodbfield' => TRUE, 'null' => TRUE)),
