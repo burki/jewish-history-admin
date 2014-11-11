@@ -6,7 +6,7 @@
  *
  * (c) 2007-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-07-29 dbu
+ * Version: 2014-11-11 dbu
  *
  * Changes:
  *
@@ -330,12 +330,14 @@ EOT;
     global $TYPE_PUBLICATION;
 
     $images = array(
-          'cover' => array(
-                        'title' => tr('Digitized Media'),
-                        'multiple' => FALSE,
+          'source' => array(
+                        'title' => tr('Digitized Media / Transcript'),
+                        'multiple' => TRUE,
                         'imgparams' => array('height' => 164,
                                              'scale' => 'down', 'keep' => 'large',
+                                             'title' => 'File',
                                              'pdf' => TRUE,
+                                             'office' => TRUE,
                                              ),
                         ));
 
@@ -522,7 +524,7 @@ EOT;
       // $ret .= '<tt><pre>' . $this->buildLiteraturTemplate() . '</tt></pre>';
 
       if (isset($uploadHandler)) {
-        $ret .= $this->renderUpload($uploadHandler);
+        $ret .= $this->renderUpload($uploadHandler, 'File Upload');
       }
 
     }

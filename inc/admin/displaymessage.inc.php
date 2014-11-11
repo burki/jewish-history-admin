@@ -166,7 +166,7 @@ class DisplayBackend extends DisplayTable
     $field = $upload_form->field($name);
     if (isset($field)) {
       if (isset($this->invalid[$name])) {
-        $ret =  '<div class="error">'
+        $ret = '<div class="error">'
              . $this->form->error_fulltext($this->invalid[$name], $this->page->lang)
              . '</div>';
       }

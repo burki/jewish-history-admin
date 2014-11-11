@@ -178,6 +178,7 @@ $GETTEXT_MESSAGES = array (
 'Image Caption' => 'Bildunterschrift',
 'Preview Image' => 'Vorschaubild',
 'Digitized Media' => 'Digitalisat',
+'Digitized Media / Transcript' => 'Digitalisat / Transkription',
 'Copyright-Notice' => 'Urheberrechtsnachweis',
 'Reviews' => 'Rezensionen',
 'Reviewers' => 'Rezensenten',
