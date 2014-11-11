@@ -40,7 +40,7 @@ class ImageUploadHandler
   }
 
   // recursively create the directory
-  static function checkDirectory ($dir, $create = TRUE, $mode=0755) {
+  static function checkDirectory ($dir, $create = TRUE, $mode = 0755) {
     if (file_exists($dir)) {
       return filetype($dir) == 'dir';  // check if it is a directory
     }

@@ -67,16 +67,18 @@
           $height_physical = $size[1];
         }
       }
-      if (!isset($height_physical)) // TODO: make the code run anyway
+      if (!isset($height_physical)) {
+        // TODO: make the code run anyway
         return;
+      }
 
       $sizes = array();
 
       $sizes['width_physical'] = $width_physical;
       $sizes['height_physical'] = $height_physical;
 
-      $width     = $this->get('width');
-      $height    = $this->get('height');
+      $width = $this->get('width');
+      $height = $this->get('height');
       $max_width = $this->get('max_width');
       $max_height = $this->get('max_height');
 
@@ -135,8 +137,9 @@
       if (isset($upload_fileroot)) {
         // find that baby
         $fname = $this->get('filename');
-        if (!isset($fname))
+        if (!isset($fname)) {
           $fname = $this->name();
+        }
 
         $extensions = $this->extensions;
         $found = 0;
@@ -157,11 +160,12 @@
           // couldn't determine size
           $img_data = array();
         }
-        $img_data['mime']  = $mime;
-        $img_data['fname'] = $upload_fileroot.$fname;
-        $img_data['url']   = $this->params['upload_urlroot'].$fname;
+        $img_data['mime'] = $mime;
+        $img_data['fname'] = $upload_fileroot . $fname;
+        $img_data['url'] = $this->params['upload_urlroot'] . $fname;
 
         $images[] = $img_data;
+
         return $images;
       }
     }
@@ -313,7 +317,7 @@
       }
     }
 
-    function process_image ($image, $orig_name, $tmp_name, $size, $type, $args='') {
+    function process_image ($image, $orig_name, $tmp_name, $size, $type, $args = '') {
       $new_name = $image->get('filename');
       if (!isset($new_name)) {
         $new_name = $image->name();
@@ -430,8 +434,9 @@
 
         return array('status' => 1, 'msg' => 'File uploaded', 'mime' => $type, 'width' => $sizes['width'], 'height' => $sizes['height']);
       }
-      else
+      else {
         return array('status' => -4, 'msg' => "Couldn't copy file to new location");
+      }
     }
 
     // isn't used yet in the library
@@ -477,6 +482,11 @@
         // IE sends 'image/pjpeg'
         $type = 'image/jpeg';
       }
+      else if ($type == 'text/pdf') {
+        // both are in use
+        $type = 'application/pdf';
+      }
+
       $path2magick = $this->params['imagemagick'];
 
       if (isset($path2magick) && isset($this->MAGICK_BINARIES['identify'])) {
