@@ -65,6 +65,14 @@ class DisplayCommunication extends DisplayTable
         $this->defaults['message_id'] = intval($_GET['id_review']);
       }
 
+      if (array_key_exists('id_reviewer', $_GET) && intval($_GET['id_reviewer']) > 0) {
+        $reviewer = $this->fetchUser(intval($_GET['id_reviewer']));
+        if (isset($reviewer)) {
+          $this->defaults['reviewer_email'] = $reviewer['email'];
+          $this->defaults['reviewer_id'] = $reviewer['id'];
+        }
+      }
+
       // set the publications for bibinfo and publication_request
       $publications = array();
       if (array_key_exists('id_publication', $_GET) && preg_match('/\d/', $_GET['id_publication'])) {
@@ -246,6 +254,7 @@ class DisplayCommunication extends DisplayTable
 
   private function replacePlaceholder ($matches) {
     $ret = '';
+
     switch ($matches[1]) {
       case 'name_from':
       case 'email_from':
@@ -294,16 +303,18 @@ class DisplayCommunication extends DisplayTable
             foreach ($this->publications as $id) {
               if (intval($id) > 0) {
                 $citation = $biblio_client->buildCitation(intval($id));
-                if (isset($citation))
-                  $ret = (!empty($ret) ? $ret . "\n\n" : '') . $citation;
+                if (isset($citation)) {
+                  $ret = (!empty($ret) ? $ret . "\n\n" : '')
+                       . $citation;
+                }
               }
             }
           }
           break;
 
       case 'reviewer_info':
-          if (isset($this->defaults['to_id'])) {
-            $user = $this->fetchUser($this->defaults['to_id']);
+          if (isset($this->defaults['reviewer_id'])) {
+            $user = $this->fetchUser($this->defaults['reviewer_id']);
           }
           if (isset($user)) {
             $ret = (!empty($user['firstname']) ? $user['firstname'].' ' : '')

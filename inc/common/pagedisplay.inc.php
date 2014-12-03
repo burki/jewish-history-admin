@@ -436,7 +436,9 @@ class PageDisplayBase
                   $cmd = UPLOAD_PATH2MAGICK . 'convert '
                     . '-geometry ' . escapeshellarg($geometry) . ' '
                     . ('image/jpeg' == $mime_type ? '+profile "*" -colorspace RGB ' : '')
-                    . escapeshellarg($fname_full).' '.escapeshellarg($fname_scaled_full);
+                    . escapeshellarg($fname_full)
+                    . ' '
+                    . escapeshellarg($fname_scaled_full);
                   // echo($cmd);
                   $ret = exec($cmd, $lines, $retval);
                 }

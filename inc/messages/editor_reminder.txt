@@ -1,0 +1,20 @@
+﻿%salutation_name_de%,
+
+leider ist die Zeit wieder viel zu schnell vergangen, sodass der vereinbarte Termin, zu dem Sie uns Ihren Überblicksartikel für die Themenkategorie
+
+%title%
+
+zusenden wollten, der %reviewer_deadline%, verstrichen ist.
+
+Wir bitten Sie daher um eine kurze Rückmeldung, wann wir mit dem Eingang Ihres Beitrags rechnen können. Auch wenn sich größere Terminprobleme bei Ihnen abzeichnen sollten, geben Sie uns bitte Bescheid. Für Rückfragen stehe wir Ihnen jederzeit gerne zur Verfügung.
+
+
+Mit besten Grüßen
+
+%name_from%
+
+--
+Institut für die Geschichte der deutschen Juden
+Beim Schlump 83, 20144 Hamburg
+E-Mail: %email_from%
+Tel.: %phone_from%

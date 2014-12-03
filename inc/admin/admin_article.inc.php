@@ -286,7 +286,14 @@ class DisplayArticle extends DisplayMessage
           id_review: form.elements['id'].value,
           title: form.elements['subject'].value
         };
-        if ('publisher_request' != mode) {
+        if ('publisher_request' == mode) {
+          params.id_reviewer = form.elements['user_id'].value;
+          if ('' == params.id_reviewer) {
+            alert('Please set a Contributor first');
+            return;
+          }
+        }
+        else {
           params.id_to = form.elements['user_id'].value;
           if ('' == params.id_to) {
             alert('Please set a Contributor first');
