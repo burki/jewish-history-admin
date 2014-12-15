@@ -5,16 +5,16 @@ das Institut für die Geschichte der deutschen Juden in Hamburg realisiert zurze
 Am Beispiel von rund 150 Quellen sollen thematische Schlaglichter auf zentrale Aspekte der lokalen, regionalen sowie der allgemeinen deutsch-jüdischen Geschichte geworfen werden. In einer ersten Projektphase, die zum 50-jährigen Instituts-Jubiläum im Jahr 2016 abgeschlossen sein wird, liegt der Fokus zunächst auf dem Hamburger Raum.
 Interpretations- und Hintergrundtexte werden die Quellen in ihre historischen Kontexte einbetten sowie durch Informationen zur Überlieferung, zur Rezeptionsgeschichte und zu wissenschaftlichen Kontroversen anreichern. Die Quellenedition wird zweisprachig sein (deutsch/englisch) und richtet sich vornehmlich an Studierende und Forschende, aber auch an Schulen und ein allgemeines, interessiertes Publikum.
 
-Eine/r unsere/r Autor/innen, %reviewer_info%, hat einen Beitrag zu einer Quelle aus Ihren Beständen verfasst, nämlich zu %title%. Die Idee ist, auf der späteren Website sowohl den Interpretationstext als auch die Quelle, bzw. einen Auszug des Dokuments (1-2 Seiten) als Digitalisat bereitzustellen.
+Eine/r unsere/r Autor/innen, %reviewer_info%, hat einen Beitrag zu einer Quelle aus Ihren Beständen verfasst, nämlich zu %title%. Die Idee ist, auf der späteren Website sowohl den Interpretationstext als auch die Quelle und zwar sowohl als Transkript als auch als Faksimile zum Download bereitzustellen.
 
 Wir möchten Sie hiermit höflich bitten, uns die Rechte für eine dauerhafte Nutzung des o.g. Digitalisats im Rahmen der Online-Quellenedition „Schlüsseldokumente zur deutsch-jüdischen Geschichte von der frühen Neuzeit bis in die Gegenwart“ zu gewähren. Sofern Sie einverstanden sein sollten, würden wir Ihnen eine entsprechende Erklärung zukommen lassen.
 Selbstverständlich wird Ihre Institution deutlich erkennbar als Rechteinhaberin aufgeführt.
 
-Sollte eine Nutzung möglich sein, würden wir uns über die Bereitstellung der entsprechenden Quelle als hoch auflösender Scan (tiff oder jpeg, Textdokumente: mind. 300 dpi, Bilder: 1200 dpi) freuen, sofern Sie dies wünschen, übernehmen wir selbstverständlich die Digitalisierung.
+Sollte eine Nutzung möglich sein, würden wir uns über die Bereitstellung der entsprechenden Quelle als hoch auflösender Scan (tif oder jpg, Textdokumente: mind. 300 dpi, Bilder: 1200 dpi) freuen, sofern Sie dies wünschen, übernehmen wir selbstverständlich die Digitalisierung.
 
 Sollten Sie weitere Informationen benötigen, stehen wir Ihnen sehr gerne für Rückfragen zur Verfügung. Bereits jetzt möchten wir Ihnen herzlich danken.
 
-Mit besten Grüßen
+Beste Grüße,
 
 
 %name_from%
