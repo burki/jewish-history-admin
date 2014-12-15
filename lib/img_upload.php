@@ -191,7 +191,8 @@
     var $params;
     var $images;
     var $max_file_size;
-    var $extensions = array('image/gif' => '.gif', 'image/jpeg' => '.jpg', 'image/png' => '.png',
+    var $extensions = array(
+                            'image/gif' => '.gif', 'image/jpeg' => '.jpg', 'image/png' => '.png',
                             'application/pdf' => '.pdf',
                             'text/rtf' => '.rtf',
                             'application/vnd.oasis.opendocument.text' => '.odt',
@@ -199,6 +200,7 @@
                             'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => '.docx',
                             );
     var $translate = array('image/tiff' => 'image/jpeg');
+    var $translate_extensions = array('image/tiff' => '.tif');
 
     function __construct ($params) {
       $this->params = $params;
@@ -207,8 +209,9 @@
         $this->max_file_size = $params['max_file_size'];
       }
 
-      if (get_cfg_var('upload_max_filesize')) {
-        $max_file_size = get_cfg_var('upload_max_filesize');
+      $upload_max_filesize = ini_get('upload_max_filesize');
+      if (!empty($upload_max_filesize)) {
+        $max_file_size = $upload_max_filesize;
         // hack to make this work with settings like 2M
         if (preg_match('/(\d+)M/', $max_file_size, $matches)) {
           $max_file_size = $matches[1] * 1000000;
@@ -323,15 +326,15 @@
         $new_name = $image->name();
       }
 
-      $scale = (gettype($args) == 'array' && isset($args['scale']))
+      $scale = (is_array($args) && isset($args['scale']))
              ? $args['scale'] : $image->get('scale');
 
-      $keep  = (gettype($args) == 'array' && isset($args['keep']))
+      $keep  = (is_array($args) && isset($args['keep']))
              ? $args['keep'] : $image->get('keep');
 
       $upload_fileroot = is_array($args) && isset($args['upload_fileroot'])
                        ? $args['upload_fileroot'] : $this->params['upload_fileroot'];
-      $new_name = $upload_fileroot.$new_name;
+      $new_name = $upload_fileroot . $new_name;
       if (!$this->check_directory(dirname($new_name))) {
         return array('status' => -3, 'msg' => "Directory " . dirname($new_name) . " doesn't exist");
       }
@@ -341,6 +344,7 @@
         $ret = move_uploaded_file($tmp_name, $filename);
       }
       else if (isset($this->translate[$type])) {
+        $type_orig = $type;
         $filename = $new_name . $this->extensions[$this->translate[$type]];
         $path2magick = $this->params['imagemagick'];
         if (isset($path2magick) && isset($this->MAGICK_BINARIES['convert'])) {
@@ -352,6 +356,11 @@
             $ret = TRUE;
           }
         }
+
+        if (is_array($args) && isset($args['keep_orig']) && $args['keep_orig']) {
+          move_uploaded_file($tmp_name, $new_name . $this->translate_extensions[$type_orig]);
+        }
+
       }
 
       if ($ret) {
