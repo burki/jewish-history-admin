@@ -442,6 +442,7 @@ class PageDisplayBase
                   // echo($cmd);
                   $ret = exec($cmd, $lines, $retval);
                 }
+
                 if (file_exists($fname_scaled_full)) {
                   list($width, $height, $type, $attr) = @getimagesize($fname_scaled_full);
 

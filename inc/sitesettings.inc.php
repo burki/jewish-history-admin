@@ -104,7 +104,7 @@ function compute_bytes ($val) {
 
 if (!defined('UPLOAD_MAX_FILE_SIZE')) {
     define('UPLOAD_MAX_FILE_SIZE',
-           compute_bytes(get_cfg_var('upload_max_filesize')));
+           compute_bytes(ini_get('upload_max_filesize')));
 }
 
 $MEDIA_EXTENSIONS = array('image/gif' => '.gif', 'image/jpeg' => '.jpg', 'image/png' => '.png',

@@ -165,7 +165,24 @@ class SystemInformationDisplay extends PageDisplay
     */
 
     $ret .= '<h2>Upload Settings</h2>';
-    $ret .= $this->buildVariableDisplay(array('MAX_FILE_SIZE' => self::human_filesize(UPLOAD_MAX_FILE_SIZE)));
+    $ret .= $this->buildVariableDisplay(
+                array(
+                      'MAX_FILE_SIZE' => self::human_filesize(UPLOAD_MAX_FILE_SIZE),
+                      'UPLOAD_FILEROOT' => UPLOAD_FILEROOT,
+                )
+            );
+
+    if (defined('UPLOAD_PATH2MAGICK')) {
+      $success = self::checkExecutable($cmd =
+                                       UPLOAD_PATH2MAGICK
+                                       . 'convert'
+                                       . (self::isWindows() ? '.exe' : ''));
+      $ret .= '<p>' . $this->buildSuccessFail($success) . ' ' . $this->htmlSpecialchars($cmd) . '</p>';
+    }
+    else {
+      $ret .= '<p>' . $this->buildSuccessFail(false)
+            . ' ' . $this->htmlSpecialchars('UPLOAD_PATH2MAGICK not set') . '</p>';
+    }
 
 
     /*
