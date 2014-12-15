@@ -563,6 +563,7 @@ EOT;
                                              'title' => 'File',
                                              'pdf' => TRUE,
                                              'office' => TRUE,
+                                             'audio' => TRUE,
                                              ),
                         'labels' => array(
                                           'source' => 'Source',

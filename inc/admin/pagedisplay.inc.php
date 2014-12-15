@@ -239,6 +239,16 @@ EOT;
                            htmlspecialchars($img_url),
                            $this->formatText(empty($caption) ? 'Office-Datei' : $caption));
       }
+      else if (in_array($img['mimetype'], array(
+                                                'audio/mpeg',
+                                                )))
+      {
+        $img_tag = sprintf('<audio src="%s" preload="none" controls></audio>',
+                           htmlspecialchars($img_url));
+        $img_tag .= sprintf('<br /><a href="%s" target="_blank">%s</a>',
+                           htmlspecialchars($img_url),
+                           $this->formatText(empty($caption) ? 'Audio' : $caption));
+      }
       else if ('application/pdf' == $img['mimetype']) {
         if (!$append_uid) {
           $img_tag = $this->buildPdfViewer($img_url, empty($caption) ? 'PDF' : $caption,

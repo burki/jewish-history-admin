@@ -5,7 +5,7 @@
   *
   * Author  : Daniel Burckhardt, daniel.burckhardt@sur-gmbh.ch
   *
-  * Version : 2014-10-29 dbu
+  * Version : 2014-12-15 dbu
   *
   * interfaces still not completely finalized,
   * but much better than just plain copy/paste
@@ -258,6 +258,10 @@ class ImageUploadHandler
           $img->extensions['application/vnd.oasis.opendocument.text'] = '.odt';
           $img->extensions['application/msword'] = '.doc';
           $img->extensions['application/vnd.openxmlformats-officedocument.wordprocessingml.document'] = '.docx';
+        }
+
+        if (isset($images[$img_name]['imgparams']['audio']) && $images[$img_name]['imgparams']['audio']) {
+          $img->extensions['audio/mpeg'] = '.mp3';
         }
 
         $imgdata = isset($img) ? $img->find_imgdata() : array();

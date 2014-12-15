@@ -193,12 +193,17 @@
     var $max_file_size;
     var $extensions = array(
                             'image/gif' => '.gif', 'image/jpeg' => '.jpg', 'image/png' => '.png',
+
                             'application/pdf' => '.pdf',
+
                             'text/rtf' => '.rtf',
                             'application/vnd.oasis.opendocument.text' => '.odt',
                             'application/msword' => '.doc',
                             'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => '.docx',
+
+                            'audio/mpeg' => '.mp3',
                             );
+
     var $translate = array('image/tiff' => 'image/jpeg');
     var $translate_extensions = array('image/tiff' => '.tif');
 
@@ -496,27 +501,9 @@
         $type = 'application/pdf';
       }
 
-      $path2magick = $this->params['imagemagick'];
+      $found = false;
 
-      if (isset($path2magick) && isset($this->MAGICK_BINARIES['identify'])) {
-        $cmd = $path2magick . $this->MAGICK_BINARIES['identify']
-             . ' -format "%m %wx%h" '
-             . escapeshellarg($filename)  . '[0]'; // use only first page, important for long pdfs;
-
-        unset($lines);
-        $ret = exec($cmd, $lines, $retval);
-        if ($retval == 0 && count($lines) > 0) {
-          if (preg_match('/^(\w+)\s([0-9]+)x([0-9]+)/', $lines[0], $matches)) {
-            // die($lines[0]." w: $matches[2] h: $matches[3] type: $matches[1]");
-            if (isset($this->MAGICK_MIME[$matches[1]])) {
-              $type = $this->MAGICK_MIME[$matches[1]];
-            }
-          }
-        }
-        else
-          unset($type);
-      }
-      else if (function_exists('finfo_open')) {
+      if (function_exists('finfo_open')) {
         $finfo = finfo_open(FILEINFO_MIME,
                             defined('FILEINFO_MAGICFILE') ? FILEINFO_MAGICFILE : NULL); // return mime type ala mimetype extension
         if ($finfo) {
@@ -530,16 +517,34 @@
           finfo_close($finfo);
           if (FALSE !== $res) {
             $type = $res;
+            $found = true;
           }
         }
       }
-      /* else {
-        require_once 'MIME/Type.php';
-        $res = MIME_Type::autoDetect($filename); // Silence Strict standards: Non-static method MIME_Type::autoDetect() should not be called statically
-        if (!@PEAR::isError($res)) {
-          $type = $res;
+
+      if (!$found) {
+        $path2magick = $this->params['imagemagick'];
+
+        if (isset($path2magick) && isset($this->MAGICK_BINARIES['identify'])) {
+          $cmd = $path2magick . $this->MAGICK_BINARIES['identify']
+               . ' -format "%m %wx%h" '
+               . escapeshellarg($filename)  . '[0]'; // use only first page, important for long pdfs;
+
+          unset($lines);
+          $ret = exec($cmd, $lines, $retval);
+          if ($retval == 0 && count($lines) > 0) {
+            if (preg_match('/^(\w+)\s([0-9]+)x([0-9]+)/', $lines[0], $matches)) {
+              // die($lines[0]." w: $matches[2] h: $matches[3] type: $matches[1]");
+              if (isset($this->MAGICK_MIME[$matches[1]])) {
+                $type = $this->MAGICK_MIME[$matches[1]];
+              }
+            }
+          }
+          else
+            unset($type);
         }
-      }*/
+      }
+
       return isset($type) ? $type : NULL;
     }
 

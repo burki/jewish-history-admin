@@ -107,12 +107,16 @@ if (!defined('UPLOAD_MAX_FILE_SIZE')) {
            compute_bytes(ini_get('upload_max_filesize')));
 }
 
-$MEDIA_EXTENSIONS = array('image/gif' => '.gif', 'image/jpeg' => '.jpg', 'image/png' => '.png',
+$MEDIA_EXTENSIONS = array(
+                          'image/gif' => '.gif', 'image/jpeg' => '.jpg', 'image/png' => '.png',
+
                           'application/pdf' => '.pdf',
                           'text/rtf' => '.rtf',
                           'application/vnd.oasis.opendocument.text' => '.odt',
                           'application/msword' => '.doc',
                           'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => '.docx',
+
+                          'audio/mpeg' => '.mp3',
                           );
 
 $STATUS_REMOVED = '-1';

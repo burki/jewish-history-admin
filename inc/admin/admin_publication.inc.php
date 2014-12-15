@@ -340,6 +340,7 @@ EOT;
                                              'title' => 'File',
                                              'pdf' => TRUE,
                                              'office' => TRUE,
+                                             'audio' => TRUE,
                                              ),
                         ));
 
