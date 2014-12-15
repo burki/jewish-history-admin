@@ -89,11 +89,12 @@ $SITE_DESCRIPTION = array(
             'title' => 'Account',
             'anonymous' => FALSE,
         ),
-        /*
-        'convert' => array(
-            'title' => 'Convert Quotes',
-            'anonymous' => TRUE,
+        'system_information' => array(
+            'title' => 'System Information',
+            'anonymous' => FALSE,
+            'display' => FALSE,
         ),
+        /*
         'feed' => array(
             'title' => 'Feed Tagging',
             'anonymous' => FALSE,

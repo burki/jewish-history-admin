@@ -83,6 +83,30 @@ $MAIL_SETTINGS = array(
   'subject_prepend'      => 'Key-Documents of German-Jewish History - ',
 );
 
+function compute_bytes ($val) {
+    if (empty($val)) {
+      return 0;
+    }
+    $val = trim($val);
+    $last = strtolower($val[strlen($val)-1]);
+    switch ($last) {
+      // The 'G' modifier is available since PHP 5.1.0
+      case 'g':
+          $val *= 1024;
+      case 'm':
+          $val *= 1024;
+      case 'k':
+          $val *= 1024;
+    }
+
+    return $val;
+}
+
+if (!defined('UPLOAD_MAX_FILE_SIZE')) {
+    define('UPLOAD_MAX_FILE_SIZE',
+           compute_bytes(get_cfg_var('upload_max_filesize')));
+}
+
 $MEDIA_EXTENSIONS = array('image/gif' => '.gif', 'image/jpeg' => '.jpg', 'image/png' => '.png',
                           'application/pdf' => '.pdf',
                           'text/rtf' => '.rtf',

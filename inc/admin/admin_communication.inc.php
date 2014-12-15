@@ -25,6 +25,7 @@ class DisplayCommunication extends DisplayTable
     'referee_request' => 40,
     'publisher_vouchercopy' => 50,
   );
+
   var $page_size = 30;
   var $table = 'Communication';
   var $fields_listing = array('id', 'to_email', 'subject', 'IFNULL(sent,changed)'); // , 'status');
