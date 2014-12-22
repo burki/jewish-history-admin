@@ -7,7 +7,7 @@
  *
  * (c) 2009-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-10-29 dbu
+ * Version: 2014-12-22 dbu
  *
  * Changes:
  *
@@ -16,6 +16,8 @@
 // General Settings
 define('STRIP_SLASHES', get_magic_quotes_gpc());
 define('SESSION_NAME', 'sid');
+
+date_default_timezone_set('Europe/Berlin');
 
 /* CRYPT_PWD stores the length of the salt for encryption which decides which method is used
    CRYPT_PWD = 0 means no encryption takes place */
@@ -55,7 +57,8 @@ $COUNTRIES_FEATURED = array('DE', 'AT', 'CH', 'UK', 'US', 'CA',
                             'AU', 'JP');
 
 $GLOBALS['THESAURI'] =
-    array('section' => 'Section',
+    array(
+          'section' => 'Section',
           'sourcetype' => 'Source Type',
           );
 

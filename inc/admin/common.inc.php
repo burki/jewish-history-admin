@@ -6,13 +6,13 @@
  *
  * (c) 2006-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-10-29 dbu
+ * Version: 2014-12-22 dbu
  *
  * Changes:
  *
  */
 
-require_once 'XML/Util.php';
+// require_once 'XML/Util.php';
 require_once INC_PATH . 'common/classes.inc.php';
 
 function send_mail ($msg) {

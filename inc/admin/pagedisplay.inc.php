@@ -6,7 +6,7 @@
  *
  * (c) 2006-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-10-29 dbu
+ * Version: 2014-12-22 dbu
  *
  * Changes:
  *
@@ -484,7 +484,7 @@ EOT;
         $this->page->site_description['structure']['root']['title'] = 'My Subscription';
       }
     }
-    $ret .= sprintf('<a href="%s"><img src="%s" style="vertical-align:text-bottom; border: 0;" width="582" height="160" alt="%s" /></a> ',
+    $ret .= sprintf('<a href="%s"><img src="%s" style="margin-left: 4px; vertical-align: text-bottom; border: 0;" width="515" height="106" alt="%s" /></a> ',
                     $url_main,
                     $this->page->BASE_PATH . 'media/logo.png',
                     $this->htmlSpecialchars(tr($SITE_DESCRIPTION['title'])));
