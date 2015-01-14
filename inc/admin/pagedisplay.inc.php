@@ -107,10 +107,11 @@ EOT;
         $querystr = sprintf("SELECT email FROM User WHERE id=%d", $changed_by);
         $dbconn = & $this->page->dbconn;
         $dbconn->query($querystr);
-        if ($dbconn->next_record())
+        if ($dbconn->next_record()) {
           $changed .= sprintf(' %s %s',
                               tr('by'),
                               $this->htmlSpecialChars($dbconn->Record['email']));
+        }
       }
       $changed = '<p>' . $changed . '</p>';
     }
@@ -122,8 +123,8 @@ EOT;
     global $MEDIA_EXTENSIONS, $UPLOAD_TRANSLATE;
 
     $folder = UPLOAD_FILEROOT.$UPLOAD_TRANSLATE[$type]
-              .sprintf(".%03d/id%05d/",
-                       intval($item_id / 32768), intval($item_id % 32768));
+            . sprintf('.%03d/id%05d/',
+                      intval($item_id / 32768), intval($item_id % 32768));
 
     return $folder . $name . $MEDIA_EXTENSIONS[$mime];
   }
@@ -131,12 +132,13 @@ EOT;
   function buildImgUrl ($item_id, $type, $name, $mime, $append_uid = FALSE) {
     global $MEDIA_EXTENSIONS, $UPLOAD_TRANSLATE;
     static $uid;
+
     if (empty($uid)) {
       $uid = uniqid();
     }
 
     $folder = UPLOAD_URLROOT.$UPLOAD_TRANSLATE[$type]
-            . sprintf(".%03d/id%05d/",
+            . sprintf('.%03d/id%05d/',
                       intval($item_id / 32768), intval($item_id % 32768));
 
     return $folder . $name . $MEDIA_EXTENSIONS[$mime]
@@ -157,7 +159,7 @@ EOT;
       $attrs['alt'] = '';
     }
     if ((array_key_exists('enlarge', $attrs) && $attrs['enlarge'])
-      || (!isset($attrs['width']) && !isset($attrs['height'])))
+        || (!isset($attrs['width']) && !isset($attrs['height'])))
     {
       $fname = preg_match('/^' . preg_quote(UPLOAD_URLROOT, '/') . '/', $relurl)
         ? preg_replace('/^' . preg_quote(UPLOAD_URLROOT, '/') . '/', UPLOAD_FILEROOT, $relurl)
@@ -195,17 +197,25 @@ EOT;
     if (isset($attrs['enlarge_only']) && (!empty($url_enlarge))) {
       $img_tag = $attrs['enlarge_only'];
     }
-    else if (isset($relurl))
-      $img_tag = '<img src="'.$relurl.'" '.$attrstr.'/>';
+    else if (isset($relurl)) {
+      $img_tag = '<img src="' . $relurl . '" ' . $attrstr . '/>';
+    }
 
     if (isset($attrs['caption']) && !empty($attrs['caption'])) {
       $img_tag .= $attrs['caption'];
     }
     if (!empty($url_enlarge)) {
-      $img_tag = '<a href="#' . (isset($attrs['anchor']) ? $attrs['anchor'] : '').'" onclick="'.$url_enlarge.'"'.(isset($attrs['anchor']) ? ' name="'.$attrs['anchor'].'"' : '') . '>' . $img_tag . '</a>';
+      $img_tag = '<a href="#'
+               . (isset($attrs['anchor']) ? $attrs['anchor'] : '')
+               . '" onclick="' . $url_enlarge . '"'
+               . (isset($attrs['anchor']) ? ' name="' . $attrs['anchor'] . '"' : '') . '>'
+               . $img_tag
+               . '</a>';
     }
     else if (isset($attrs['anchor'])) {
-      $img_tag = '<a name="' . $attrs['anchor'] . '">' . $img_tag . '</a>';
+      $img_tag = '<a name="' . $attrs['anchor'] . '">'
+               . $img_tag
+               . '</a>';
     }
     return $img_tag;
   }
@@ -357,10 +367,11 @@ EOT;
     $ret = '';
     $field = $upload_form->field($name);
     if (isset($field)) {
-      if (isset($this->invalid[$name]))
+      if (isset($this->invalid[$name])) {
         $ret = '<div class="error">'
              . $this->form->error_fulltext($this->invalid[$name], $this->page->lang)
              . '</div>';
+      }
 
       $ret .= $field->show($args);
     }
@@ -421,8 +432,9 @@ EOT;
         if (isset($img)) {
           $img_field = '';
           if ($max_images != 1) {
-            if ($count > 0)
+            if ($count > 0) {
               $rows[] = '<hr />';
+            }
             $img_field .= '<h4>' . $title . '</h4>';
           }
           ++$count;

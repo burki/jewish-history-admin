@@ -85,6 +85,10 @@ $SITE_DESCRIPTION = array(
             'title' => 'Wertelisten',
             'anonymous' => FALSE,
         ),
+        'convert' => array(
+            'title' => 'TEI nach HTML',
+            'anonymous' => FALSE,
+        ),
         'account' => array(
             'title' => 'Account',
             'anonymous' => FALSE,
