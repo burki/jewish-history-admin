@@ -5,7 +5,7 @@
   *
   * Author  : Daniel Burckhardt, daniel.burckhardt@sur-gmbh.ch
   *
-  * Version : 2014-12-15 dbu
+  * Version : 2015-01-21 dbu
   *
   * interfaces still not completely finalized,
   * but much better than just plain copy/paste
@@ -253,6 +253,10 @@ class ImageUploadHandler
           $img->extensions['application/pdf'] = '.pdf';
         }
 
+        if (isset($images[$img_name]['imgparams']['audio']) && $images[$img_name]['imgparams']['audio']) {
+          $img->extensions['audio/mpeg'] = '.mp3';
+        }
+
         if (isset($images[$img_name]['imgparams']['office']) && $images[$img_name]['imgparams']['office']) {
           $img->extensions['text/rtf'] = '.rtf';
           $img->extensions['application/vnd.oasis.opendocument.text'] = '.odt';
@@ -260,8 +264,8 @@ class ImageUploadHandler
           $img->extensions['application/vnd.openxmlformats-officedocument.wordprocessingml.document'] = '.docx';
         }
 
-        if (isset($images[$img_name]['imgparams']['audio']) && $images[$img_name]['imgparams']['audio']) {
-          $img->extensions['audio/mpeg'] = '.mp3';
+        if (isset($images[$img_name]['imgparams']['xml']) && $images[$img_name]['imgparams']['xml']) {
+          $img->extensions['application/xml'] = '.xml';
         }
 
         $imgdata = isset($img) ? $img->find_imgdata() : array();

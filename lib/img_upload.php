@@ -4,9 +4,9 @@
   *
   * Author  : Daniel Burckhardt, daniel.burckhardt@sur-gmbh.ch
   *
-  * (c) 2000-2014
+  * (c) 2000-2015
   *
-  * Version : 2014-10-29 dbu
+  * Version : 2015-01-21 dbu
   *
   * Changes :
   *           2008-05-26 dbu silence warnings
@@ -196,12 +196,14 @@
 
                             'application/pdf' => '.pdf',
 
+                            'audio/mpeg' => '.mp3',
+
                             'text/rtf' => '.rtf',
                             'application/vnd.oasis.opendocument.text' => '.odt',
                             'application/msword' => '.doc',
                             'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => '.docx',
 
-                            'audio/mpeg' => '.mp3',
+                            'application/xml' => '.xml',
                             );
 
     var $translate = array('image/tiff' => 'image/jpeg');

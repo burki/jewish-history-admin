@@ -4,9 +4,9 @@
  *
  * Base Display class for Admin-pages
  *
- * (c) 2006-2014 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-12-22 dbu
+ * Version: 2015-01-21 dbu
  *
  * Changes:
  *
@@ -248,6 +248,11 @@ EOT;
         $img_tag = sprintf('<a href="%s" target="_blank">%s</a>',
                            htmlspecialchars($img_url),
                            $this->formatText(empty($caption) ? 'Office-Datei' : $caption));
+      }
+      else if (in_array($img['mimetype'], array('application/xml'))) {
+        $img_tag = sprintf('<a href="%s" target="_blank">%s</a>',
+                           htmlspecialchars($img_url),
+                           $this->formatText(empty($caption) ? 'XML-Datei' : $caption));
       }
       else if (in_array($img['mimetype'], array(
                                                 'audio/mpeg',

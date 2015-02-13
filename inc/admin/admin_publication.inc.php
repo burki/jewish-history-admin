@@ -4,9 +4,9 @@
  *
  * Class for managing publications (sources)
  *
- * (c) 2007-2014 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-11-11 dbu
+ * Version: 2015-01-21 dbu
  *
  * Changes:
  *
@@ -339,8 +339,9 @@ EOT;
                                              'keep_orig' => TRUE,
                                              'title' => 'File',
                                              'pdf' => TRUE,
-                                             'office' => TRUE,
                                              'audio' => TRUE,
+                                             'office' => TRUE,
+                                             'xml' => TRUE,
                                              ),
                         ));
 

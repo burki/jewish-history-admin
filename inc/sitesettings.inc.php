@@ -114,12 +114,15 @@ $MEDIA_EXTENSIONS = array(
                           'image/gif' => '.gif', 'image/jpeg' => '.jpg', 'image/png' => '.png',
 
                           'application/pdf' => '.pdf',
+
+                          'audio/mpeg' => '.mp3',
+
                           'text/rtf' => '.rtf',
                           'application/vnd.oasis.opendocument.text' => '.odt',
                           'application/msword' => '.doc',
                           'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => '.docx',
 
-                          'audio/mpeg' => '.mp3',
+                          'application/xml' => '.xml',
                           );
 
 $STATUS_REMOVED = '-1';

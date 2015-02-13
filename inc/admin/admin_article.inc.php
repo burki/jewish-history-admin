@@ -562,8 +562,9 @@ EOT;
                                              'keep_orig' => TRUE,
                                              'title' => 'File',
                                              'pdf' => TRUE,
-                                             'office' => TRUE,
                                              'audio' => TRUE,
+                                             'office' => TRUE,
+                                             'xml' => TRUE,
                                              ),
                         'labels' => array(
                                           'source' => 'Source',
