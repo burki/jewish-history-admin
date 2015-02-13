@@ -6,14 +6,13 @@
  *
  * (c) 2007-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-01-21 dbu
+ * Version: 2015-02-13 dbu
  *
  * Changes:
  *
  */
 
-require_once INC_PATH . 'common/image_upload_handler.inc.php';
-require_once INC_PATH . 'common/tablemanager.inc.php';
+require_once INC_PATH . 'admin/displaybackend.inc.php';
 
 require_once INC_PATH . 'common/biblioservice.inc.php';
 
@@ -134,7 +133,7 @@ class PublicationRecord extends TableManagerRecord
   }
 }
 
-class DisplayPublication extends DisplayTable
+class DisplayPublication extends DisplayBackend
 {
   var $page_size = 30;
   var $table = 'Publication';
@@ -152,6 +151,19 @@ class DisplayPublication extends DisplayTable
                 );
   var $cols_listing = array('author' => 'Author/Editor', 'title' => 'Title', 'year' => 'Year', '');
   var $view_after_edit = TRUE;
+
+  function init () {
+    $ret = parent::init();
+    if (FALSE === $ret) {
+      return $ret;
+    }
+
+    if (!$this->checkAction(TABLEMANAGER_EDIT)) {
+      $this->listing_default_action = TABLEMANAGER_VIEW;
+    }
+
+    return $ret;
+  }
 
   function instantiateRecord ($table = '', $dbconn = '') {
     return new PublicationRecord(array('tables' => $this->table, 'dbconn' => $this->page->dbconn));
@@ -435,12 +447,6 @@ EOT;
     return $ret;
   }
 
-  function buildEditButton () {
-    return sprintf(' <span class="regular">[<a href="%s">%s</a>]</span>',
-                   htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_EDIT) => $this->id))),
-                   tr('edit'));
-  }
-
   function buildReviewSubject (&$record) {
     $editor = FALSE;
     $authors = $record->get_value('author');
@@ -522,7 +528,10 @@ EOT;
       $url_add = $this->page->buildLink(array('pn' => 'article', 'edit' => -1,
                                               'subject' => $this->buildReviewSubject($record), 'publication' => $this->id));
       $ret .= '<h2>' . tr('Articles')
-            . ' <span class="regular">[<a href="' . htmlspecialchars($url_add).'">' . tr('add new') . '</a>]</span></h2>'
+            . ($this->checkAction(TABLEMANAGER_EDIT)
+                ? ' <span class="regular">[<a href="' . htmlspecialchars($url_add).'">' . tr('add new') . '</a>]</span>'
+                : '')
+            . '</h2>'
             . $reviews;
 
       // $ret .= '<tt><pre>' . $this->buildLiteraturTemplate() . '</tt></pre>';
@@ -534,78 +543,6 @@ EOT;
     }
 
     return $ret;
-  }
-
-  function wikiNormalizeAuthors ($authors) {
-    if (empty($authors)) {
-      return '';
-    }
-    $authors = preg_split('/\s*;\s*/', $authors);
-    $normalized = array();
-    foreach ($authors as $author) {
-      list($last, $first) = preg_split('/\s*,\s*/', $author, 2);
-      $normalized[] = (!empty($first) ? $first . ' ' : '') . $last;
-    }
-    return implode(', ', $normalized);
-  }
-
-  function buildLiteraturTemplate () {
-    $values = array();
-    foreach ($this->record->get_fieldnames() as $name) {
-      $values[$name] = $this->record->get_value($name);
-    }
-    $author_publisher = '';
-    if (!empty($values['author'])) {
-      $author_publisher = '|Autor=' . $this->wikiNormalizeAuthors($values['author']);
-    }
-    if (!empty($values['editor'])) {
-      $author_publisher .= (!empty($author_publisher) ? "\n" : '')
-        . '|Herausgeber=' . $this->wikiNormalizeAuthors($values['editor']);
-    }
-
-    $isbn = $values['isbn'];
-    try {
-      // to pretty print
-      if (!empty($isbn))
-        $url = sprintf('http://xisbn.worldcat.org/webservices/xid/isbn/%s?method=hyphen&format=xml',
-                       $isbn);
-        $client = new Zend_Http_Client($url);
-        $response = $client->request();
-        if (!$response->isError() && preg_match('|<isbn[^>]*>(.*?)</isbn>|s', $response->getBody(), $matches)) {
-          $isbn = $matches[1];
-        }
-
-    }
-    catch (Exception $e) {
-      ; // ignore and use without hyphens
-    }
-
-    $publisher = '';
-    if (!empty($values['publisher_id'])) {
-      $querystr = sprintf("SELECT name"
-                          . " FROM Publisher"
-                          . " WHERE id=%d",
-                          $values['publisher_id']);
-      $dbconn = & $this->page->dbconn;
-      $dbconn->query($querystr);
-      if ($dbconn->next_record()) {
-        $publisher = $dbconn->Record['name'];
-      }
-    }
-    return <<<EOT
-{{literatur
-$author_publisher
-|Titel={$values['title']}
-|Verlag=$publisher
-|Ort={$values['place']}
-|Jahr={$values['publication_date']}
-|ISBN=$isbn
-|cover_image=
-|related_to=
-|seitenname=
-|dzg_artikel=
-}}
-EOT;
   }
 
   function buildListingCell (&$row, $col_index, $val = NULL) {

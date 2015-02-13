@@ -1,14 +1,12 @@
 <?php
 /*
- * admin_subscriber.inc.php
+ * admin_author.inc.php
  *
- * Manage the subscribers
+ * Manage the authors
  *
- * (c) 2006-2014 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-07-29 dbu
- *
- * TODO: validity of Subscription Status/Hold-Date
+ * Version: 2015-02-13 dbu
  *
  * Changes:
  *
@@ -17,8 +15,8 @@
 require_once INC_PATH . 'common/tablemanager.inc.php';
 require_once INC_PATH . 'admin/common.inc.php';
 
-class SubscriberFlow extends TableManagerFlow {
-  const LISTSERV = 1000;
+class AuthorFlow extends TableManagerFlow
+{
   const MERGE    = 1010;
 
   var $user;
@@ -34,12 +32,8 @@ class SubscriberFlow extends TableManagerFlow {
   }
 
   function init ($page) {
-    // die('SubscriberFlow::init()');
+    // die('AuthorFlow::init()');
     if ($this->is_internal) {
-      if (isset($page->parameters['listserv']) && ($id = intval($page->parameters['listserv'])) > 0) {
-        $this->id = $id;
-        return self::LISTSERV;
-      }
       if (isset($page->parameters['merge']) && ($id = intval($page->parameters['merge'])) > 0) {
         $this->id = $id;
         return self::MERGE;
@@ -47,38 +41,42 @@ class SubscriberFlow extends TableManagerFlow {
       return parent::init($page);
     }
     else {
-      if (isset($page->parameters['listserv'])) {
-        $this->id = $this->user['id'];
-        return self::LISTSERV;
+      // only view
+      if (isset($page->parameters['view']) && ($id = intval($page->parameters['view'])) > 0) {
+        $this->id = $id;
+        return TABLEMANAGER_VIEW;
       }
-      return isset($page->parameters['edit']) ? TABLEMANAGER_EDIT : FALSE;
+      return FALSE;
     }
   }
 
   function primaryKey ($id = '') {
-    if ($this->is_internal)
+    if ($this->is_internal) {
       return parent::primaryKey($id);
+    }
 
     // just handle own stuff
-    return $this->user['id'];
+    return parent::primaryKey($id);
   }
 
   function advance ($step) {
-    if ($this->is_internal)
+    if ($this->is_internal) {
       return parent::advance($step);
+    }
 
     // there is no listing for regular users
     return FALSE;
   }
 }
 
-class SubscriberRecord extends TableManagerRecord {
+class AuthorRecord extends TableManagerRecord
+{
 
   function delete ($id) {
     $dbconn = $this->params['dbconn'];
     $querystr = sprintf("UPDATE %s SET status=%d WHERE id=%d",
                         $this->params['tables'],
-                        SubscriberListing::$status_deleted,
+                        AuthorListing::$status_deleted,
                         $id);
     $dbconn->query($querystr);
 
@@ -87,12 +85,13 @@ class SubscriberRecord extends TableManagerRecord {
 
 }
 
-class SubscriberQueryConditionBuilder extends TableManagerQueryConditionBuilder {
+class AuthorQueryConditionBuilder extends TableManagerQueryConditionBuilder {
 
   function buildStatusCondition () {
     $num_args = func_num_args();
-    if ($num_args <= 0)
+    if ($num_args <= 0) {
       return;
+    }
     $fields = func_get_args();
 
     if (isset($this->term) && '' !== $this->term) {
@@ -109,7 +108,7 @@ class SubscriberQueryConditionBuilder extends TableManagerQueryConditionBuilder 
 
 }
 
-class DisplaySubscriber extends DisplayTable
+class DisplayAuthor extends DisplayTable
 {
   var $table = 'User';
   var $fields_listing = array('User.id AS id', 'lastname', 'firstname', 'email',
@@ -124,16 +123,18 @@ class DisplaySubscriber extends DisplayTable
   var $search_fulltext = NULL;
 
   function __construct (&$page) {
-    parent::__construct($page, new SubscriberFlow($page));
+    parent::__construct($page, new AuthorFlow($page));
 
-    $this->status_deleted = SubscriberListing::$status_deleted;
+    $this->status_deleted = AuthorListing::$status_deleted;
 
-    if ($page->lang() != 'en_US')
+    if ($page->lang() != 'en_US') {
       $this->datetime_style = 'DD.MM.YYYY';
+    }
     $this->messages['item_new'] = 'New Author';
     $this->search_fulltext = $this->page->getPostValue('fulltext');
-    if (!isset($this->search_fulltext))
+    if (!isset($this->search_fulltext)) {
       $this->search_fulltext = $this->page->getSessionValue('fulltext');
+    }
     $this->page->setSessionValue('fulltext', $this->search_fulltext);
 
     $review = $this->page->getSessionValue('review');
@@ -159,8 +160,6 @@ class DisplaySubscriber extends DisplayTable
 
   function init () {
     $this->step = $this->workflow->init($this->page);
-    if (in_array($this->step, array(SubscriberFlow::LISTSERV, SubscriberFlow::MERGE)))
-      return $this->step;
 
     return parent::init();
   }
@@ -175,7 +174,7 @@ class DisplaySubscriber extends DisplayTable
   function instantiateRecord ($table = '', $dbconn = '') {
     global $COUNTRIES_FEATURED;
 
-    $record =  new SubscriberRecord(array('tables' => $this->table, 'dbconn' => $this->page->dbconn));
+    $record =  new AuthorRecord(array('tables' => $this->table, 'dbconn' => $this->page->dbconn));
 
     $countries = $this->getCountries();
     $countries_ordered = array('' => tr('-- not available --'));
@@ -186,13 +185,15 @@ class DisplaySubscriber extends DisplayTable
       $countries_ordered['&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;'] = FALSE; // separator
     }
     foreach ($countries as $cc => $name) {
-      if (!isset($countries_ordered[$cc]))
+      if (!isset($countries_ordered[$cc])) {
         $countries_ordered[$cc] = $name;
+      }
     }
 
     $status_options = array();
-    foreach (SubscriberListing::$status_list as $val => $label)
+    foreach (AuthorListing::$status_list as $val => $label) {
       $status_options[$val] = tr($label);
+    }
 
     $sex_options = array('' => '--', 'F' => tr('Mrs.'), 'M' => tr('Mr.'));
     $review_options = array('' => tr('outstanding request'), 'Y' => tr('yes'), 'N' => tr('no'));
@@ -256,7 +257,7 @@ class DisplaySubscriber extends DisplayTable
   }
 
   function instantiateQueryConditionBuilder ($term) {
-    return new SubscriberQueryConditionBuilder($term);
+    return new AuthorQueryConditionBuilder($term);
   }
 
   function getEditRows () {
@@ -295,6 +296,7 @@ class DisplaySubscriber extends DisplayTable
         // 'description' => array('label' => 'Profile'),
         'areas' => array('label' => 'Areas of interest'),
     ));
+
     if ($this->is_internal) {
       $rows = array_merge($rows,
         array(
@@ -311,7 +313,7 @@ class DisplaySubscriber extends DisplayTable
     }
     else {
       $rows['email']['value'] = $this->record->get_value('email');
-      $rows['status']['value'] = tr(SubscriberListing::$status_list[$this->record->get_value('status')]);
+      $rows['status']['value'] = tr(AuthorListing::$status_list[$this->record->get_value('status')]);
     }
 
 
@@ -326,18 +328,20 @@ class DisplaySubscriber extends DisplayTable
   function buildView () {
     $this->id = $this->workflow->primaryKey();
 
-    $subscriber = new SubscriberListing($this->id);
+    $author = new AuthorListing($this->id);
 
-    if (!$subscriber->query($this->page->dbconn))
+    if (!$author->query($this->page->dbconn)) {
         return 'An error occured query-ing your data';
+    }
 
-    return $subscriber->build($this, $this->is_internal ? 'admin' : 'default');
+    return $author->build($this, $this->workflow->is_internal
+                          ? 'admin' : 'restricted');
   }
 
   function buildSearchBar () {
 /*
     $select_options = array('<option value="">'.tr('-- all --').'</option>');
-    foreach (SubscriberListing::$status_list as $status => $label)
+    foreach (AuthorListing::$status_list as $status => $label)
       if ($this->status_deleted != $status) {
         $selected = $this->search['status'] !== ''
             && $this->search['status'] == $status
@@ -345,8 +349,8 @@ class DisplaySubscriber extends DisplayTable
         $select_options[] = sprintf('<option value="%d"%s>%s</option>', $status, $selected, htmlspecialchars(tr($label)));
       }
 */
-    $ret = sprintf('<form action="%s" method="post" name="search">',
-                   htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, 'page_id' => 0))));
+      $ret = sprintf('<form action="%s" method="post" name="search">',
+                     htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, 'page_id' => 0))));
 
       $search = '<input type="text" name="search" value="'.$this->htmlSpecialchars(array_key_exists('search', $this->search) ?  $this->search['search'] : '').'" size="40" />';
       $search .= '<label><input type="hidden" name="fulltext" value="0" /><input type="checkbox" name="fulltext" value="1" '.($this->search_fulltext ? ' checked="checked"' : '').'/> '.$this->htmlSpecialchars(tr('Fulltext')).'</label>';
@@ -403,284 +407,45 @@ EOT;
     $val = NULL;
     switch ($col_index) {
       case 1:
-        $val .= '<a href="'.$this->page->buildLink(array('pn' => $this->page->name, 'view' => $row['id'])).'">'
-            .$this->formatText($row['lastname'].(isset($row['firstname']) ? ' '.$row['firstname']: '')).'</a>';
+        $val .= '<a href="' . htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, 'view' => $row['id']))) . '">'
+              . $this->formatText($row['lastname'] . (isset($row['firstname']) ? ' ' . $row['firstname'] : ''))
+              . '</a>';
         break;
+
       case 2:
       case 6:
         return FALSE;
         break;
+
       case 3:
         $val = $row['email'];
         if (array_key_exists('status', $this->search)
            && ('0' === $this->search['status'] || -3 == $this->search['status'])) {
-          if (isset($row['comment']))
-            $val = (isset($val) ? $val.'<br />' : '')
+          if (isset($row['comment'])) {
+            $val = (isset($val) ? $val . '<br />' : '')
               .$this->formatText($row['comment']);
+          }
         }
         break;
+
       case 4:
           $val = '&nbsp;';
           if (FALSE && array_key_exists('status', $this->search)
            && ('' === $this->search['status'] || '0' === $this->search['status']))
-            $val = tr(SubscriberListing::$status_list[$row['status']]).' '.$val;
+          {
+            $val = tr(AuthorListing::$status_list[$row['status']]) . ' ' . $val;
+          }
         break;
+
       case 5:
         $val = '<div align="right">'
-          .$this->formatTimestamp($row['created'], 'd.m.y').'</div>';
+             . $this->formatTimestamp($row['created'], 'd.m.y')
+             . '</div>';
         break;
 
     }
 
     return parent::buildListingCell($row, $col_index, $val);
-  }
-
-  function buildListserv () {
-    $name = 'listserv';
-
-    $action = $this->isPostback($name)
-      ? $this->page->getPostValue('action')
-      : $this->page->parameters['action'];
-
-    $record = &parent::instantiateRecord();
-    $record->add_fields(
-      array(
-        new Field(array('name' => 'email', 'type' => 'email', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => FALSE)),
-        new Field(array('name' => 'action', 'type' => 'select', 'options' => array('add', 'change', 'delete', 'nomail', 'mail'), 'null' => FALSE, 'default' => $action, 'nodbfield' => TRUE)),
-      ));
-    if ('add' == $action) {
-      if ($this->is_internal) {
-        $record->add_fields(
-          array(
-            new Field(array('name' => 'lastname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'null' => TRUE)),
-            new Field(array('name' => 'firstname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'null' => TRUE)),
-            new Field(array('name' => 'place', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'null' => TRUE)),
-            new Field(array('name' => 'country', 'type' => 'text', 'size' => 3, 'datatype' => 'char', 'null' => TRUE)),
-            new Field(array('name' => 'name_place', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => FALSE, 'nodbfield' => TRUE)),
-          ));
-      }
-      else {
-        $querystr = "UPDATE ".$this->table
-                   .' SET status = 0'
-                   .' WHERE id='.$this->workflow->primaryKey().' AND status <= 0';
-        $this->page->dbconn->query($querystr);
-
-        switch ($this->page->lang()) {
-          case 'de_DE':
-            $ret = '<p>Vielen Dank für Ihr erneutes Interesse an Docupedia. Wir werden Ihre Anmeldung in den nächsten Tagen prüfen.</p>';
-            break;
-          case 'en_US':
-          default:
-            $ret = '<p>Thank you very much for your renewed interest in Docupedia. We\'ll review your registration form in the next couple days.</p>';
-        }
-
-        $ret .= sprintf('<p>[<a href="%s">%s</a>]</p>', $this->page->buildLink(array('pn' => $this->page->name)), tr('continue'));
-
-        return $ret;
-      }
-    }
-    else if ('change' == $action) {
-      $record->add_fields(
-        array(
-                new Field(array('name' => 'email_new', 'type' => 'email', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => FALSE, 'nodbfield' => TRUE)),
-        ));
-    }
-    else if ('nomail' == $action) {
-      $record->add_fields(
-        array(
-                new Field(array('name' => 'hold', 'type' => 'date', 'datatype' => 'date', 'null' => TRUE, 'nodbfield' => TRUE)),
-        ));
-    }
-    else if ('mail' == $action || 'delete' == $action) {
-    }
-    else
-      return FALSE; // invalid action
-
-    $this->record = &$record;
-    $this->form = &$this->instantiateHtmlForm('command', $this->page->buildLink(array('pn' => $this->page->name, 'listserv' => $this->workflow->primaryKey())), $name);
-
-    $show_form = TRUE;
-    $submit = $this->page->getPostValue('_submit');
-
-    if (!empty($submit)) {
-      if ($this->is_internal)
-        $this->setInput();
-      else {
-        // avoid any spoofing
-        $safe_params = array('action' => $action);
-        switch ($action) {
-          case 'change':
-            if (array_key_exists('email_new', $_POST))
-              $safe_params['email_new'] = $_POST['email_new'];
-            break;
-          case 'nomail':
-            if (array_key_exists('hold', $_POST))
-              $safe_params['hold'] = $_POST['hold'];
-            break;
-        }
-        $this->form->set_values($safe_params);
-      }
-
-      if ('change' == $action || (!$this->is_internal && ('mail' == $action || 'nomail' == $action || 'delete' == $action))) {
-        // make sure email isn't spoofed
-        $dbconn = &$this->page->dbconn;
-        $querystr = sprintf("SELECT email FROM User WHERE id=%d", $this->workflow->primaryKey());
-        $dbconn->query($querystr);
-        if ($dbconn->next_record())
-          $this->form->set_value('email', $dbconn->Record['email']);
-        else if ($this->is_internal)
-          $this->form->set_value('email', '');
-        else
-          return FALSE;
-      }
-
-      if ($this->form->validate()) {
-        $show_form = FALSE;
-
-        if ('add' == $action) {
-          $name_place = translit_7bit($this->form->get_value('name_place'));
-          if (preg_match('/&#\d+;/', $name_place)) {
-            $this->page->msg = 'The name or place may not contain any umlauts';
-            $show_form = TRUE;
-          }
-        }
-        else if ('change' == $action) {
-        }
-
-        if (!$show_form) {
-          global $MAIL_SETTINGS;
-          // compose the message
-          switch ($action) {
-            case 'add':
-              $cmd = sprintf('ADD %s %s %s', LIST_NAME, $this->form->get_value('email'), $name_place);
-              break;
-            case 'change':
-              $cmd = sprintf('CHANGE %s %s %s', LIST_NAME, $this->form->get_value('email'), $this->form->get_value('email_new'));
-              break;
-            case 'delete':
-              $cmd = sprintf('DELETE %s %s', LIST_NAME, $this->form->get_value('email'));
-              break;
-            case 'mail':
-              $cmd = sprintf('SET %s MAIL FOR %s', LIST_NAME, $this->form->get_value('email'));
-              break;
-            case 'nomail':
-              $cmd = sprintf('SET %s NOMAIL FOR %s', LIST_NAME, $this->form->get_value('email'));
-              break;
-          }
-
-          $headers = array('From: '.$MAIL_SETTINGS['from_listserv']);
-          if (isset($MAIL_SETTINGS['bcc_listserv']))
-            $headers[] = 'Bcc: '.$MAIL_SETTINGS['bcc_listserv'];
-
-          $listserv_msg = array(
-                  'to' => $MAIL_SETTINGS['listserv'],
-                  'subject' => '',
-                  'body' => $cmd,
-                  'headers' => implode("\n", $headers)
-          );
-
-          if (send_mail($listserv_msg)) {
-            $msg = tr('The following message was sent');
-            $update = '';
-            switch ($action) {
-              case 'add':
-                $update = 'status=1, subscribed=NOW(), unsubscribed=NULL, hold=NULL';
-                break;
-              case 'delete':
-                $update = 'status=-5, unsubscribed=NOW(), hold=NULL';
-                break;
-              case 'mail':
-                $update = 'status=1, hold=NULL, unsubscribed=NULL';
-                break;
-              case 'nomail':
-                $hold = $this->form->get_value('hold');
-                if (!empty($hold)) {
-                  $hold = $this->form->field('hold')->value_internal();
-                  $hold_sql = sprintf("'%04d-%02d-%02d'", $hold['year'], $hold['month'], $hold['day']);
-                }
-                else
-                  $hold_sql = 'NULL';
-                $update = 'status=2, hold='.$hold_sql;
-                break;
-              case 'change':
-                $update = sprintf("email='%s'", $this->page->dbconn->escape_string($this->form->get_value('email_new')));
-                break;
-            }
-            if (!empty($update)) {
-              $querystr = "UPDATE ".$this->table
-                          .' SET '.$update
-                          .' WHERE id='.$this->workflow->primaryKey();
-              $this->page->dbconn->query($querystr);
-            }
-
-          }
-          else
-            $msg = 'The following message could not be sent';
-
-          $ret = '<p>'.$msg.':<tt><pre>To: '.$listserv_msg['to']
-            ."\n"
-            .$cmd.'</p></tt></p>';
-
-          $ret .= sprintf('<p>[<a href="%s">%s</a>]</p>', $this->page->buildLink(array('pn' => $this->page->name)), tr('continue'));
-        }
-      }
-      else {
-        $this->invalid = $this->form->invalid();
-      }
-    }
-    else if ($this->form->fetch(array('where' => 'id='.$this->workflow->primaryKey()))) {
-      if ('add' == $action) {
-        $name_place = translit_7bit(sprintf('%s %s, %s %s',
-                              $this->form->get_value('firstname'),
-                              $this->form->get_value('lastname'),
-                              $this->form->get_value('place'),
-                              $this->form->get_value('country')
-                              ));
-
-        $this->form->set_value('name_place', $name_place);
-      }
-    }
-    else
-      $show_form = FALSE;
-
-    if ($show_form) {
-      if ('change' == $action) {
-        $rows['email'] = array('label' => 'Current Subscription E-mail',
-                              'value' => $this->form->get_value('email'));
-        $rows['email_new'] = array('label' => 'New Subscription E-mail');
-      }
-      else {
-        $rows = array(
-          'email' => array('label' => 'Subscription E-mail'),
-        );
-        if (!$this->is_internal)
-          $rows['email']['value'] = $this->form->get_value('email');
-
-        if ('add' == $action) {
-          // Vorname Nachname, Ort
-          $rows['name_place'] = array('label' => 'Firstname Lastname, Place');
-        }
-        else if ('nomail' == $action) {
-          $rows['hold'] = array('label' => 'Reactivate on', 'show_datetimestyle' => true);
-        }
-      }
-
-      $rows = array_merge(
-                $rows,
-                array(
-                  'action' => array('label' => 'Action'),
-                  $this->form->show_submit(tr('Go')),
-                )
-              );
-      if (!$this->is_internal) // fix action
-        $rows['action']['value'] = '<input name="action" type="hidden" value="'
-          .$action.'" />'.$action;
-
-      return parent::renderEditForm($rows, $name);
-    }
-    else {
-      return !empty($ret) ? $ret : FALSE;
-    }
   }
 
   function buildMerge () {
@@ -789,7 +554,9 @@ EOT;
               $record_new->set_value($fieldname, $old);
             }
             else {
-              $record_new->set_value($fieldname, $new.utf8_encode("\n\n=== aus gelöschtem Eintrag übernommen:\n").$old);
+              $record_new->set_value($fieldname,
+                                     $new . utf8_encode("\n\n=== aus gelöschtem Eintrag übernommen:\n")
+                                     . $old);
             }
             $store = TRUE;
           }
@@ -800,10 +567,11 @@ EOT;
           $record_new->store();
         }
         $querystr = sprintf("UPDATE User SET status=%d WHERE id=%d",
-                           SubscriberListing::$status_deleted, $id);
+                           AuthorListing::$status_deleted, $id);
         $this->page->dbconn->query($querystr);
         $this->page->redirect(array('pn' => $this->page->name, 'edit' => intval($this->page->parameters['with'])));
         break;
+
       default:
         $orig = sprintf('%s %s, %s (%s)',
                   $record->get_value('firstname'),
@@ -823,7 +591,7 @@ EOT;
         $querystr = sprintf("SELECT id, firstname, lastname, email, place, status, UNIX_TIMESTAMP(created) AS created_timestamp FROM User WHERE (email = '%s' OR (lastname LIKE '%s' AND firstname LIKE '%s')) AND id<>%d AND status <> %d ORDER BY email='%s' DESC, status DESC, created DESC",
                     $dbconn->escape_string($record->get_value('email')),
                     $dbconn->escape_string($record->get_value('lastname')),                    $dbconn->escape_string($record->get_value('firstname')),
-                    $id, SubscriberListing::$status_deleted,
+                    $id, AuthorListing::$status_deleted,
                     $dbconn->escape_string($record->get_value('email'))
                     );
         $dbconn->query($querystr);
@@ -832,32 +600,37 @@ EOT;
         while ($dbconn->next_record()) {
           $params_replace['with'] = $dbconn->Record['id'];
           $replace_confirm = sprintf('%s %s (%s) %s',
-                  $dbconn->Record['firstname'],
-                  $dbconn->Record['lastname'],
-                  $dbconn->Record['email'],
-                  $this->formatTimestamp($dbconn->Record['created_timestamp']));
+                                     $dbconn->Record['firstname'],
+                                     $dbconn->Record['lastname'],
+                                     $dbconn->Record['email'],
+                                     $this->formatTimestamp($dbconn->Record['created_timestamp']));
           $confirm_msg = sprintf(
               tr('Are you sure you want to replace\\n%s\\nwith\\n%s?'),
               $orig_confirm,
               $replace_confirm);
+
           $replace .= '<br />'
-            .$this->formatText(sprintf('%s %s, %s (%s) %s %s',
-                  $dbconn->Record['firstname'],
-                  $dbconn->Record['lastname'],
-                  $dbconn->Record['place'],
-                  $dbconn->Record['email'],
-                  tr(SubscriberListing::$status_list[$dbconn->Record['status']]),
-                  $this->formatTimestamp($dbconn->Record['created_timestamp'])
+            . $this->formatText(sprintf('%s %s, %s (%s) %s %s',
+                                        $dbconn->Record['firstname'],
+                                        $dbconn->Record['lastname'],
+                                        $dbconn->Record['place'],
+                                        $dbconn->Record['email'],
+                                        tr(AuthorListing::$status_list[$dbconn->Record['status']]),
+                                        $this->formatTimestamp($dbconn->Record['created_timestamp'])
                   ))
             .' <input type="button" name="select" value="select" onClick="if (confirm('.sprintf("'%s'", htmlspecialchars($confirm_msg)).')) window.location.href='.sprintf("'%s'", htmlspecialchars($this->page->buildLink($params_replace))).';" />';
         }
         if (!empty($replace)) {
-          $ret = '<p>'.sprintf(tr('Replace %s with'), $this->formatText($orig))
-                .':'.$replace.'</p>';
+          $ret = '<p>'
+               . sprintf(tr('Replace %s with'), $this->formatText($orig))
+               . ':' . $replace
+               . '</p>';
         }
         else {
-          $ret = '<p>TODO: '.tr('Please search for a subscriber replacing')
-              .' '.$this->formatText($orig).'</p>';
+          $ret = '<p>TODO: '
+               . tr('Please search for an author replacelemnt')
+               . ' ' . $this->formatText($orig)
+               . '</p>';
         }
         // $ret .= '<p>TODO: search field</p>';
     }
@@ -866,30 +639,24 @@ EOT;
   }
 
   function buildContent () {
-    if (SubscriberFlow::LISTSERV == $this->step) {
-      $res = $this->buildListserv();
-      if ('boolean' == gettype($res)) {
-        if ($res)
-          $this->step = TABLEMANAGER_VIEW;
-      }
-      else
-        return $res;
-    }
-    else if (SubscriberFlow::MERGE == $this->step) {
+    if (AuthorFlow::MERGE == $this->step) {
       $res = $this->buildMerge();
       if ('boolean' == gettype($res)) {
-        if ($res)
+        if ($res) {
           $this->step = TABLEMANAGER_VIEW;
+        }
       }
-      else
+      else {
         return $res;
+      }
     }
     return parent::buildContent();
   }
 }
 
-$display = new DisplaySubscriber($page);
-if (FALSE === $display->init($page))
+$display = new DisplayAuthor($page);
+if (FALSE === $display->init($page)) {
   $page->redirect(array('pn' => ''));
+}
 
 $page->setDisplay($display);

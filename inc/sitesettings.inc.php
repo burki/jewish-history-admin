@@ -37,8 +37,8 @@ define('GETTEXT_AVAILABLE', FALSE); // don't use system-gettext
 define('COUNTRIES_FROM_DB', FALSE);
 
 //
-$RIGHTS_EDITOR = 0x02;  // these see all data
-$RIGHTS_REFEREE = 0x10; // referees (currently no login, might change later)
+$RIGHTS_EDITOR = 0x02;  // these can see/edit all data
+$RIGHTS_REFEREE = 0x10; // these can see but not edit
 $RIGHTS_ADMIN = 0x04;   // these can handle restricted system settings
 
 define('STATUS_DELETED', -1); // reserved value in the database

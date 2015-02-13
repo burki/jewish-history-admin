@@ -4,9 +4,9 @@
  *
  * Functions to initialize the page (browser, session, login-stuff, ...)
  *
- * (c) 2009-2014 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-10-29 dbu
+ * Version: 2015-02-13 dbu
  *
  * Changes:
  *
@@ -35,7 +35,7 @@ class Page
   protected $gettext_utf8_encode = FALSE;
   var $name;
   var $include;
-  var $user;
+  var $user = array();
   var $login_preset;
   var $path;
   var $parameters;
@@ -50,6 +50,7 @@ class Page
   var $dbconn;
   var $expired = FALSE;
   var $site_description;
+  var $msg = '';
 
   static function gettext ($msg) {
     global $GETTEXT_MESSAGES;
@@ -305,9 +306,9 @@ class Page
 
     $this->expire();
 
-    $this->determineLang();
-
     $this->identify();
+
+    $this->determineLang();
 
     if (defined('LOCALE_DEFAULT')) {
       // TODO: we might override this in the future with settings that depend on
@@ -402,6 +403,7 @@ class Page
   }
 
   function clearLogin () {
+    $this->user = array();
     unset($_SESSION['user']);
   }
 
@@ -591,8 +593,9 @@ class Page
         $this->redirect();
       }
     }
-    else
+    else {
       echo 'no renderer set';
+    }
   }
 
   function buildLink ($options = '') {

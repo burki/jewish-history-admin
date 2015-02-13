@@ -4,9 +4,9 @@
  *
  * Page class for admin-section
  *
- * (c) 2009-2014 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-06-30 dbu
+ * Version: 2015-02-13 dbu
  *
  * Changes:
  *
@@ -40,6 +40,12 @@ class AdminPage extends Page
                     $this->include = 'login';
         }
     }
+
+    function isAdminUser () {
+        return isset($this->user['privs'])
+            && 0 != ($this->user['privs'] & $GLOBALS['RIGHTS_ADMIN']);
+    }
+
 }
 
 $URL_REWRITE = array(); // don't do rewrites for the backend
@@ -55,7 +61,7 @@ $SITE_DESCRIPTION = array(
             'title' => 'Recover Password',
             'anonymous' => TRUE,
         ),
-        'subscriber' => array(
+        'author' => array(
             'title' => 'Authors',
             'anonymous' => FALSE,
         ),

@@ -4,9 +4,9 @@
  *
  * Manage the articles
  *
- * (c) 2009-2014 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-10-29 dbu
+ * Version: 2015-02-13 dbu
  *
  * Changes:
  *
@@ -133,6 +133,14 @@ class DisplayArticle extends DisplayMessage
 
   function init () {
     $ret = parent::init();
+    if (FALSE === $ret) {
+      return $ret;
+    }
+
+    if (!$this->checkAction(TABLEMANAGER_EDIT)) {
+      $this->listing_default_action = TABLEMANAGER_VIEW;
+      return $ret;
+    }
 
     // update publications
     if (array_key_exists('publication_add', $_POST)) {
@@ -520,15 +528,18 @@ EOT;
 
       $publications .= sprintf('<li id="item_%d">', $dbconn->Record['id'])
         . (isset($dbconn->Record['author']) ? $dbconn->Record['author'] : $dbconn->Record['editor'])
-        . ': <i>'.$this->formatText($dbconn->Record['title']).'</i>'
+        . ': <i>' . $this->formatText($dbconn->Record['title']) . '</i>'
         . (!empty($publisher_place_year) ? ' ' : '')
         . $this->formatText($publisher_place_year)
-        .sprintf(' [<a href="%s">%s</a>] [<a href="%s">%s</a>]',
-                 htmlspecialchars($this->page->buildLink($params_view)), tr('view'),
-                 htmlspecialchars($this->page->buildLink($params_remove)), tr('remove'))
-        .'</li>';
+        . sprintf(' [<a href="%s">%s</a>]',
+                  htmlspecialchars($this->page->buildLink($params_view)), tr('view'))
+        . ($this->checkAction(TABLEMANAGER_EDIT)
+            ? sprintf(' [<a href="%s">%s</a>]',
+                  htmlspecialchars($this->page->buildLink($params_remove)), tr('remove'))
+            : '')
+        . '</li>';
     }
-    if (!empty($publications)) {
+    if ($this->checkAction(TABLEMANAGER_EDIT) && !empty($publications)) {
       $publications .= '</ul>';
       $msg_submit = tr('Store updated order');
       $publications .= <<<EOT

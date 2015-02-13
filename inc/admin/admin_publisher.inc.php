@@ -4,9 +4,9 @@
  *
  * Class for managing holding institutions
  *
- * (c) 2008-2014 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-10-29 dbu
+ * Version: 2015-02-13 dbu
  *
  * Changes:
  *
@@ -72,9 +72,22 @@ class DisplayPublisher extends DisplayTable
   function __construct (&$page, $workflow = '') {
     parent::__construct($page, $workflow);
 
-    if ('xls' == $this->page->display)
+    if ('xls' == $this->page->display) {
       $this->page_size = -1;
+    }
   }
+
+  function init () {
+    global $RIGHTS_EDITOR, $RIGHTS_ADMIN;
+
+    if (empty($this->page->user)
+        || 0 == ($this->page->user['privs'] & ($RIGHTS_ADMIN | $RIGHTS_EDITOR)))
+    {
+      return false;
+    }
+    return parent::init();
+  }
+
 
   function getCountries () {
     return Countries::getAll();
@@ -89,8 +102,9 @@ class DisplayPublisher extends DisplayTable
 
     $record = parent::buildRecord($name);
 
-    if (!isset($record))
+    if (!isset($record)) {
       return;
+    }
 
     $countries = $this->getCountries();
     $countries_ordered = array('' => tr('-- not available --'));

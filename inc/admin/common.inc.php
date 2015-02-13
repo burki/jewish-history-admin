@@ -4,9 +4,9 @@
  *
  * Common stuff for the admin pages
  *
- * (c) 2006-2014 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-12-22 dbu
+ * Version: 2015-02-13 dbu
  *
  * Changes:
  *
@@ -17,7 +17,7 @@ require_once INC_PATH . 'common/classes.inc.php';
 
 function send_mail ($msg) {
   if (!defined('MAIL_SEND') || !MAIL_SEND) {
-  ?>
+?>
 <pre>
 To: <?php echo $msg['to'] ?>&nbsp;
 <?php echo $msg['headers'] ?>
@@ -27,10 +27,9 @@ Subject: <?php echo $msg['subject'] ?>
 <?php echo $msg['body'] ?>
 </pre>
   <?php
-      return 1;
-    }
-    else
-      return mail($msg['to'], $msg['subject'], $msg['body'], $msg['headers']);
+    return 1;
+  }
+  return mail($msg['to'], $msg['subject'], $msg['body'], $msg['headers']);
 }
 
 function is_associative($array) {
@@ -63,12 +62,11 @@ function translit_7bit ($str) {
 
     return $str;
   }
-  else {
-    $str = iconv('UTF-8', 'us-ascii//TRANSLIT', $str);
 
-    $str = preg_replace('/\\"([aou])/i', "\\1e", $str);
-    return preg_replace("/[`'".'\\"]/', '', $str);
-  }
+  $str = iconv('UTF-8', 'us-ascii//TRANSLIT', $str);
+
+  $str = preg_replace('/\\"([aou])/i', "\\1e", $str);
+  return preg_replace("/[`'".'\\"]/', '', $str);
 }
 
 function replace_num_entity($ord) {
@@ -172,10 +170,10 @@ function writeStringBIFF8(&$writer, $row, $col, $str, $format = 0) {
 }
 
 function writeMultibyte (&$sheet, $row, $col, $str, $format = 0) {
-  if (preg_match('/&#([0-9a-fx]+);/i', $str))
+  if (preg_match('/&#([0-9a-fx]+);/i', $str)) {
     return writeStringBIFF8($sheet, $row, $col, mb_convert_encoding(preg_replace_callback('/&#([0-9a-fx]+);/mi', 'replace_num_entity', $str), "UTF-16LE", "UTF-8"), $format);
-  else
-    return $sheet->write($row, $col, $str, $format);
+  }
+  return $sheet->write($row, $col, $str, $format);
 }
 
 function strip_specialchars($txt) {
@@ -192,7 +190,7 @@ function format_mailbody ($txt) {
   return strip_specialchars(join("\r\n\r\n", $paras));
 }
 
-class SubscriberListing
+class AuthorListing
 {
   static $status_deleted = -100;
   static $status_list = array(
@@ -208,13 +206,15 @@ class SubscriberListing
   var $record;
 
   function __construct ($id = -1) {
-    if ($id >= 0)
+    if ($id >= 0) {
       $this->id = $id;
+    }
   }
 
   function query (&$dbconn) {
-    if (!isset($this->id))
+    if (!isset($this->id)) {
       return FALSE;
+    }
 
     $tables = 'User';
     $fields = array(
@@ -232,8 +232,8 @@ class SubscriberListing
 
         // internal
         'comment',
-
     );
+
     $where_conditions = array("User.id =".$this->id);
 
     if (defined('COUNTRIES_FROM_DB') && COUNTRIES_FROM_DB) {
@@ -243,7 +243,8 @@ class SubscriberListing
     }
 
     $querystr = "SELECT ".implode(', ', $fields)
-        ." FROM $tables WHERE ".implode(' AND ', $where_conditions);
+              . " FROM $tables"
+              . " WHERE " . implode(' AND ', $where_conditions);
 
     $dbconn->query($querystr);
     if ($dbconn->next_record()) {
@@ -285,25 +286,30 @@ class SubscriberListing
   }
 
   function formatUrl ($url, $show_protocol = FALSE) {
-    if (!preg_match('/^http(s)?\:/', $url))
+    if (!preg_match('/^http(s)?\:/', $url)) {
       $url = 'http://'.$url;
+    }
 
     // split link into protocol and destination, if available...
     $url_parts = preg_split('/\:/', $url, 2);
-    if ($show_protocol)
+    if ($show_protocol) {
       $name = $url;
+    }
     else {
       $name = count($url_parts) == 1 ? $url_parts[0] : preg_replace('!^/+!', '', $url_parts[1]);
-      if (preg_match('!^[^/]+/$!', $name)) // if there is just a '/' after domain, then remove
+      if (preg_match('!^[^/]+/$!', $name)) {
+        // if there is just a '/' after domain, then remove
         $name = preg_replace('!/$!', '', $name);
+      }
     }
 
-    return '<a href="'.htmlspecialchars($url).'" target="_blank">'.htmlspecialchars($name).'</a>';
+    return '<a href="' . htmlspecialchars($url) . '" target="_blank">'
+          . htmlspecialchars($name) . '</a>';
   }
 
   function buildSection (&$view, $title) {
     return '<div style="margin-top: 1em; width: 100%; margin-bottom: 0.5em; border-bottom: 1px solid gray;"><span style="color: gray;">'
-    .$view->formatText(tr($title)).'</span></div>';
+      . $view->formatText(tr($title)) . '</span></div>';
   }
 
   function buildEntry (&$view, $entry, $label = '', $format_entry = TRUE) {
@@ -352,17 +358,20 @@ class SubscriberListing
 
     $ret = array();
     foreach ($actions as $action => $label) {
-      $ret[] = sprintf('[<a href="%s">%s</a>]', $view->page->buildLink(array('pn' => 'subscriber', 'listserv' => $this->id, 'action' => $action)), $label);
+      $ret[] = sprintf('[<a href="%s">%s</a>]',
+                       htmlspecialchars($view->page->buildLink(array('pn' => 'author', 'listserv' => $this->id, 'action' => $action))), $label);
     }
 
     return implode(' ', $ret);
   }
 
-  function build (&$view, $mode = 'default') { // 'default', 'admin'
+  function build (&$view, $mode = 'default') {
+    // 'restricted', 'default', 'admin'
     if (!isset($this->record)) {
       $found = $this->query($view->page->dbconn);
-      if (!$found)
+      if (!$found) {
         return 'ERROR in query';
+      }
     }
 
 // var_dump($this->record);
@@ -372,7 +381,10 @@ class SubscriberListing
     $show_delete = 'admin' == $mode && !in_array($this->record['status'], array(1, 2)); // delete only those not subscribed or on hold
 
     // title
-    $edit = $show_edit ? ' <span class="regular">[<a href="'.$view->page->buildLink(array('pn' => 'subscriber', (isset($view->workflow) ? $view->workflow->name(TABLEMANAGER_EDIT) : 'edit') => $this->id)).'">'.tr('edit').'</a>]</span>' : '';
+    $edit = $show_edit
+      ? ' <span class="regular">[<a href="' . htmlspecialchars($view->page->buildLink(array('pn' => 'author', (isset($view->workflow) ? $view->workflow->name(TABLEMANAGER_EDIT) : 'edit') => $this->id)))
+        . '">' . tr('edit') . '</a>]</span>'
+      : '';
 
     $merge = '';
     if ($show_merge) {
@@ -381,14 +393,16 @@ class SubscriberListing
       $querystr = sprintf("SELECT COUNT(*) AS count_candidate FROM User WHERE (email = '%s' OR (lastname LIKE '%s' AND firstname LIKE '%s')) AND id<>%d AND status <> %d",
                     empty($this->record['email']) ? 'DUMMY' : $dbconn->escape_string($this->record['email']),
                     $dbconn->escape_string($this->record['lastname']),                    $dbconn->escape_string($this->record['firstname']),
-                    $this->id, SubscriberListing::$status_deleted);
+                    $this->id, AuthorListing::$status_deleted);
       $dbconn->query($querystr);
       if ($dbconn->next_record() && $dbconn->Record['count_candidate'] > 0)
-        $merge = ' <span class="regular">[<a href="'.$view->page->buildLink(array('pn' => 'subscriber', 'merge' => $this->id)).'">'.tr('merge').'</a>]</span>';
+        $merge = ' <span class="regular">[<a href="' . htmlspecialchars($view->page->buildLink(array('pn' => 'author', 'merge' => $this->id))) . '">'
+               . tr('merge')
+               . '</a>]</span>';
     }
     $delete = '';
     if ($show_delete) {
-      $url_delete = $view->page->buildLink(array('pn'=>$view->page->name, 'delete' => $this->id));
+      $url_delete = $view->page->buildLink(array('pn' => $view->page->name, 'delete' => $this->id));
       $delete = sprintf(' <span class="regular">[<a href="javascript:if (confirm(%s)) window.location.href=%s">',
                 "'".tr('Do you want to delete this record (no undo)?')."'",
                 "'".htmlspecialchars($url_delete)."'")
@@ -398,15 +412,18 @@ class SubscriberListing
     $ret = '';
     if ('admin' == $mode) {
       $ret .= '<h2>'.$view->htmlSpecialChars(
-          $this->record['firstname'].' '.$this->record['lastname'])
-          .(isset($this->record['title']) ? ', '.$this->record['title'] : '')
-          .$edit.$merge.$delete.'</h2>';
+              $this->record['firstname'] . ' ' . $this->record['lastname'])
+              . (isset($this->record['title']) ? ', '.$this->record['title'] : '')
+            . $edit . $merge . $delete
+            .'</h2>';
 
-      if (isset($this->record['created']) && $this->record['created'] > 0)
+      if (isset($this->record['created']) && $this->record['created'] > 0) {
         $ret .= $this->buildEntry($view, $view->formatTimestamp($this->record['created']), 'Created').'<br />';
+      }
 
-      if (isset($this->record['position']))
+      if (isset($this->record['position'])) {
         $ret .= $this->buildEntry($view, $this->record['position'], 'Position');
+      }
     }
 
 
@@ -524,8 +541,9 @@ class SubscriberListing
           if ('review' == $field) {
             $value = 'Y' == $this->record[$field] ? tr('yes') : tr('no');
           }
-          else
+          else {
             $value = $this->record[$field];
+          }
 
           $review[] = $this->buildEntry($view, $value, $label);
         }
@@ -533,21 +551,23 @@ class SubscriberListing
 
       if (count($review) > 0) {
         $ret .= $this->buildSection($view, 'Contributor Info')
-              .implode('<br />', $review);
+              . implode('<br />', $review);
       }
     }
     else {
       global $MAIL_SETTINGS;
+      /*
       // just a general text
       $ret .= $this->buildSection($view, 'Review suggestion')
         .tr('If you have a suggestion for a review, please contact us at')
         .' '.'<a href="mailto:'.$MAIL_SETTINGS['assistance'].'">'
         .$MAIL_SETTINGS['assistance'].'</a>.';
+        */
     }
 
     if ('admin' == $mode && !empty($this->record['comment'])) {
       $ret .= $this->buildSection($view, 'Internal notes and comment')
-             .$view->formatParagraphs($this->record['comment']);
+            . $view->formatParagraphs($this->record['comment']);
     }
 
     return $ret;

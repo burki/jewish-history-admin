@@ -6,7 +6,7 @@
  *
  * (c) 2006-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-01-21 dbu
+ * Version: 2015-02-13 dbu
  *
  * Changes:
  *
@@ -28,10 +28,11 @@ class PageDisplay extends PageDisplayBase
   var $xls_data = array();
 
   function __construct (&$page) {
-    global $RIGHTS_EDITOR;
+    global $RIGHTS_REFEREE, $RIGHTS_EDITOR;
 
     $this->page = $page;
-    $this->is_internal = 0 != ($this->page->user['privs'] & $RIGHTS_EDITOR);
+    $this->is_internal = !empty($this->page->user)
+                       && 0 != ($this->page->user['privs'] & ($RIGHTS_REFEREE | $RIGHTS_EDITOR));
   }
 
   function formatTimestamp ($when, $format = 'd.m.Y') {
@@ -498,9 +499,10 @@ EOT;
             . $this->formatText($this->page->user['login'])
             . ' | <a class="inverse" href="' . $this->page->buildLink(array('pn' => 'account', 'edit' => $this->page->user['id'])).'">'.tr('My Account').'</a> | <a class="inverse" href="'.$this->page->buildLink(array('pn' => '', 'do_logout' => 1)).'">'.tr('Sign out').'</a></div>';
       if (!$this->is_internal) {
-        $this->page->site_description['structure']['root']['title'] = 'My Subscription';
+        $this->page->site_description['structure']['root']['title'] = 'Home';
       }
     }
+
     $ret .= sprintf('<a href="%s"><img src="%s" style="margin-left: 4px; vertical-align: text-bottom; border: 0;" width="515" height="106" alt="%s" /></a> ',
                     $url_main,
                     $this->page->BASE_PATH . 'media/logo.png',

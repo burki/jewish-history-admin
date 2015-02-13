@@ -4,9 +4,9 @@
  *
  * Class for managing communication
  *
- * (c) 2008-2014 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-07-29 dbu
+ * Version: 2015-02-13 dbu
  *
  * Changes:
  *
@@ -41,6 +41,14 @@ class DisplayCommunication extends DisplayTable
   var $publications;
 
   function init () {
+    global $RIGHTS_EDITOR, $RIGHTS_ADMIN;
+
+    if (empty($this->page->user)
+        || 0 == ($this->page->user['privs'] & ($RIGHTS_ADMIN | $RIGHTS_EDITOR)))
+    {
+      return false;
+    }
+
     if (!isset($this->id) && array_key_exists('mode', $_GET)) {
       if (array_key_exists($_GET['mode'], self::$TYPE_MAP)) {
         $this->defaults['type'] = self::$TYPE_MAP[$_GET['mode']];
@@ -439,10 +447,12 @@ class DisplayCommunication extends DisplayTable
     // return array('body' => array('format' => 'p'));
   }
 
+  /*
   function buildEditButton () {
     return sprintf(' <span class="regular">[<a href="%s">' . tr('edit') . '</a>]</span>',
                    htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_EDIT) => $this->id))));
   }
+  */
 
   function buildViewRows () {
     $rows = $this->getEditRows();
