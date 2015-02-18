@@ -116,6 +116,7 @@ $MEDIA_EXTENSIONS = array(
                           'application/pdf' => '.pdf',
 
                           'audio/mpeg' => '.mp3',
+                          'video/mp4' => '.mp4',
 
                           'text/rtf' => '.rtf',
                           'application/vnd.oasis.opendocument.text' => '.odt',

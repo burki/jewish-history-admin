@@ -256,6 +256,9 @@ class ImageUploadHandler
         if (isset($images[$img_name]['imgparams']['audio']) && $images[$img_name]['imgparams']['audio']) {
           $img->extensions['audio/mpeg'] = '.mp3';
         }
+        if (isset($images[$img_name]['imgparams']['video']) && $images[$img_name]['imgparams']['video']) {
+          $img->extensions['video/mp4'] = '.mp4';
+        }
 
         if (isset($images[$img_name]['imgparams']['office']) && $images[$img_name]['imgparams']['office']) {
           $img->extensions['text/rtf'] = '.rtf';

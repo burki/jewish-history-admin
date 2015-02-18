@@ -352,6 +352,7 @@ EOT;
                                              'title' => 'File',
                                              'pdf' => TRUE,
                                              'audio' => TRUE,
+                                             'video' => TRUE,
                                              'office' => TRUE,
                                              'xml' => TRUE,
                                              ),

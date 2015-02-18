@@ -153,6 +153,7 @@ $GETTEXT_MESSAGES = array (
 'DD.MM.YYYY' => 'DD.MM.JJJJ',
 'Author(s)' => 'Autor(en)',
 'Editor(s)' => 'Herausgeber',
+'Editor' => 'Herausgeber',
 'Publisher' => 'Verlag',
 'Publishers' => 'Verlage',
 'Place of publication' => 'Ort',
@@ -257,5 +258,8 @@ $GETTEXT_MESSAGES = array (
 'Article suggestion' => 'Artikel-Vorschlag',
 'Internal notes and comment' => 'Interne Bemerkungen und Kommentare',
 'Contribution areas' => 'Beitrags-Schwerpunkte',
+'Last change: %s' => 'Letzte Änderung: %s',
+'by' => 'durch',
+'generate' => 'generieren',
 );
 

@@ -106,7 +106,6 @@ class DisplayArticle extends DisplayMessage
     '-112' => 'abgelehnt Artikel',
   );
   var $status_default = '-99';
-  var $editor_options;
 
   function __construct (&$page) {
     global $MESSAGE_ARTICLE;
@@ -114,6 +113,33 @@ class DisplayArticle extends DisplayMessage
     $this->type = $MESSAGE_ARTICLE;
     $this->messages['item_new'] = tr('New Article');
     parent::__construct($page);
+
+    // referee and section
+    $this->joins_listing[] = 'LEFT OUTER JOIN User R ON Message.referee=R.id';
+    $this->joins_listing[] = 'LEFT OUTER JOIN Term T ON Message.section=T.id';
+
+    $index = 3;
+    $array = $this->fields_listing;
+    $this->fields_listing = array_merge(array_slice($array, 0, $index),
+                                        array("CONCAT(R.lastname, ' ', R.firstname) AS referee",
+                                              'T.name AS section',
+                                              ),
+                                        array_slice($array, $index, count($array) - 1));
+    $this->cols_listing = array_merge_at($this->cols_listing,
+                                         array('referee' => 'Referee',
+                                               'section' => 'Section'),
+                                         'contributor');
+    $this->condition[] = array('name' => 'referee',
+                               'method' => 'buildEditorCondition',
+                               'args' => $this->table . '.referee',
+                               'persist' => 'session');
+    $this->condition[] = array('name' => 'section',
+                               'method' => 'buildEditorCondition',
+                               'args' => $this->table . '.section',
+                               'persist' => 'session');
+    $this->order['referee'] = array('referee', 'referee DESC');
+    $this->order['section'] = array('section', 'section DESC');
+
     $this->order['date'] = array('IF(0 = reviewer_deadline + 0, published, reviewer_deadline) DESC', 'IF(0 = reviewer_deadline + 0, published, reviewer_deadline)');
     $this->fields_listing[count($this->fields_listing) -1 ] = "DATE(reviewer_deadline) AS reviewer_deadline";
     $this->cols_listing['date'] = 'Author deadline';
@@ -560,6 +586,13 @@ EOT;
     return $ret;
   }
 
+  function buildSearchFields($options = array()) {
+    $options['section'] = 'Section';
+    // $options['editor'] = 'Article Editor';
+    $options['referee'] = 'Referee';
+    return parent::buildSearchFields($options);
+  }
+
   function getImageDescriptions () {
     global $TYPE_MESSAGE;
 
@@ -574,6 +607,7 @@ EOT;
                                              'title' => 'File',
                                              'pdf' => TRUE,
                                              'audio' => TRUE,
+                                             'video' => TRUE,
                                              'office' => TRUE,
                                              'xml' => TRUE,
                                              ),

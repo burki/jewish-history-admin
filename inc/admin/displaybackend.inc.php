@@ -50,8 +50,8 @@ class DisplayBackendFlow extends TableManagerFlow
 
     if (TABLEMANAGER_EDIT == $ret) {
       global $RIGHTS_EDITOR, $RIGHTS_ADMIN;
-      if (empty($this->page->user)
-          || 0 == ($this->page->user['privs'] & ($RIGHTS_ADMIN | $RIGHTS_EDITOR)))
+      if (empty($page->user)
+          || 0 == ($page->user['privs'] & ($RIGHTS_ADMIN | $RIGHTS_EDITOR)))
       {
         // only view
         return isset($this->id) ? TABLEMANAGER_VIEW : TABLEMANAGER_LIST;
@@ -62,7 +62,6 @@ class DisplayBackendFlow extends TableManagerFlow
   }
 
 }
-
 
 /* Common base class for the backend with paging and upload handling */
 class DisplayBackend extends DisplayTable

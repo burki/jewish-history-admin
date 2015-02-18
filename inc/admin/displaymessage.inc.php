@@ -179,15 +179,16 @@ class DisplayMessage extends DisplayBackend
   var $table = 'Message';
   var $fields_listing = array('Message.id AS id', 'subject',
                               "CONCAT(User.lastname, ' ', User.firstname) AS fullname",
-                              "CONCAT(U.lastname, ' ', U.firstname) AS editor",
+//                              "CONCAT(U.lastname, ' ', U.firstname) AS editor",
                               'Message.status AS status', "DATE(published) AS published");
   var $joins_listing = array('LEFT OUTER JOIN MessageUser ON MessageUser.message_id=Message.id AND MessageUser.ord=0',
                              'LEFT OUTER JOIN User ON MessageUser.user_id=User.id',
-                             'LEFT OUTER JOIN User U ON Message.editor=U.id');
+//                             'LEFT OUTER JOIN User U ON Message.editor=U.id',
+                             );
 
   var $cols_listing = array('id' => 'ID', 'subject' => 'Title',
                             'contributor' => 'Contributor',
-                            'editor' => 'Editor',
+//                            'editor' => 'Editor',
                             'status' => 'Status',
                             'date' => 'Publication');
   var $idcol_listing = TRUE;
@@ -200,7 +201,7 @@ class DisplayMessage extends DisplayBackend
   var $order = array('id' => array('id DESC', 'id'),
                      'subject' => array('subject', 'subject DESC'),
                      'contributor' => array('fullname', 'fullname DESC'),
-                     'editor' => array('editor', 'editor DESC'),
+//                     'editor' => array('editor', 'editor DESC'),
                      'status' => array('Message.status', 'Message.status DESC'),
                      'date' => array('IF(0 = published + 0, Message.changed, published) DESC', 'IF(0 = published + 0, Message.changed, published)'),
                      );
@@ -226,10 +227,12 @@ class DisplayMessage extends DisplayBackend
                                'method' => 'buildStatusCondition',
                                'args' => $this->table . '.status',
                                'persist' => 'session');
+    /*
     $this->condition[] = array('name' => 'editor',
                                'method' => 'buildEditorCondition',
-                               'args' => $this->table.'.editor',
+                               'args' => $this->table . '.editor',
                                'persist' => 'session');
+                               */
 
     $this->search_fulltext = $this->page->getPostValue('fulltext');
     if (!isset($this->search_fulltext)) {
@@ -323,7 +326,7 @@ class DisplayMessage extends DisplayBackend
   }
 
   function setInput ($values = NULL) {
-    parent::setInput($value);
+    parent::setInput($values);
     if (isset($this->tinymce_fields) && count($this->tinymce_fields) > 0) {
       foreach ($this->tinymce_fields as $fieldname) {
         $this->form->set_value($fieldname, $this->unformatParagraphs($this->form->get_value($fieldname)));
@@ -691,7 +694,7 @@ EOT;
          . ': <select name="status">' . implode($status_options) . '</select>';
   }
 
-  function buildSearchFields () {
+  function buildSearchFields ($options = array()) {
     $search = sprintf('<input type="text" name="search" value="%s" size="40" />',
                       $this->htmlSpecialchars(array_key_exists('search', $this->search) ?  $this->search['search'] : ''));
     $search .= sprintf('<label><input type="hidden" name="fulltext" value="0" /><input type="checkbox" name="fulltext" value="1"%s /> %s</label>',
@@ -700,21 +703,31 @@ EOT;
 
     $search .=  '<br />' . $this->buildStatusOptions();
 
+    $select_fields = array('status');
+
     if (method_exists($this, 'buildOptions')) {
-      // Betreuer - TODO: make a bit more generic
-      $editor_options = array('<option value="">'.tr('-- all --').'</option>');
-      foreach ($this->buildOptions('editor') as $id => $label) {
-        $selected = isset($this->search['editor'])
-            && $this->search['editor'] !== ''
-            && $this->search['editor'] == $id
-        ? ' selected="selected"' : '';
-        $editor_options[] = sprintf('<option value="%s"%s>%s</option>', $id, $selected, htmlspecialchars(tr($label)));
+      foreach ($options as $name => $option_label) {
+         $select_fields[] = $name;
+        // Betreuer - TODO: make a bit more generic
+        $select_options = array('<option value="">' . tr('-- all --') . '</option>');
+        foreach ($this->buildOptions($name) as $id => $label) {
+          $selected = isset($this->search[$name])
+              && $this->search[$name] !== ''
+              && $this->search[$name] == $id
+          ? ' selected="selected"' : '';
+          $select_options[] = sprintf('<option value="%s"%s>%s</option>',
+                                      $id, $selected,
+                                      htmlspecialchars(tr($label)));
+        }
+        $search .= ' ' . tr($option_label)
+                 . sprintf(': <select name="%s">%s</select>',
+                           $name, implode($select_options));
+
       }
-      $search .= ' ' . tr('Article Editor')
-               . ': <select name="editor">' . implode($editor_options) . '</select>';
     }
 
     // clear the search
+    $select_fields_json = json_encode($select_fields);
     $url_clear = $this->page->BASE_PATH . 'media/clear.gif';
     $search .= <<<EOT
       <script>
@@ -726,7 +739,7 @@ EOT;
             if (null != form.elements[textfields[i]])
               form.elements[textfields[i]].value = '';
           }
-          var selectfields = ['status', 'editor'];
+          var selectfields = ${select_fields_json};
           for (var i = 0; i < selectfields.length; i++) {
             if (null != form.elements[selectfields[i]])
               form.elements[selectfields[i]].selectedIndex = 0;

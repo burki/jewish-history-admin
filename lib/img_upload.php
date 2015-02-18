@@ -197,6 +197,7 @@
                             'application/pdf' => '.pdf',
 
                             'audio/mpeg' => '.mp3',
+                            'video/mp4' => '.mp4',
 
                             'text/rtf' => '.rtf',
                             'application/vnd.oasis.opendocument.text' => '.odt',
@@ -520,6 +521,10 @@
           if (FALSE !== $res) {
             $type = $res;
             $found = true;
+            if ($type == 'video/mp') {
+              // adjust
+              $type = 'video/mp4';
+            }
           }
         }
       }

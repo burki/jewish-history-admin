@@ -265,6 +265,16 @@ EOT;
                            htmlspecialchars($img_url),
                            $this->formatText(empty($caption) ? 'Audio' : $caption));
       }
+      else if (in_array($img['mimetype'], array(
+                                                'video/mp4',
+                                                )))
+      {
+        $img_tag = sprintf('<video src="%s" preload="none" controls></video>',
+                           htmlspecialchars($img_url));
+        $img_tag .= sprintf('<br /><a href="%s" target="_blank">%s</a>',
+                           htmlspecialchars($img_url),
+                           $this->formatText(empty($caption) ? 'Video' : $caption));
+      }
       else if ('application/pdf' == $img['mimetype']) {
         if (!$append_uid) {
           $img_tag = $this->buildPdfViewer($img_url, empty($caption) ? 'PDF' : $caption,
