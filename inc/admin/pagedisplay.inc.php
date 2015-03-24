@@ -269,7 +269,7 @@ EOT;
                                                 'video/mp4',
                                                 )))
       {
-        $img_tag = sprintf('<video src="%s" preload="none" controls></video>',
+        $img_tag = sprintf('<div style="max-width: 800px"><video style="width: 100%%; height: auto;" src="%s" preload="none" controls></video></div>',
                            htmlspecialchars($img_url));
         $img_tag .= sprintf('<br /><a href="%s" target="_blank">%s</a>',
                            htmlspecialchars($img_url),
