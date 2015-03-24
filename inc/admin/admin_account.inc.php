@@ -6,7 +6,7 @@
  *
  * (c) 2006-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-02-13 dbu
+ * Version: 2015-02-24 dbu
  *
  *
  * Changes:
@@ -86,7 +86,7 @@ class DisplayAccount extends DisplayTable
                     );
   var $condition = array(
       "User.status <> -100", // deleted user
-      array('name' => 'search', 'method' => 'buildLikeCondition', 'args' => 'email'),
+      array('name' => 'search', 'method' => 'buildLikeCondition', 'args' => 'email,lastname,firstname'),
   );
 
   function instantiateRecord ($table = '', $dbconn = '') {
