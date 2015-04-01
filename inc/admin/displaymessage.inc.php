@@ -761,8 +761,6 @@ EOT;
   }
 
   function buildListingCell (&$row, $col_index, $val = NULL) {
-    global $MESSAGE_STATUS;
-
     $val = NULL;
 
     if (count($this->cols_listing) - 2 == $col_index) {

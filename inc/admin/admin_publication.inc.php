@@ -58,7 +58,7 @@ class PublicationRecord extends TableManagerRecord
           if (file_exists($fullname)) {
             $fname_store = $fullname;
 
-            $fullname_scaled = $folder.$fname.'.jpg';
+            $fullname_scaled = $folder . $fname . '.jpg';
 
             if (defined('UPLOAD_PATH2MAGICK')) {
               $cmd = UPLOAD_PATH2MAGICK . 'convert'
@@ -459,7 +459,7 @@ EOT;
     if (!empty($authors)) {
       // $parts = preg_split('/\s*\;\s/', $authors);
       // list($lastname, $firstname) = preg_split('/\s*,\s*/', $parts[0]);
-      // $author_short = (!empty($firstname) ? $firstname[0].'. ' : '').$lastname;
+      // $author_short = (!empty($firstname) ? $firstname[0] . '. ' : '') . $lastname;
       $author_short = $authors;
       if ($editor) {
         $author_short .= ' (Hrsg.)';

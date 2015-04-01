@@ -65,7 +65,9 @@ class DisplayRoot extends PageDisplay
           $ret = '<ul>';
         }
         $url = isset($action['url']) ? $action['url'] : $this->page->buildLink(array('pn' => $action['name']));
-        $ret .= '<li><a href="'.$url.'">'.$this->formatText(tr($action['title'])).'</a></li>';
+        $ret .= '<li><a href="' . htmlspecialchars($url) . '">'
+              . $this->formatText(tr($action['title']))
+              . '</a></li>';
       }
     }
     if (!empty($ret)) {

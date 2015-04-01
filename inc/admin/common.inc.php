@@ -6,7 +6,7 @@
  *
  * (c) 2006-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-02-13 dbu
+ * Version: 2015-03-26 dbu
  *
  * Changes:
  *
@@ -42,7 +42,7 @@ function is_associative($array) {
 }
 
 function native_to_utf8 ($str) {
-  return mb_convert_encoding($str, "UTF-8", "Windows-1252");
+  return mb_convert_encoding($str, 'UTF-8', 'Windows-1252');
 }
 
 function translit_7bit ($str) {
@@ -87,15 +87,15 @@ function replace_num_entity($ord) {
     {
         return chr($ord);
     }
-    elseif ($ord < 2048)
+    else if ($ord < 2048)
     {
         $no_bytes = 2;
     }
-    elseif ($ord < 65536)
+    else if ($ord < 65536)
     {
         $no_bytes = 3;
     }
-    elseif ($ord < 1114112)
+    else if ($ord < 1114112)
     {
         $no_bytes = 4;
     }
@@ -177,7 +177,7 @@ function writeMultibyte (&$sheet, $row, $col, $str, $format = 0) {
 }
 
 function strip_specialchars($txt) {
-  $match   = array('/’/s', '/[“”]/s', '/—/s');
+  $match = array('/’/s', '/[“”]/s', '/—/s');
   $replace = array("'", '"', '-');
   return preg_replace($match, $replace, $txt, -1);
 }
@@ -269,13 +269,13 @@ class AuthorListing
       $zipcodestyle = isset($record['zipcodestyle']) ? $record['zipcodestyle'] : Countries::zipcodeStyle($record['cc']);
       switch($zipcodestyle) {
         case 1:
-          $zipcode_town .= $separator.$record['zip'];
+          $zipcode_town .= $separator . $record['zip'];
           break;
         case 2:
-          $zipcode_town .= ($single ? ' ' : "\n").$record['zip'];
+          $zipcode_town .= ($single ? ' ' : "\n") . $record['zip'];
           break;
         default:
-          $zipcode_town = $record['zip'].' '.$zipcode_town;
+          $zipcode_town = $record['zip'] . ' ' . $zipcode_town;
       }
     }
     if ($append_country && !empty($record['cc'])) {
@@ -287,7 +287,7 @@ class AuthorListing
 
   function formatUrl ($url, $show_protocol = FALSE) {
     if (!preg_match('/^http(s)?\:/', $url)) {
-      $url = 'http://'.$url;
+      $url = 'http://' . $url;
     }
 
     // split link into protocol and destination, if available...
@@ -314,9 +314,10 @@ class AuthorListing
 
   function buildEntry (&$view, $entry, $label = '', $format_entry = TRUE) {
     $ret = !empty($label)
-            ? '<span class="listingLabel">'.tr($label).'</span> '
-            : '';
-    $ret .= ($format_entry ? $view->formatText($entry) : $entry).'</span>';
+           ? '<span class="listingLabel">' . tr($label) . '</span> '
+           : '';
+
+    $ret .= ($format_entry ? $view->formatText($entry) : $entry);
 
     return $ret;
   }
@@ -391,34 +392,38 @@ class AuthorListing
       // check if there might be someone to merge with
       $dbconn = isset($view->page->dbconn) ? $view->page->dbconn : new DB;
       $querystr = sprintf("SELECT COUNT(*) AS count_candidate FROM User WHERE (email = '%s' OR (lastname LIKE '%s' AND firstname LIKE '%s')) AND id<>%d AND status <> %d",
-                    empty($this->record['email']) ? 'DUMMY' : $dbconn->escape_string($this->record['email']),
-                    $dbconn->escape_string($this->record['lastname']),                    $dbconn->escape_string($this->record['firstname']),
-                    $this->id, AuthorListing::$status_deleted);
+                          empty($this->record['email']) ? 'DUMMY' : $dbconn->escape_string($this->record['email']),
+                          $dbconn->escape_string($this->record['lastname']),
+                          $dbconn->escape_string($this->record['firstname']),
+                          $this->id, AuthorListing::$status_deleted);
       $dbconn->query($querystr);
-      if ($dbconn->next_record() && $dbconn->Record['count_candidate'] > 0)
+      if ($dbconn->next_record() && $dbconn->Record['count_candidate'] > 0) {
         $merge = ' <span class="regular">[<a href="' . htmlspecialchars($view->page->buildLink(array('pn' => 'author', 'merge' => $this->id))) . '">'
                . tr('merge')
                . '</a>]</span>';
+      }
     }
     $delete = '';
     if ($show_delete) {
       $url_delete = $view->page->buildLink(array('pn' => $view->page->name, 'delete' => $this->id));
       $delete = sprintf(' <span class="regular">[<a href="javascript:if (confirm(%s)) window.location.href=%s">',
-                "'".tr('Do you want to delete this record (no undo)?')."'",
-                "'".htmlspecialchars($url_delete)."'")
-        .tr('delete').'</a>]</span>';
+                        "'" . tr('Do you want to delete this record (no undo)?') . "'",
+                        "'" . htmlspecialchars($url_delete) . "'")
+              . tr('delete')
+              . '</a>]</span>';
     }
 
     $ret = '';
     if ('admin' == $mode) {
-      $ret .= '<h2>'.$view->htmlSpecialChars(
+      $ret .= '<h2>' . $view->htmlSpecialChars(
               $this->record['firstname'] . ' ' . $this->record['lastname'])
               . (isset($this->record['title']) ? ', '.$this->record['title'] : '')
             . $edit . $merge . $delete
-            .'</h2>';
+            . '</h2>';
 
       if (isset($this->record['created']) && $this->record['created'] > 0) {
-        $ret .= $this->buildEntry($view, $view->formatTimestamp($this->record['created']), 'Created').'<br />';
+        $ret .= $this->buildEntry($view, $view->formatTimestamp($this->record['created']), 'Created')
+              . '<br />';
       }
 
       if (isset($this->record['position'])) {
@@ -426,13 +431,12 @@ class AuthorListing
       }
     }
 
-
     // top
     $top = array();
 
     if (isset($this->record['email'])) {
       $top[] = $this->buildEntry($view, $this->record['email']
-                                 .(TRUE || 'admin' == $mode ? ' '.$this->buildSubscriptionAction($view, $this->record['status'], 'email') : ''), '<!--Subscription -->E-mail', FALSE);
+                                 . (TRUE || 'admin' == $mode ? ' ' . $this->buildSubscriptionAction($view, $this->record['status'], 'email') : ''), '<!--Subscription -->E-mail', FALSE);
       /* $top[] = $this->buildEntry($view,
         (isset(self::$status_list[$this->record['status']])
          ? tr(self::$status_list[$this->record['status']]).' ' : '')
@@ -450,17 +454,19 @@ class AuthorListing
 
     if (count($top) > 0) {
       $ret .= '<br />' // $this->buildSection($view, 'Subscription')
-        .implode('<br />', $top);
+            . implode('<br />', $top);
     }
 
     if (!('admin' == $mode)) {
-      $ret .= '<h3>'.tr('Personal Info').$edit.'</h3>'
-        .$view->htmlSpecialChars(
-          $this->record['firstname'].' '.$this->record['lastname'])
-          .(isset($this->record['title']) ? ', '.$this->record['title'] : '');
+      $ret .= '<h3>' . tr('Personal Info') . $edit . '</h3>'
+            . $view->htmlSpecialChars(
+                                      $this->record['firstname'].' '.$this->record['lastname'])
+            . (isset($this->record['title']) ? ', '.$this->record['title'] : '');
 
-      if (isset($this->record['position']))
-        $ret .= '<br />'.$this->buildEntry($view, $this->record['position'], 'Position');
+      if (isset($this->record['position'])) {
+        $ret .= '<br />'
+              . $this->buildEntry($view, $this->record['position'], 'Position');
+      }
     }
     // contact
     $contact = array();
@@ -473,13 +479,16 @@ class AuthorListing
 
     // address
     $address = array();
-    if (isset($this->record['address']))
+    if (isset($this->record['address'])) {
       $address[] = $this->record['address'];
+    }
     $place_with_country = $this->buildPlaceWithZip($this->record, TRUE);
-    if (!empty($place_with_country))
+    if (!empty($place_with_country)) {
       $address[] = $place_with_country;
-    if (count($address) > 0)
+    }
+    if (count($address) > 0) {
       $contact[] = $this->buildEntry($view, implode("\n", $address), 'Address');
+    }
 
     if ('admin' == $mode) {
       $contact_fields = array('phone' => 'Phone', 'fax' => 'Fax');
@@ -492,11 +501,13 @@ class AuthorListing
 
     if (count($contact) > 0) {
       $ret .= $this->buildSection($view, 'Contact Info')
-        .implode('<br />', $contact).'</p>';
+            . implode('<br />', $contact)
+            . '</p>';
     }
 
     // personal info
     $personal = array();
+
     $personal_fields = array(
         'url' => 'Homepage',
         'supervisor' => 'Supervisor',
@@ -513,6 +524,7 @@ class AuthorListing
           'forum' => 'Other lists and fora',
           ));
     }
+
     foreach ($personal_fields as $field => $label) {
       if (!empty($this->record[$field])) {
         $value = 'url' == $field
@@ -524,8 +536,8 @@ class AuthorListing
     }
 
     if (count($personal) > 0) {
-      $ret .= $this->buildSection($view, 'Personal Info').
-        implode('<br />', $personal);
+      $ret .= $this->buildSection($view, 'Personal Info')
+            . implode('<br />', $personal);
     }
 
     // review info
@@ -536,6 +548,7 @@ class AuthorListing
           'review_areas' => 'Contribution areas',
           'review_suggest' => 'Article suggestion',
       );
+
       foreach ($review_fields as $field => $label) {
         if (!empty($this->record[$field])) {
           if ('review' == $field) {
@@ -548,6 +561,8 @@ class AuthorListing
           $review[] = $this->buildEntry($view, $value, $label);
         }
       }
+
+      // get all messages involved
 
       if (count($review) > 0) {
         $ret .= $this->buildSection($view, 'Contributor Info')

@@ -67,7 +67,7 @@ class MessageWithPublicationRecord extends MessageRecord
     if ($stored) {
       $publication = $this->get_value('publication');
       if (isset($publication) && intval($publication) > 0) {
-        $dbconn = new DB;
+        $dbconn = new DB();
         // add at the bottom
         $querystr = sprintf("SELECT MAX(ord) FROM MessagePublication WHERE message_id=%d",
                             intval($publication));
@@ -86,6 +86,7 @@ class MessageWithPublicationRecord extends MessageRecord
 
 class DisplayArticle extends DisplayMessage
 {
+  // var $show_xls_export = TRUE;
   var $status_options = array (
     '-99' => 'angedacht',
     '-76' => 'angefragt Autor',
@@ -150,7 +151,8 @@ class DisplayArticle extends DisplayMessage
   }
 
   function constructFulltextCondition () {
-    $this->condition[] = array('name' => 'search',
+    $this->condition[] = array(
+                               'name' => 'search',
                                'method' => 'buildFulltextCondition',
                                'args' => 'subject,User.firstname,User.lastname,body',
                                'persist' => 'session',
@@ -197,7 +199,8 @@ class DisplayArticle extends DisplayMessage
         $dbconn = &$this->page->dbconn;
         foreach ($order['publications'] as $ord => $id_publication) {
           $querystr = sprintf("UPDATE MessagePublication SET ord=%d WHERE message_id=%d AND publication_id=%d",
-                              intval($ord), $this->workflow->primaryKey(), intval($id_publication));
+                              intval($ord),
+                              $this->workflow->primaryKey(), intval($id_publication));
           $dbconn->query($querystr);
         }
       }
@@ -224,12 +227,14 @@ class DisplayArticle extends DisplayMessage
           $querystr = sprintf("SELECT id, name FROM Term WHERE category='%s' AND status >= 0 ORDER BY ord, name",
                               addslashes($type));
           break;
+
       case 'referee':
           $querystr = "SELECT id, lastname, firstname FROM User";
           $querystr .= sprintf(" WHERE 0 <> (privs & %d) AND id > 1 AND status <> %d",
                                $RIGHTS_REFEREE, STATUS_DELETED);
           $querystr .= " ORDER BY lastname, firstname";
           break;
+
       case 'editor':
       default:
           $querystr = "SELECT id, lastname, firstname FROM User";
@@ -591,6 +596,24 @@ EOT;
     // $options['editor'] = 'Article Editor';
     $options['referee'] = 'Referee';
     return parent::buildSearchFields($options);
+  }
+
+  function buildListingRow (&$row) {
+    if ('xls' == $this->page->display) {
+      $xls_row = array();
+      for ($i = 0; $i < $this->cols_listing_count; $i++) {
+        $val = $row[$i];
+        if (count($this->cols_listing) - 2 == $i && isset($val)) {
+          $val = $this->status_options[$val];
+        }
+
+        $xls_row[] = $val;
+      }
+      $this->xls_data[] = $xls_row;
+    }
+    else {
+      return parent::buildListingRow($row);
+    }
   }
 
   function getImageDescriptions () {

@@ -216,7 +216,9 @@ class DisplayAccount extends DisplayTable
       'email' => array('label' => $edit_self ? 'Your Account E-mail' : 'Account E-mail', 'value' => $this->record->get_value('email')),
       'lastname' => array('label' => 'Last Name'),
       'firstname' => array('label' => 'First Name'),
-      'pwd' => array('label' => tr('New Password').':<br />('.tr('Must be at least six characters').')'),
+      'pwd' => array('label' => tr('New Password')
+                     . ':<br />(' . tr('Must be at least six characters') . ')'
+                     ),
       'pwd_confirm' => array('label' => 'Confirm Password'),
     );
 
@@ -226,7 +228,8 @@ class DisplayAccount extends DisplayTable
       if ($edit_self) {
         // if i'm admin, i'm at least EDITOR
         $rights_mask &= ~$RIGHTS_EDITOR;
-        $fields[] = '<input type="hidden" name="privs[]" value="'.$RIGHTS_EDITOR.'" />'.$privs->show($rights_mask);
+        $fields[] = '<input type="hidden" name="privs[]" value="' . $RIGHTS_EDITOR . '" />'
+                  . $privs->show($rights_mask);
       }
       else {
         $fields['privs'] = array('label' => 'Access rights', 'value' => $privs->show($rights_mask));

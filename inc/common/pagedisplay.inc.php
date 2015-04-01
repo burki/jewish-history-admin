@@ -470,6 +470,13 @@ class PageDisplayBase
     return implode("\n", $tags);
   }
 
+  function buildHtmlStartTag ($lang_attr = '') {
+    return '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'
+      . '<html xmlns="http://www.w3.org/1999/xhtml"' . $lang_attr . '>'
+      . "\n";
+
+  }
+
   function buildHtmlStart () {
     // javascript
     $scriptcode = '';
@@ -522,10 +529,10 @@ EOT;
     $lang_attr = !empty($lang)
       ? sprintf(' lang="%s" xml:lang="%s"', $lang, $lang) : '';
 
+    $html_start = $this->buildHtmlStartTag($lang_attr);
+
     return <<<EOT
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"$lang_attr>
+$html_start
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=$charset" />
     <title>$title</title>

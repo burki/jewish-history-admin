@@ -246,9 +246,10 @@ class DisplayPasswordRecover extends PageDisplay
           $email_sent = $this->data['email_sent'];
 
           $content = '<p>'
-            .sprintf(tr('An e-mail containing instructions for changing your password has been sent to %s.'), $email_sent)
-            .'</p>';
-          $content .= '<p>'.tr("If this doesn't solve your problem, please contact us for technical assistance at").' <a href="mailto:'.$email_assistance.'">'.$email_assistance.'</a>.</p>';
+            . sprintf(tr('An e-mail containing instructions for changing your password has been sent to %s.'),
+                      $email_sent)
+            . '</p>';
+          $content .= '<p>' . tr("If this doesn't solve your problem, please contact us for technical assistance at").' <a href="mailto:' . $email_assistance . '">' . $email_assistance . '</a>.</p>';
         }
         break;
 
@@ -259,9 +260,9 @@ class DisplayPasswordRecover extends PageDisplay
       case SHOW_PWDCHANGED:
         $url_root = $page->buildLink(array('pn' => 'root'));
 
-        $content = '<p>'.tr('Your password has been changed. You will use this password when accessing this site in the future.')
-        .'<p>'.tr('You can now delete the instruction e-mail.')
-        .'<p>'.tr('To choose a new password, you can click on "My Account" or request a new instruction e-mail.').'</p>';
+        $content = '<p>' . tr('Your password has been changed. You will use this password when accessing this site in the future.') . '</p>'
+                 . '<p>' . tr('You can now delete the instruction e-mail.') . '</p>'
+                 . '<p>' . tr('To choose a new password, you can click on "My Account" or request a new instruction e-mail.') . '</p>';
 
         $continue = ucfirst(tr('continue'));
         $content .= <<<EOT
@@ -270,7 +271,9 @@ EOT;
         break;
 
       case SHOW_PWDFORM:
-        $msg_line = '<p class="message">'.(!empty($this->msg) ? $this->msg : tr('You can now pick a new password')).'</p>';
+        $msg_line = '<p class="message">'
+                  . (!empty($this->msg) ? $this->msg : tr('You can now pick a new password'))
+                  . '</p>';
 
         $action = $page->buildLink(array('pn' => $page->name));
         $recover_code = $this->data['recover_code'];
@@ -283,15 +286,14 @@ EOT;
       $msg_line
 EOT;
 
-        $content .= $this->buildContentLine(tr('New Password').':', '<input type="password" name="pwd" /> '.tr('Must be at least six characters'));
-        $content .= $this->buildContentLine(tr('Confirm new Password').':', '<input type="password" name="pwd_confirm" />');
-        $content .= $this->buildContentLine('&nbsp;', '<input name="submitpwd" type="submit" value="'.ucfirst(tr('continue')).'" />');
+        $content .= $this->buildContentLine(tr('New Password') . ':', '<input type="password" name="pwd" /> '.tr('Must be at least six characters'));
+        $content .= $this->buildContentLine(tr('Confirm new Password') . ':', '<input type="password" name="pwd_confirm" />');
+        $content .= $this->buildContentLine('&nbsp;', '<input name="submitpwd" type="submit" value="' . ucfirst(tr('continue')) . '" />');
 
         $content .= <<<EOT
       </form>
 EOT;
         break;
-
 
       default:
         $email_assistance = $MAIL_SETTINGS['technical_assistance'];
@@ -300,7 +302,7 @@ EOT;
 
         $content = '<p>' . tr("In case you forgot your password or haven't set one yet, we will immediatly send out e-mail instructions on how to create a new password. Your current (forgotten) password will remain active until you respond to that mail.") . '</p>';
 
-        $content .= '<form action="'.htmlspecialchars($action).'" method="post">';
+        $content .= '<form action="' . htmlspecialchars($action) . '" method="post">';
 
         if (!empty($this->msg)) {
           $content .= '<p class="message">' . $this->msg . '</p>';
@@ -308,11 +310,10 @@ EOT;
 
         $this_login = !empty($_REQUEST['login']) ? $_REQUEST['login'] : '';
 
-        $content .= $this->buildContentLine(tr('Your E-mail').':', '<input name="login" size="35" value="'.$this->htmlSpecialchars($this_login).'" />');
-        $content .= $this->buildContentLine('&nbsp;', '<input name="submit" type="submit" value="'.tr('Send').'" />');
+        $content .= $this->buildContentLine(tr('Your E-mail').':', '<input name="login" size="35" value="' . $this->htmlSpecialchars($this_login) . '" />');
+        $content .= $this->buildContentLine('&nbsp;', '<input name="submit" type="submit" value="' . tr('Send') . '" />');
 
-
-        $support_note = '<p>'.tr("If this doesn't solve your problem, please contact us for technical assistance at").' <a href="mailto:'.$email_assistance.'">'.$email_assistance.'</a>.</p>';
+        $support_note = '<p>' . tr("If this doesn't solve your problem, please contact us for technical assistance at") . ' <a href="mailto:' . $email_assistance . '">' . $email_assistance . '</a>.</p>';
         $content .= <<<EOT
       </form>
       $support_note
@@ -328,9 +329,11 @@ switch($display->init()) {
   case SHOW_LOGIN:
     $page->redirect(array());
     break;
+  /*
   case FORWARD_LOGINFIRST:
     $page->redirect(array('pn' => 'admin_first'));
     break;
+  */
   default:
     $page->setDisplay($display);
 }

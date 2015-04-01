@@ -172,6 +172,7 @@ class TableManagerQueryConditionBuilder
     if (empty($this->term)) {
       return;
     }
+
     $num_args = func_num_args();
     if ($num_args <= 0) {
       return;
@@ -209,6 +210,7 @@ class DisplayTable extends PageDisplay
 
   var $page_size = -1;
   var $show_xls_export = FALSE;
+  var $show_record_count = FALSE;
 
   var $fields;
   var $distinct_listing = FALSE;
@@ -224,7 +226,7 @@ class DisplayTable extends PageDisplay
 
   var $id;                // value of the primary key field
   var $search;            // search-fields
-  var $paging = array();
+  var $paging;
   var $order;             // the different orderings of the listing
   var $order_index;
   var $condition;
@@ -236,12 +238,13 @@ class DisplayTable extends PageDisplay
 
     parent::__construct($page);
     $this->workflow = gettype($workflow) == 'object'
-        ? $workflow
-        : new TableManagerFlow($this->is_internal && (isset($this->view_after_edit) && $this->view_after_edit));
+      ? $workflow
+      : new TableManagerFlow($this->is_internal && (isset($this->view_after_edit) && $this->view_after_edit));
   }
 
   function init () {
     $this->step = $this->workflow->init($this->page);
+
     if ($this->step == TABLEMANAGER_NOACCESS) {
       return FALSE;
     }
@@ -268,7 +271,9 @@ class DisplayTable extends PageDisplay
     if ($_SERVER['REQUEST_METHOD'] != 'POST' || $this->clear_postback) {
       return FALSE;
     }
-    return isset($_POST['_postback']) && !empty($_POST['_postback']) ? (!empty($name) ? $name == $_POST['_postback'] : TRUE) : FALSE;
+    return isset($_POST['_postback']) && !empty($_POST['_postback'])
+      ? (!empty($name) ? $name == $_POST['_postback'] : TRUE)
+      : FALSE;
   }
 
   function buildRecord ($name = '') {
@@ -356,7 +361,8 @@ class DisplayTable extends PageDisplay
   } // process
 
   function message ($msg_name, $lang = NULL) {
-    return tr(isset($this->messages[$msg_name]) ? $this->messages[$msg_name] : $msg_name);
+    $ret = isset($this->messages[$msg_name]) ? $this->messages[$msg_name] : $msg_name;
+    return is_array($ret) ? array_map('tr', $ret) : tr($ret);
   }
 
   function renderEditForm ($rows, $name = 'detail') {
@@ -433,6 +439,11 @@ class DisplayTable extends PageDisplay
     return array('id' => TRUE, '' => $this->form->show_submit('Store'));
   }
 
+  function buildFormAction () {
+    return $this->page->buildLink(array('pn' => $this->page->name,
+                                        $this->workflow->name(TABLEMANAGER_EDIT) => isset($this->id) ? $this->id : -1));
+  }
+
   function buildEdit ($name = 'detail') {
     if (!isset($this->record)) {
       return FALSE;
@@ -452,9 +463,7 @@ class DisplayTable extends PageDisplay
     $this->postback = $name;
 
     // here we can start to build-up the HTML-Form
-    $action = $this->page->buildLink(array('pn' => $this->page->name,
-    $this->workflow->name(TABLEMANAGER_EDIT) => isset($this->id) ? $this->id : -1));
-
+    $action = $this->buildFormAction();
     if (!isset($this->form)) {
       $this->form = $this->instantiateHtmlForm($name, $action);
     }
@@ -465,7 +474,6 @@ class DisplayTable extends PageDisplay
     return $this->renderEditForm($this->getEditRows(), $name);
   }
 
-
   // functions to build up a query:
   // SELECT *Fields* FROM *Tables* WHERE *Where* ORDER BY *Order*
   function buildListingFields () {
@@ -473,20 +481,20 @@ class DisplayTable extends PageDisplay
       $fieldnames = $this->record->get_fieldnames();
 
       for ($i = 0; $i < count($fieldnames); $i++) {
-        $field = & $this->record->get_field($fieldnames[$i]);
+        $field = $this->record->get_field($fieldnames[$i]);
         switch ($field->get('type')) {
           case 'date':
           case 'datetime':
-              $format = $field->get('format');
-              if (isset($format)) {
-                $fieldnames[$i] = "DATE_FORMAT(" . $fieldnames[$i] . ", '$format') AS ".$fieldnames[$i];
-              }
-              break;
+            $format = $field->get('format');
+            if (isset($format)) {
+              $fieldnames[$i] = "DATE_FORMAT(" . $fieldnames[$i] . ", '$format') AS " . $fieldnames[$i];
+            }
+            break;
           default:
-              $expression = $field->get('expression');
-              if (!empty($expression)) {
-                $fieldnames[$i] = $field->get('expression') . ' AS ' . $fieldnames[$i];
-              }
+            $expression = $field->get('expression');
+            if (!empty($expression)) {
+              $fieldnames[$i] = $field->get('expression') . ' AS ' . $fieldnames[$i];
+            }
         }
       }
       $this->fields_listing = $fieldnames;
@@ -506,10 +514,10 @@ class DisplayTable extends PageDisplay
             case 'date':
             case 'datetime':
             case 'timestamp':
-                $fieldnames[$i] = "DATE_FORMAT($fieldname, '%Y-%m-%d %H:%i:%s') AS $fieldname";
-                break;
+              $fieldnames[$i] = "DATE_FORMAT($fieldname, '%Y-%m-%d %H:%i:%s') AS $fieldname";
+              break;
             default:
-                $fieldnames[$i] = $fieldname;
+              $fieldnames[$i] = $fieldname;
           }
         }
         $this->fields_listing = $fieldnames;
@@ -556,8 +564,6 @@ class DisplayTable extends PageDisplay
           if (isset($condition['name'])) {
             $name = $condition['name'];
             $value = array_key_exists($name, $_REQUEST) ? $_REQUEST[$name] : '';
-            if ($this->page->STRIP_SLASHES)
-              $value = stripslashes($value);
 
             if (array_key_exists('persist', $condition)) {
               if (!array_key_exists($name, $_REQUEST)) {
@@ -615,10 +621,12 @@ class DisplayTable extends PageDisplay
 // var_dump($current_order);
 // var_dump($order_index);
 
-    if (isset($_REQUEST['sort']) && isset($order[$_REQUEST['sort']])) { // wish for new sort
+    if (isset($_REQUEST['sort']) && isset($order[$_REQUEST['sort']])) {
+      // wish for new sort
       $new_order = $_REQUEST['sort'];
     }
-    else if (!empty($current_order) && isset($order[$current_order])) { // change order of existing sort
+    else if (!empty($current_order) && isset($order[$current_order])) {
+      // change order of existing sort
       $new_order = $current_order;
     }
     else {
@@ -716,7 +724,7 @@ class DisplayTable extends PageDisplay
         if ($current_end > $count) {
           $current_end = $count;
         }
-        $this->paging['record_start'] = (($page_id * $page_size) + 1);
+        $this->paging['record_start'] = ($page_id * $page_size) + 1;
         $this->paging['record_end'] = $current_end;
         $this->paging['record_count'] = $count;
       }
@@ -724,7 +732,7 @@ class DisplayTable extends PageDisplay
     }
     else {
       // just query - the calling method will fetch the rows
-      $this->active_conn = new DB;
+      $this->active_conn = new DB();
       $this->active_conn->query($querystr);
     }
   }
@@ -754,15 +762,41 @@ class DisplayTable extends PageDisplay
     }
     return $export;
   }
+
+  function buildListingAdd () {
+    return sprintf('[<a href="%s">%s</a>]',
+                   htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_EDIT) => -1))),
+                   tr('add'));
+  }
+
   function buildListingAddItem () {
     $ret = '';
 
     if ($this->cols_listing_count > 0) {
-      $ret .= sprintf('<tr><td class="listing" colspan="%d">%s</td><td style="text-align:right;" class="listing">[<a href="%s">%s</a>]</td></tr>',
-        $this->cols_listing_count - 1,
-        $this->message('item_new'),
-        htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_EDIT) => -1))),
-        tr('add'));
+      if ($this->show_record_count || $this->show_xls_export) {
+        $total = '';
+
+        if ($this->show_record_count && isset($this->paging['record_count'])) {
+          list($one, $many) = $this->message('record_count');
+          $total = $this->paging['record_count'] . ' ' . (1 == $this->paging['record_count'] ? $one : $many);
+        }
+
+        $export = $this->buildListingExport();
+
+        $ret .= sprintf('<tr><td>%s</td><td colspan="%d" align="right">%s</td></tr>',
+                        $total,
+                        $this->cols_listing_count - 1,
+                        $export);
+      }
+
+      $button_add = $this->buildListingAdd();
+      $msg_add = !empty($button_add) ? $this->message('item_new') : '';
+
+
+      $ret .= sprintf('<tr class="Add"><td class="listing" colspan="%d">%s</td>'
+                      . '<td class="listing">%s</td></tr>',
+                      $this->cols_listing_count - 1,
+                      $msg_add, $button_add);
     }
 
     return $ret;
@@ -776,6 +810,7 @@ class DisplayTable extends PageDisplay
     if (!isset($this->paging) || !($this->cols_listing_count > 0)) {
       return '';
     }
+
     if ($this->paging['page_count'] <= 1 && !$this->show_xls_export) {
       return '';
     }
@@ -787,30 +822,26 @@ class DisplayTable extends PageDisplay
     }
 
     $page_select = '<select name="page_id" onChange="this.form.submit()">';
-    for ($page_id = 0; $page_id < $this->paging['page_count']; $page_id++)
-        $page_select .= sprintf('<option value="%d"%s>%d</option>',
+    for ($page_id = 0; $page_id < $this->paging['page_count']; $page_id++) {
+      $page_select .= sprintf('<option value="%d"%s>%d</option>',
                               $page_id,
                               $page_id == $this->paging['page_id'] ? ' selected="selected"' : '',
                               $page_id + 1);
+    }
     $page_select .= '</select>' . '/' . $this->paging['page_count'];
 
     $row = sprintf('<form action="%s" method="post">',
                    htmlspecialchars($this->page->buildLink($page_params)))
          . tr('Result Page') . ': '
          . ($this->paging['page_id'] > 0
-            ? '<a href="'.$this->page->buildLink(array_merge($page_params, array('page_id' => $this->paging['page_id'] - 1))).'">&lt; '.tr('Previous').'</a> '
+            ? '<a href="' . htmlspecialchars($this->page->buildLink(array_merge($page_params, array('page_id' => $this->paging['page_id'] - 1)))) . '">&lt; ' . tr('Previous') . '</a> '
             : '')
          . $page_select
          . ($this->paging['page_id'] < $this->paging['page_count'] - 1
-           ? ' <a href="'.$this->page->buildLink(array_merge($page_params, array('page_id' => $this->paging['page_id'] + 1))).'">'.tr('Next').' &gt;</a>' : '')
+           ? ' <a href="' . htmlspecialchars($this->page->buildLink(array_merge($page_params, array('page_id' => $this->paging['page_id'] + 1)))) . '">' . tr('Next') . ' &gt;</a>' : '')
          . '</form>';
 
     $colspan = $this->cols_listing_count;
-    if ($this->show_xls_export) {
-      --$colspan;
-      $row .= sprintf('</td><td align="right">[<a href="%s">export</a>]',
-                      htmlspecialchars($this->page->buildLink($page_params + array('view' => 'xls'))));
-    }
 
     return sprintf('<tr class="listing"><td class="listing" colspan="%d" nowrap="nowrap" style="text-align: center;">%s</td></tr>',
                    $colspan, $row);
@@ -820,15 +851,19 @@ class DisplayTable extends PageDisplay
     if (!isset($this->cols_listing)) {
       return '';
     }
+
     $headers = & $this->cols_listing;
     $ret = '<tr>';
     $col_names = array_keys($headers);
     for ($i = 0; $i < count($col_names); $i++) {
       $col_name = $col_names[$i];
       $header = $this->formatText(tr($headers[$col_name]));
-      if (array_key_exists($col_name, $this->order))
-        $header = sprintf('<a href="%s">%s</a>', $this->page->buildLink(array('pn' => $this->page->name, 'page_id' => 0, 'sort' => $col_name)), $header);
-      $ret .= '<th>'.$header.'</th>';
+      if (array_key_exists($col_name, $this->order)) {
+        $header = sprintf('<a href="%s">%s</a>',
+                          htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, 'page_id' => 0, 'sort' => $col_name))),
+                          $header);
+      }
+      $ret .= '<th>' . $header . '</th>';
     }
     $ret .= '</tr>';
 

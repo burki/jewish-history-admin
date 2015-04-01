@@ -111,7 +111,7 @@ class Page
 
     $this->PHP_SELF = $_SERVER['PHP_SELF'];
     $this->URL_SELF = ($this->SERVER_PORT == '443' ? 'https' : 'http') // Protocoll
-      . '://' . $this->SERVER_NAME . ($this->SERVER_PORT != '80' ? ':'.$this->SERVER_PORT : '')
+      . '://' . $this->SERVER_NAME . ($this->SERVER_PORT != '80' ? ':' . $this->SERVER_PORT : '')
       . $this->PHP_SELF;
   }
 
@@ -625,9 +625,10 @@ class Page
         foreach ($options as $key => $val) {
           if (gettype($val) == 'string' && empty($val))
             continue;
-          if ('anchor' == $key)
-            $anchor = '#'.$val;
-          elseif ('pn' == $key && isset($URL_REWRITE[$val])) {
+          if ('anchor' == $key) {
+            $anchor = '#' . $val;
+          }
+          else if ('pn' == $key && isset($URL_REWRITE[$val])) {
             if (gettype($URL_REWRITE[$val]) == 'string') {
               $rewrite = $URL_REWRITE[$val];
               if (preg_match('/^http(s?)\:/', $rewrite))

@@ -6,7 +6,7 @@
  *
  * (c) 2006-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-02-13 dbu
+ * Version: 2015-03-26 dbu
  *
  * Changes:
  *
@@ -22,10 +22,10 @@ class AuthorFlow extends TableManagerFlow
   var $user;
   var $is_internal = FALSE;
 
-  function __construct (&$page) {
+  function __construct ($page) {
     global $RIGHTS_EDITOR;
 
-    $this->user = &$page->user;
+    $this->user = $page->user;
     $this->is_internal = 0 != ($this->user['privs'] & $RIGHTS_EDITOR);
 
     parent::TableManagerFlow($this->is_internal);
@@ -100,7 +100,7 @@ class AuthorQueryConditionBuilder extends TableManagerQueryConditionBuilder {
         // also show expired on holds
         $ret = "($ret "
           // ." OR ".$fields[0]. " = -3" // uncomment for open requests
-             . " OR (".$fields[0]." = 2 AND hold <= CURRENT_DATE()))";
+             . " OR (" . $fields[0] . " = 2 AND hold <= CURRENT_DATE()))";
       }
       return $ret;
     }
@@ -151,7 +151,7 @@ class DisplayAuthor extends DisplayTable
     }
 
     $this->condition = array(
-      "User.status <> ".$this->status_deleted,
+      "User.status <> " . $this->status_deleted,
       array('name' => 'status', 'method' => 'buildStatusCondition', 'args' => 'status', 'persist' => 'session'),
       $search_condition,
       array('name' => 'review', 'method' => 'buildLikeCondition', 'args' => 'review', 'persist' => 'session'),
@@ -273,7 +273,8 @@ class DisplayAuthor extends DisplayTable
         array(
           array('label' => 'Subscribed / Unsubscribed', 'fields' => array('subscribed', 'unsubscribed'), 'show_datetimestyle' => true),
           'hold' => array('label' => 'Hold until', 'show_datetimestyle' => true),
-          $this->form->show_submit(tr('Store')).'<hr noshade="noshade" />',
+          $this->form->show_submit(tr('Store'))
+          . '<hr noshade="noshade" />',
         ));
     }
 
@@ -316,7 +317,6 @@ class DisplayAuthor extends DisplayTable
       $rows['status']['value'] = tr(AuthorListing::$status_list[$this->record->get_value('status')]);
     }
 
-
     return array_merge(
       $rows,
       array(
@@ -331,7 +331,7 @@ class DisplayAuthor extends DisplayTable
     $author = new AuthorListing($this->id);
 
     if (!$author->query($this->page->dbconn)) {
-        return 'An error occured query-ing your data';
+      return 'An error occured query-ing your data';
     }
 
     return $author->build($this, $this->workflow->is_internal
@@ -340,7 +340,7 @@ class DisplayAuthor extends DisplayTable
 
   function buildSearchBar () {
 /*
-    $select_options = array('<option value="">'.tr('-- all --').'</option>');
+    $select_options = array('<option value="">' . tr('-- all --') . '</option>');
     foreach (AuthorListing::$status_list as $status => $label)
       if ($this->status_deleted != $status) {
         $selected = $this->search['status'] !== ''
@@ -352,20 +352,28 @@ class DisplayAuthor extends DisplayTable
       $ret = sprintf('<form action="%s" method="post" name="search">',
                      htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, 'page_id' => 0))));
 
-      $search = '<input type="text" name="search" value="'.$this->htmlSpecialchars(array_key_exists('search', $this->search) ?  $this->search['search'] : '').'" size="40" />';
-      $search .= '<label><input type="hidden" name="fulltext" value="0" /><input type="checkbox" name="fulltext" value="1" '.($this->search_fulltext ? ' checked="checked"' : '').'/> '.$this->htmlSpecialchars(tr('Fulltext')).'</label>';
+      $search = '<input type="text" name="search" value="' . $this->htmlSpecialchars(array_key_exists('search', $this->search) ?  $this->search['search'] : '') . '" size="40" />';
+      $search .= '<label><input type="hidden" name="fulltext" value="0" />'
+               . '<input type="checkbox" name="fulltext" value="1" '
+               . ($this->search_fulltext ? ' checked="checked"' : '')
+               . '/> '
+               . $this->htmlSpecialchars(tr('Fulltext'))
+               . '</label>';
       /*
-      $search .= '<br />'.tr('Subscription Status').': <select name="status">'.implode($select_options).'</select>';
+      $search .= '<br />' . tr('Subscription Status') . ': <select name="status">' . implode($select_options) . '</select>';
       */
 
       foreach (array('' => '-- all --', 'Y' => 'yes', /* 'N' => 'no', */) as $status => $label) {
         $selected = isset($this->search['review']) && $this->search['review'] !== ''
             && $this->search['review'] == $status
             ? ' selected="selected"' : '';
-        $review_options[] = sprintf('<option value="%s"%s>%s</option>', $status, $selected, htmlspecialchars(tr($label)));
+        $review_options[] = sprintf('<option value="%s"%s>%s</option>',
+                                    $status, $selected,
+                                    htmlspecialchars(tr($label)));
       }
 
-      $search .= ' '. tr('Willing to contribute') . ': <select name="review">'.implode($review_options).'</select>';
+      $search .= ' ' . tr('Willing to contribute')
+               . ': <select name="review">' . implode($review_options) . '</select>';
       // clear the search
       $url_clear = $this->page->BASE_PATH . 'media/clear.gif';
       $search .= <<<EOT
@@ -394,7 +402,7 @@ class DisplayAuthor extends DisplayTable
       </script>
       <a title="Clear search fields" href="javascript:clear_search();"><img src="$url_clear" border="0" /></a>
 EOT;
-    $search .= ' <input class="submit" type="submit" value="'.tr('Search').'" />';
+    $search .= ' <input class="submit" type="submit" value="' . tr('Search') . '" />';
 
     $ret .= sprintf('<tr><td colspan="%d" nowrap="nowrap">', $this->cols_listing_count + 1)
             .$search.'</td></tr>';
@@ -442,7 +450,6 @@ EOT;
              . $this->formatTimestamp($row['created'], 'd.m.y')
              . '</div>';
         break;
-
     }
 
     return parent::buildListingCell($row, $col_index, $val);
@@ -456,18 +463,23 @@ EOT;
     $record = $this->instantiateRecord();
     // created is default of type function
     $record->get_field('created')->set('datatype', 'date');
-    if (!$record->fetch($id))
+    if (!$record->fetch($id)) {
       return FALSE;
+    }
 
     $action = NULL;
-    if (array_key_exists('with', $this->page->parameters) && intval($this->page->parameters['with']) > 0) {
+    if (array_key_exists('with', $this->page->parameters)
+        && intval($this->page->parameters['with']) > 0)
+    {
       $action = 'merge';
       $id_new = intval($this->page->parameters['with']);
     }
-    if ($this->isPostback($name))
+    if ($this->isPostback($name)) {
       $action = $this->page->getPostValue('action');
-    else if (array_key_exists('action', $this->page->parameters))
+    }
+    else if (array_key_exists('action', $this->page->parameters)) {
       $action = $this->page->parameters['action'];
+    }
 
     $ret = FALSE;
 
@@ -475,8 +487,9 @@ EOT;
       case 'merge':
         $record_new = $this->instantiateRecord();
         $record_new->get_field('created')->set('datatype', 'date');
-        if (!$record_new->fetch($id_new))
+        if (!$record_new->fetch($id_new)) {
           return FALSE;
+        }
 
         $store = FALSE;
 
@@ -618,7 +631,7 @@ EOT;
                                         tr(AuthorListing::$status_list[$dbconn->Record['status']]),
                                         $this->formatTimestamp($dbconn->Record['created_timestamp'])
                   ))
-            .' <input type="button" name="select" value="select" onClick="if (confirm('.sprintf("'%s'", htmlspecialchars($confirm_msg)).')) window.location.href='.sprintf("'%s'", htmlspecialchars($this->page->buildLink($params_replace))).';" />';
+            .' <input type="button" name="select" value="select" onClick="if (confirm(' . sprintf("'%s'", htmlspecialchars($confirm_msg)) . ')) window.location.href=' . sprintf("'%s'", htmlspecialchars($this->page->buildLink($params_replace))) . ';" />';
         }
         if (!empty($replace)) {
           $ret = '<p>'

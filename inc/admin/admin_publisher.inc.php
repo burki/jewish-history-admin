@@ -292,12 +292,16 @@ EOT;
       $rows = $this->buildViewRows();
       $edit = $this->buildEditButton();
 
-      $ret = '<h2>' . $this->formatText($record->get_value('name')).' '.$edit . '</h2>';
+      $ret = '<h2>'
+           . $this->formatText($record->get_value('name'))
+           . ' ' . $edit
+           . '</h2>';
 
       $ret .= $this->renderView($record, $rows);
 
-      if (isset($uploadHandler))
+      if (isset($uploadHandler)) {
         $ret .= $this->renderUpload($uploadHandler);
+      }
 
     }
 
@@ -327,8 +331,9 @@ EOT;
       }
       $this->xls_data[] = $xls_row;
     }
-    else
+    else {
       return parent::buildListingRow($row);
+    }
   }
 
   function buildMerge () {
