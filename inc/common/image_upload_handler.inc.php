@@ -118,6 +118,7 @@ class ImageUploadHandler
       // delete this item
       $querystr = "DELETE FROM Media WHERE id=$media_id";
       $dbconn->query($querystr);
+      return $media_id;
     }
   }
 
@@ -182,6 +183,14 @@ class ImageUploadHandler
     return $img_record;
   }
 
+  function instantiateImage ($params) {
+    return new Image($params);
+  }
+
+  function instantiateImageUpload ($params) {
+    return new ImageUpload($params);
+  }
+
   function buildImgFolder () {
     global $UPLOAD_TRANSLATE;
 
@@ -203,11 +212,11 @@ class ImageUploadHandler
       $img_form = $this->instantiateUploadRecord($dbconn);
       // $img_form->set_value('ord', $images[$key]['ord']);
       $this->img_forms[$key] = new FormHTML(array(), $img_form);
-      $this->img_images[] = new Image(array_merge(array('name' => $key), $images[$key]['imgparams']));
+      $this->img_images[] = $this->instantiateImage(array_merge(array('name' => $key), $images[$key]['imgparams']));
     }
     $folder = $this->buildImgFolder();
 
-    $img_upload = new ImageUpload(array(
+    $img_upload = $this->instantiateImageUpload(array(
                                     'action' => $action,
                                     'upload_fileroot' => UPLOAD_FILEROOT . $folder,
                                     'upload_urlroot'  => UPLOAD_URLROOT . $folder,
@@ -223,16 +232,36 @@ class ImageUploadHandler
     return $img_upload;
   }
 
+  function storeImgData ($img, $img_form, $img_name) {
+    $imgdata = isset($img) ? $img->find_imgdata() : array();
+    if (count($imgdata) > 0) {
+      if (isset($this->dbconn)) {
+        $dbconn = & $this->dbconn;
+      }
+      else {
+        $dbconn = new DB;
+      }
+      // we have an image
+      $img_form->set_values(array('name' => $img_name, 'width' => isset($imgdata[0]['width']) ? $imgdata[0]['width'] : -1,
+                                  'height' => isset($imgdata[0]['height']) ? $imgdata[0]['height'] : -1,
+                                  'mimetype' => $imgdata[0]['mime']));
+
+      // find out if we already have an item
+      $querystr = sprintf("SELECT id FROM Media WHERE item_id=%d AND type=%d AND name='%s' ORDER BY ord DESC LIMIT 1",
+                          $this->item_id, $this->type, $img_name);
+      $dbconn->query($querystr);
+      if ($dbconn->next_record()) {
+        $img_form->set_value('id', $dbconn->Record['id']);
+      }
+
+      $img_form->set_values(array('item_id' => $this->item_id, 'ord' => 0));
+      $img_form->store();
+    }
+  }
+
   function process (&$img_upload, &$images) {
     $upload_results = array();
     $img_names = array_keys($this->img_forms);
-
-    if (isset($this->dbconn)) {
-      $dbconn = & $this->dbconn;
-    }
-    else {
-      $dbconn = new DB;
-    }
 
     for ($i = 0; $i < count($img_names); $i++) {
       $img_name = $img_names[$i];
@@ -271,30 +300,14 @@ class ImageUploadHandler
           $img->extensions['application/xml'] = '.xml';
         }
 
-        $imgdata = isset($img) ? $img->find_imgdata() : array();
-        if (count($imgdata) > 0) {
-          // we have an image
-          $img_form->set_values(array('name' => $img_name, 'width' => isset($imgdata[0]['width']) ? $imgdata[0]['width'] : -1,
-                                      'height' => isset($imgdata[0]['height']) ? $imgdata[0]['height'] : -1,
-                                      'mimetype' => $imgdata[0]['mime']));
-
-          // find out if we already have an item
-          $querystr = sprintf("SELECT id FROM Media WHERE item_id=%d AND type=%d AND name='%s' ORDER BY ord DESC LIMIT 1", $this->item_id, $this->type, $img_name);
-          $dbconn->query($querystr);
-          if ($dbconn->next_record()) {
-            $img_form->set_value('id', $dbconn->Record['id']);
-          }
-
-          $img_form->set_values(array('item_id' => $this->item_id, 'ord' => 0));
-          $img_form->store();
-        }
+        $this->storeImgData($img, $img_form, $img_name);
       }
       else {
         $invalid = $img_form->invalid();
         // var_dump($invalid);
       }
-
     }  // for
+
     return $upload_results;
   }
 

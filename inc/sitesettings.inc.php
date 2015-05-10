@@ -5,9 +5,9 @@
  * Sitewide settings
  * (put machine dependent stuff like hardwired paths, logins and passwords in inc/local.inc.php)
  *
- * (c) 2009-2014 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-12-22 dbu
+ * Version: 2015-05-09 dbu
  *
  * Changes:
  *
@@ -137,6 +137,8 @@ $MESSAGE_ARTICLE = 200;
 
 // MEDIA TYPES
 $TYPE_MESSAGE = 0;
+$TYPE_PERSON = 10;
+$TYPE_PLACE = 20;
 $TYPE_PUBLICATION = 50;
 
 $UPLOAD_TRANSLATE = array(

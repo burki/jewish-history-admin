@@ -447,12 +447,10 @@ class DisplayCommunication extends DisplayTable
     // return array('body' => array('format' => 'p'));
   }
 
-  /*
   function buildEditButton () {
     return sprintf(' <span class="regular">[<a href="%s">' . tr('edit') . '</a>]</span>',
                    htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_EDIT) => $this->id))));
   }
-  */
 
   function buildViewRows () {
     $rows = $this->getEditRows();

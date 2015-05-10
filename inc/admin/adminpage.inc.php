@@ -6,7 +6,7 @@
  *
  * (c) 2009-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-02-13 dbu
+ * Version: 2015-04-01 dbu
  *
  * Changes:
  *
@@ -85,6 +85,14 @@ $SITE_DESCRIPTION = array(
         ),
         'publisher' => array(
             'title' => 'Holding Institutions',
+            'anonymous' => FALSE,
+        ),
+        'person' => array(
+            'title' => 'Normdata: Persons',
+            'anonymous' => FALSE,
+        ),
+        'place' => array(
+            'title' => 'Normdata: Places',
             'anonymous' => FALSE,
         ),
         'term' => array(

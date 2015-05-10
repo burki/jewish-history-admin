@@ -6,7 +6,7 @@
  *
  * (c) 2010-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-02-13 dbu
+ * Version: 2015-05-10 dbu
  *
  * Changes:
  *
@@ -49,6 +49,16 @@ class DisplayRoot extends PageDisplay
       array(
         'name' => 'term',
         'title' => 'Wertelisten',
+        'privs' => $RIGHTS_ADMIN,
+      ),
+      array(
+        'name' => 'person',
+        'title' => 'Personennamen',
+        'privs' => $RIGHTS_ADMIN,
+      ),
+      array(
+        'name' => 'place',
+        'title' => 'Ortsnamen',
         'privs' => $RIGHTS_ADMIN,
       ),
       array(

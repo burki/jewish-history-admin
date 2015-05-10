@@ -6,7 +6,7 @@
  *
  * (c) 2007-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-02-13 dbu
+ * Version: 2015-05-09 dbu
  *
  * Changes:
  *
@@ -63,17 +63,195 @@ class DisplayBackendFlow extends TableManagerFlow
 
 }
 
+class CollectingReader extends Sabre\Xml\Reader
+{
+    function xml($source, $encoding = null, $options = 0)
+    {
+        // hack for <?xml-model href="http://www.deutschestextarchiv.de/basisformat_ohne_header.rng"
+        // type="application/xml"
+        // schematypens="http://relaxng.org/ns/structure/1.0"?\>
+        $source = preg_replace('/<\?xml\-model [\s\S]*?\?>/', '', $source);
+        parent::xml($source, $encoding, $options);
+    }
+
+    function collect($output)
+    {
+        $this->collected[] = $output;
+    }
+
+    function parse()
+    {
+        $this->collected = array();
+        parent::parse();
+        return $this->collected;
+    }
+
+    static function collectElement(Sabre\Xml\Reader $reader)
+    {
+        $name = $reader->getClark();
+        // var_dump($name);
+        $attributes = $reader->parseAttributes();
+
+        $res = [
+            'name' => $name,
+            'attributes' => $attributes,
+            'text' => $reader->readText(),
+        ];
+
+        $reader->collect($res);
+
+        $reader->next();
+    }
+}
+
+class BackendImageUploadHandler extends ImageUploadHandler
+{
+  function instantiateUploadRecord ($dbconn) {
+    $img_record = parent::instantiateUploadRecord($dbconn);
+
+    $img_record->add_fields(
+      array(
+        new Field(array('name' => 'additional', 'type' => 'hidden', 'cols' => 60, 'rows' => 3, 'datatype' => 'char', 'null' => TRUE)),
+      ));
+    return $img_record;
+  }
+
+  function storeImgData ($img, $img_form, $img_name) {
+    $imgdata = isset($img) ? $img->find_imgdata() : array();
+    if (count($imgdata) > 0) {
+      if (isset($this->dbconn)) {
+        $dbconn = & $this->dbconn;
+      }
+      else {
+        $dbconn = new DB;
+      }
+      $additional = array();
+      if ('application/xml' == $imgdata[0]['mime']) {
+        $input = file_get_contents($imgdata[0]['fname']);
+        $reader = new CollectingReader();
+        $reader->elementMap = [
+            '{http://www.tei-c.org/ns/1.0}persName' => 'CollectingReader::collectElement',
+            '{http://www.tei-c.org/ns/1.0}placeName' => 'CollectingReader::collectElement',
+        ];
+        try {
+          $reader->xml($input);
+          $output = $reader->parse();
+          foreach ($output as $entity) {
+            $uri = trim($entity['attributes']['ref']);
+            switch ($entity['name']) {
+              case '{http://www.tei-c.org/ns/1.0}placeName':
+                $type = 'place';
+                if (preg_match('/^'
+                               . preg_quote('http://vocab.getty.edu/tgn/', '/')
+                               . '\d+$/', $uri))
+                {
+                }
+                else {
+                  // die($uri);
+                  unset($uri);
+                }
+                break;
+
+              case '{http://www.tei-c.org/ns/1.0}persName':
+                $type = 'person';
+                if (preg_match('/^'
+                               . preg_quote('http://d-nb.info/gnd/', '/')
+                               . '\d+[xX]?$/', $uri))
+                {
+                }
+                else {
+                  // die($uri);
+                  unset($uri);
+                }
+                break;
+
+              default:
+                unset($uri);
+            }
+
+            if (isset($uri)) {
+              if (!isset($additional[$type])) {
+                $additional[$type] = array();
+              }
+              if (!isset($additional[$type][$uri])) {
+                $additional[$type][$uri] = 0;
+              }
+              ++$additional[$type][$uri];
+            }
+
+          }
+        }
+        catch (\Exception $e) {
+        }
+      }
+      // we have an image
+      $img_form->set_values(array('name' => $img_name, 'width' => isset($imgdata[0]['width']) ? $imgdata[0]['width'] : -1,
+                                  'height' => isset($imgdata[0]['height']) ? $imgdata[0]['height'] : -1,
+                                  'mimetype' => $imgdata[0]['mime'],
+                                  'additional' => json_encode($additional)));
+
+      // find out if we already have an item
+      $querystr = sprintf("SELECT id FROM Media WHERE item_id=%d AND type=%d AND name='%s' ORDER BY ord DESC LIMIT 1",
+                          $this->item_id, $this->type, $img_name);
+      $dbconn->query($querystr);
+      if ($dbconn->next_record()) {
+        $img_form->set_value('id', $dbconn->Record['id']);
+        // remove old entries from MediaEntity
+        $querystr = sprintf("DELETE FROM MediaEntity WHERE media_id=%d",
+                            $dbconn->Record['id']);
+        $dbconn->query($querystr);
+      }
+      $img_form->set_values(array('item_id' => $this->item_id, 'ord' => 0));
+      $img_form->store();
+      if (!empty($additional)) {
+        global $TYPE_PERSON, $TYPE_PLACE;
+        $media_id = $img_form->get_value('id');
+        if ($media_id > 0) {
+          foreach ($additional as $type => $entries) {
+            foreach ($entries as $uri => $num) {
+              $querystr = "INSERT INTO MediaEntity (media_id, uri, type, num)"
+                        . sprintf(" VALUES(%d, '%s', %d, %d)",
+                                  $media_id, addslashes($uri),
+                                  'person' == $type ? $TYPE_PERSON : $TYPE_PLACE,
+                                  $num)
+                        . sprintf(' ON DUPLICATE KEY UPDATE num=%d', $num);
+              $dbconn->query($querystr);
+            }
+          }
+
+        }
+      }
+    }
+  }
+
+  // methods
+  function delete ($img_name) {
+    $media_id = parent::delete($img_name);
+    if (isset($media_id) && $media_id > 0) {
+      $querystr = sprintf("DELETE FROM MediaEntity WHERE media_id=%d",
+                          $media_id);
+      $dbconn = new DB;
+      $dbconn->query($querystr);
+    }
+  }
+
+}
+
 /* Common base class for the backend with paging and upload handling */
 class DisplayBackend extends DisplayTable
 {
   var $listing_default_action = TABLEMANAGER_EDIT;
   var $datetime_style = 'DD/MM/YYYY';
+  var $status_deleted = '-1';
 
   function __construct (&$page, $workflow = '') {
     if (!is_object($workflow)) {
       $workflow = new DisplayBackendFlow($page);
     }
     parent::__construct($page, $workflow);
+    $this->script_url[] = 'script/jquery-1.9.1.min.js';
+    $this->script_url[] = 'script/jquery-noconflict.js';
+    $this->script_url[] = 'script/jquery-ui-1.10.3.custom.min.js';
   }
 
 
@@ -118,6 +296,148 @@ class DisplayBackend extends DisplayTable
                    tr('edit'));
   }
 
+  function buildView () {
+    $this->id = $this->workflow->primaryKey();
+    $record = $this->buildRecord();
+    if ($found = $record->fetch($this->id)) {
+      $this->record = &$record;
+      $uploadHandler = $this->instantiateUploadHandler();
+      if (isset($uploadHandler)) {
+        $this->processUpload($uploadHandler);
+      }
+
+      $rows = $this->buildViewRows();
+
+      $edit = $this->buildEditButton();
+
+      $ret = '<h2>' . $this->formatText($record->get_value('title')) . ' ' . $edit . '</h2>';
+
+      $ret .= $this->renderView($record, $rows);
+
+      if (isset($uploadHandler)) {
+        $ret .= $this->renderUpload($uploadHandler);
+      }
+
+    }
+    $ret .= $this->buildViewFooter($found);
+
+    return $ret;
+  }
+
+  function getViewFormats () {
+    return array('body' => array('format' => 'p'));
+  }
+
+  function buildViewRows () {
+    // a bit of a hack since formatText messes up numerical entities
+    $status_options = array();
+    if (isset($this->status_options)) {
+      foreach ($this->status_options as $key => $val) {
+        $status_options[$key] = mb_convert_encoding($val, 'UTF-8', 'HTML-ENTITIES');
+      }
+      $this->view_options['status'] = $status_options;
+    }
+
+    $rows = $this->getEditRows('view');
+    if (isset($rows['title'])) {
+      unset($rows['title']);
+    }
+
+    $formats = $this->getViewFormats();
+
+    $view_rows = array();
+
+    foreach ($rows as $key => $descr) {
+      if ($descr !== FALSE && gettype($key) == 'string') {
+        if (isset($formats[$key])) {
+          $descr = array_merge($descr, $formats[$key]);
+        }
+        $view_rows[$key] = $descr;
+        if (isset($this->view_options[$key])) {
+          $view_rows[$key]['options'] = $this->view_options[$key];
+        }
+      }
+    }
+
+    return $view_rows;
+  }
+
+  function renderView ($record, $rows) {
+    $ret = '';
+    if (!empty($this->page->msg)) {
+      $ret .= '<p class="message">' . $this->page->msg . '</p>';
+    }
+
+    $fields = array();
+    if ('array' == gettype($rows)) {
+      foreach ($rows as $key => $row_descr) {
+        if ('string' == gettype($row_descr)) {
+          $fields[] = array('&nbsp;', $row_descr);
+        }
+        else {
+          $label = isset($row_descr['label']) ? tr($row_descr['label']).':' : '';
+          // var_dump($row_descr);
+          if (isset($row_descr['fields'])) {
+            $value = '';
+            foreach ($row_descr['fields'] as $field) {
+              $field_value = $record->get_value($field);
+              $field_value = array_key_exists('format', $row_descr) && 'p' == $row_descr['format']
+                ? $this->formatParagraphs($field_value) : $this->formatText($field_value);
+              $value .= (!empty($value) ? ' ' : '').$field_value;
+            }
+          }
+          else if (isset($row_descr['value'])) {
+            $value = $row_descr['value'];
+          }
+          else {
+            $field_value = $record->get_value($key);
+            if (isset($row_descr['options']) && isset($field_value) && '' !== $field_value) {
+              $values = preg_split('/,\s*/', $field_value);
+              for ($i = 0; $i < count($values); $i++) {
+                if (isset($row_descr['options'][$values[$i]])) {
+                  $values[$i] = $row_descr['options'][$values[$i]];
+                }
+              }
+              $field_value = implode(', ', $values);
+            }
+            $value = isset($row_descr['format']) && 'p' == $row_descr['format']
+                ? $this->formatParagraphs($field_value) : $this->formatText($field_value);
+          }
+
+          $fields[] = array($label, $value);
+        }
+      }
+    }
+    if (count($fields) > 0) {
+      $ret .= $this->buildContentLineMultiple($fields);
+    }
+
+    return $ret;
+  }
+
+  function buildViewFooter ($found = TRUE) {
+    $ret = ($found ? '<hr />' : '')
+         . '[<a href="' . htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name))) . '">'
+         . tr('back to overview')
+         . '</a>]';
+
+    if ($found && isset($this->record)) {
+      $status = $this->record->get_value('status');
+      if ($status <= 0 && $this->checkAction(TABLEMANAGER_DELETE)) {
+        global $JAVASCRIPT_CONFIRMDELETE;
+
+        $this->script_code .= $JAVASCRIPT_CONFIRMDELETE;
+        $url_delete = $this->page->buildLink(array('pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_DELETE) => $this->id));
+        $ret .= sprintf(" [<a href=\"javascript:confirmDelete('%s', '%s')\">%s</a>]",
+                          'Wollen Sie diesen Beitrag wirklich l&ouml;schen?\n(kein UNDO)',
+                          htmlspecialchars($url_delete),
+                          tr('delete message'));
+      }
+    }
+
+    return $ret;
+  }
+
   function buildSearchBar () {
     // var_dump($this->search);
 
@@ -157,7 +477,8 @@ class DisplayBackend extends DisplayTable
                                'type' => $media_type, 'name' => $name);
         }
       }
-      return new ImageUploadHandler($this->workflow->primaryKey(), $media_type);
+
+      return new BackendImageUploadHandler($this->workflow->primaryKey(), $media_type);
     }
   }
 

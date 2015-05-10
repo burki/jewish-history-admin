@@ -2,6 +2,7 @@
 
 @import url('css/teichi.css');
 @import url('css/jquery.autocomplete.css');
+@import url('css/smoothness/jquery-ui-1.10.3.custom.min.css');
 
 /* content areas */
 html, body, #holder { min-height: 100%; width: 100%; height: 100%;}

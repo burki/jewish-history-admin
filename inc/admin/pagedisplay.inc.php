@@ -123,7 +123,8 @@ EOT;
   function buildImgFname ($item_id, $type, $name, $mime) {
     global $MEDIA_EXTENSIONS, $UPLOAD_TRANSLATE;
 
-    $folder = UPLOAD_FILEROOT.$UPLOAD_TRANSLATE[$type]
+    $folder = UPLOAD_FILEROOT
+            . $UPLOAD_TRANSLATE[$type]
             . sprintf('.%03d/id%05d/',
                       intval($item_id / 32768), intval($item_id % 32768));
 
@@ -138,7 +139,8 @@ EOT;
       $uid = uniqid();
     }
 
-    $folder = UPLOAD_URLROOT.$UPLOAD_TRANSLATE[$type]
+    $folder = UPLOAD_URLROOT
+            . $UPLOAD_TRANSLATE[$type]
             . sprintf('.%03d/id%05d/',
                       intval($item_id / 32768), intval($item_id % 32768));
 
@@ -177,12 +179,22 @@ EOT;
 
           if (file_exists($fname_large)) {
             $size_large = getimagesize($fname_large);
-            $url_enlarge = "window.open('".BASE_PATH."img.php?url=".urlencode($relurl)."&width=".$size_large[0]."&height=".$size_large[1]."&caption=".urlencode($attrs['enlarge_caption'])."', '_blank', 'width=".($size_large[0] + $IMG_ENLARGE_ADDWIDTH).",height=".($size_large[1] + $IMG_ENLARGE_ADDHEIGHT).",resizable=yes');";
+            $url_enlarge = "window.open('"
+                         . BASE_PATH . "img.php?url=" . urlencode($relurl)
+                         . "&width=" . $size_large[0] . "&height=" . $size_large[1]
+                         . "&caption=" . urlencode($attrs['enlarge_caption'])
+                         . "', '_blank', 'width=" . ($size_large[0] + $IMG_ENLARGE_ADDWIDTH) . ",height=" . ($size_large[1] + $IMG_ENLARGE_ADDHEIGHT) . ",resizable=yes');";
             $url_enlarge .= 'return false;';
             $attrs['alt'] = 'Click to enlarge';
           }
           else if (isset($attrs['enlarge_only'])) {
-            $url_enlarge = "window.open('".BASE_PATH."img.php?url=".urlencode($relurl)."&large=0&width=".$size[0]."&height=".$size[1]."&caption=".urlencode($attrs['enlarge_caption'])."', '_blank', 'width=".($size[0] + $IMG_ENLARGE_ADDWIDTH).",height=".($size[1] + $IMG_ENLARGE_ADDHEIGHT).",resizable=yes');";
+            $url_enlarge = "window.open('"
+                         . BASE_PATH
+                         . "img.php?url=" . urlencode($relurl)
+                         . "&large=0&width=" . $size[0]
+                         . "&height=" . $size[1]
+                         . "&caption=" . urlencode($attrs['enlarge_caption'])
+                         . "', '_blank', 'width=" . ($size[0] + $IMG_ENLARGE_ADDWIDTH) . ",height=" . ($size[1] + $IMG_ENLARGE_ADDHEIGHT) . ",resizable=yes');";
             $url_enlarge .= 'return false;';
           }
         }
@@ -222,7 +234,7 @@ EOT;
   }
 
   function fetchImage (&$dbconn, $item_id, $type, $img_name) {
-    $querystr = sprintf("SELECT item_id, caption, copyright, width, height, mimetype FROM Media WHERE item_id=%d AND type=%d AND name='%s'",
+    $querystr = sprintf("SELECT id AS media_id, item_id, caption, copyright, width, height, mimetype FROM Media WHERE item_id=%d AND type=%d AND name='%s'",
                         $item_id, $type, $dbconn->escape_string($img_name));
 
     $dbconn->query($querystr);
@@ -251,7 +263,10 @@ EOT;
                            $this->formatText(empty($caption) ? 'Office-Datei' : $caption));
       }
       else if (in_array($img['mimetype'], array('application/xml'))) {
-        $img_tag = sprintf('<a href="%s" target="_blank">%s</a>',
+        $img_tag = sprintf('<a class="previewOverlayTrigger" href="%s" target="_blank">%s</a> ',
+                           htmlspecialchars(BASE_PATH . "xml.php?media_id=" . $img['media_id']),
+                           $this->formatText('HTML-Vorschau'));
+        $img_tag .= sprintf('<a href="%s" target="_blank">%s</a>',
                            htmlspecialchars($img_url),
                            $this->formatText(empty($caption) ? 'XML-Datei' : $caption));
       }

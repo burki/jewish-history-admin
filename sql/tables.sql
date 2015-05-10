@@ -206,57 +206,93 @@ CREATE TABLE Media (
   created       TIMESTAMP,                      # when it was created
   caption       VARCHAR(255),                   # img-caption
   descr         TEXT NULL,                      # further stuff
-  copyright     VARCHAR(255)                    # copyright
+  copyright     VARCHAR(255),                   # copyright
+  additional    TEXT NULL
 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 CREATE Index MediaItemName ON Media(item_id, name);
 
-CREATE TABLE Feed (
+CREATE TABLE MediaEntity (
+  media_id     INT NULL,                        # to which Media it belongs
+  uri           VARCHAR(255) NOT NULL,          # link to Entity
+  type          INT DEFAULT 0,                  # to what $TYPE_ ({PERSON|PLACE}) it belongs
+  num          INT NOT NULL DEFAULT 1           # how often it appears
+) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+CREATE UNIQUE INDEX idxMediaEntityUri ON MediaEntity (media_id, uri);
+
+CREATE TABLE Person (
   id            INT AUTO_INCREMENT PRIMARY KEY, # unique id
-  flags         INT DEFAULT 0,                  #
-  url           VARCHAR(255) NOT NULL,
-  updated       DATETIME NOT NULL DEFAULT '0000-00-00', # last changed
+  status        INT NOT NULL DEFAULT 0,         # -1: removed
+
+  lastname      VARCHAR(255),                   # Name of the Person
+  firstname     VARCHAR(255) NULL,              # Firstname(s)
+
+  title         VARCHAR(255) NULL,
+  sex           ENUM('M', 'F') NULL,
+
+  name_variant  TEXT NULL,
+
+  birthdate     DATE NULL,
+  deathdate     DATE NULL,
+  birthdeath_note TEXT NULL,
+
+  birthplace    VARCHAR(255) NULL,
+  deathplace    VARCHAR(255) NULL,
+  actionplace   VARCHAR(255) NULL,
+  exile         VARCHAR(255) NULL,
+
+  study         VARCHAR(255) NULL,
+  profession    VARCHAR(255) NULL,
+  occupation    VARCHAR(255) NULL,
+
+  country       CHAR(2) NULL,                   #
+  cv            TEXT NULL,                      #
+
+  url           VARCHAR(255) NULL,
+
+  gnd           VARCHAR(10) NULL,               #
+  viaf          VARCHAR(16) NULL,               #
+  lc_naf        VARCHAR(16) NULL,               #
+
+  literature    TEXT NULL,                  #
+  archive       TEXT NULL,                  #
+  estate        TEXT NULL,                  #
+  pictures      TEXT NULL,                  #
+
+  # Common
+  comment_internal TEXT NULL,                   # Interner Vermerk
+
   created       DATETIME,                       # when it was created
-  name          VARCHAR(127) NULL,              # we use this name
-  title         VARCHAR(255) NULL,              #
-  descr         TEXT NULL,                      # further stuff
-  tags          VARCHAR(511) NULL
+  created_by    INT NULL,                       # ref to User.id: who created the entry
+  changed       DATETIME NULL,                  # when it was changed
+  changed_by    INT NULL                        #
 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+#CREATE FULLTEXT INDEX idxPersonFulltext ON Person (firstname, lastname);
 
-INSERT INTO Feed (url, name, title, created, flags) VALUES
-('http://hsozkult.geschichte.hu-berlin.de/index.asp?type=whatsnew&view=xml-rss&category=rezbuecher&epoche=22&days=60', 'hsk-rezbuecher', 'HSK-Rezensionen', NOW(), 0x01);
-
-INSERT INTO Feed (url, name, title, created, flags) VALUES
-('http://hsozkult.geschichte.hu-berlin.de/index.asp?type=whatsnew&view=xml-rss&category=termine&epoche=22&days=60', 'hsk-termine', 'HSK-Termine', NOW(), 0x01);
-
-INSERT INTO Feed (url, name, title, created, flags) VALUES
-('http://hsozkult.geschichte.hu-berlin.de/index.asp?type=whatsnew&view=xml-rss&category=tagungsberichte&epoche=22&days=60', 'hsk-tagungsberichte', 'HSK-Tagungsberichte', NOW(), 0x01);
-
-CREATE TABLE Entry (
+CREATE TABLE Place (
   id            INT AUTO_INCREMENT PRIMARY KEY, # unique id
-  flags         INT DEFAULT 0,                  #
-  url           VARCHAR(255) NOT NULL,
-  updated       DATETIME NOT NULL DEFAULT '0000-00-00', # last changed
+  status        INT NOT NULL DEFAULT 0,         # -1: removed
+  type          VARCHAR(50) NOT NULL,
+
+  name           VARCHAR(255),
+  name_variant  TEXT NULL,
+
+  country_code   CHAR(2),
+  parent_path    VARCHAR(1023),
+  latitude       DOUBLE,
+  longitude      DOUBLE,
+  tgn            INT NULL,
+  tgn_parent     INT NULL,
+  gnd            VARCHAR(255) NULL,
+  geonames_id    INT NULL,
+  geonames_parent_adm1 INT NULL,
+  geonames_parent_adm2 INT NULL,
+  geonames_parent_adm3 INT NULL,
+
+  # Common
+  comment_internal TEXT NULL,                   # Interner Vermerk
+
   created       DATETIME,                       # when it was created
-  title         VARCHAR(255) NULL,              #
-  descr         TEXT NULL,                      # further stuff
-  body          TEXT NULL
+  created_by    INT NULL,                       # ref to User.id: who created the entry
+  changed       DATETIME NULL,                  # when it was changed
+  changed_by    INT NULL                        #
 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-
-CREATE TABLE FeedEntry (
-  entry_id INT NOT NULL REFERENCES FeedEntry.id,
-  feed_id INT NOT NULL REFERENCES Feed.id,
-  message_id INT NULL
-) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-
-CREATE TABLE Tag (
-  id            INT AUTO_INCREMENT PRIMARY KEY, # unique id
-  title         VARCHAR(255) NOT NULL
-) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-INSERT INTO Tag (title) VALUES ('Mediengeschichte');
-
-CREATE TABLE EntryTag (
-    entry_id INT NOT NULL REFERENCES FeedEntry.id,
-    tag_id INT NOT NULL REFERENCES Tag.id,
-    count INT NOT NULL DEFAULT 1
-);
-CREATE UNIQUE INDEX idxEntryTag ON EntryTag(entry_id, tag_id);

@@ -98,7 +98,7 @@ function split_quoted ($search) {
 class WsHandlerFactory
 {
   // private constructor
-  private function __construct(){}
+  private function __construct() {}
 
   private static $class_map = array();
 

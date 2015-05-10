@@ -30,6 +30,34 @@ class PageDisplayBase
     $this->page = $page;
   }
 
+  function buildCountryOptions ($prepend_featured = FALSE) {
+    require_once INC_PATH . 'common/classes.inc.php';
+
+    $countries = Countries::getAll($this->page->lang());
+
+    if (!isset($GLOBALS['COUNTRIES_FEATURED']) || !$prepend_featured) {
+      return $countries;
+    }
+
+    for ($i = 0; $i < count($GLOBALS['COUNTRIES_FEATURED']); $i++) {
+      $countries_ordered[$GLOBALS['COUNTRIES_FEATURED'][$i]] = $countries[$GLOBALS['COUNTRIES_FEATURED'][$i]];
+    }
+
+    // separator
+    /*
+    $line = chr(hexdec('E2')) . chr(hexdec(94)) . chr(hexdec(80));
+    $countries_ordered[''] = $line;
+    */
+    $countries_ordered['&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;'] = FALSE; // separator
+    foreach ($countries as $cc => $name) {
+      if (!isset($countries_ordered[$cc])) {
+        $countries_ordered[$cc] = $name;
+      }
+    }
+
+    return $countries_ordered;
+  }
+
   function htmlSpecialchars ($txt) {
     $match = array('/&(?!\#\d+;)/s', '/</s', '/>/s', '/"/s');
     $replace = array('&amp;', '&lt;', '&gt;', '&quot;');
@@ -495,7 +523,7 @@ class PageDisplayBase
 
     if (!empty($this->script_ready)) {
       $scriptcode .= '<script language="JavaScript" type="text/javascript">'
-                   . '$(document).ready(function(){ ';
+                   . 'jQuery(document).ready(function(){ ';
       foreach ($this->script_ready as $ready) {
         $scriptcode .= $ready . "\n" ;
       }

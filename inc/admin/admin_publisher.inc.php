@@ -35,7 +35,8 @@ class PublisherFlow extends TableManagerFlow
   }
 }
 
-class PublisherRecord extends TableManagerRecord {
+class PublisherRecord extends TableManagerRecord
+{
 
   function delete ($id) {
     global $STATUS_REMOVED;
@@ -87,7 +88,6 @@ class DisplayPublisher extends DisplayTable
     }
     return parent::init();
   }
-
 
   function getCountries () {
     return Countries::getAll();
@@ -197,8 +197,9 @@ class DisplayPublisher extends DisplayTable
 
   function buildViewRows () {
     $rows = $this->getEditRows();
-    if (isset($rows['name']))
+    if (isset($rows['name'])) {
       unset($rows['name']);
+    }
 
     $formats = $this->getViewFormats();
 
@@ -206,8 +207,9 @@ class DisplayPublisher extends DisplayTable
 
     foreach ($rows as $key => $descr) {
       if ($descr !== FALSE && gettype($key) == 'string') {
-        if (isset($formats[$key]))
+        if (isset($formats[$key])) {
           $descr = array_merge($descr, $formats[$key]);
+        }
         $view_rows[$key] = $descr;
       }
     }
@@ -217,14 +219,16 @@ class DisplayPublisher extends DisplayTable
 
   function renderView ($record, $rows) {
     $ret = '';
-    if (!empty($this->page->msg))
+    if (!empty($this->page->msg)) {
       $ret .= '<p class="message">' . $this->page->msg . '</p>';
+    }
 
     $fields = array();
     if ('array' == gettype($rows)) {
       foreach ($rows as $key => $row_descr) {
-        if ('string' == gettype($row_descr))
+        if ('string' == gettype($row_descr)) {
           $fields[] = array('&nbsp;', $row_descr);
+        }
         else {
           $label = isset($row_descr['label']) ? tr($row_descr['label']).':' : '';
           // var_dump($row_descr);
@@ -237,8 +241,9 @@ class DisplayPublisher extends DisplayTable
               $value .= (!empty($value) ? ' ' : '').$field_value;
             }
           }
-          else if (isset($row_descr['value']))
+          else if (isset($row_descr['value'])) {
             $value = $row_descr['value'];
+          }
           else {
             $field_value = $record->get_value($key);
             $value = isset($row_descr['format']) && 'p' == $row_descr['format']
@@ -249,8 +254,9 @@ class DisplayPublisher extends DisplayTable
         }
       }
     }
-    if (count($fields) > 0)
+    if (count($fields) > 0) {
       $ret .= $this->buildContentLineMultiple($fields);
+    }
 
     return $ret;
   }
@@ -286,8 +292,9 @@ EOT;
     if ($found = $record->fetch($this->id)) {
       $this->record = &$record;
       $uploadHandler = $this->instantiateUploadHandler();
-      if (isset($uploadHandler))
+      if (isset($uploadHandler)) {
         $this->processUpload($uploadHandler);
+      }
 
       $rows = $this->buildViewRows();
       $edit = $this->buildEditButton();
@@ -350,7 +357,8 @@ EOT;
       return FALSE;
     $action = NULL;
     if (array_key_exists('with', $_POST)
-        && intval($_POST['with']) > 0) {
+        && intval($_POST['with']) > 0)
+    {
       $action = 'merge';
       $id_new = intval($_POST['with']);
     }
@@ -359,14 +367,16 @@ EOT;
     switch ($action) {
       case 'merge':
         $record_new = $this->buildRecord();
-        if (!$record_new->fetch($id_new))
+        if (!$record_new->fetch($id_new)) {
           return FALSE;
+        }
 
         $querystr = sprintf("UPDATE Publication SET publisher_id=%d WHERE publisher_id=%d",
-            $id_new, $id);
+                            $id_new, $id);
         $this->page->dbconn->query($querystr);
         $this->page->redirect(array('pn' => $this->page->name, 'delete' => $id));
         break;
+
       default:
         $orig = sprintf('%s%s',
                   $record->get_value('name'),
@@ -377,7 +387,7 @@ EOT;
         // show replacements
         $dbconn = &$this->page->dbconn;
         $querystr = sprintf("SELECT id, name, place, status, UNIX_TIMESTAMP(created) AS created_timestamp FROM Publisher WHERE id<>%d AND status <> %d ORDER BY name, status DESC, created DESC",
-                    $id, $STATUS_REMOVED);
+                            $id, $STATUS_REMOVED);
         $dbconn->query($querystr);
         $replace = '';
         $params_replace = array('pn' => $this->page->name, 'delete' => $id);
@@ -389,7 +399,7 @@ EOT;
         }
         if (!empty($replace)) {
           $ret = '<form method="post" action="'.htmlspecialchars($this->page->buildLink($params_replace)).'"><p>' . sprintf(tr('Assign publications belonging to %s to'), $this->formatText($orig))
-                .': <select name="with">' . $replace . '</select><input type="submit" value="'. tr('replace') . '" /></p></form>';
+               . ': <select name="with">' . $replace . '</select><input type="submit" value="'. tr('replace') . '" /></p></form>';
         }
         // $ret .= '<p>TODO: search field</p>';
     }
@@ -401,11 +411,13 @@ EOT;
     if (PublisherFlow::MERGE == $this->step) {
       $res = $this->buildMerge();
       if ('boolean' == gettype($res)) {
-        if ($res)
+        if ($res) {
           $this->step = TABLEMANAGER_VIEW;
+        }
       }
-      else
+      else {
         return $res;
+      }
     }
     return parent::buildContent();
   }
@@ -413,7 +425,8 @@ EOT;
 }
 
 $display = new DisplayPublisher($page, new PublisherFlow($page));
-if (FALSE === $display->init())
+if (FALSE === $display->init()) {
   $page->redirect(array('pn' => ''));
+}
 
 $page->setDisplay($display);

@@ -20,6 +20,7 @@
         "semsol/arc2": "2.2.*",
         "easyrdf/easyrdf": "~0.9",
         "ml/json-ld": "~1.0",
+        "sabre/xml": "0.4.3",
 
         "pear-pear.php.net/PEAR" : "*",
         "pear-pear.php.net/Text_Wiki" : "*",

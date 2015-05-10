@@ -2,11 +2,11 @@
 /*
  * admin.php
  *
- * admin system
+ * admin system: http://juedische-geschichte-online.net/admin.php
  *
- * (c) 2008-2014 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-06-26 dbu
+ * Version: 2015-05-02 dbu
  *
  * Changes:
  *
@@ -22,9 +22,10 @@ require_once INC_PATH . 'admin/adminpage.inc.php';
 $page = new AdminPage(new DB(), $SITE_DESCRIPTION);
 $page->init(array_key_exists('pn', $_REQUEST) ? $_REQUEST['pn'] : NULL);
 
-// ab hier ist $page->pagename definiert
+// from here on, $page->include is defined
+
 require_once INC_PATH . 'admin/pagedisplay.inc.php';
 require_once INC_PATH . 'admin/' . ('login' == $page->include ? '' : 'admin_')
-    . $page->include . '.inc.php';
+           . $page->include . '.inc.php';
 
 $page->display();

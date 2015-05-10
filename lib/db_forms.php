@@ -1190,8 +1190,9 @@ $values).')';
     }
 
     function parse_datetime ($datetime_string, $datetime_style = '', $century_window = 50) {
-      if (!isset($datetimeparser[$datetime_style]))
+      if (!isset($datetimeparser[$datetime_style])) {
         $datetimeparser[$datetime_style] = new DateTimeParser($datetime_style);
+      }
       return $datetimeparser[$datetime_style]->parse($datetime_string, $century_window);
     }
 
@@ -1883,7 +1884,8 @@ $values).')';
             switch ($thisfield->get('type')) {
               case 'date' :
               case 'datetime':
-                if (gettype($val) == 'array') { // from select
+                if (gettype($val) == 'array') {
+                  // from select
                   // a nasty hack for datetime-selects
                   $format = $datetime_style;
                   $format = preg_replace('/[D]+/', '%02d', $format);
