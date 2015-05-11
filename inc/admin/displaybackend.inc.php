@@ -137,6 +137,9 @@ class BackendImageUploadHandler extends ImageUploadHandler
           $reader->xml($input);
           $output = $reader->parse();
           foreach ($output as $entity) {
+            if (empty($entity['attributes']['ref'])) {
+              continue;
+            }
             $uri = trim($entity['attributes']['ref']);
             switch ($entity['name']) {
               case '{http://www.tei-c.org/ns/1.0}placeName':

@@ -38,7 +38,7 @@ if (!$dbconn->next_record() || 'application/xml' != $dbconn->Record['mimetype'])
 }
 $img = $dbconn->Record;
 $fname = $display->buildImgFname($img['item_id'], $img['type'], $img['name'], $img['mimetype']);
-$xslt_dir = BASE_FILEPATH . '../docs/tei2html/';
+$xslt_dir = BASE_FILEPATH . '../inc/xslt/';
 $cmd = sprintf('java -cp %s net.sf.saxon.Transform -s:%s -xsl:%s',
                 realpath($xslt_dir . 'saxon9he.jar'),
                 realpath($fname),
