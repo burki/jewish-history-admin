@@ -189,7 +189,10 @@
         }
 
         /* dbu */
-        .editorial {
+        .editorial.inline {
+          color: #909090;
+        }
+        .editorial.foot {
           display: none;
         }
         span.tooltipster-icon {
@@ -393,17 +396,25 @@
 
 <!-- editorial notes -->
 <xsl:template match='tei:note[@type="editorial"]'>
-  <span class="editorial-marker tooltipster-icon" href="#{generate-id()}">(?)</span><span id="{generate-id()}" class="editorial"><xsl:apply-templates/></span>
+  <xsl:choose>
+    <xsl:when test="@place='foot'">
+      <span class="editorial-marker tooltipster-icon" href="#{generate-id()}">(i)</span><span id="{generate-id()}" class="editorial foot"><xsl:apply-templates/></span>
+    </xsl:when>
+    <xsl:otherwise>
+      <span class="editorial inline"><xsl:apply-templates/></span>
+    </xsl:otherwise>
+  </xsl:choose>
 </xsl:template>
 
 <!-- footnotes -->
-<xsl:template match='tei:note[@place="foot"]'>
+<xsl:template match='tei:note[@place="foot" and not(@type)]'>
   <xsl:if test="string-length(@prev)=0">
     <span class="fn-intext"><xsl:value-of select='@n'/></span>
   </xsl:if>
 </xsl:template>
 
 <xsl:template match='tei:note[@place="foot"]' mode="footnotes">
+  <xsl:if test="not(@type='editorial')">
   <div class="footnote" style="margin-bottom:1em">
     <xsl:choose>
       <xsl:when test="string-length(@prev)!=0 or string-length(@sameAs)!=0"></xsl:when>
@@ -415,6 +426,7 @@
     <xsl:apply-templates/>
     <xsl:apply-templates select='tei:fw[@place="bottom"][@type="catch"]' mode="fn-catch"/>
   </div>
+  </xsl:if>
 </xsl:template>
 
 <xsl:template match="tei:note/tei:fw"/>
