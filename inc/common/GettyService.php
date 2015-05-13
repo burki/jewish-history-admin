@@ -104,20 +104,34 @@ class GettyPlaceData
         if (!empty($uri)) {
             $resource = $graph->resource($uri);
         }
-        // echo $resource->dump();
 
         $place->tgn = $resource->get('dc11:identifier')->getValue();
         $prefLabels = $resource->all('skos:prefLabel');
         $preferredName = '';
-        foreach ($prefLabels as $prefLabel) {
-            if (empty($preferredName) || 'de' == $prefLabel->getLang()) {
-                $preferredName = $prefLabel->getValue();
-                $values['preferredName'] = $preferredName;
+        if (empty($prefLabels)) {
+            $prefLabels = $resource->all('skosxl:prefLabel');
+            if (empty($prefLabels)) {
+                echo $resource->dump();
+                exit;
+            }
+            foreach ($prefLabels as $prefLabel) {
+                if ($prefLabel instanceof \EasyRdf_Resource) {
+                    $subgraph = $place->executeRdfQuery($prefLabel->getUri(),
+                                                        array('Accept' => 'application/rdf+xml'));
+                    $subresource = $subgraph->resource($prefLabel->getUri());
+                    $preferredName = $subresource->get('gvp:term')->getValue();
+                    $values['preferredName'] = $preferredName;
+                }
             }
         }
-        /* $place->setValuesFromResource($values, $resource,
-                                     array('prefLabel' => 'preferredName'),
-                                     'skos'); */
+        else {
+            foreach ($prefLabels as $prefLabel) {
+                if (empty($preferredName) || 'de' == $prefLabel->getLang()) {
+                    $preferredName = $prefLabel->getValue();
+                    $values['preferredName'] = $preferredName;
+                }
+            }
+        }
 
         $place->setValuesFromResource($values, $resource,
                                      array(

@@ -21,16 +21,17 @@ class PlaceFlow extends TableManagerFlow
   const MERGE = 1010;
   const IMPORT = 1100;
 
-  static $TABLES_RELATED = array('ItemPlace JOIN Item ON ItemPlace.id_item=Item.id AND Item.status >= 0' => 'id_place');
+  static $TABLES_RELATED = array("MediaEntity JOIN Place ON CONCAT('http://vocab.getty.edu/tgn/', Place.tgn) = MediaEntity.uri AND Place.id=?");
 
   function init ($page) {
     $ret = parent::init($page);
     if (TABLEMANAGER_DELETE == $ret) {
       $dbconn = new DB();
-      foreach (self::$TABLES_RELATED as $table => $key_field) {
-        $querystr = sprintf("SELECT COUNT(*) AS count FROM %s WHERE $key_field=?",
-                            $table);
-        $dbconn->query($querystr, array($this->id));
+      foreach (self::$TABLES_RELATED as $from_where) {
+        $querystr = sprintf("SELECT COUNT(*) AS count FROM %s",
+                            $from_where);
+        $querystr = preg_replace('/\?/', $this->id, $querystr);
+        $dbconn->query($querystr);
         if ($dbconn->next_record()
             && ($row = $dbconn->Record)
             && $row['count'] > 0)
@@ -162,11 +163,11 @@ class DisplayPlace extends DisplayBackend
         new Field(array('name' => 'name_variant', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 40, 'rows' => 2, 'null' => TRUE)),
 
         new Field(array('name' => 'country_code', 'id' => 'country', 'type' => 'select', 'datatype' => 'char', 'null' => TRUE, 'options' => array_keys($countries_ordered), 'labels' => array_values($countries_ordered),
-                        'data-placeholder' => $label_select_country, 'default' => 'DE', 'null' => TRUE)),
+                        'data-placeholder' => $label_select_country, 'null' => TRUE)),
 
         new Field(array('name' => 'tgn', 'id' => 'tgn', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
         new Field(array('name' => 'tgn_parent', 'id' => 'tgn_parent', 'type' => 'hidden', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
-        new Field(array('name' => 'parent_path', 'id' => 'parent_path', 'type' => 'text', 'datatype' => 'char', 'size' => 40, 'null' => TRUE)),
+        new Field(array('name' => 'parent_path', 'id' => 'parent_path', 'type' => 'hidden', 'datatype' => 'char', 'size' => 40, 'null' => TRUE)),
 
         new Field(array('name' => 'latitude', 'id' => 'latitude', 'type' => 'hidden', 'datatype' => 'char', 'size' => 15, 'null' => TRUE)),
         new Field(array('name' => 'longitude', 'id' => 'longitude', 'type' => 'hidden', 'datatype' => 'char', 'size' => 15, 'null' => TRUE)),
@@ -202,14 +203,14 @@ class DisplayPlace extends DisplayBackend
                      'description' => 'Identifikator',
                      ),
       'tgn_parent' => FALSE,
+      'parent_path' => ('edit' == $mode ? FALSE : array('label' => 'Uebergeordnet')),
       (isset($this->form) ? $tgn_search . $this->form->show_submit(tr('Store')) : '')
       . '<hr noshade="noshade" />',
 
-      'country' => array('label' => 'Country'),
+      'country_code' => array('label' => 'Country'),
 
-      '<hr noshade="noshade" />',
-
-      '<hr noshade="noshade" />',
+      'longitude' => FALSE,
+      'latitude' => FALSE,
 
       '<hr noshade="noshade" />',
       'comment_internal' => array('label' => 'Internal notes and comments'),
@@ -534,42 +535,6 @@ EOT;
     global $TYPE_PLACE;
 
     return array($TYPE_PLACE, array());
-
-
-    $images = array(
-          'portrait' => array(
-                        'title' => tr('Portrait'),
-                        'multiple' => FALSE,
-                        'imgparams' => array('max_width' => 1024, 'max_height' => 1024,
-                                             'scale' => 'down', 'keep' => 'large'),
-                        'labels' => array(
-                                          'source' => 'Photographer',
-                                          'displaydate' => 'Date Taken',
-                                          ),
-                        ),
-          'additional' => array(
-                        'title' => tr('Additional Images'),
-                        'multiple' => TRUE,
-                        'imgparams' => array('max_width' => 1024, 'max_height' => 1024,
-                                             'scale' => 'down', 'keep' => 'large'),
-                        'labels' => array(
-                                          'source' => 'Photographer',
-                                          'displaydate' => 'Date Taken',
-                                          ),
-                        ),
-          'document' => array(
-                        'title' => tr('Weitere Dokumente (Bio, Archivalien, ...)'),
-                        'multiple' => TRUE,
-                        'imgparams' => array('max_width' => 300, 'max_height' => 300,
-                                             'scale' => 'down', 'keep' => 'large', 'pdf' => TRUE),
-                        'labels' => array(
-                                          'source' => 'Source',
-                                          'displaydate' => 'Creation Date',
-                                          ),
-                        ),
-          );
-
-    return array($TYPE_PLACE, $images);
   }
 
   function buildMerge () {
@@ -584,18 +549,20 @@ EOT;
       return FALSE;
     $action = NULL;
     if (array_key_exists('with', $_POST)
-        && intval($_POST['with']) > 0) {
+        && intval($_POST['with']) > 0)
+    {
       $action = 'merge';
       $id_new = intval($_POST['with']);
     }
     $ret = FALSE;
 
-    $dbconn = Database::getAdapter();
+    $dbconn = new DB();
     switch ($action) {
       case 'merge':
         $record_new = $this->buildRecord();
-        if (!$record_new->fetch($id_new))
+        if (!$record_new->fetch($id_new)) {
           return FALSE;
+        }
 
         foreach (PlaceFlow::$TABLES_RELATED as $table => $key_field) {
           $querystr = sprintf("UPDATE %s SET %s=%d WHERE %s=%d",
@@ -608,17 +575,19 @@ EOT;
       default:
         $orig = sprintf('%s',
                         $record->get_value('name'));
+        return sprintf('%s cannot be deleted since there are entries connected to this place',
+                       $orig);
 
-        // show replacements
-        $querystr = sprintf("SELECT id, name, UNIX_TIMESTAMP(created) AS created_timestamp FROM Place WHERE id<>%d AND status >= 0 ORDER BY lastname, firstname, status DESC, created DESC",
-                            $id);
-        $stmt = $dbconn->query($querystr);
-        $replace = '';
         $params_replace = array('pn' => $this->page->name, 'delete' => $id);
-        while (FALSE !== $stmt && ($row = $stmt->fetch())) {
+        // show replacements
+        $querystr = sprintf("SELECT id, name, UNIX_TIMESTAMP(created) AS created_timestamp FROM Place WHERE id<>%d AND status >= 0 ORDER BY name, status DESC, created DESC",
+                            $id);
+        $dbconn->query($querystr);
+        $replace = '';
+        while ($dbconn->next_record()) {
           $replace .= sprintf('<option value="%d">%s</option>',
-                              $row['id'],
-                              $this->htmlSpecialchars($row['name'])
+                              $dbconn->Record['id'],
+                              $this->htmlSpecialchars($dbconn->Record['name'])
                              );
         }
         if (!empty($replace)) {
@@ -694,13 +663,22 @@ EOT;
           $record->set_value($dst, $value);
         }
         $record->store();
-        var_dump($place->preferredName);
+        // var_dump($place->preferredName);
         $ret .= ' -> ' . $place->preferredName . '<br />';
-        exit;
+        // exit;
       }
 
     }
     return $ret;
+  }
+
+  function buildViewFooter ($found = TRUE) {
+    $tgn = $this->record->get_value('tgn');
+    $publications = !empty($tgn)
+      ? $this->buildRelatedPublications('http://vocab.getty.edu/tgn/' . $tgn)
+      : '';
+
+    return $publications . parent::buildViewFooter($found);
   }
 
   function buildContent () {

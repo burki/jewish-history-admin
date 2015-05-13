@@ -6,7 +6,7 @@
  *
  * (c) 2009-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-05-09 dbu
+ * Version: 2015-05-13 dbu
  *
  * TODO:
  *
@@ -21,15 +21,16 @@ class PersonFlow extends TableManagerFlow
   const MERGE = 1010;
   const IMPORT = 1100;
 
-  static $TABLES_RELATED = array('ItemPerson JOIN Item ON ItemPerson.id_item=Item.id AND Item.status >= 0' => 'id_person');
+  static $TABLES_RELATED = array("MediaEntity JOIN Person ON CONCAT('http://d-nb.info/gnd/', Person.gnd) = MediaEntity.uri AND Person.id=?");
 
   function init ($page) {
     $ret = parent::init($page);
     if (TABLEMANAGER_DELETE == $ret) {
       $dbconn = new DB();
-      foreach (self::$TABLES_RELATED as $table => $key_field) {
-        $querystr = sprintf("SELECT COUNT(*) AS count FROM %s WHERE $key_field=?",
-                            $table);
+      foreach (self::$TABLES_RELATED as $from_where) {
+        $querystr = sprintf("SELECT COUNT(*) AS count FROM %s",
+                            $from_where);
+        $querystr = preg_replace('/\?/', $this->id, $querystr);
         $dbconn->query($querystr, array($this->id));
         if ($dbconn->next_record()
             && ($row = $dbconn->Record)
@@ -417,6 +418,15 @@ EOT;
     return $this->formatText($record->get_value('lastname') . ', ' . $record->get_value('firstname'));
   }
 
+  function buildViewFooter ($found = TRUE) {
+    $gnd = $this->record->get_value('gnd');
+    $publications = !empty($gnd)
+      ? $this->buildRelatedPublications('http://d-nb.info/gnd/' . $gnd)
+      : '';
+
+    return $publications . parent::buildViewFooter($found);
+  }
+
   function buildViewAdditional (&$record, $uploadHandler) {
     return '';
     require_once INC_PATH . '/common/displayhelper.inc.php';
@@ -634,7 +644,7 @@ EOT;
     }
     $ret = FALSE;
 
-    $dbconn = Database::getAdapter();
+    $dbconn = new DB();
     switch ($action) {
       case 'merge':
         $record_new = $this->buildRecord();
@@ -653,6 +663,8 @@ EOT;
                   $record->get_value('lastname'),
                   '' != $record->get_value('firstname')
                   ? ', ' .$record->get_value('firstname') : '');
+        return sprintf('%s cannot be deleted since there are entries connected to this person',
+                       $orig);
 
         // show replacements
         $querystr = sprintf("SELECT id, lastname, firstname, status, UNIX_TIMESTAMP(created) AS created_timestamp FROM Person WHERE id<>%d AND status >= 0 ORDER BY lastname, firstname, status DESC, created DESC",

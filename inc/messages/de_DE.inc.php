@@ -231,6 +231,7 @@ $GETTEXT_MESSAGES = array (
 'System Administrator' => 'Systemverwalter',
 'add new publisher' => 'neuen Verlag hinzufügen',
 'delete message' => 'Beitrag löschen',
+'delete entry' => 'Eintrag löschen',
 'Communication' => 'Kommunikation',
 'Articles' => 'Artikel',
 'New Article' => 'Neuer Artikel',

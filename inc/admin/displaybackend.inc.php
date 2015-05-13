@@ -418,6 +418,50 @@ class DisplayBackend extends DisplayTable
     return $ret;
   }
 
+  function buildRelatedPublications($uri) {
+    // fetch the publications
+    $querystr = sprintf("SELECT DISTINCT Publication.id AS id, title, author, editor, YEAR(publication_date) AS year, place, publisher"
+                        . " FROM Publication, Media, MediaEntity"
+                        . " WHERE MediaEntity.uri='%s' AND MediaEntity.media_id=Media.id AND Media.type=%s AND Media.item_id=Publication.id"
+                        . " ORDER BY Publication.title",
+                        $uri, $GLOBALS['TYPE_PUBLICATION']);
+    $dbconn = &$this->page->dbconn;
+    $dbconn->query($querystr);
+    $publications = '';
+    $params_view = array('pn' => 'publication');
+    while ($dbconn->next_record()) {
+      if (empty($publications)) {
+        $publications = '<hr style="clear: both" /><ul id="publications">';
+      }
+      $params_view['view'] = $dbconn->Record['id'];
+      $publisher_place_year = '';
+      if (!empty($dbconn->Record['place'])) {
+        $publisher_place_year = $dbconn->Record['place'];
+      }
+      if (!empty($dbconn->Record['publisher'])) {
+        $publisher_place_year .= (!empty($publisher_place_year) ? ': ' : '')
+          . $dbconn->Record['publisher'];
+      }
+      if (!empty($dbconn->Record['year'])) {
+        $publisher_place_year .= (!empty($publisher_place_year) ? ', ' : '')
+          . $dbconn->Record['year'];
+      }
+
+      $publications .= sprintf('<li id="item_%d">', $dbconn->Record['id'])
+        . (isset($dbconn->Record['author']) ? $dbconn->Record['author'] : $dbconn->Record['editor'])
+        . ': <i>' . $this->formatText($dbconn->Record['title']) . '</i>'
+        . (!empty($publisher_place_year) ? ' ' : '')
+        . $this->formatText($publisher_place_year)
+        . sprintf(' [<a href="%s">%s</a>]',
+                  htmlspecialchars($this->page->buildLink($params_view)), tr('view'))
+        . '</li>';
+    }
+    if (!empty($publications)) {
+      $publications .= '</ul>';
+    }
+    return $publications;
+  }
+
   function buildViewFooter ($found = TRUE) {
     $ret = ($found ? '<hr />' : '')
          . '[<a href="' . htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name))) . '">'
@@ -432,9 +476,9 @@ class DisplayBackend extends DisplayTable
         $this->script_code .= $JAVASCRIPT_CONFIRMDELETE;
         $url_delete = $this->page->buildLink(array('pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_DELETE) => $this->id));
         $ret .= sprintf(" [<a href=\"javascript:confirmDelete('%s', '%s')\">%s</a>]",
-                          'Wollen Sie diesen Beitrag wirklich l&ouml;schen?\n(kein UNDO)',
+                          'Wollen Sie diesen Eintrag wirklich l&ouml;schen?\n(kein UNDO)',
                           htmlspecialchars($url_delete),
-                          tr('delete message'));
+                          tr('delete entry'));
       }
     }
 
@@ -533,7 +577,7 @@ class DisplayBackend extends DisplayTable
   }
 
   function renderUpload (&$imageUploadHandler, $title = 'File Upload') {
-    $ret = '<h2>' . $this->formatText(tr($title)) . '</h2>';
+    $ret = '';
 
     $params_self = array('pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_VIEW) => $this->id);
     $action = $this->page->buildLink($params_self);
@@ -578,7 +622,7 @@ class DisplayBackend extends DisplayTable
       $imageUploadHandler->fetchAll();
 
       $count = 0;
-      foreach ($imageUploadHandler->img_titles as $img_name => $title) {
+      foreach ($imageUploadHandler->img_titles as $img_name => $img_title) {
         $img = $imageUpload->image($img_name);
         if (isset($img)) {
           $img_field = '';
@@ -586,7 +630,7 @@ class DisplayBackend extends DisplayTable
             if ($count > 0) {
               $rows[] = '<hr />';
             }
-            $img_field .= '<h4>' . $title . '</h4>';
+            $img_field .= '<h4>' . $img_title . '</h4>';
           }
           ++$count;
 
@@ -640,7 +684,10 @@ class DisplayBackend extends DisplayTable
         }
       } // foreach
     } // foreach
+
     if (!$first) {
+      $ret = '<h2>' . $this->formatText(tr($title)) . '</h2>'
+           . $ret;
       $ret .= $imageUpload->show_end();
     }
 
