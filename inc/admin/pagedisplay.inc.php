@@ -22,7 +22,7 @@ class PageDisplay extends PageDisplayBase
   var $is_internal = FALSE;
   var $issue;
   var $location;
-  var $stylesheet = 'admin.css';
+  var $stylesheet = array('admin.css');
   var $span_range = NULL; // '[\x{3400}-\x{9faf}]';
   var $span_class = ''; // 'cn';
   var $xls_data = array();
@@ -316,17 +316,6 @@ EOT;
 
       return $img_tag;
     }
-  }
-
-  function buildHtmlLinkTags () {
-    $tags = array(); // css, rss
-    if (!empty($this->stylesheet)) {
-      //link to stylesheet
-      $tags[] =
-        sprintf('<link rel="stylesheet" href="%s" type="text/css"></link>',
-                htmlspecialchars($this->page->BASE_PATH . $this->stylesheet));
-    }
-    return implode("\n", $tags);
   }
 
   function buildHtmlEnd () {

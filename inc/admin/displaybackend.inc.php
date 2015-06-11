@@ -299,6 +299,19 @@ class DisplayBackend extends DisplayTable
                    tr('edit'));
   }
 
+  function initMultiselect () {
+    // activate multiselect
+    $this->script_url[] = 'script/jquery.uix.multiselect.min.js';
+    $this->stylesheet[] = 'css/jquery.uix.multiselect.css';
+
+    $setLocale = '';
+    if ('de_DE' == $this->page->lang()) {
+      $this->script_url[] = 'script/locale/jquery.uix.multiselect_de.js';
+      $setLocale = ".multiselect('locale', 'de')";
+    }
+    $this->script_ready[] = "jQuery('select.uiMultiselect').multiselect()" . $setLocale . ";";
+  }
+
   function buildView () {
     $this->id = $this->workflow->primaryKey();
     $record = $this->buildRecord();

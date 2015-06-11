@@ -58,7 +58,7 @@ CREATE TABLE Message (
   id            INT AUTO_INCREMENT PRIMARY KEY, # unique id
   flags         INT DEFAULT 0,                  #
   status        INT DEFAULT 0,                  # -1: removed, 0: proofread, 1: publish
-  section       INT NULL,                       # to which section it belongs
+  section       VARCHAR(255) NULL,              # to which section(s) it belongs
   type          INT NOT NULL,                   #
   parent_id     INT NULL,                       # articles in issue...
   ord           INT DEFAULT 0,  		        # Ordnung innerhalb Kids mit gleichem Parent

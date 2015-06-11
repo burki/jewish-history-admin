@@ -6,7 +6,7 @@
  *
  * (c) 2009-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-02-13 dbu
+ * Version: 2015-06-11 dbu
  *
  * Changes:
  *
@@ -35,6 +35,7 @@ class ArticleQueryConditionBuilder extends MessageQueryConditionBuilder
     if ($num_args <= 0) {
       return;
     }
+
     $fields = func_get_args();
 
     if (isset($this->term) && '' !== $this->term) {
@@ -119,11 +120,13 @@ class DisplayArticle extends DisplayMessage
     $this->joins_listing[] = 'LEFT OUTER JOIN User R ON Message.referee=R.id';
     $this->joins_listing[] = 'LEFT OUTER JOIN Term T ON Message.section=T.id';
 
+    $this->view_options['section'] = $this->section_options = $this->buildOptions('section');
     $index = 3;
     $array = $this->fields_listing;
     $this->fields_listing = array_merge(array_slice($array, 0, $index),
                                         array("CONCAT(R.lastname, ' ', R.firstname) AS referee",
-                                              'T.name AS section',
+                                              // 'T.name AS section',
+                                              $this->table . '.section AS section',
                                               ),
                                         array_slice($array, $index, count($array) - 1));
     $this->cols_listing = array_merge_at($this->cols_listing,
@@ -135,7 +138,7 @@ class DisplayArticle extends DisplayMessage
                                'args' => $this->table . '.referee',
                                'persist' => 'session');
     $this->condition[] = array('name' => 'section',
-                               'method' => 'buildEditorCondition',
+                               'method' => 'buildSectionCondition',
                                'args' => $this->table . '.section',
                                'persist' => 'session');
     $this->order['referee'] = array('referee', 'referee DESC');
@@ -224,7 +227,9 @@ class DisplayArticle extends DisplayMessage
     $dbconn = & $this->page->dbconn;
     switch ($type) {
       case 'section':
-          $querystr = sprintf("SELECT id, name FROM Term WHERE category='%s' AND status >= 0 ORDER BY ord, name",
+          $querystr = sprintf("SELECT id, name FROM Term"
+                              . " WHERE category='%s' AND status >= 0"
+                              . " ORDER BY ord, name",
                               addslashes($type));
           break;
 
@@ -269,11 +274,14 @@ class DisplayArticle extends DisplayMessage
     $this->view_options['referee'] = $this->referee_options = $this->buildOptions('referee');
 
     $record->add_fields(array(
-        new Field(array('name' => 'publication', 'type' => 'hidden', 'datatype' => 'int', 'nodbfield' => 1, 'null' => TRUE)),
+        new Field(array('name' => 'publication', 'type' => 'hidden', 'datatype' => 'int',
+                        'nodbfield' => TRUE, 'null' => TRUE)),
         new Field(array('name' => 'section', 'type' => 'select',
-                        'options' => array_merge(array(''), array_keys($this->section_options)),
-                        'labels' => array_merge(array(tr('-- please select --')), array_values($this->section_options)),
-                        'datatype' => 'int', 'null' => FALSE)),
+                        'options' => array_merge(array(/*''*/), array_keys($this->section_options)),
+                        'labels' => array_merge(array(/*tr('-- please select --')*/), array_values($this->section_options)),
+                        /* 'datatype' => 'int', 'multiple' => FALSE, */
+                        'datatype' => 'char', 'multiple' => TRUE, 'class' => 'chosen-select',
+                        'null' => FALSE)),
         new Field(array('name' => 'editor', 'type' => 'select',
                         'options' => array_merge(array(''), array_keys($this->editor_options)),
                         'labels' => array_merge(array(tr('-- none --')), array_values($this->editor_options)),
@@ -316,7 +324,15 @@ class DisplayArticle extends DisplayMessage
     if ('edit' == $mode) {
       $url_ws = $this->page->BASE_PATH . 'admin/admin_ws.php';
 
+      $this->stylesheet[] = 'css/chosen.css';
+      $this->script_url[] = 'script/chosen.jquery.min.js';
       $this->script_code .= <<<EOT
+    // for chosen
+    jQuery(document).ready(function() {
+      jQuery('.chosen-select').chosen({width: "95%"});
+    }); //
+
+
   function generateCommunication (url, mode) {
       var form = document.forms['detail'];
       if (null != form) {

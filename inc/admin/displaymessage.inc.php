@@ -53,6 +53,20 @@ class MessageQueryConditionBuilder extends TableManagerQueryConditionBuilder
     return;
   }
 
+  function buildSectionCondition () {
+    $num_args = func_num_args();
+    if ($num_args <= 0) {
+      return;
+    }
+    $fields = func_get_args();
+
+    if (isset($this->term) && '' !== $this->term) {
+      $ret = $fields[0] . " REGEXP '[[:<:]]" . intval($this->term) . "[[:>:]]'";
+      return $ret;
+    }
+    return;
+  }
+
 }
 
 class DisplayMessageFlow extends DisplayBackendFlow
@@ -625,7 +639,14 @@ EOT;
   function buildListingCell (&$row, $col_index, $val = NULL) {
     $val = NULL;
 
-    if (count($this->cols_listing) - 2 == $col_index) {
+    if (count($this->cols_listing) - 3 == $col_index && !empty($this->view_options['section'])) {
+      $sections = array();
+      foreach (preg_split('/\s*,\s/', $row[$col_index]) as $section) {
+        $sections[] = $this->view_options['section'][$section];
+      }
+      $val = implode(', ', $sections);
+    }
+    else if (count($this->cols_listing) - 2 == $col_index) {
       $val = (isset($row[$col_index]) ? $this->status_options[$row[$col_index]] : '');
     }
     else if (count($this->cols_listing) - 1 == $col_index) {
