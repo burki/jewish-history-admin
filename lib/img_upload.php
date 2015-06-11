@@ -6,7 +6,7 @@
   *
   * (c) 2000-2015
   *
-  * Version : 2015-01-21 dbu
+  * Version : 2015-06-11 dbu
   *
   * Changes :
   *           2008-05-26 dbu silence warnings
@@ -356,8 +356,10 @@
         $filename = $new_name . $this->extensions[$this->translate[$type]];
         $path2magick = $this->params['imagemagick'];
         if (isset($path2magick) && isset($this->MAGICK_BINARIES['convert'])) {
-          $cmd = $path2magick . $this->MAGICK_BINARIES['convert'] . ' ' . $tmp_name . ' ' . $filename;
-
+          $cmd = $path2magick . $this->MAGICK_BINARIES['convert']
+               . ' ' . $tmp_name
+               . ('image/tiff' == $type_orig ? '[0]' : '') // tiff can have multiple layer
+               . ' ' . $filename;
           exec($cmd, $lines, $retval);
           if ($retval == 0) {
             $type = $this->translate[$type];
