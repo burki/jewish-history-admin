@@ -15,15 +15,20 @@
 
         "swiftmailer/swiftmailer": "~5.0",
 
-        "zendframework/zendframework1": "1.12.*",
+        "zendframework/zendframework1": "~1.12",
         "cocur/slugify": "~1.0",
         "semsol/arc2": "2.2.*",
         "easyrdf/easyrdf": "~0.9",
         "ml/json-ld": "~1.0",
+        "kriswallsmith/buzz": "@stable",
         "sabre/xml": "0.4.3",
 
         "pear-pear.php.net/PEAR" : "*",
         "pear-pear.php.net/Text_Wiki" : "*",
         "pear-pear.php.net/XML_Util" : "*"
+    },
+    "autoload": {
+        "psr-4": { "OxGarage\\": "lib/OxGarage/" }
     }
+
 }

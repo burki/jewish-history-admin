@@ -38,6 +38,12 @@ if (!$dbconn->next_record() || 'application/xml' != $dbconn->Record['mimetype'])
 }
 $img = $dbconn->Record;
 $fname = $display->buildImgFname($img['item_id'], $img['type'], $img['name'], $img['mimetype']);
+if (array_key_exists('format', $_GET) && in_array($_GET['format'], array('docx'))) {
+  $client = new \OxGarage\Client();
+  // $client->convert(file_get_contents($fname), 'txt:text:plain');
+  $client->convert(realpath($fname));
+  exit;
+}
 $xslt_dir = BASE_FILEPATH . '../inc/xslt/';
 $cmd = sprintf('java -cp %s net.sf.saxon.Transform -s:%s -xsl:%s',
                 realpath($xslt_dir . 'saxon9he.jar'),

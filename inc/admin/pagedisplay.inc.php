@@ -266,6 +266,9 @@ EOT;
         $img_tag = sprintf('<a class="previewOverlayTrigger" href="%s" target="_blank">%s</a> ',
                            htmlspecialchars(BASE_PATH . "xml.php?media_id=" . $img['media_id']),
                            $this->formatText('HTML-Vorschau'));
+        $img_tag .= sprintf(' <a href="%s">%s</a> ',
+                           htmlspecialchars(BASE_PATH . "xml.php?format=docx&media_id=" . $img['media_id']),
+                           $this->formatText('Word-Export'));
         $img_tag .= sprintf('<a href="%s" target="_blank">%s</a>',
                            htmlspecialchars($img_url),
                            $this->formatText(empty($caption) ? 'XML-Datei' : $caption));
