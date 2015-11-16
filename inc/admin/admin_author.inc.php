@@ -6,7 +6,7 @@
  *
  * (c) 2006-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-03-26 dbu
+ * Version: 2015-11-16 dbu
  *
  * Changes:
  *
@@ -144,7 +144,7 @@ class DisplayAuthor extends DisplayTable
     }
 
     if ($this->search_fulltext) {
-      $search_condition = array('name' => 'search', 'method' => 'buildFulltextCondition', 'args' => 'lastname,firstname,email,institution,supervisor,address,areas,description,review_areas', 'persist' => 'session');
+      $search_condition = array('name' => 'search', 'method' => 'buildFulltextCondition', 'args' => 'lastname,firstname,email,institution,address,areas,description,review_areas', 'persist' => 'session');
     }
     else {
       $search_condition = array('name' => 'search', 'method' => 'buildLikeCondition', 'args' => 'lastname,firstname,email', 'persist' => 'session');
@@ -231,8 +231,9 @@ class DisplayAuthor extends DisplayTable
         new Field(array('name' => 'phone', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 40, 'null' => TRUE)),
         new Field(array('name' => 'fax', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 40, 'null' => TRUE)),
         new Field(array('name' => 'url', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => TRUE)),
-        new Field(array('name' => 'supervisor', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => TRUE)),
-//        new Field(array('name' => 'description', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
+//        new Field(array('name' => 'supervisor', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => TRUE)),
+        new Field(array('name' => 'description', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
+        new Field(array('name' => 'description_de', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
         new Field(array('name' => 'areas', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
         new Field(array('name' => 'ip', 'type' => 'hidden', 'datatype' => 'char', 'null' => TRUE, 'noupdate' => TRUE, 'value' => $_SERVER['REMOTE_ADDR'])),
 
@@ -293,8 +294,10 @@ class DisplayAuthor extends DisplayTable
         'fax' => array('label' => 'Fax'),
         '<hr noshade="noshade" />',
         'url' => array('label' => 'Homepage'),
-        'supervisor' => array('label' => 'Supervisor'),
-        // 'description' => array('label' => 'Profile'),
+        'description_de' => array('label' => 'Public CV (de)'),
+        'description' => array('label' => 'Public CV (en)'),
+        '<hr noshade="noshade" />',
+        // 'supervisor' => array('label' => 'Supervisor'),
         'areas' => array('label' => 'Areas of interest'),
     ));
 
@@ -334,8 +337,49 @@ class DisplayAuthor extends DisplayTable
       return 'An error occured query-ing your data';
     }
 
-    return $author->build($this, $this->workflow->is_internal
+    $ret = $author->build($this, $this->workflow->is_internal
                           ? 'admin' : 'restricted');
+
+    if ($this->is_internal) {
+      global $STATUS_OPTIONS;
+
+      $reviews_found = FALSE; $reviews = '';
+
+      // show all articles related to this person
+      $querystr = sprintf("SELECT Message.id AS id, subject, Message.status AS status"
+                          ." FROM Message INNER JOIN MessageUser ON MessageUser.message_id=Message.id"
+                          ." WHERE MessageUser.user_id=%d AND Message.status <> %d"
+                          ." ORDER BY Message.id DESC",
+                          $this->id, STATUS_DELETED);
+
+      $dbconn = & $this->page->dbconn;
+      $dbconn->query($querystr);
+      $reviews = '';
+      $params_view = array('pn' => 'article');
+      $reviews_found = FALSE;
+      while ($dbconn->next_record()) {
+        if (!$reviews_found) {
+          $reviews = '<ul>';
+          $reviews_found = TRUE;
+        }
+        $params_view['view'] = $dbconn->Record['id'];
+        $reviews .= sprintf('<li id="item_%d">', $dbconn->Record['id'])
+                  . sprintf('<a href="%s">%s</a> (%s)',
+                            htmlspecialchars($this->page->buildLink($params_view)),
+                            $this->formatText($dbconn->Record['subject']),
+                            $STATUS_OPTIONS[$dbconn->Record['status']])
+          . '</li>';
+      }
+      if ($reviews_found) {
+        $reviews .= '</ul>';
+      }
+
+      if ($reviews_found) {
+        $ret .= '<h2>' . tr('Article') . '</h2>'
+              . $reviews;
+      }
+    }
+    return $ret;
   }
 
   function buildSearchBar () {
@@ -496,58 +540,12 @@ EOT;
         if ($record->get_value('status') > $record_new->get_value('status')) {
           $record_new->set_value('status', $record->get_value('status'));
         }
-        /* foreach(array('created', 'subscribed') as $fieldname) {
-          $old = $record->get_field($fieldname)->get('value_internal');
-          $new = $record_new->get_field($fieldname)->get('value_internal');
-
-          switch ($fieldname) {
-            case 'subscribed':
-              $update = FALSE;
-
-              if (isset($old)) {
-                if (!isset($new)) {
-                  $new = $old;
-                  $update = true;
-                }
-                else {
-                  $old_nr = sprintf('%04d%02d%02d', $old['year'], $old['month'], $old['day']);
-                  $new_nr = sprintf('%04d%02d%02d', $new['year'], $new['month'], $new['day']);
-                  if ($old_nr <= $new_nr) {
-                    $new = $old;
-                    $update = true;
-                  }
-                }
-                if ($update) {
-                  $record_new->set_fieldvalue($fieldname, 'value_internal', $new);
-                  $store = TRUE;
-                }
-              }
-              break;
-            case 'unsubscribed':
-              if ($record_new->get_value('status') > 0) {
-                $record_new->set_fieldvalue($fieldname, 'value_internal', NULL);
-                $store = TRUE;
-              }
-              break;
-            case 'created':
-              if (isset($old)) {
-                $old_nr = sprintf('%04d%02d%02d', $old['year'], $old['month'], $old['day']);
-                $new_nr = sprintf('%04d%02d%02d', $new['year'], $new['month'], $new['day']);
-                $update = false;
-                if (!isset($new_nr) || $old_nr <= $new_nr) {
-                  $new = $old;
-                  $update = true;
-                }
-                if ($update) {
-                  $record_new->set_fieldvalue($fieldname, 'value_internal', $new);
-                  $record_new->get_field('created')->set('noupdate', FALSE); // created is normally not updated
-                  $store = TRUE;
-                }
-              }
-          }
-        } */
         // add old fields to new if empty
-        foreach(array('email', 'firstname', 'lastname', 'title', 'email_work', 'institution', 'position', 'address', 'place', 'zip', 'country', 'phone', 'fax', 'supervisor', 'forum', 'sex') as $fieldname) {
+        foreach(array('email', 'firstname', 'lastname', 'title',
+                      'email_work', 'institution', 'position',
+                      'address', 'place', 'zip', 'country', 'phone', 'fax',
+                      'supervisor',
+                      'forum', 'sex') as $fieldname) {
           $old = $record->get_value($fieldname);
           if (!empty($old)) {
             $new = $record_new->get_value($fieldname);
@@ -559,7 +557,10 @@ EOT;
         }
 
         // add old fields to new if empty
-        foreach(array('expectations', 'areas', 'description', 'knownthrough', 'review_areas', 'review_suggest', 'comment') as $fieldname) {
+        foreach(array('expectations', 'areas', 'description',
+                      'knownthrough',
+                      'review_areas', 'review_suggest',
+                      'comment') as $fieldname) {
           $old = $record->get_value($fieldname);
           if (!empty($old)) {
             $new = $record_new->get_value($fieldname);

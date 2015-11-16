@@ -4,9 +4,9 @@
  *
  * Webservices for managing publications (books)
  *
- * (c) 2007-2014 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-10-29 dbu
+ * Version: 2015-10-29 dbu
  *
  * Changes:
  *
@@ -14,7 +14,7 @@
 
 class WsPublication extends WsHandler
 {
-  // example-call: http://localhost/docupedia/admin/admin_ws.php?pn=publication&action=fetchPublicationByIsbn&isbn=0444503285&_debug=1
+  // example-call: http://localhost/juedische-geschichte/admin_ws.php?pn=publication&action=fetchPublicationByIsbn&isbn=0444503285&_debug=1
   function buildResponse () {
     $valid_actions = array('fetchPublicationByIsbn', 'matchPublication');
 

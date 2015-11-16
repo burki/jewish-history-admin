@@ -6,7 +6,7 @@
  *
  * (c) 2009-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-06-11 dbu
+ * Version: 2015-11-16 dbu
  *
  * Changes:
  *
@@ -88,30 +88,13 @@ class MessageWithPublicationRecord extends MessageRecord
 class DisplayArticle extends DisplayMessage
 {
   // var $show_xls_export = TRUE;
-  var $status_options = array (
-    '-99' => 'angedacht',
-    '-76' => 'angefragt Autor',
-    '-73' => 'vergeben Autor',
-    '-69' => '1. Mahnung',
-    '-68' => '2. Mahnung',
-    '-67' => '3. Mahnung',
-    '-66' => '4. Mahnung',
-    '-59' => 'eingegangen Autor',
-    '-55' => 'an Gutachter',
-    '-53' => '&#220;berarbeitung Autor',
-    '-49' => 'inhaltlich ok',
-    '-45' => 'formal ok',
-    '1'   => 'ver&#246;ffentlicht',
-    '-100' => 'abgebrochen Redakteur',
-    '-103' => 'abgebrochen bewahrende Institution',
-    '-106' => 'abgebrochen Autor',
-    '-112' => 'abgelehnt Artikel',
-  );
+  var $status_options;
   var $status_default = '-99';
 
   function __construct (&$page) {
-    global $MESSAGE_ARTICLE;
+    global $MESSAGE_ARTICLE, $STATUS_OPTIONS;
 
+    $this->status_options = $STATUS_OPTIONS;
     $this->type = $MESSAGE_ARTICLE;
     $this->messages['item_new'] = tr('New Article');
     parent::__construct($page);
@@ -222,7 +205,7 @@ class DisplayArticle extends DisplayMessage
   }
 
   function buildOptions ($type = 'editor') {
-    global $RIGHTS_EDITOR, $RIGHTS_REFEREE;
+    global $RIGHTS_EDITOR, $RIGHTS_REFEREE, $RIGHTS_TRANSLATOR;
 
     $dbconn = & $this->page->dbconn;
     switch ($type) {
@@ -234,9 +217,11 @@ class DisplayArticle extends DisplayMessage
           break;
 
       case 'referee':
+      case 'translator':
           $querystr = "SELECT id, lastname, firstname FROM User";
-          $querystr .= sprintf(" WHERE 0 <> (privs & %d) AND id > 1 AND status <> %d",
-                               $RIGHTS_REFEREE, STATUS_DELETED);
+          $querystr .= sprintf(" WHERE 0 <> (privs & %d) AND status <> %d",
+                               'translator' == $type ? $RIGHTS_TRANSLATOR : $RIGHTS_REFEREE,
+                               STATUS_DELETED);
           $querystr .= " ORDER BY lastname, firstname";
           break;
 
@@ -272,6 +257,7 @@ class DisplayArticle extends DisplayMessage
     $this->view_options['section'] = $this->section_options = $this->buildOptions('section');
     $this->view_options['editor'] = $this->editor_options = $this->buildOptions('editor');
     $this->view_options['referee'] = $this->referee_options = $this->buildOptions('referee');
+    $this->view_options['translator'] = $this->translator_options = $this->buildOptions('translator');
 
     $record->add_fields(array(
         new Field(array('name' => 'publication', 'type' => 'hidden', 'datatype' => 'int',
@@ -289,6 +275,10 @@ class DisplayArticle extends DisplayMessage
         new Field(array('name' => 'referee', 'type' => 'select',
                         'options' => array_merge(array(''), array_keys($this->referee_options)),
                         'labels' => array_merge(array(tr('-- none --')), array_values($this->referee_options)),
+                        'datatype' => 'int', 'null' => TRUE)),
+        new Field(array('name' => 'translator', 'type' => 'select',
+                        'options' => array_merge(array(''), array_keys($this->translator_options)),
+                        'labels' => array_merge(array(tr('-- none --')), array_values($this->translator_options)),
                         'datatype' => 'int', 'null' => TRUE)),
 
         new Field(array('name' => 'reviewer_request', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
@@ -322,7 +312,7 @@ class DisplayArticle extends DisplayMessage
 
   function getEditRows ($mode = 'edit') {
     if ('edit' == $mode) {
-      $url_ws = $this->page->BASE_PATH . 'admin/admin_ws.php';
+      $url_ws = $this->page->BASE_PATH . 'admin_ws.php';
 
       $this->stylesheet[] = 'css/chosen.css';
       $this->script_url[] = 'script/chosen.jquery.min.js';
@@ -358,13 +348,19 @@ class DisplayArticle extends DisplayMessage
             alert('Please set a Title first');
             return;
           }
-          if ('' == form.elements['section'].value) {
+          if ('' == form.elements['section[]'].value) {
             alert('Please select a Section first');
             return;
           }
           else {
-            var elt = form.elements['section'];
-            params.section = elt.options[elt.selectedIndex].text;
+            var elt = form.elements['section[]'];
+            var selected = [];
+            for (var i = 0; i < elt.options.length; i++) {
+              if (elt.options[ i ].selected) {
+                selected.push(elt.options[ i ].text);
+              }
+            }
+            params.section = selected.join(', ');
           }
         }
         if ('reviewer_sent' == mode || 'reviewer_reminder' == mode) {
@@ -488,25 +484,26 @@ EOT;
                             : $this->record->get_value('slug')),
             'editor' => array('label' => 'Article Editor'),
             'referee' => array('label' => 'Referee'),
+            'translator' => array('label' => 'Translator'),
       ), 'status');
     $rows = array_merge_at($rows,
       array(
             'reviewer_request' => array(
                 'label' => 'Author contacted',
                 'value' => 'edit' == $mode ?
-                  $this->getFormField('reviewer_request').$reviewer_request_button
+                  $this->getFormField('reviewer_request') . $reviewer_request_button
                   : $this->record->get_value('reviewer_request')
             ),
             'reviewer_sent' => array(
                 'label' => 'Author accepted',
                 'value' => 'edit' == $mode ?
-                  $this->getFormField('reviewer_sent').$reviewer_sent_button
+                  $this->getFormField('reviewer_sent') . $reviewer_sent_button
                   : $this->record->get_value('reviewer_sent')
             ),
             'reviewer_deadline' => array(
                 'label' => 'Author deadline',
                 'value' => 'edit' == $mode ?
-                  $this->getFormField('reviewer_deadline').$reviewer_reminder_button
+                  $this->getFormField('reviewer_deadline') . $reviewer_reminder_button
                   : $this->record->get_value('reviewer_deadline')
             ),
             'reviewer_received' => array('label' => 'Article received'),
@@ -543,7 +540,7 @@ EOT;
     $this->script_url[] = 'script/scriptaculous/prototype.js';
     $this->script_url[] = 'script/scriptaculous/scriptaculous.js';
 
-    $url_ws = $this->page->BASE_URL . 'admin/admin_ws.php?pn=publication&action=matchPublication';
+    $url_ws = $this->page->BASE_URL . 'admin_ws.php?pn=publication&action=matchPublication';
 
     $url_submit = $this->page->buildLink(array('pn' => $this->page->name, 'view' => $this->id));
     $publication_selector = <<<EOT
@@ -557,8 +554,9 @@ EOT;
     $params_remove = array('pn' => $this->page->name, 'view' => $this->id);
     $params_view = array('pn' => 'publication');
     while ($dbconn->next_record()) {
-      if (empty($publications))
+      if (empty($publications)) {
         $publications = '<ul id="publications" class="sortableList">';
+      }
       $params_remove['publication_remove'] = $params_view['view'] = $dbconn->Record['id'];
       $publisher_place_year = '';
       if (!empty($dbconn->Record['place'])) {
@@ -607,7 +605,7 @@ EOT;
     return $ret;
   }
 
-  function buildSearchFields($options = array()) {
+  function buildSearchFields ($options = array()) {
     $options['section'] = 'Section';
     // $options['editor'] = 'Article Editor';
     $options['referee'] = 'Referee';

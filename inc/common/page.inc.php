@@ -370,7 +370,7 @@ class Page
       $pwd = $this->getPostValue('_pwd');
 
       $success = FALSE;
-      while(!$success) {
+      while (!$success) {
         $login = $dbconn->Record['login'];
         if ($this->passwordCheck($pwd, $dbconn->Record['pwd'])) {
           $success = TRUE;
@@ -436,7 +436,7 @@ class Page
       }
       $dbconn->query($querystr);
       $issue = -1; $flags = 0; $name = '';
-      while($dbconn->next_record() && (-1 == $issue || $issue == $dbconn->Record['issue'])) {
+      while ($dbconn->next_record() && (-1 == $issue || $issue == $dbconn->Record['issue'])) {
         $issue = $dbconn->Record['issue'];
         $name = $dbconn->Record['name'];
         $flags |= $dbconn->Record['flags']; // TODO: koennte man vermutlich auch über SUM(flags) GROUP BY id_location/issue hinkriegen

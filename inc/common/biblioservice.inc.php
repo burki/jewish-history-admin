@@ -4,9 +4,9 @@
  *
  * Class for handling bibliographic information
  *
- * (c) 2007-2009 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2014 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2009-01-21 dbu
+ * Version: 2014-02-02 dbu
  *
  * Changes:
  *
@@ -15,11 +15,17 @@
 require_once LIB_PATH . 'ISBN.php';
 require_once INC_PATH . 'common/BiblioService_GBV.php';
 
-define('AMAZON_API_KEY', '0J66P30ZWFXNDWCRNB82');
+define('AMAZON_API_KEY', '1HB1SJ1CB602FSGN59G2');
+define('AMAZON_SECRET_KEY', 'wVxuEUnPflJDLg8jaUvuJ26i1NH0fZ8431rm43uZ');
 
 class BiblioService_Amazon
 {
     static $ws = array(); // singleton by store
+    static $associate_ids = array(
+                                  // string by store
+                                  'US' => 'oskopevisua0a-20',
+                                  'DE' => 'oskopevisuals-21',
+                                  );
 
     var $stores = array();
 
@@ -28,7 +34,7 @@ class BiblioService_Amazon
           require_once 'Zend/Service/Amazon.php';
 
           // TODO: get AMAZON_API_KEY from ini-framework
-          self::$ws[$store] = new Zend_Service_Amazon(AMAZON_API_KEY, $store);
+          self::$ws[$store] = new Zend_Service_Amazon(AMAZON_API_KEY, $store, AMAZON_SECRET_KEY);
         }
 
         return self::$ws[$store];
@@ -37,33 +43,40 @@ class BiblioService_Amazon
     static function buildTitleSubtitle ($fulltitle) {
         $parts = preg_split('/(\:|\.)\s+/', $fulltitle, 2);
 
-        if (count($parts) == 2)
+        if (count($parts) == 2) {
             return $parts;
+        }
 
         return array($parts[0], '');
     }
 
     function __construct ($stores = array()) {
-        if (0 == count($stores))
+        if (0 == count($stores)) {
             $stores = array('DE', 'US');
+        }
         $this->stores = $stores;
     }
 
     function itemLookup ($isbn) {
         $success = FALSE;
+        $response = NULL;
 
         // amazon currently supports only isbn-10 in asin-query
         $isbn_query = $isbn;
         $isbn_version = ISBN::guessVersion($isbn);
         if (isset($isbn_version) && ISBN_VERSION_ISBN_13 == $isbn_version) {
             $isbn_query = ISBN::convert($isbn, $isbn_version, ISBN_VERSION_ISBN_10);
-            if (FALSE === $isbn_query)
+            if (FALSE === $isbn_query) {
                 $isbn_query = $isbn; // wind back if it failed
+            }
         }
         $params = array('ResponseGroup' => 'Large');
 
         foreach ($this->stores as $store) {
             $ws = self::getService($store);
+            if (isset(self::$associate_ids[$store])) {
+                $params['AssociateTag'] = self::$associate_ids[$store];
+            }
 
             try {
                 $result = $ws->itemLookup($isbn_query, $params);
@@ -87,43 +100,51 @@ class BiblioService_Amazon
                             list($surname, $given) = BiblioService::buildSurnameGiven($value);
                             $fullname = $surname . (!empty($given) ? ', '.$given : '');
                         }
-                        if ('Creator' == $field && isset($response['author']) && $fullname == $response['author'])
+                        if ('Creator' == $field && isset($response['author']) && $fullname == $response['author']) {
                             continue;
+                        }
                         $response['Creator' == $field ? 'editor' : strtolower($field)] = $fullname;
                     }
                 }
 
                 if ('Book' == $result->ProductGroup) {
                     // var_dump($result);
-                    if (!empty($result->Publisher))
-                          $response['publisher'] = $result->Publisher;
+                    if (!empty($result->Publisher)) {
+                        $response['publisher'] = $result->Publisher;
+                    }
                     if (preg_match('/^(\d{4})/', $result->PublicationDate, $matches)) {
-                          $response['publication_date'] = $matches[1];
-                          $response['isbn'] = BiblioService::normalizeIsbn($response['isbn']);
+                        $response['publication_date'] = $matches[1];
+                        $response['isbn'] = BiblioService::normalizeIsbn($response['isbn']);
                     }
 
-                    if (!empty($result->Binding))
+                    if (!empty($result->Binding)) {
                         $response['binding'] = $result->Binding;
-                    if (isset($result->NumberOfPages) && $result->NumberOfPages > 1)
-                        $response['pages'] = $result->NumberOfPages.' p.';
-                    if (!empty($result->FormattedPrice))
+                    }
+                    if (isset($result->NumberOfPages) && $result->NumberOfPages > 1) {
+                        $response['pages'] = $result->NumberOfPages . ' p.';
+                    }
+                    if (!empty($result->FormattedPrice)) {
                         $response['listprice'] = $result->FormattedPrice;
+                    }
                     else {
-                        if (isset($result->Offers))
+                        if (isset($result->Offers)) {
                             $offerSummary = &$result->Offers;
-                        else
+                        }
+                        else {
                             $offerSummary = &$result->OfferSummary;
+                        }
 
                         if (isset($offerSummary)) {
-                            if (isset($offerSummary->Offers) && isset($offerSummary->Offers[0]->Price) && 'EUR' == $offerSummary->Offers[0]->CurrencyCode)
-                                $response['listprice'] = 'EUR '.sprintf('%01.2f', $offerSummary->Offers[0]->Price / 100);
+                            if (isset($offerSummary->Offers) && isset($offerSummary->Offers[0]->Price) && 'EUR' == $offerSummary->Offers[0]->CurrencyCode) {
+                                $response['listprice'] = 'EUR ' . sprintf('%01.2f', $offerSummary->Offers[0]->Price / 100);
+                            }
                         }
                     }
 
                     if (isset($offerSummary)) {
-                        if (isset($offerSummary->Offers) && isset($offerSummary->Offers[0]->PriceFormatted))
-                            $price['price'] = 'Price: '.$offerSummary->Offers[0]->PriceFormatted;
-
+                        if (isset($offerSummary->Offers) && isset($offerSummary->Offers[0]->PriceFormatted)) {
+                            $price['price'] = 'Price: ' . $offerSummary->Offers[0]->PriceFormatted;
+                        }
                     }
                 }
 
@@ -135,8 +156,9 @@ class BiblioService_Amazon
                 // We did not find any matches for your request. (AWS.ECommerceService.NoExactMatches)
             }
 
-            if ($success)
+            if ($success) {
                 break;
+            }
         }
 
         return $response;
@@ -207,10 +229,10 @@ class BiblioService
 
         if (NULL === $GIVEN) {
             // read a list of given-names from a file
-            $fname = dirname(__FILE__).DIRECTORY_SEPARATOR.'given_names.txt';
+            $fname = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'given_names.txt';
             $given_names = @file($fname);
             if (FALSE !== $given_names) {
-                foreach($given_names as $given_names)
+                foreach ($given_names as $given_names)
                     $GIVEN[strtolower($given_names)] = TRUE;
             }
             else
@@ -247,57 +269,66 @@ class BiblioService
             $querystr = "SELECT isbn FROM Publication WHERE id=" . $identifier;
 
             $dbconn->query($querystr);
-            if ($dbconn->next_record())
+            if ($dbconn->next_record()) {
                 $identifier = $dbconn->Record['isbn'];
+            }
         }
 
         $record = $this->fetchByIsbn($identifier);
         if (isset($record)) {
-            $ret = isset($record['author']) ? $record['author'] : $record['editor'].' (Hrsg.)';
+            $ret = isset($record['author']) ? $record['author'] : $record['editor'] . ' (Hrsg.)';
             $ret .= ': '.$record['title'];
 
             $publisher_place_year = '';
-            if (!empty($record['place']))
+            if (!empty($record['place'])) {
               $publisher_place_year = $record['place'];
-            if (!empty($record['publisher']))
+            }
+            if (!empty($record['publisher'])) {
               $publisher_place_year .= (!empty($publisher_place_year) ? ': ' : '')
                 . $record['publisher'];
-            if (!empty($record['publication_date']))
+            }
+            if (!empty($record['publication_date'])) {
               $publisher_place_year .= (!empty($publisher_place_year) ? ' ' : '')
                 . $record['publication_date'];
+            }
 
             $isbn = new ISBN($identifier);
 
             return $ret . (preg_match('/[\!\?\.]$/', $ret) ? '' : '.')
-                . ' ' . $publisher_place_year . '. '
-                . $isbn->getISBNDisplayable(' i:=');
+                 . ' ' . $publisher_place_year . '. '
+                 . $isbn->getISBNDisplayable(' i:=');
         }
     }
 
     function fetchByIsbn ($isbn, $options = NULL) {
         // cache_external: 1 - overwrite, 0 - insert if not exists, -1: don't cache
         static $defaultOptions = array('from_db' => TRUE, 'from_external' => TRUE, 'cache_external' => 0);
+
         $options = $this->_prepareOptions($options, $defaultOptions);
 
         $isbn = self::normalizeIsbn($isbn); // remove blanks and hyphens
-        if (self::validateIsbn($isbn))
+        if (self::validateIsbn($isbn)) {
             $isbn_version = ISBN::guessVersion($isbn);
+        }
 
         if ($options['from_db'] || $options['cache_external'] >= 0) {
             $dbconn = $this->getDbConn();
 
             // first check if we have it in the database
-            $isbns_sql = array("'".$dbconn->escape_string($isbn)."'");
+            $isbns_sql = array("'" . $dbconn->escape_string($isbn) . "'");
 
             // we query also for the variant
             if (isset($isbn_version)) {
-                if (ISBN_VERSION_ISBN_10 == $isbn_version)
+                if (ISBN_VERSION_ISBN_10 == $isbn_version) {
                     $isbn_variant = ISBN::convert($isbn, $isbn_version, ISBN_VERSION_ISBN_13);
-                else if (ISBN_VERSION_ISBN_10 != $isbn_version)
+                }
+                else if (ISBN_VERSION_ISBN_10 != $isbn_version) {
                     $isbn_variant = ISBN::convert($isbn, $isbn_version, ISBN_VERSION_ISBN_10);
+                }
             }
-            if (isset($isbn_variant))
+            if (isset($isbn_variant)) {
                 $isbns_sql[] = "'" . $dbconn->escape_string($isbn_variant) . "'";
+            }
         }
 
         if ($options['from_db']) {
@@ -325,20 +356,31 @@ class BiblioService
         }
 
         if ($options['from_external']) {
+            $ws_amazon = new BiblioService_Amazon(array('DE', 'US'));
+
+            $level = error_reporting();
+            error_reporting($level & (~E_NOTICE));
+            $response_amazon = $ws_amazon->itemLookup($isbn);
+            error_reporting($level);
+
             $ws_gbv = new BiblioService_GBV();
             $results = $ws_gbv->searchRetrieve($isbn);
             if (isset($results) && count($results) > 0) {
                 $response = $results[0];
+                if (!isset($response['image'])
+                    && isset($response_amazon) && !empty($response_amazon['image'])) {
+                    $response['image'] = $response_amazon['image'];
+                }
             }
-            else {
-                $ws_amazon = new BiblioService_Amazon(array('DE', 'US'));
-                $response = $ws_amazon->itemLookup ($isbn);
+            else if (isset($response_amazon)) {
+                $response = $response_amazon;
             }
 
             if (isset($response)) {
                 // check if we have to store to db
                 if (FALSE && $options['cache_external'] >= 0) {
                     // TODO: insert/update the $response into the database
+                    // TODO: do proper utf8-handling
                     $querystr = sprintf("SELECT id FROM Publication WHERE isbn IN(%s) AND status >= 0 ORDER BY isbn='%s' DESC LIMIT 1",
                                 implode(', ', $isbns_sql), $dbconn->escape_string($isbn));
                     $dbconn->query($querystr);
@@ -367,11 +409,11 @@ class BiblioService
                                     $querystr .= ', ';
                                 $querystr .= $fields[$i].'='.$values[$i];
                             }
-                            $querystr .= " WHERE id=".$update;
+                            $querystr .= " WHERE id=" . $update;
                         }
                         else {
                             $querystr = "INSERT INTO Publication (".implode(', ', $fields)
-                                ." ) VALUES (".implode(', ', $values).")";
+                                . " ) VALUES (" . implode(', ', $values) . ")";
                         }
                         // die($querystr);
                         $dbconn->query($querystr);

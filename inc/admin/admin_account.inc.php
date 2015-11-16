@@ -6,7 +6,7 @@
  *
  * (c) 2006-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-02-24 dbu
+ * Version: 2015-11-16 dbu
  *
  *
  * Changes:
@@ -108,6 +108,7 @@ class DisplayAccount extends DisplayTable
                                                 tr('System Administrator'),
                                                 '',
                                                 tr('Referee'),
+                                                tr('Translator'),
                                                 ),
                              )
                        ),
@@ -141,8 +142,9 @@ class DisplayAccount extends DisplayTable
       if ($dbconn->next_record()) {
         $old_login = $dbconn->Record['login'];
         $new_login = $form->get_value('email');
-        if ($old_login == $new_login)
+        if ($old_login == $new_login) {
           $check_login = FALSE;
+        }
         else if (empty($new_login)) {
           $form->set_value('email', $new_login = $old_login);
           $check_login = FALSE;
@@ -207,7 +209,7 @@ class DisplayAccount extends DisplayTable
   }
 
   function getEditRows () {
-    global $RIGHTS_EDITOR, $RIGHTS_ADMIN, $RIGHTS_REFEREE;
+    global $RIGHTS_EDITOR, $RIGHTS_ADMIN, $RIGHTS_REFEREE, $RIGHTS_TRANSLATOR;
 
     $edit_self = ($this->form->get_value('id') == $this->page->user['id']);
 
@@ -224,7 +226,7 @@ class DisplayAccount extends DisplayTable
 
     if ($this->page->user['privs'] & $RIGHTS_ADMIN) {
       $privs = $this->form->field('privs');
-      $rights_mask = $RIGHTS_EDITOR | $RIGHTS_ADMIN | $RIGHTS_REFEREE;
+      $rights_mask = $RIGHTS_EDITOR | $RIGHTS_ADMIN | $RIGHTS_REFEREE | $RIGHTS_TRANSLATOR;
       if ($edit_self) {
         // if i'm admin, i'm at least EDITOR
         $rights_mask &= ~$RIGHTS_EDITOR;
@@ -272,6 +274,7 @@ class DisplayAccount extends DisplayTable
         $parts = array();
         foreach (array(
                        $GLOBALS['RIGHTS_REFEREE'] => 'Hrsg',
+                       $GLOBALS['RIGHTS_TRANSLATOR'] => 'Über',
                        $GLOBALS['RIGHTS_EDITOR'] => 'Ed',
                        $GLOBALS['RIGHTS_ADMIN'] => 'Ad'
                        )
@@ -302,7 +305,7 @@ class DisplayAccount extends DisplayTable
   }
 
   function buildContent () {
-    switch(array_key_exists('action', $this->page->parameters)
+    switch (array_key_exists('action', $this->page->parameters)
            ? $this->page->parameters['action'] : NULL) {
       default:
         $ret = parent::buildContent();

@@ -4,9 +4,9 @@
  *
  * Abstract Base Display class
  *
- * (c) 2007-2014 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-10-29 dbu
+ * Version: 2015-11-04 dbu
  *
  * Changes:
  *
@@ -213,7 +213,7 @@ class PageDisplayBase
     $encoder = $this->instantiateEncoder(TRUE);
 
     $class = ''; $enable_list = FALSE;
-    switch(gettype($options)) {
+    switch (gettype($options)) {
       case 'array':
           if (array_key_exists('class', $options))
             $class = $options['class'];

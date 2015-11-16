@@ -39,7 +39,7 @@ class MyUrnAllocation extends UrnAllocation
 
 class WsArticle extends WsHandler
 {
-  // example-call: http://localhost/juedische-geschichte/admin/admin_ws.php?pn=article&action=generateUrn&_debug=1&url=http://edoc1.cms.hu-berlin.de/Administration/urn/urn.php
+  // example-call: http://localhost/juedische-geschichte/admin_ws.php?pn=article&action=generateUrn&_debug=1&url=http://edoc1.cms.hu-berlin.de/Administration/urn/urn.php
   function buildResponse () {
     $valid_actions = array('generateSlug', 'generateUrn');
 

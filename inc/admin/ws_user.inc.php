@@ -14,7 +14,7 @@
 
 class WsUser extends WsHandler
 {
-  // example-call: http://arthist.net/admin/admin_ws.php5?pn=user&action=matchUser&fulltext=burckhardt&_debug=1
+  // example-call: http://localhost/juedische-geschichte/admin_ws.php?pn=user&action=matchUser&fulltext=burckhardt&_debug=1
   function buildResponse () {
     $valid_actions = array('matchUser');
 

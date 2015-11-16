@@ -6,7 +6,7 @@
  *
  * (c) 2007-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-02-13 dbu
+ * Version: 2015-11-04 dbu
  *
  * Changes:
  *
@@ -364,7 +364,7 @@ class DisplayMessage extends DisplayBackend
     if ('edit' == $mode) {
       // build the user-autocompleter
 
-      $url_ws = $this->page->BASE_PATH . 'admin/admin_ws.php?pn=user&action=matchUser';
+      $url_ws = $this->page->BASE_PATH . 'admin_ws.php?pn=user&action=matchUser';
       $user_value = <<<EOT
 <input type="hidden" name="user_id" value="$user_id" />
 <input type="text" id="user" name="user" style="width:350px; border: 1px solid black;" value="$user" />

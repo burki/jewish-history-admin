@@ -37,7 +37,7 @@ class Countries
   }
 
   static function zipcodeStyle ($cc) {
-    switch($cc) {
+    switch ($cc) {
       case 'UK':
         return 2;
       case 'AU':

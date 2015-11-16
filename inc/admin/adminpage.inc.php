@@ -31,7 +31,7 @@ class AdminPage extends Page
     }
 
     function authenticate () {
-        switch($this->name) {
+        switch ($this->name) {
             case 'pwd': // anonymous pages
                 break;
             default:

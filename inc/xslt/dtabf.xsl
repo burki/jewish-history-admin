@@ -18,7 +18,7 @@
       <!-- dbu -->
       <xsl:apply-templates select=".//tei:titleStmt" mode="head" />
       <link rel="stylesheet" type="text/css" href="./vendor/tooltipster-master/css/tooltipster.css" />
-      <script type="text/javascript" src="//code.jquery.com/jquery-1.7.0.min.js"></script>
+      <script type="text/javascript" src="./script/jquery-1.11.0.min.js"></script>
       <script type="text/javascript" src="./vendor/tooltipster-master/js/jquery.tooltipster.min.js"></script>
       <script>
         $(document).ready(function() {

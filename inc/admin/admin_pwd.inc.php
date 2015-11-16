@@ -189,7 +189,7 @@ class DisplayPasswordRecover extends PageDisplay
             $pwd_ok  = $page->passwordValid($pwd, $pwd_confirm);
 
             if ($pwd_ok <= 0) {
-              switch($pwd_ok) {
+              switch ($pwd_ok) {
                 case -1 :
                   $msg = tr('Your password is not long enough (at least six characters)');
                   break;
@@ -237,7 +237,7 @@ class DisplayPasswordRecover extends PageDisplay
 
     $page = &$this->page; // save some typing
 
-    switch($this->mode) {
+    switch ($this->mode) {
       case SHOW_RECOVERSUCCESS:
         if (!empty($this->msg))
           $content = $this->msg;
@@ -325,7 +325,7 @@ EOT;
 
 $display = new DisplayPasswordRecover($page);
 
-switch($display->init()) {
+switch ($display->init()) {
   case SHOW_LOGIN:
     $page->redirect(array());
     break;

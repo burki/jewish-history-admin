@@ -23,7 +23,8 @@ CREATE TABLE User (
   fax varchar(30) NULL,
   url varchar(255) NULL,
   supervisor varchar(255) NULL,
-  description text,
+  description text null,
+  description_de text null,
   areas text,
   expectations text,
   knownthrough varchar(255) NULL,
@@ -73,6 +74,7 @@ CREATE TABLE Message (
 
   # review fields
   referee       INT NULL,                       #
+  translator    INT NULL,                       #
 
   publisher_request DATETIME NULL,
   publisher_received DATETIME NULL,
@@ -257,6 +259,7 @@ CREATE TABLE Person (
   archive       TEXT NULL,                  #
   estate        TEXT NULL,                  #
   pictures      TEXT NULL,                  #
+  entityfacts   TEXT NULL,
 
   # Common
   comment_internal TEXT NULL,                   # Interner Vermerk

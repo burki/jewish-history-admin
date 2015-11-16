@@ -6,7 +6,7 @@
  *
  * (c) 2006-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-03-26 dbu
+ * Version: 2015-07-21 dbu
  *
  * Changes:
  *
@@ -104,7 +104,7 @@ function replace_num_entity($ord) {
         return;
     }
 
-    switch($no_bytes)
+    switch ($no_bytes)
     {
         case 2:
         {
@@ -225,8 +225,10 @@ class AuthorListing
         'UNIX_TIMESTAMP(hold) AS hold',
         // contact
         'email_work', 'institution', 'address', 'zip', 'place', 'country AS cc', 'phone', 'fax',
+        // public
+        'url', 'description_de', 'description',
         // personal
-        'url', 'supervisor', 'areas', 'expectations', 'knownthrough', /* 'description', */ 'forum',
+        'supervisor', 'areas', 'expectations', 'knownthrough', 'forum',
         // review
         'review', 'review_areas', 'review_suggest',
 
@@ -267,7 +269,7 @@ class AuthorListing
     $zipcode_town = $record['place'];
     if (isset($record['zip'])) {
       $zipcodestyle = isset($record['zipcodestyle']) ? $record['zipcodestyle'] : Countries::zipcodeStyle($record['cc']);
-      switch($zipcodestyle) {
+      switch ($zipcodestyle) {
         case 1:
           $zipcode_town .= $separator . $record['zip'];
           break;
@@ -328,14 +330,15 @@ class AuthorListing
     $actions = array();
 
     if ('email' == $field) {
-      switch($status) {
+      switch ($status) {
         case 1:
         case 2:
-            $actions = array('change' => tr('change'));
+          $actions = array('change' => tr('change'));
+          break;
       }
     }
     else {
-      switch($status) {
+      switch ($status) {
         case -10:
         case 0:
         case -5:
@@ -437,19 +440,6 @@ class AuthorListing
     if (isset($this->record['email'])) {
       $top[] = $this->buildEntry($view, $this->record['email']
                                  . (TRUE || 'admin' == $mode ? ' ' . $this->buildSubscriptionAction($view, $this->record['status'], 'email') : ''), '<!--Subscription -->E-mail', FALSE);
-      /* $top[] = $this->buildEntry($view,
-        (isset(self::$status_list[$this->record['status']])
-         ? tr(self::$status_list[$this->record['status']]).' ' : '')
-        .(TRUE || 'admin' == $mode ? $this->buildSubscriptionAction($view, $this->record['status']) : '')
-        .($this->record['subscribed'] && 0 != $this->record['status'] ? '<br />' : ' ')
-        .(isset($this->record['subscribed']) && $this->record['subscribed'] > 0
-            ? $view->formatTimestamp($this->record['subscribed']) : '')
-        .(isset($this->record['unsubscribed']) && $this->record['unsubscribed'] > 0
-            ? '-'.$view->formatTimestamp($this->record['unsubscribed']) : '')
-        .(isset($this->record['hold']) && $this->record['hold'] > 0
-          ? ", ".tr('Hold until').' '.$view->formatTimestamp($this->record['hold']) : '')
-        ,
-        'Status', FALSE); */
     }
 
     if (count($top) > 0) {
@@ -505,11 +495,32 @@ class AuthorListing
             . '</p>';
     }
 
+    // public info
+    $public = array();
+    $public_fields = array(
+        'url' => 'Homepage',
+        'description_de' => 'Public CV (de)',
+        'description' => 'Public CV (en)',
+    );
+    foreach ($public_fields as $field => $label) {
+      if (!empty($this->record[$field])) {
+        $value = 'url' == $field
+          ? $this->formatUrl($this->record[$field])
+          : $this->record[$field];
+
+        $public[] = $this->buildEntry($view, $value, $label, 'url' != $field);
+      }
+    }
+
+    if (count($public) > 0) {
+      $ret .= $this->buildSection($view, 'Public Info')
+            . implode('<br />', $public);
+    }
+
     // personal info
     $personal = array();
 
     $personal_fields = array(
-        'url' => 'Homepage',
         'supervisor' => 'Supervisor',
         'areas' => 'Areas of interest',
     );
@@ -520,7 +531,6 @@ class AuthorListing
         array(
           'expectations' => 'Expectations',
           'knownthrough' => 'How did you get to know us',
-          // 'description' => '',
           'forum' => 'Other lists and fora',
           ));
     }

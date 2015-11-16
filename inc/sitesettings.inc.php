@@ -7,7 +7,7 @@
  *
  * (c) 2009-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-05-09 dbu
+ * Version: 2015-11-16 dbu
  *
  * Changes:
  *
@@ -39,6 +39,7 @@ define('COUNTRIES_FROM_DB', FALSE);
 //
 $RIGHTS_EDITOR = 0x02;  // these can see/edit all data
 $RIGHTS_REFEREE = 0x10; // these can see but not edit
+$RIGHTS_TRANSLATOR = 0x20; // these can see but not edit
 $RIGHTS_ADMIN = 0x04;   // these can handle restricted system settings
 
 define('STATUS_DELETED', -1); // reserved value in the database
@@ -129,6 +130,26 @@ $MEDIA_EXTENSIONS = array(
 $STATUS_REMOVED = '-1';
 $STATUS_EDIT = '0';
 $MESSAGE_STATUS = array($STATUS_EDIT => 'draft', '1' => 'publish', $STATUS_REMOVED => 'removed');
+
+$STATUS_OPTIONS = array (
+    '-99' => 'angedacht',
+    '-76' => 'angefragt Autor',
+    '-73' => 'vergeben Autor',
+    '-69' => '1. Mahnung',
+    '-68' => '2. Mahnung',
+    '-67' => '3. Mahnung',
+    '-66' => '4. Mahnung',
+    '-59' => 'eingegangen Autor',
+    '-55' => 'an Gutachter',
+    '-53' => '&#220;berarbeitung Autor',
+    '-49' => 'inhaltlich ok',
+    '-45' => 'formal ok',
+    '1'   => 'ver&#246;ffentlicht',
+    '-100' => 'abgebrochen Redakteur',
+    '-103' => 'abgebrochen bewahrende Institution',
+    '-106' => 'abgebrochen Autor',
+    '-112' => 'abgelehnt Artikel',
+);
 
 // $MESSAGE_TYPES
 $MESSAGE_REVIEW_PUBLICATION = 100;
