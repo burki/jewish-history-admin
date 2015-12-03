@@ -9,8 +9,9 @@ class Countries
   static $from_db = COUNTRIES_FROM_DB;
 
   static function getAll () {
-    if (isset(self::$countries))
+    if (isset(self::$countries)) {
       return self::$countries;
+    }
 
     if (self::$from_db) {
       $querystr = "SELECT cc, name FROM Country ORDER BY name";
@@ -31,8 +32,9 @@ class Countries
   }
 
   static function name ($cc) {
-    if (isset(self::$countries))
+    if (isset(self::$countries)) {
       self::getAll();
+    }
     return isset(self::$countries[$cc]) ? self::$countries[$cc] : $cc;
   }
 
@@ -53,16 +55,115 @@ class Countries
 
 }
 
-class MysqlFulltextSimpleParser {
+class Languages
+{
+  static $languages = array();
+  static $from_db = FALSE; // LANGUAGES_FROM_DB;
+
+  static function getAll ($lang = 'en', $dbconn = NULL) {
+    if (isset(self::$languages[$lang]))
+      return self::$languages[$lang];
+
+    if (self::$from_db) {
+      if (!isset($dbconn)) {
+        $dbconn = Dbconn::getAdaptor();
+      }
+      $querystr = "SELECT iso639_2, name FROM Languages ORDER BY name";
+      $countries = array();
+      $stmt = $dbconn->query($querystr);
+      while ($stmt !== FALSE && $row = $stmt->fetch()) {
+        self::$languages[$lang][$row['iso639_2']] = $row['name'];
+      }
+    }
+    else {
+      $lines = file(dirname(__FILE__) . '/iso-639-1_utf-8.txt');
+      switch ($lang) {
+        case 'de':
+        case 'de_DE':
+          $col_name = 3;
+          break;
+        default: // english
+          $col_name = 1;
+      }
+      foreach ($lines as $line) {
+        $line = chop($line);
+        $parts = preg_split('/\t/', $line);
+        if (!empty($parts[0])) {
+          self::$languages[$lang][$parts[0]] = $parts[$col_name];
+        }
+      }
+      if (1 != $col_name) {
+        asort(self::$languages[$lang]);
+      }
+    }
+
+    return self::$languages[$lang];
+  }
+
+  static function name ($iso639_2) {
+    if (isset(self::$languages)) {
+      self::getAll();
+    }
+    return isset(self::$languages[$iso639_2]) ? self::$languages[$iso639_2] : $iso639_2;
+  }
+
+  static function guess ($text) {
+    require_once 'PEAR.php';
+    require_once 'Text/LanguageDetect.php';
+
+    $l = new Text_LanguageDetect();
+    $l->_data_dir = realpath(dirname(__FILE__) . '/../../lib/data/'); // since we didn't install cleanly by pear
+
+    $q = utf8_encode($text);
+    $len = $l->utf8strlen($q);
+    if ($len < 20) {
+      return;
+    }
+
+    $result = $l->detectConfidence($q);
+
+    if (@PEAR::isError($result)) {
+      // echo $result->getMessage();
+    }
+    else if ($result == null) {
+      //  echo "Text_LanguageDetect cannot identify this piece of text. <br /><br />\n";
+    }
+    else {
+      switch ($result['language']) {
+        /* case 'German':
+          $ret = 'ger';
+          break; */
+        default:
+          $languages = self::getAll();
+          foreach ($languages as $key => $name) {
+            if (preg_match('/(.+);/', $name, $matches)) {
+              // Stuff like 'Spanish; Castilian'
+              $name = $matches[1];
+            }
+            if (strtolower($name) == $result['language']) {
+              return $key;
+            }
+          }
+          // echo 'TODO: detected ' . $result['language'];
+          //         echo "Text_LanguageDetect thinks this text is written in <b>{$result['language']}</b> ({$result['similarity']}, {$result['confidence']})<br /><br />\n";
+
+      }
+    }
+  }
+
+}
+
+class MysqlFulltextSimpleParser
+{
   var $min_length = 0; // you might have to turn this up to ft_min_word_len
 
  /**
-    * Callback function (or mode / state), called by the Lexer. This one
-    * deals with text outside of a variable reference.
-    * @param string the matched text
-    * @param int lexer state (ignored here)
-    */
-  function accept($match, $state) {
+  * Callback function (or mode / state), called by the Lexer. This one
+  * deals with text outside of a variable reference.
+  * @param string the matched text
+  * @param int lexer state (ignored here)
+  */
+  function accept ($match, $state) {
     // echo "$state: -$match-<br />";
     if ($state == LEXER_UNMATCHED && strlen($match) < $this->min_length && strpos($match, '*') === FALSE)
       return TRUE;
@@ -74,29 +175,29 @@ class MysqlFulltextSimpleParser {
     return TRUE;
   }
 
-  function writeQuoted($match, $state) {
+  function writeQuoted ($match, $state) {
     static $words;
 
     switch ($state) {
     // Entering the variable reference
     case LEXER_ENTER:
-        $words = array();
-        break;
+      $words = array();
+      break;
 
     // Contents of the variable reference
     case LEXER_MATCHED:
-        break;
+      break;
 
     case LEXER_UNMATCHED:
-        if (strlen($match) >= $this->min_length)
-          $words[] = $match;
-        break;
+      if (strlen($match) >= $this->min_length)
+        $words[] = $match;
+      break;
 
     // Exiting the variable reference
     case LEXER_EXIT:
-        if (count($words) > 0)
-          $this->output .= '+"'.implode(' ', $words).'"';
-        break;
+      if (count($words) > 0)
+        $this->output .= '+"' . implode(' ', $words) . '"';
+      break;
     }
 
     return TRUE;

@@ -209,6 +209,23 @@ class DisplayArticle extends DisplayMessage
 
     $dbconn = & $this->page->dbconn;
     switch ($type) {
+      case 'lang':
+        global $LANGUAGES_FEATURED;
+        $languages = $this->getLanguages($this->page->lang());
+        if (isset($LANGUAGES_FEATURED)) {
+          for ($i = 0; $i < count($LANGUAGES_FEATURED); $i++) {
+            $languages_ordered[$LANGUAGES_FEATURED[$i]] = $languages[$LANGUAGES_FEATURED[$i]];
+          }
+          $languages_ordered['&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;'] = FALSE; // separator
+        }
+        foreach ($languages as $iso639_2 => $name) {
+          if (!isset($languages_ordered[$iso639_2])) {
+            $languages_ordered[$iso639_2] = $name;
+          }
+        }
+        return $languages_ordered;
+        break;
+
       case 'section':
           $querystr = sprintf("SELECT id, name FROM Term"
                               . " WHERE category='%s' AND status >= 0"
@@ -218,6 +235,7 @@ class DisplayArticle extends DisplayMessage
 
       case 'referee':
       case 'translator':
+          global $RIGHTS_REFEREE, $RIGHTS_TRANSLATOR;
           $querystr = "SELECT id, lastname, firstname FROM User";
           $querystr .= sprintf(" WHERE 0 <> (privs & %d) AND status <> %d",
                                'translator' == $type ? $RIGHTS_TRANSLATOR : $RIGHTS_REFEREE,
@@ -258,6 +276,8 @@ class DisplayArticle extends DisplayMessage
     $this->view_options['editor'] = $this->editor_options = $this->buildOptions('editor');
     $this->view_options['referee'] = $this->referee_options = $this->buildOptions('referee');
     $this->view_options['translator'] = $this->translator_options = $this->buildOptions('translator');
+    $this->view_options['lang'] = $this->buildOptions('lang');
+    $languages_ordered = array('' => tr('-- please select --')) + $this->view_options['lang'];
 
     $record->add_fields(array(
         new Field(array('name' => 'publication', 'type' => 'hidden', 'datatype' => 'int',
@@ -276,6 +296,7 @@ class DisplayArticle extends DisplayMessage
                         'options' => array_merge(array(''), array_keys($this->referee_options)),
                         'labels' => array_merge(array(tr('-- none --')), array_values($this->referee_options)),
                         'datatype' => 'int', 'null' => TRUE)),
+        new Field(array('name' => 'lang', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($languages_ordered), 'labels' => array_values($languages_ordered), 'null' => TRUE)),
         new Field(array('name' => 'translator', 'type' => 'select',
                         'options' => array_merge(array(''), array_keys($this->translator_options)),
                         'labels' => array_merge(array(tr('-- none --')), array_values($this->translator_options)),
@@ -484,6 +505,7 @@ EOT;
                             : $this->record->get_value('slug')),
             'editor' => array('label' => 'Article Editor'),
             'referee' => array('label' => 'Referee'),
+            'lang' => array('label' => 'Quellsprache'),
             'translator' => array('label' => 'Translator'),
       ), 'status');
     $rows = array_merge_at($rows,

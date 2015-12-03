@@ -58,6 +58,12 @@ class PageDisplayBase
     return $countries_ordered;
   }
 
+  function getLanguages ($lang = 'en') {
+    require_once INC_PATH . 'common/classes.inc.php';
+
+    return Languages::getAll($lang);
+  }
+
   function htmlSpecialchars ($txt) {
     $match = array('/&(?!\#\d+;)/s', '/</s', '/>/s', '/"/s');
     $replace = array('&amp;', '&lt;', '&gt;', '&quot;');

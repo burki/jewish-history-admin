@@ -532,8 +532,9 @@ function myInsertLink (href, target, title, onclick, action) {
 
 EOT;
 
-      foreach ($this->tinymce_fields as $fieldname)
+      foreach ($this->tinymce_fields as $fieldname) {
         $this->form->set_value($fieldname, $this->formatParagraphs($this->form->get_value($fieldname)));
+      }
     }
 
     $changed = isset($this->id) ? $this->buildChangedBy() : '';

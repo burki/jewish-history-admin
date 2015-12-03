@@ -6,7 +6,7 @@
  *
  * (c) 2007-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-05-09 dbu
+ * Version: 2015-12-03 dbu
  *
  * Changes:
  *
@@ -169,24 +169,56 @@ class DisplayPublication extends DisplayBackend
     return new PublicationRecord(array('tables' => $this->table, 'dbconn' => $this->page->dbconn));
   }
 
-  function buildOptions ($category) {
+  function buildOptions ($type) {
     $dbconn = & $this->page->dbconn;
-    switch ($category) {
+    switch ($type) {
+      case 'lang':
+        global $LANGUAGES_FEATURED;
+        $languages = $this->getLanguages($this->page->lang());
+        if (isset($LANGUAGES_FEATURED)) {
+          for ($i = 0; $i < count($LANGUAGES_FEATURED); $i++) {
+            $languages_ordered[$LANGUAGES_FEATURED[$i]] = $languages[$LANGUAGES_FEATURED[$i]];
+          }
+          $languages_ordered['&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;'] = FALSE; // separator
+        }
+        foreach ($languages as $iso639_2 => $name) {
+          if (!isset($languages_ordered[$iso639_2])) {
+            $languages_ordered[$iso639_2] = $name;
+          }
+        }
+        return $languages_ordered;
+        break;
+
       case 'type':
           $type = 'sourcetype';
           $querystr = sprintf("SELECT id, name FROM Term WHERE category='%s' AND status >= 0 ORDER BY ord, name",
                               addslashes($type));
           break;
+
       case 'publisher':
           $querystr = sprintf("SELECT id, name FROM %s WHERE status >= 0 ORDER BY name",
-                            $dbconn->escape_string(ucfirst($category)));
+                            $dbconn->escape_string(ucfirst($type)));
+          break;
+
+      case 'referee':
+      case 'translator':
+          global $RIGHTS_REFEREE, $RIGHTS_TRANSLATOR;
+          $querystr = "SELECT id, lastname, firstname FROM User";
+          $querystr .= sprintf(" WHERE 0 <> (privs & %d) AND status <> %d",
+                               'translator' == $type ? $RIGHTS_TRANSLATOR : $RIGHTS_REFEREE,
+                               STATUS_USER_DELETED);
+          $querystr .= " ORDER BY lastname, firstname";
           break;
     }
+
     if (isset($querystr)) {
       $dbconn->query($querystr);
       $options = array();
       while ($dbconn->next_record()) {
-        $options[$dbconn->Record['id']] = $dbconn->Record['name'];
+        $options[$dbconn->Record['id']] = in_array($type, array('sourcetype', 'publisher'))
+                ? $dbconn->Record['name']
+                : $dbconn->Record['lastname'] . ', ' . $dbconn->Record['firstname'];
+
       }
 
       return $options;
@@ -201,6 +233,10 @@ class DisplayPublication extends DisplayBackend
     }
 
     $this->view_options['type'] = $type_options = $this->buildOptions('type');
+    $this->view_options['translator'] = $this->translator_options = $this->buildOptions('translator');
+    $this->view_options['lang'] = $this->buildOptions('lang');
+    $languages_ordered = array('' => tr('-- please select --')) + $this->view_options['lang'];
+
     $publisher_options = $this->buildOptions('publisher');
     $record->add_fields(array(
         new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => TRUE)),
@@ -227,6 +263,13 @@ class DisplayPublication extends DisplayBackend
         new Field(array('name' => 'listprice', 'id' => 'listprice', 'type' => 'text', 'size' =>60, 'datatype' => 'char', 'maxlength' => 50, 'null' => TRUE)),
         new Field(array('name' => 'image_url', 'id' => 'image', 'type' => 'hidden', 'datatype' => 'char', 'null' => TRUE, 'nodbfield' => TRUE)),
         new Field(array('name' => 'url', 'id' => 'toc_url', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlenght' => 255, 'null' => TRUE)),
+
+        new Field(array('name' => 'lang', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($languages_ordered), 'labels' => array_values($languages_ordered), 'null' => TRUE)),
+        new Field(array('name' => 'translator', 'type' => 'select',
+                'options' => array_merge(array(''), array_keys($this->translator_options)),
+                'labels' => array_merge(array(tr('-- none --')), array_values($this->translator_options)),
+                'datatype' => 'int', 'null' => TRUE)),
+
         new Field(array('name' => 'comment', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
       ));
 
@@ -260,6 +303,9 @@ class DisplayPublication extends DisplayBackend
       // 'listprice' => array('label' => 'List price'),
       'url' => array('label' => 'URL'),
       'image_url' => FALSE, // hidden field
+
+      'lang' => array('label' => 'Quellsprache'),
+      'translator' => array('label' => 'Translator'),
 
       'comment' => array('label' => 'Internal notes and comments'),
 
@@ -366,8 +412,12 @@ EOT;
   }
 
   function buildViewRows () {
-    $resolve_options = array('type' => 'type',
-                             'publisher_id' => 'publisher');
+    $resolve_options = array(
+                             'type' => 'type',
+                             'publisher_id' => 'publisher',
+                             'lang' => 'lang',
+                             'translator' => 'translator',
+                             );
 
     $rows = $this->getEditRows();
     if (isset($rows['title'])) {

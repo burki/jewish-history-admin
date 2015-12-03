@@ -1,0 +1,184 @@
+aar	Afar	afar	Danakil-Sprache
+abk	Abkhazian	abkhaze	Abchasisch
+afr	Afrikaans	afrikaans	Afrikaans
+aka	Akan	akan	Akan-Sprache
+alb	Albanian	albanais	Albanisch
+amh	Amharic	amharique	Amharisch
+ara	Arabic	arabe	Arabisch
+arg	Aragonese	aragonais	Aragonesisch
+arm	Armenian	arménien	Armenisch
+asm	Assamese	assamais	Assamesisch
+ava	Avaric	avar	Awarisch
+ave	Avestan	avestique	Avestisch
+aym	Aymara	aymara	Aymará-Sprache
+aze	Azerbaijani	azéri	Aserbeidschanisch
+bak	Bashkir	bachkir	Baschkirisch
+bam	Bambara	bambara	Bambara-Sprache
+baq	Basque	basque	Baskisch
+bel	Belarusian	biélorusse	Weißrussisch
+ben	Bengali	bengali	Bengali
+bih	Bihari languages	langues biharis	Bihari (Andere)
+bis	Bislama	bichlamar	Beach-la-mar
+bos	Bosnian	bosniaque	Bosnisch
+bre	Breton	breton	Bretonisch
+bul	Bulgarian	bulgare	Bulgarisch
+bur	Burmese	birman	Birmanisch
+cat	Catalan; Valencian	catalan; valencien	Katalanisch
+cha	Chamorro	chamorro	Chamorro-Sprache
+che	Chechen	tchétchène	Tschetschenisch
+chi	Chinese	chinois	Chinesisch
+chu	Church Slavic; Old Slavonic; Church Slavonic; Old Bulgarian; Old Church Slavonic	slavon d'église; vieux slave; slavon liturgique; vieux bulgare	Kirchenslawisch
+chv	Chuvash	tchouvache	Tschuwaschisch
+cor	Cornish	cornique	Kornisch
+cos	Corsican	corse	Korsisch
+cre	Cree	cree	Cree-Sprache
+cze	Czech	tchèque	Tschechisch
+dan	Danish	danois	Dänisch
+div	Divehi; Dhivehi; Maldivian	maldivien	Maledivisch
+dut	Dutch; Flemish	néerlandais; flamand	Niederländisch
+dzo	Dzongkha	dzongkha	Dzongkha
+eng	English	anglais	Englisch
+epo	Esperanto	espéranto	Esperanto
+est	Estonian	estonien	Estnisch
+ewe	Ewe	éwé	Ewe-Sprache
+fao	Faroese	féroïen	Färöisch
+fij	Fijian	fidjien	Fidschi-Sprache
+fin	Finnish	finnois	Finnisch
+fre	French	français	Französisch
+fry	Western Frisian	frison occidental	Friesisch
+ful	Fulah	peul	Ful
+geo	Georgian	géorgien	Georgisch
+ger	German	allemand	Deutsch
+gla	Gaelic; Scottish Gaelic	gaélique; gaélique écossais	Gälisch-Schottisch
+gle	Irish	irlandais	Irisch
+glg	Galician	galicien	Galicisch
+glv	Manx	manx; mannois	Manx
+gre	Greek, Modern (1453-)	grec moderne (après 1453)	Neugriechisch
+grn	Guarani	guarani	Guaraní-Sprache
+guj	Gujarati	goudjrati	Gujarātī-Sprache
+hat	Haitian; Haitian Creole	haïtien; créole haïtien	Haïtien (Haiti-Kreolisch)
+hau	Hausa	haoussa	Haussa-Sprache
+heb	Hebrew	hébreu	Hebräisch
+her	Herero	herero	Herero-Sprache
+hin	Hindi	hindi	Hindi
+hmo	Hiri Motu	hiri motu	Hiri-Motu
+hrv	Croatian	croate	Kroatisch
+hun	Hungarian	hongrois	Ungarisch
+ibo	Igbo	igbo	Ibo-Sprache
+ice	Icelandic	islandais	Isländisch
+ido	Ido	ido	Ido
+iii	Sichuan Yi; Nuosu	yi de Sichuan	Lalo-Sprache
+iku	Inuktitut	inuktitut	Inuktitut
+ile	Interlingue; Occidental	interlingue	Interlingue
+ina	Interlingua (International Auxiliary Language Association)	interlingua (langue auxiliaire internationale)	Interlingua
+ind	Indonesian	indonésien	Bahasa Indonesia
+ipk	Inupiaq	inupiaq	Inupik
+ita	Italian	italien	Italienisch
+jav	Javanese	javanais	Javanisch
+jpn	Japanese	japonais	Japanisch
+kal	Kalaallisut; Greenlandic	groenlandais	Grönländisch
+kan	Kannada	kannada	Kannada
+kas	Kashmiri	kashmiri	Kaschmiri
+kau	Kanuri	kanouri	Kanuri-Sprache
+kaz	Kazakh	kazakh	Kasachisch
+khm	Central Khmer	khmer central	Kambodschanisch
+kik	Kikuyu; Gikuyu	kikuyu	Kikuyu-Sprache
+kin	Kinyarwanda	rwanda	Rwanda-Sprache
+kir	Kirghiz; Kyrgyz	kirghiz	Kirgisisch
+kom	Komi	kom	Komi-Sprache
+kon	Kongo	kongo	Kongo-Sprache
+kor	Korean	coréen	Koreanisch
+kua	Kuanyama; Kwanyama	kuanyama; kwanyama	Kwanyama-Sprache
+kur	Kurdish	kurde	Kurdisch
+lao	Lao	lao	Laotisch
+lat	Latin	latin	Latein
+lav	Latvian	letton	Lettisch
+lim	Limburgan; Limburger; Limburgish	limbourgeois	Limburgisch
+lin	Lingala	lingala	Lingala
+lit	Lithuanian	lituanien	Litauisch
+ltz	Luxembourgish; Letzeburgesch	luxembourgeois	Luxemburgisch
+lub	Luba-Katanga	luba-katanga	Luba-Katanga-Sprache
+lug	Ganda	ganda	Ganda-Sprache
+mac	Macedonian	macédonien	Makedonisch
+mah	Marshallese	marshall	Marschallesisch
+mal	Malayalam	malayalam	Malayalam
+mao	Maori	maori	Maori-Sprache
+mar	Marathi	marathe	Marathi
+may	Malay	malais	Malaiisch
+mlg	Malagasy	malgache	Malagassi-Sprache
+mlt	Maltese	maltais	Maltesisch
+mon	Mongolian	mongol	Mongolisch
+nau	Nauru	nauruan	Nauruanisch
+nav	Navajo; Navaho	navaho	Navajo-Sprache
+nbl	Ndebele, South; South Ndebele	ndébélé du Sud	Ndebele-Sprache <Transvaal>
+nde	Ndebele, North; North Ndebele	ndébélé du Nord	Ndebele-Sprache <Simbabwe>
+ndo	Ndonga	ndonga	Ndonga
+nep	Nepali	népalais	Nepali
+nno	Norwegian Nynorsk; Nynorsk, Norwegian	norvégien nynorsk; nynorsk, norvégien	Nynorsk
+nob	Bokmål, Norwegian; Norwegian Bokmål	norvégien bokmål	Bokmål
+nor	Norwegian	norvégien	Norwegisch
+nya	Chichewa; Chewa; Nyanja	chichewa; chewa; nyanja	Nyanja-Sprache
+oci	Occitan (post 1500); Provençal	occitan (après 1500); provençal	Okzitanisch
+oji	Ojibwa	ojibwa	Ojibwa-Sprache
+ori	Oriya	oriya	Oriya-Sprache
+orm	Oromo	galla	Galla-Sprache
+oss	Ossetian; Ossetic	ossète	Ossetisch
+pan	Panjabi; Punjabi	pendjabi	Pandschabi-Sprache
+per	Persian	persan	Persisch
+pli	Pali	pali	Pāli
+pol	Polish	polonais	Polnisch
+por	Portuguese	portugais	Portugiesisch
+pus	Pushto; Pashto	pachto	Paschtu
+que	Quechua	quechua	Quechua-Sprache
+roh	Romansh	romanche	Rätoromanisch
+rum	Romanian; Moldavian; Moldovan	roumain; moldave	Rumänisch
+run	Rundi	rundi	Rundi-Sprache
+rus	Russian	russe	Russisch
+sag	Sango	sango	Sango-Sprache
+san	Sanskrit	sanskrit	Sanskrit
+sin	Sinhala; Sinhalese	singhalais	Singhalesisch
+slo	Slovak	slovaque	Slowakisch
+slv	Slovenian	slovène	Slowenisch
+sme	Northern Sami	sami du Nord	Nordsaamisch
+smo	Samoan	samoan	Samoanisch
+sna	Shona	shona	Schona-Sprache
+snd	Sindhi	sindhi	Sindhi-Sprache
+som	Somali	somali	Somali
+sot	Sotho, Southern	sotho du Sud	Süd-Sotho-Sprache
+spa	Spanish; Castilian	espagnol; castillan	Spanisch
+srd	Sardinian	sarde	Sardisch
+srp	Serbian	serbe	Serbisch
+ssw	Swati	swati	Swasi-Sprache
+sun	Sundanese	soundanais	Sundanesisch
+swa	Swahili	swahili	Swahili
+swe	Swedish	suédois	Schwedisch
+tah	Tahitian	tahitien	Tahitisch
+tam	Tamil	tamoul	Tamil
+tat	Tatar	tatar	Tatarisch
+tel	Telugu	télougou	Telugu-Sprache
+tgk	Tajik	tadjik	Tadschikisch
+tgl	Tagalog	tagalog	Tagalog
+tha	Thai	thaï	Thailändisch
+tib	Tibetan	tibétain	Tibetisch
+tir	Tigrinya	tigrigna	Tigrinja-Sprache
+ton	Tonga (Tonga Islands)	tongan (Îles Tonga)	Tongaisch
+tsn	Tswana	tswana	Tswana-Sprache
+tso	Tsonga	tsonga	Tsonga-Sprache
+tuk	Turkmen	turkmène	Turkmenisch
+tur	Turkish	turc	Türkisch
+twi	Twi	twi	Twi-Sprache
+uig	Uighur; Uyghur	ouïgour	Uigurisch
+ukr	Ukrainian	ukrainien	Ukrainisch
+urd	Urdu	ourdou	Urdu
+uzb	Uzbek	ouszbek	Usbekisch
+ven	Venda	venda	Venda-Sprache
+vie	Vietnamese	vietnamien	Vietnamesisch
+vol	Volapük	volapük	Volapük
+wel	Welsh	gallois	Kymrisch
+wln	Walloon	wallon	Wallonisch
+wol	Wolof	wolof	Wolof-Sprache
+xho	Xhosa	xhosa	Xhosa-Sprache
+yid	Yiddish	yiddish	Jiddisch
+yor	Yoruba	yoruba	Yoruba-Sprache
+zha	Zhuang; Chuang	zhuang; chuang	Zhuang
+zul	Zulu	zoulou	Zulu-Sprache

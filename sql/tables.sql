@@ -63,6 +63,7 @@ CREATE TABLE Message (
   type          INT NOT NULL,                   #
   parent_id     INT NULL,                       # articles in issue...
   ord           INT DEFAULT 0,  		        # Ordnung innerhalb Kids mit gleichem Parent
+  lang          VARCHAR(5) NULL,
   subject       VARCHAR(255) NULL,              # Title of the node
   body          LONGTEXT NULL,                  # the entry in plain txt, XML, binary,
   published     DATETIME NULL,                  #
@@ -178,6 +179,9 @@ CREATE TABLE Publication (
   place         VARCHAR(127) NULL,              #
   listprice     VARCHAR(50) NULL,               #
   url           VARCHAR(511) NULL,              # link to TOC and similar things
+
+  lang          VARCHAR(5) NULL,
+  translator    INT NULL,                       #
 
   # Common
   comment       TEXT NULL,                      # internal comment

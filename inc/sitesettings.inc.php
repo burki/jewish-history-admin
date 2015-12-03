@@ -57,6 +57,7 @@ $COUNTRIES_FEATURED = array('DE', 'AT', 'CH', 'UK', 'US', 'CA',
                             'FR', 'IT', 'ES', 'NL', 'BE',
                             'DK', 'SE', 'NO', 'FI',
                             'AU', 'JP');
+$GLOBALS['LANGUAGES_FEATURED'] = array('ger', 'eng', 'fre', 'ita', 'spa', 'heb', 'yid');
 
 $GLOBALS['THESAURI'] =
     array(
