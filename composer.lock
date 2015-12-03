@@ -565,16 +565,16 @@
         },
         {
             "name": "semsol/arc2",
-            "version": "2.2.5",
+            "version": "2.2.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/semsol/arc2.git",
-                "reference": "38a8e1378eafcba062b5bd6349b656e1bf083b9f"
+                "reference": "75158bd470e264439dd6773b75f023becdeb78c4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/semsol/arc2/zipball/38a8e1378eafcba062b5bd6349b656e1bf083b9f",
-                "reference": "38a8e1378eafcba062b5bd6349b656e1bf083b9f",
+                "url": "https://api.github.com/repos/semsol/arc2/zipball/75158bd470e264439dd6773b75f023becdeb78c4",
+                "reference": "75158bd470e264439dd6773b75f023becdeb78c4",
                 "shasum": ""
             },
             "require": {
@@ -605,7 +605,7 @@
                 "RDF",
                 "sparql"
             ],
-            "time": "2015-05-14 09:42:03"
+            "time": "2015-11-24 06:22:45"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -662,16 +662,16 @@
         },
         {
             "name": "zendframework/zendframework1",
-            "version": "1.12.16",
+            "version": "1.12.17",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zendframework/zf1.git",
-                "reference": "8a3c471ef0a337d303cd5ae578e64c2ba1d2c025"
+                "reference": "9f0bbc8b626bf35030afd766d9a7e506864e8e0b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zf1/zipball/8a3c471ef0a337d303cd5ae578e64c2ba1d2c025",
-                "reference": "8a3c471ef0a337d303cd5ae578e64c2ba1d2c025",
+                "url": "https://api.github.com/repos/zendframework/zf1/zipball/9f0bbc8b626bf35030afd766d9a7e506864e8e0b",
+                "reference": "9f0bbc8b626bf35030afd766d9a7e506864e8e0b",
                 "shasum": ""
             },
             "require": {
@@ -705,7 +705,7 @@
                 "ZF1",
                 "framework"
             ],
-            "time": "2015-09-15 15:49:51"
+            "time": "2015-11-23 15:11:10"
         }
     ],
     "packages-dev": [],
