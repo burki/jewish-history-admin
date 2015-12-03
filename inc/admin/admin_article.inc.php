@@ -221,7 +221,7 @@ class DisplayArticle extends DisplayMessage
           $querystr = "SELECT id, lastname, firstname FROM User";
           $querystr .= sprintf(" WHERE 0 <> (privs & %d) AND status <> %d",
                                'translator' == $type ? $RIGHTS_TRANSLATOR : $RIGHTS_REFEREE,
-                               STATUS_DELETED);
+                               STATUS_USER_DELETED);
           $querystr .= " ORDER BY lastname, firstname";
           break;
 
@@ -230,7 +230,7 @@ class DisplayArticle extends DisplayMessage
           $querystr = "SELECT id, lastname, firstname FROM User";
           // id > 1 so Daniel Burckhardt doesn't get displayed
           $querystr .= sprintf(" WHERE 0 <> (privs & %d) AND id > 1 AND status <> %d",
-                               $RIGHTS_EDITOR, STATUS_DELETED);
+                               $RIGHTS_EDITOR, STATUS_USER_DELETED);
           $querystr .= " ORDER BY lastname, firstname";
           break;
     }
