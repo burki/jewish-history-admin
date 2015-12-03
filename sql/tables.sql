@@ -62,12 +62,12 @@ CREATE TABLE Message (
   section       VARCHAR(255) NULL,              # to which section(s) it belongs
   type          INT NOT NULL,                   #
   parent_id     INT NULL,                       # articles in issue...
-  ord           INT DEFAULT 0,  		        # Ordnung innerhalb Kids mit gleichem Parent
+  ord           INT DEFAULT 0,                  # Ordnung innerhalb Kids mit gleichem Parent
   lang          VARCHAR(5) NULL,
   subject       VARCHAR(255) NULL,              # Title of the node
   body          LONGTEXT NULL,                  # the entry in plain txt, XML, binary,
   published     DATETIME NULL,                  #
-  slug           VARCHAR(255) NULL,             # slug
+  slug          VARCHAR(255) NULL,              # slug
   url           VARCHAR(255) NULL,              # Permanent-Link
   urn           VARCHAR(255) NULL,              # URL
   tags          VARCHAR(255) NULL,              #
@@ -99,7 +99,7 @@ CREATE INDEX MessageTypePublish ON Message (type, published);
 CREATE TABLE MessageUser (
   message_id    INT NOT NULL REFERENCES Message.id,  # to which message it belongs
   user_id       INT NOT NULL REFERENCES User.id,
-  ord           INT NOT NULL DEFAULT 0  	     # Order for multiple User for one Message
+  ord           INT NOT NULL DEFAULT 0          # Order for multiple User for one Message
 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 CREATE UNIQUE INDEX idxMessageUser ON MessageUser(message_id, user_id);
 
@@ -109,7 +109,7 @@ CREATE TABLE Publisher (
 
   name          VARCHAR(255),                   # Name of the publisher
   domicile      VARCHAR(255) NULL,              # Domicile
-  isbn         VARCHAR(255) NULL,               # ISBN prefix(es)
+  isbn          VARCHAR(255) NULL,              # ISBN prefix(es)
 
   # general address
   address text NULL,
@@ -142,7 +142,7 @@ CREATE TABLE Communication (
   status        INT DEFAULT 0,                  # -1: removed, 0: proofread, 1: publish
   type          INT NOT NULL,                   #
   parent_id     INT NULL,                       # if we ever want to do threads
-  ord           INT DEFAULT 0,  		        # Ordnung innerhalb Kids mit gleichem Parent
+  ord           INT DEFAULT 0,                  # Ordnung innerhalb Kids mit gleichem Parent
   from_id       INT NOT NULL REFERENCES User.id,# User that sent
   from_email    VARCHAR(255) NULL,              # Override User.email
   to_id         INT NULL,                       # User/Publisher it was sent to
@@ -182,6 +182,9 @@ CREATE TABLE Publication (
 
   lang          VARCHAR(5) NULL,
   translator    INT NULL,                       #
+  place_identifier VARCHAR(255) NULL,           #
+  indexingdate  DATE NULL,
+  displaydate VARCHAR(127) NULL,                #
 
   # Common
   comment       TEXT NULL,                      # internal comment
@@ -207,7 +210,7 @@ CREATE TABLE Media (
   mimetype      VARCHAR(80) NOT NULL,           # e.g image/gif, image/jpeg
   width         INT NOT NULL,                   #
   height        INT NOT NULL,                   #
-  ord           INT DEFAULT 0,  		# Ordnung innerhalb Kids mit gleichem Parent
+  ord           INT DEFAULT 0,                  # Ordnung innerhalb Kids mit gleichem Parent
   changed       TIMESTAMP NULL,                 # last changed
   created       TIMESTAMP,                      # when it was created
   caption       VARCHAR(255),                   # img-caption
@@ -259,10 +262,10 @@ CREATE TABLE Person (
   viaf          VARCHAR(16) NULL,               #
   lc_naf        VARCHAR(16) NULL,               #
 
-  literature    TEXT NULL,                  #
-  archive       TEXT NULL,                  #
-  estate        TEXT NULL,                  #
-  pictures      TEXT NULL,                  #
+  literature    TEXT NULL,                      #
+  archive       TEXT NULL,                      #
+  estate        TEXT NULL,                      #
+  pictures      TEXT NULL,                      #
   entityfacts   TEXT NULL,
 
   # Common
@@ -280,17 +283,17 @@ CREATE TABLE Place (
   status        INT NOT NULL DEFAULT 0,         # -1: removed
   type          VARCHAR(50) NOT NULL,
 
-  name           VARCHAR(255),
+  name          VARCHAR(255),
   name_variant  TEXT NULL,
 
-  country_code   CHAR(2),
-  parent_path    VARCHAR(1023),
-  latitude       DOUBLE,
-  longitude      DOUBLE,
-  tgn            INT NULL,
-  tgn_parent     INT NULL,
-  gnd            VARCHAR(255) NULL,
-  geonames_id    INT NULL,
+  country_code  CHAR(2),
+  parent_path   VARCHAR(1023),
+  latitude      DOUBLE,
+  longitude     DOUBLE,
+  tgn           INT NULL,
+  tgn_parent    INT NULL,
+  gnd           VARCHAR(255) NULL,
+  geonames_id   INT NULL,
   geonames_parent_adm1 INT NULL,
   geonames_parent_adm2 INT NULL,
   geonames_parent_adm3 INT NULL,

@@ -266,9 +266,12 @@ class DisplayPublication extends DisplayBackend
 
         new Field(array('name' => 'lang', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($languages_ordered), 'labels' => array_values($languages_ordered), 'null' => TRUE)),
         new Field(array('name' => 'translator', 'type' => 'select',
-                'options' => array_merge(array(''), array_keys($this->translator_options)),
-                'labels' => array_merge(array(tr('-- none --')), array_values($this->translator_options)),
-                'datatype' => 'int', 'null' => TRUE)),
+                        'options' => array_merge(array(''), array_keys($this->translator_options)),
+                        'labels' => array_merge(array(tr('-- none --')), array_values($this->translator_options)),
+                        'datatype' => 'int', 'null' => TRUE)),
+        new Field(array('name' => 'place_identifier', 'id' => 'place_identifier', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlenght' => 255, 'null' => TRUE)),
+        new Field(array('name' => 'indexingdate', 'type' => 'date', 'incomplete' => TRUE, 'datatype' => 'date', 'null' => TRUE)),
+        new Field(array('name' => 'displaydate', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
 
         new Field(array('name' => 'comment', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
       ));
@@ -306,6 +309,10 @@ class DisplayPublication extends DisplayBackend
 
       'lang' => array('label' => 'Quellsprache'),
       'translator' => array('label' => 'Translator'),
+
+      'place_identifier' => array('label' => 'Primärort (Getty-Identifier)'),
+      'indexingdate' => array('label' => 'Primärdatum (JJJJ oder TT.MM.JJJJ)'),
+      'displaydate' => array('label' => 'Übersteuerung Primärdatum (z.B. "um 1600")'),
 
       'comment' => array('label' => 'Internal notes and comments'),
 
