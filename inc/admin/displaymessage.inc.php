@@ -6,7 +6,7 @@
  *
  * (c) 2007-2015 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-11-04 dbu
+ * Version: 2015-12-03 dbu
  *
  * Changes:
  *
@@ -300,7 +300,7 @@ class DisplayMessage extends DisplayBackend
         new Field(array('name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()')),
         new Field(array('name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => TRUE)),
         new Field(array('name' => 'published', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
-        new Field(array('name' => 'subject', 'id' => 'subject', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80)),
+        new Field(array('name' => 'subject', 'id' => 'subject', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 160)),
         new Field(array('name' => 'user', 'type' => 'text', 'nodbfield' => TRUE, 'null' => TRUE)),
         new Field(array('name' => 'user_id', 'type' => 'int', 'nodbfield' => TRUE, 'null' => TRUE)),
         new Field(array('name' => 'users', 'type' => 'select', 'multiple' => TRUE, 'nodbfield' => TRUE, 'null' => TRUE)),
