@@ -273,7 +273,7 @@ class DisplayPublication extends DisplayBackend
         new Field(array('name' => 'indexingdate', 'type' => 'date', 'incomplete' => TRUE, 'datatype' => 'date', 'null' => TRUE)),
         new Field(array('name' => 'displaydate', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
 
-        new Field(array('name' => 'comment', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
+        new Field(array('name' => 'comment', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 15, 'null' => TRUE)),
       ));
 
     return $record;

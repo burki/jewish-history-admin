@@ -305,7 +305,7 @@ class DisplayMessage extends DisplayBackend
         new Field(array('name' => 'user_id', 'type' => 'int', 'nodbfield' => TRUE, 'null' => TRUE)),
         new Field(array('name' => 'users', 'type' => 'select', 'multiple' => TRUE, 'nodbfield' => TRUE, 'null' => TRUE)),
         new Field(array('name' => 'body', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 20, 'null' => TRUE)),
-        new Field(array('name' => 'comment', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
+        new Field(array('name' => 'comment', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 15, 'null' => TRUE)),
       ));
 
     return $record;
