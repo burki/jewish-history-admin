@@ -39,7 +39,7 @@ class MessageQueryConditionBuilder extends TableManagerQueryConditionBuilder
     }
   }
 
-  function buildEditorCondition () {
+  function buildEqualCondition () {
     $num_args = func_num_args();
     if ($num_args <= 0) {
       return;
@@ -243,7 +243,7 @@ class DisplayMessage extends DisplayBackend
                                'persist' => 'session');
     /*
     $this->condition[] = array('name' => 'editor',
-                               'method' => 'buildEditorCondition',
+                               'method' => 'buildEqualCondition',
                                'args' => $this->table . '.editor',
                                'persist' => 'session');
                                */
@@ -542,7 +542,6 @@ EOT;
     return $changed . parent::renderEditForm($rows, $name);
   }
 
-
   function buildStatusOptions ($options = NULL) {
     if (!isset($options)) {
       $options = & $this->status_options;
@@ -567,7 +566,7 @@ EOT;
                                     $this->htmlSpecialchars(tr($label)));
       }
     }
-    return tr('Editing Status')
+    return tr('Status')
          . ': <select name="status">' . implode($status_options) . '</select>';
   }
 
@@ -599,7 +598,6 @@ EOT;
         $search .= ' ' . tr($option_label)
                  . sprintf(': <select name="%s">%s</select>',
                            $name, implode($select_options));
-
       }
     }
 

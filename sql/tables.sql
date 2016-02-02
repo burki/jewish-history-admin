@@ -182,6 +182,7 @@ CREATE TABLE Publication (
 
   lang          VARCHAR(5) NULL,
   translator    INT NULL,                       #
+  status_translation  INT NULL,                 #
   place_identifier VARCHAR(255) NULL,           #
   indexingdate  DATE NULL,
   displaydate VARCHAR(127) NULL,                #

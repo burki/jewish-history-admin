@@ -4,9 +4,9 @@
  *
  * Manage the articles
  *
- * (c) 2009-2015 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-11-16 dbu
+ * Version: 2016-02-02 dbu
  *
  * Changes:
  *
@@ -58,6 +58,7 @@ class ArticleQueryConditionBuilder extends MessageQueryConditionBuilder
 
     return  $fields[0] . '<>-1';
   }
+
 }
 
 class MessageWithPublicationRecord extends MessageRecord
@@ -116,8 +117,12 @@ class DisplayArticle extends DisplayMessage
                                          array('referee' => 'Referee',
                                                'section' => 'Section'),
                                          'contributor');
+    $this->condition[] = array('name' => 'status_translation',
+                               'method' => 'buildEqualCondition',
+                               'args' => $this->table . '.status_translation',
+                               'persist' => 'session');
     $this->condition[] = array('name' => 'referee',
-                               'method' => 'buildEditorCondition',
+                               'method' => 'buildEqualCondition',
                                'args' => $this->table . '.referee',
                                'persist' => 'session');
     $this->condition[] = array('name' => 'section',
@@ -211,6 +216,7 @@ class DisplayArticle extends DisplayMessage
     switch ($type) {
       case 'lang':
         global $LANGUAGES_FEATURED;
+
         $languages = $this->getLanguages($this->page->lang());
         if (isset($LANGUAGES_FEATURED)) {
           for ($i = 0; $i < count($LANGUAGES_FEATURED); $i++) {
@@ -224,6 +230,11 @@ class DisplayArticle extends DisplayMessage
           }
         }
         return $languages_ordered;
+        break;
+
+      case 'status_translation':
+        global $STATUS_TRANSLATION_OPTIONS;
+        return $STATUS_TRANSLATION_OPTIONS;
         break;
 
       case 'section':
@@ -278,6 +289,8 @@ class DisplayArticle extends DisplayMessage
     $this->view_options['translator'] = $this->translator_options = $this->buildOptions('translator');
     $this->view_options['lang'] = $this->buildOptions('lang');
     $languages_ordered = array('' => tr('-- please select --')) + $this->view_options['lang'];
+    $this->view_options['status_translation'] = $this->status_translation_options
+      = array('' => tr('-- please select --')) + $this->buildOptions('status_translation');
 
     $record->add_fields(array(
         new Field(array('name' => 'publication', 'type' => 'hidden', 'datatype' => 'int',
@@ -301,6 +314,7 @@ class DisplayArticle extends DisplayMessage
                         'options' => array_merge(array(''), array_keys($this->translator_options)),
                         'labels' => array_merge(array(tr('-- none --')), array_values($this->translator_options)),
                         'datatype' => 'int', 'null' => TRUE)),
+        new Field(array('name' => 'status_translation', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($this->status_translation_options), 'labels' => array_values($this->status_translation_options), 'null' => TRUE)),
 
         new Field(array('name' => 'reviewer_request', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
         new Field(array('name' => 'reviewer_sent', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
@@ -507,6 +521,7 @@ EOT;
             'referee' => array('label' => 'Referee'),
             'lang' => array('label' => 'Quellsprache'),
             'translator' => array('label' => 'Translator'),
+            'status_translation' => array('label' => 'Translation Status'),
       ), 'status');
     $rows = array_merge_at($rows,
       array(
@@ -628,8 +643,8 @@ EOT;
   }
 
   function buildSearchFields ($options = array()) {
+    $options['status_translation'] = '';
     $options['section'] = 'Section';
-    // $options['editor'] = 'Article Editor';
     $options['referee'] = 'Referee';
     return parent::buildSearchFields($options);
   }

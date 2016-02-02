@@ -133,7 +133,7 @@ $STATUS_REMOVED = '-1';
 $STATUS_EDIT = '0';
 $MESSAGE_STATUS = array($STATUS_EDIT => 'draft', '1' => 'publish', $STATUS_REMOVED => 'removed');
 
-$STATUS_OPTIONS = array (
+$STATUS_OPTIONS = array(
     '-99' => 'angedacht',
     '-76' => 'angefragt Autor',
     '-73' => 'vergeben Autor',
@@ -146,11 +146,26 @@ $STATUS_OPTIONS = array (
     '-53' => '&#220;berarbeitung Autor',
     '-49' => 'inhaltlich ok',
     '-45' => 'formal ok',
+    '-39' => 'f&#252;r Auszeichnung bereit',
+    '-35' => 'Auszeichnung erstellt',
+    '-33' => 'Auszeichnung ok',
     '1'   => 'ver&#246;ffentlicht',
     '-100' => 'abgebrochen Redakteur',
     '-103' => 'abgebrochen bewahrende Institution',
     '-106' => 'abgebrochen Autor',
     '-112' => 'abgelehnt Artikel',
+);
+
+$STATUS_TRANSLATION_OPTIONS = array(
+    '-29' => 'für Übersetzung bereit',
+    '-25' => 'Übersetzung vergeben',
+    '-24' => 'Übersetzung eingegangen',
+    '-23' => 'Überarbeitung Übersetzung',
+    '-15' => 'Übersetzung formal ok',
+    '-9' => 'Übersetzung für Auszeichnung bereit',
+    '-5' => 'Auszeichnung Übersetzung erstellt',
+    '-3' => 'Auszeichnung Übersetzung ok',
+    '31' => 'Übersetzung veröffentlicht',
 );
 
 // $MESSAGE_TYPES

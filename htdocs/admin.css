@@ -135,6 +135,10 @@ td.listing, td.form {
   border-top: 1px #c8c8c8 solid;
 }
 
+.listing select[name="section"], .listing select[name="referee"] {
+  max-width: 125px;
+}
+
 /* page elements */
 #menuAccount {
   float: right;

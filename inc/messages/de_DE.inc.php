@@ -254,6 +254,7 @@ $GETTEXT_MESSAGES = array (
 'Holding Institutions' => 'Bewahrende Institutionen',
 'Holding Institution request' => 'Quellenanfrage',
 'Holding Institution response' => 'Antwort auf Quellenanfrage',
+'Translation Status' => 'Status Übersetzung',
 'add new Holding Institution' => 'neue bewahrende Institution hinzufügen',
 'Send E-Mail' => 'E-Mail verschicken',
 'Show Word-file' => 'Word-Datei anzeigen',
