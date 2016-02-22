@@ -4,9 +4,9 @@
  *
  * mail out a link to the password-change page
  *
- * (c) 2009-2014 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-10-29 dbu
+ * Version: 2016-02-22 dbu
  *
  * Changes:
  *
@@ -85,7 +85,8 @@ class DisplayPasswordRecover extends PageDisplay
     $mode = SHOW_RECOVERFORM;
 
     $msg = NULL;
-    if (_MailValidate($login, 2) != 0) { // check if we have a syntactically valid e-mail address
+    if (_MailValidate($login, 2) != 0) {
+      // check if we have a syntactically valid e-mail address
       $msg = tr("You didn't specify a valid e-mail address");
     }
     else {
@@ -132,8 +133,9 @@ class DisplayPasswordRecover extends PageDisplay
           }
         }
       }
-      else
+      else {
         $msg = tr("Your e-mail didn't match an entry in our database.");
+      }
     }
 
     return array($mode, $msg);

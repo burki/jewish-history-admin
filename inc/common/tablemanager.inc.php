@@ -4,9 +4,9 @@
  *
  * Base class to administrate Database items
  *
- * (c) 2006-2015 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-02-13 dbu
+ * Version: 2016-02-22 dbu
  *
  * TODO:
  *       the models TableManagerRecord->fetch()-method shouldn't need a style
@@ -365,11 +365,18 @@ class DisplayTable extends PageDisplay
     return is_array($ret) ? array_map('tr', $ret) : tr($ret);
   }
 
+  function renderEditFormHiddenFields ($name) {
+    return '<input type="hidden" name="_postback" value="' . $this->htmlSpecialchars($name) . '" />';
+  }
+
   function renderEditForm ($rows, $name = 'detail') {
     $ret = '';
-    if (!empty($this->page->msg))
-      $ret .= '<p class="message">'.$this->page->msg.'</p>';
-    $ret .= $this->form->show_start().'<input type="hidden" name="_postback" value="'.$this->htmlSpecialchars($name).'" />';
+    if (!empty($this->page->msg)) {
+      $ret .= '<p class="message">' . $this->page->msg . '</p>';
+    }
+    $ret .= $this->form->show_start()
+          . $this->renderEditFormHiddenFields($name)
+          ;
     $fields = array();
     if ('array' == gettype($rows)) {
       foreach ($rows as $key => $row_descr) {
@@ -427,8 +434,9 @@ class DisplayTable extends PageDisplay
         }
       }
     }
-    if (count($fields) > 0)
+    if (count($fields) > 0) {
       $ret .= $this->buildContentLineMultiple($fields);
+    }
 
     $ret .= $this->form->show_end();
 

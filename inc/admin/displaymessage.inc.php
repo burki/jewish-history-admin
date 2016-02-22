@@ -4,9 +4,9 @@
  *
  * Base-Class for managing messages
  *
- * (c) 2007-2015 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-12-03 dbu
+ * Version: 2016-02-22 dbu
  *
  * Changes:
  *
@@ -115,11 +115,12 @@ class MessageRecord extends TablemanagerRecord
               $value = 0 == $ord ? $this->get_value('user_' . $name) : NULL;
               $sql_values[$name] = !empty($value) ? sprintf("'%s'", addslashes($value)) : 'NULL';
             } */
-
-            $querystr = sprintf("INSERT INTO MessageUser (message_id, user_id, ord)"
-                                . " VALUES (%d, %s, %d)",
-                                $message_id, !empty($user_id) ? $user_id : 'NULL', $ord++);
-            $dbconn->query($querystr);
+            if (!empty($user_id)) {
+              $querystr = sprintf("INSERT INTO MessageUser (message_id, user_id, ord)"
+                                  . " VALUES (%d, %s, %d)",
+                                  $message_id, !empty($user_id) ? $user_id : 'NULL', $ord++);
+              $dbconn->query($querystr);
+            }
           }
           $stored[$user_id] = TRUE;
         }

@@ -4,9 +4,9 @@
  *
  * Base-Class for backend
  *
- * (c) 2007-2015 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-05-09 dbu
+ * Version: 2016-02-22 dbu
  *
  * Changes:
  *
@@ -257,7 +257,6 @@ class DisplayBackend extends DisplayTable
     $this->script_url[] = 'script/jquery-ui-1.10.3.custom.min.js';
   }
 
-
   function checkAction ($step) {
     if ($this->page->isAdminUser()) {
       // admins have all rights
@@ -310,6 +309,34 @@ class DisplayBackend extends DisplayTable
       $setLocale = ".multiselect('locale', 'de')";
     }
     $this->script_ready[] = "jQuery('select.uiMultiselect').multiselect()" . $setLocale . ";";
+  }
+
+  // try to determine change-conflicts
+  function renderEditFormHiddenFields ($name) {
+    $ret = parent::renderEditFormHiddenFields($name);
+    $changed_datetime = $this->form->get_value('changed');
+    if (!empty($changed_datetime) && 'NOW()' != $changed_datetime) {
+      $ret .= sprintf('<input type="hidden" name="_changed" value="%s" />',
+                      htmlspecialchars($changed_datetime));
+    }
+    return $ret;
+  }
+
+  function validateInput () {
+    $success = parent::validateInput();
+    if ($success) {
+      if (!empty($_POST['_changed'])) {
+        $id = $this->workflow->primaryKey();
+        $record = $this->buildRecord();
+        if ($found = $record->fetch($id)) {
+          if (strcmp($_POST['_changed'], $record->get_value('changed')) < 0) {
+            $this->page->msg = 'Dieser Datensatz wurde scheinbar zwischenzeitlich aktualisiert. Um einen Versionskonflikt zu vermeiden, &ouml;ffnen Sie ihn bitte erneut und tragen die &Auml;nderung nochmal ein.';
+            return false;
+          }
+        }
+      }
+    }
+    return $success;
   }
 
   function buildView () {

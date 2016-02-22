@@ -5,9 +5,9 @@
   * Requires: phplib-database classes
   * Author  : Daniel Burckhardt, daniel.burckhardt@sur-gmbh.ch
   *
-  * (c) 2000-2014
+  * (c) 2000-2016
   *
-  * Version : 2014-02-11 dbu
+  * Version : 2016-02-22 dbu
   *
   * Changes :
   *
@@ -2029,7 +2029,8 @@
                 break;
 
               case 'hidden':
-                if (is_array($val)) { // so we can access them
+                if (is_array($val)) {
+                  // so we can access them
                   $this->record->set_fieldvalue($name, 'value_internal', $val);
                 }
                 else if (isset($val)) {
@@ -2122,7 +2123,7 @@
       return sprintf('<form method="%s" action="%s"%s%s>',
                      isset($this->params['method'])
                      ? $this->params['method'] : 'post',
-                     $this->params['action'],
+                     htmlspecialchars($this->params['action']),
                      isset($this->params['name']) ? ' name="' . $this->params['name'] . '"' : '',
                      $args_string)
             . '<input type="hidden" name="_submit" value="' . uniqid('') . '" />';
