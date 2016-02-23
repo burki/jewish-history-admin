@@ -72,6 +72,7 @@ CREATE TABLE Message (
   urn           VARCHAR(255) NULL,              # URL
   tags          VARCHAR(255) NULL,              #
   editor        INT NULL,                       #
+  license       VARCHAR(50) NULL,
 
   # review fields
   referee       INT NULL,                       #
@@ -176,9 +177,12 @@ CREATE TABLE Publication (
   publication_date DATE NULL,                   # year(-month(-day))
   publisher_id  INT NULL REFERENCES Publisher.id, #
   publisher     VARCHAR(127) NULL,              # TODO: should we normalize
+  archive_location VARCHAR(127) NULL,           # for manuscripts
   place         VARCHAR(127) NULL,              #
   listprice     VARCHAR(50) NULL,               #
   url           VARCHAR(511) NULL,              # link to TOC and similar things
+  license       VARCHAR(50) NULL,
+  attribution   TEXT NULL,
 
   lang          VARCHAR(5) NULL,
   translator    INT NULL,                       #

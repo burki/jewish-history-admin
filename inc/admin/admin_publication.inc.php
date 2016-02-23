@@ -4,9 +4,9 @@
  *
  * Class for managing publications (sources)
  *
- * (c) 2007-2015 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-12-03 dbu
+ * Version: 2016-02-23 dbu
  *
  * Changes:
  *
@@ -18,12 +18,23 @@ require_once INC_PATH . 'common/biblioservice.inc.php';
 
 class PublicationRecord extends TableManagerRecord
 {
+  var $languages = array('de', 'en');
+
   function store ($args = '') {
     // remove dashes and convert x to upper from isbn
     $isbn = $this->get_value('isbn');
     if (!empty($isbn)) {
       $this->set_value('isbn', BiblioService::normalizeIsbn($isbn));
     }
+
+    $attribution = array();
+    foreach ($this->languages as $language) {
+      $value = $this->get_value('attribution_' . $language);
+      if (!empty($value)) {
+        $attribution[$language] = trim($value);
+      }
+    }
+    $this->set_value('attribution', json_encode($attribution));
 
     $stored = parent::store();
 
@@ -109,6 +120,19 @@ class PublicationRecord extends TableManagerRecord
     return $stored;
   }
 
+  function fetch ($args, $datetime_style = '') {
+    $fetched = parent::fetch($args, $datetime_style);
+    if ($fetched) {
+      $attribution = json_decode($this->get_value('attribution'), TRUE);
+      foreach ($this->languages as $language) {
+        if (FALSE !== $attribution && array_key_exists($language, $attribution)) {
+          $this->set_value('attribution_' . $language, $attribution[$language]);
+        }
+      }
+    }
+    return $fetched;
+  }
+
   function delete ($id) {
     global $STATUS_REMOVED;
 
@@ -189,6 +213,15 @@ class DisplayPublication extends DisplayBackend
         return $languages_ordered;
         break;
 
+      case 'license':
+        global $LICENSE_OPTIONS;
+        $licenses = array();
+        foreach ($LICENSE_OPTIONS as $key => $label) {
+          $licenses[$key] = tr($label);
+        }
+        return $licenses;
+        break;
+      
       case 'type':
           $type = 'sourcetype';
           $querystr = sprintf("SELECT id, name FROM Term WHERE category='%s' AND status >= 0 ORDER BY ord, name",
@@ -235,6 +268,7 @@ class DisplayPublication extends DisplayBackend
     $this->view_options['type'] = $type_options = $this->buildOptions('type');
     $this->view_options['translator'] = $this->translator_options = $this->buildOptions('translator');
     $this->view_options['lang'] = $this->buildOptions('lang');
+    $this->view_options['license'] = $license_options = $this->buildOptions('license');
     $languages_ordered = array('' => tr('-- please select --')) + $this->view_options['lang'];
 
     $publisher_options = $this->buildOptions('publisher');
@@ -257,6 +291,7 @@ class DisplayPublication extends DisplayBackend
                         'options' => array_merge(array(''), array_keys($publisher_options)),
                         'labels' => array_merge(array('-- select a holding institution --'), array_values($publisher_options)), 'datatype' => 'int')),
         // new Field(array('name' => 'publisher', 'id' => 'publisher', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 127, 'null' => TRUE)),
+        new Field(array('name' => 'archive_location', 'id' => 'archive_location', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
         new Field(array('name' => 'publication_date', 'id' => 'publication_date', 'type' => 'date', 'incomplete' => TRUE, 'datatype' => 'date', 'null' => 1)),
         new Field(array('name' => 'binding', 'id' => 'binding', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 50, 'null' => TRUE)),
         new Field(array('name' => 'pages', 'id' => 'pages', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 50, 'null' => TRUE)),
@@ -272,6 +307,13 @@ class DisplayPublication extends DisplayBackend
         new Field(array('name' => 'place_identifier', 'id' => 'place_identifier', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlenght' => 255, 'null' => TRUE)),
         new Field(array('name' => 'indexingdate', 'type' => 'date', 'incomplete' => TRUE, 'datatype' => 'date', 'null' => TRUE)),
         new Field(array('name' => 'displaydate', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+
+        new Field(array('name' => 'license', 'id' => 'license', 'type' => 'select',
+                        'options' => array_keys($license_options),
+                        'labels' => array_values($license_options), 'datatype' => 'char', 'null' => TRUE)),
+        new Field(array('name' => 'attribution', 'type' => 'hidden', 'datatype' => 'char', 'null' => TRUE)),
+        new Field(array('name' => 'attribution_de', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 3, 'null' => TRUE, 'nodbfield' => TRUE)),
+        new Field(array('name' => 'attribution_en', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 3, 'null' => TRUE, 'nodbfield' => TRUE)),
 
         new Field(array('name' => 'comment', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 15, 'null' => TRUE)),
       ));
@@ -300,6 +342,7 @@ class DisplayPublication extends DisplayBackend
                               'value' => isset($this->form)
                               ? $this->getFormField('publisher_id') . $add_publisher_button
                               : ''),
+      'archive_location' => array('label' => 'Archive location'),
       'publication_date' => array('label' => 'Publication date'),
       'binding' => array('label' => 'Binding'),
       'pages' => array('label' => 'Pages/Ills.'),
@@ -313,6 +356,14 @@ class DisplayPublication extends DisplayBackend
       'place_identifier' => array('label' => 'Primärort (Getty-Identifier)'),
       'indexingdate' => array('label' => 'Primärdatum (JJJJ oder TT.MM.JJJJ)'),
       'displaydate' => array('label' => 'Übersteuerung Primärdatum (z.B. "um 1600")'),
+
+      '<hr noshade="noshade" />',
+      'license' => array('label' => 'License'),
+
+      'attribution_de' => array('label' => 'Attribution (German)'),
+      'attribution_en' => array('label' => 'Attribution (English)'),
+
+      '<hr noshade="noshade" />',
 
       'comment' => array('label' => 'Internal notes and comments'),
 

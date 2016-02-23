@@ -252,6 +252,7 @@ $GETTEXT_MESSAGES = array (
 'Covered Source(s)' => 'Behandelte Quelle(n)',
 'Holding Institution' => 'Bewahrende Institution',
 'Holding Institutions' => 'Bewahrende Institutionen',
+'Archive location' => 'Signatur',
 'Holding Institution request' => 'Quellenanfrage',
 'Holding Institution response' => 'Antwort auf Quellenanfrage',
 'Translation Status' => 'Status Übersetzung',
@@ -267,5 +268,11 @@ $GETTEXT_MESSAGES = array (
 'Last change: %s' => 'Letzte Änderung: %s',
 'by' => 'durch',
 'generate' => 'generieren',
+'Attribution (German)' => 'Quellennachweis (Deutsch)',
+'Attribution (English)' => 'Quellennachweis (Englisch)',
+'restricted (display only)' => 'eingeschränkt (nur Anzeige)',
+'regular (download for private and educational use)' => 'regulär (Download für Privat- und Unterrichtszwecke)',
+'Public Domain' => 'Gemeinfrei',
+'License' => 'Lizenz',
 );
 

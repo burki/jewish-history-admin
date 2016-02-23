@@ -6,7 +6,7 @@
  *
  * (c) 2009-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2016-02-02 dbu
+ * Version: 2016-02-23 dbu
  *
  * Changes:
  *
@@ -232,6 +232,15 @@ class DisplayArticle extends DisplayMessage
         return $languages_ordered;
         break;
 
+      case 'license':
+        global $LICENSE_OPTIONS;
+        $licenses = array();
+        foreach ($LICENSE_OPTIONS as $key => $label) {
+          $licenses[$key] = tr($label);
+        }
+        return $licenses;
+        break;
+
       case 'status_translation':
         global $STATUS_TRANSLATION_OPTIONS;
         return $STATUS_TRANSLATION_OPTIONS;
@@ -291,6 +300,7 @@ class DisplayArticle extends DisplayMessage
     $languages_ordered = array('' => tr('-- please select --')) + $this->view_options['lang'];
     $this->view_options['status_translation'] = $this->status_translation_options
       = array('' => tr('-- please select --')) + $this->buildOptions('status_translation');
+    $this->view_options['license'] = $license_options = $this->buildOptions('license');
 
     $record->add_fields(array(
         new Field(array('name' => 'publication', 'type' => 'hidden', 'datatype' => 'int',
@@ -330,6 +340,9 @@ class DisplayArticle extends DisplayMessage
         // new Field(array('name' => 'url', 'id' => 'url', 'type' => 'text', 'datatype' => 'char', 'size' => 65, 'maxlength' => 200, 'null' => TRUE)),
         // new Field(array('name' => 'urn', 'id' => 'urn', 'type' => 'text', 'datatype' => 'char', 'size' => 45, 'maxlength' => 200, 'null' => TRUE)),
         // new Field(array('name' => 'tags', 'id' => 'urn', 'type' => 'text', 'datatype' => 'char', 'size' => 45, 'maxlength' => 200, 'null' => TRUE)),
+        new Field(array('name' => 'license', 'id' => 'license', 'type' => 'select',
+                        'options' => array_keys($license_options),
+                        'labels' => array_values($license_options), 'datatype' => 'char', 'null' => TRUE)),
     ));
 
     if (!isset($this->workflow->id)) {
@@ -565,6 +578,10 @@ EOT;
             'tags' => array('label' => 'Feed Tag(s)'), */
       ), 'published');
 
+    $rows = array_merge_at($rows,
+      array(
+        'license' => array('label' => 'License'),
+      ), 'comment');
     return $rows;
   }
 

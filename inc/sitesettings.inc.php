@@ -5,9 +5,9 @@
  * Sitewide settings
  * (put machine dependent stuff like hardwired paths, logins and passwords in inc/local.inc.php)
  *
- * (c) 2009-2015 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-11-16 dbu
+ * Version: 2016-02-23 dbu
  *
  * Changes:
  *
@@ -166,6 +166,15 @@ $STATUS_TRANSLATION_OPTIONS = array(
     '-5' => 'Auszeichnung Übersetzung erstellt',
     '-3' => 'Auszeichnung Übersetzung ok',
     '31' => 'Übersetzung veröffentlicht',
+);
+
+$LICENSE_OPTIONS = array(
+    ''  => '-- unknown --',
+    'restricted' => 'restricted (display only)',
+    'regular' => 'regular (download for private and educational use)',
+    'CC BY-NC-ND' => 'Creative Commons BY-NC-ND',
+    'CC BY-SA' => 'Creative Commons BY-SA',
+    'PD' => 'Public Domain',
 );
 
 // $MESSAGE_TYPES
