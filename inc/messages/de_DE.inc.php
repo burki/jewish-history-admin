@@ -274,5 +274,11 @@ $GETTEXT_MESSAGES = array (
 'regular (download for private and educational use)' => 'regulär (Download für Privat- und Unterrichtszwecke)',
 'Public Domain' => 'Gemeinfrei',
 'License' => 'Lizenz',
+'finalized' => 'abgeschlossen',
+'Peer Review' => 'Begutachtung',
+'Markup' => 'Auszeichnung',
+'Bibliography' => 'Literatur',
+'Translation' => 'Übersetzung',
+'Translation Markup' => 'Auszeichnung Übersetzung',
 );
 

@@ -303,6 +303,16 @@ class DisplayArticle extends DisplayMessage
     $this->view_options['license'] = $license_options = $this->buildOptions('license');
 
     $record->add_fields(array(
+        new Field(array('name' => 'status_flags', 'type' => 'checkbox', 'datatype' => 'bitmap', 'null' => TRUE, 'default' => 0,
+                              'labels' => array(
+                                                0x01 => tr('Peer Review') . ' ' . tr('finalized'),
+                                                0x02 => tr('Markup') . ' ' . tr('finalized'),
+                                                0x04 => tr('Bibliography') . ' ' . tr('finalized'),
+                                                0x08 => tr('Translation') . ' ' . tr('finalized'),
+                                                0x10 => tr('Translation Markup') . ' ' . tr('finalized'),
+                                                ),
+                             )
+                       ),
         new Field(array('name' => 'publication', 'type' => 'hidden', 'datatype' => 'int',
                         'nodbfield' => TRUE, 'null' => TRUE)),
         new Field(array('name' => 'section', 'type' => 'select',
@@ -343,6 +353,11 @@ class DisplayArticle extends DisplayMessage
         new Field(array('name' => 'license', 'id' => 'license', 'type' => 'select',
                         'options' => array_keys($license_options),
                         'labels' => array_values($license_options), 'datatype' => 'char', 'null' => TRUE)),
+        new Field(array('name' => 'comment_review', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE)),
+        new Field(array('name' => 'comment_markup', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE)),
+        new Field(array('name' => 'comment_bibliography', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE)),
+        new Field(array('name' => 'comment_translation', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE)),
+        new Field(array('name' => 'comment_translation_markup', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE)),
     ));
 
     if (!isset($this->workflow->id)) {
@@ -578,10 +593,42 @@ EOT;
             'tags' => array('label' => 'Feed Tag(s)'), */
       ), 'published');
 
-    $rows = array_merge_at($rows,
-      array(
-        'license' => array('label' => 'License'),
-      ), 'comment');
+    $additional = array('license' => array('label' => 'License'));
+    if ('edit' == $mode) {
+      $status_flags = $this->form->field('status_flags');
+    }
+    else {
+      $status_flags_value = $this->record->get_value('status_flags');
+    }
+
+    foreach (array(
+                   'review' => array('label' => 'Peer Review', 'mask' => 0x1),
+                   'markup' => array('label' => 'Markup', 'mask' => 0x02),
+                   'bibliography' => array('label' => 'Bibliography', 'mask' => 0x04),
+                   'translation' => array('label' => 'Translation', 'mask' => 0x08),
+                   'translation_markup' => array('label' => 'Translation Markup', 'mask' => 0x10),
+                   )
+             as $key => $options)
+    {
+      if ('edit' == $mode) {
+        $finalized = $status_flags->show($options['mask']) . '<br />';
+      }
+      else {
+        $finalized = (0 != ($status_flags_value & $options['mask']) ? tr('finalized') . '<br />' : '');
+      }
+      $additional['comment_' . $key] = array(
+        'label' => $options['label'],
+        'value' => $finalized
+          . ('edit' == $mode
+                                  ? $this->getFormField('comment_' . $key)
+                                  : $this->record->get_value('comment_' . $key))
+      );
+    }
+
+
+
+    $rows = array_merge_at($rows, $additional, 'users');
+
     return $rows;
   }
 

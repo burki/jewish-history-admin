@@ -28,7 +28,7 @@ function array_merge_at ($array1, $array2, $after_field = NULL) {
     else {
       $ret[$key] = $val;
     }
-    if (isset($after_field) && $key == $after_field) {
+    if (isset($after_field) && $key === $after_field) {
       //var_dump($after_field);
       $ret = array_merge($ret, $array2);
       unset($after_field);

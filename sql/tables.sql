@@ -59,6 +59,7 @@ CREATE TABLE Message (
   id            INT AUTO_INCREMENT PRIMARY KEY, # unique id
   flags         INT DEFAULT 0,                  #
   status        INT DEFAULT 0,                  # -1: removed, 0: proofread, 1: publish
+  status_flags  INT DEFAULT 0,
   section       VARCHAR(255) NULL,              # to which section(s) it belongs
   type          INT NOT NULL,                   #
   parent_id     INT NULL,                       # articles in issue...
@@ -87,6 +88,12 @@ CREATE TABLE Message (
   referee_sent DATETIME NULL,
   referee_deadline DATETIME NULL,
   publisher_vouchercopy DATETIME NULL,
+
+  comment_review  TEXT NULL,
+  comment_markup  TEXT NULL,
+  comment_bibliography  TEXT NULL,
+  comment_translation  TEXT NULL,
+  comment_translation_markup  TEXT NULL,
 
   # common fields
   comment       TEXT NULL,                      # internal comment
