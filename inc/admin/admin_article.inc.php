@@ -6,7 +6,7 @@
  *
  * (c) 2009-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2016-02-23 dbu
+ * Version: 2016-02-24 dbu
  *
  * Changes:
  *
@@ -310,6 +310,7 @@ class DisplayArticle extends DisplayMessage
                                                 0x04 => tr('Bibliography') . ' ' . tr('finalized'),
                                                 0x08 => tr('Translation') . ' ' . tr('finalized'),
                                                 0x10 => tr('Translation Markup') . ' ' . tr('finalized'),
+                                                0x20 => tr('ready for publishing'),
                                                 ),
                              )
                        ),
@@ -625,7 +626,16 @@ EOT;
       );
     }
 
-
+    if ('edit' == $mode) {
+      $finalized = $status_flags->show(0x20) . '<br />';
+    }
+    else {
+      $finalized = (0 != ($status_flags_value & 0x20) ? tr('ready for publishing') . '<br />' : '');
+    }
+    $additional['status_source'] = array(
+      'label' => 'Source',
+      'value' => $finalized,
+    );
 
     $rows = array_merge_at($rows, $additional, 'users');
 

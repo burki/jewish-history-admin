@@ -7,7 +7,7 @@
  *
  * (c) 2009-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2016-02-23 dbu
+ * Version: 2016-02-24 dbu
  *
  * Changes:
  *
@@ -166,6 +166,19 @@ $STATUS_TRANSLATION_OPTIONS = array(
     '-5' => 'Auszeichnung Übersetzung erstellt',
     '-3' => 'Auszeichnung Übersetzung ok',
     '31' => 'Übersetzung veröffentlicht',
+);
+
+$STATUS_SOURCE_OPTIONS = array(
+    '-99' => 'angedacht',
+    '-76' => 'angefragt bewahrende Institution',
+    '-59' => 'eingegangen',
+    '-39' => 'f&#252;r Auszeichnung bereit',
+    '-35' => 'Auszeichnung erstellt',
+    '-33' => 'Auszeichnung ok',
+    '-32' => 'Lizenz geklärt',
+    '1'   => 'ver&#246;ffentlicht',
+    '-100' => 'abgebrochen Redakteur',
+    '-103' => 'abgebrochen bewahrende Institution',
 );
 
 $LICENSE_OPTIONS = array(

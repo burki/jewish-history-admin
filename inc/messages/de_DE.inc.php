@@ -237,6 +237,7 @@ $GETTEXT_MESSAGES = array (
 'delete message' => 'Beitrag löschen',
 'delete entry' => 'Eintrag löschen',
 'Communication' => 'Kommunikation',
+'Article' => 'Artikel',
 'Articles' => 'Artikel',
 'New Article' => 'Neuer Artikel',
 'set publisher' => 'Verlag zuordnen',
@@ -280,5 +281,7 @@ $GETTEXT_MESSAGES = array (
 'Bibliography' => 'Literatur',
 'Translation' => 'Übersetzung',
 'Translation Markup' => 'Auszeichnung Übersetzung',
+'Source' => 'Quelle',
+'ready for publishing' => 'kann veröffentlicht werden',
 );
 

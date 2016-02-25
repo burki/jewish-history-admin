@@ -6,7 +6,7 @@
  *
  * (c) 2007-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2016-02-23 dbu
+ * Version: 2016-02-24 dbu
  *
  * Changes:
  *
@@ -125,7 +125,7 @@ class PublicationRecord extends TableManagerRecord
     if ($fetched) {
       $attribution = json_decode($this->get_value('attribution'), TRUE);
       foreach ($this->languages as $language) {
-        if (FALSE !== $attribution && array_key_exists($language, $attribution)) {
+        if (isset($attribution) && FALSE !== $attribution && array_key_exists($language, $attribution)) {
           $this->set_value('attribution_' . $language, $attribution[$language]);
         }
       }
@@ -161,20 +161,50 @@ class DisplayPublication extends DisplayBackend
 {
   var $page_size = 30;
   var $table = 'Publication';
-  var $fields_listing = array('id', 'IFNULL(author,editor)', 'title', 'YEAR(publication_date) AS year', 'status');
+  var $fields_listing = array('id', 'IFNULL(author,editor)', 'title',
+                              'YEAR(publication_date) AS year',
+                              'status');
+
+  var $status_options;
+  var $status_default = '-99';
+  var $status_deleted = '-1';
 
   var $condition = array(
       array('name' => 'search', 'method' => 'buildLikeCondition', 'args' => 'title,author,editor'),
-      'Publication.status>=0'
+      'Publication.status <> -1'
       // alternative: buildFulltextCondition
   );
   var $order = array(
                      'author' => array('IFNULL(author,editor)', 'IFNULL(author,editor) DESC'),
                      'title' => array('title', 'title DESC'),
-                     'year' => array('YEAR(publication_date) DESC', 'YEAR(publication_date)')
+                     'year' => array('YEAR(publication_date) DESC', 'YEAR(publication_date)'),
+                     'status' => array('Publication.status', 'Publication.status DESC'),
                 );
-  var $cols_listing = array('author' => 'Author/Editor', 'title' => 'Title', 'year' => 'Year', '');
+  var $cols_listing = array(
+                            'author' => 'Author/Editor',
+                            'title' => 'Title',
+                            'year' => 'Year',
+                            'status' => 'Status',
+                            );
   var $view_after_edit = TRUE;
+
+  function __construct (&$page) {
+    global $STATUS_SOURCE_OPTIONS;
+
+    $this->status_options = $this->view_options['status'] = $STATUS_SOURCE_OPTIONS;
+    parent::__construct($page);
+
+    $this->condition[] = array('name' => 'status',
+                               'method' => 'buildEqualCondition',
+                               'args' => $this->table . '.status',
+                               'persist' => 'session');
+
+    $this->condition[] = array('name' => 'status_translation',
+                               'method' => 'buildEqualCondition',
+                               'args' => $this->table . '.status_translation',
+                               'persist' => 'session');
+
+  }
 
   function init () {
     $ret = parent::init();
@@ -191,6 +221,34 @@ class DisplayPublication extends DisplayBackend
 
   function instantiateRecord ($table = '', $dbconn = '') {
     return new PublicationRecord(array('tables' => $this->table, 'dbconn' => $this->page->dbconn));
+  }
+
+  function buildStatusOptions ($options = NULL) {
+    if (!isset($options)) {
+      $options = & $this->status_options;
+    }
+
+    $status_options = array('<option value="">' . tr('-- all --') . '</option>');
+    foreach ($options as $status => $label) {
+      if ($this->status_deleted != $status) {
+        $selected = isset($this->search['status']) && $this->search['status'] !== ''
+            && $this->search['status'] == $status
+            ? ' selected="selected"' : '';
+        $style = '';
+        if (preg_match('/^_(.*)_$/', $label, $matches)) {
+          $label = $matches[1];
+          $style = ' style="font-style: italic;"';
+        }
+
+        $status_options[] = sprintf('<option value="%d"%s%s>%s</option>',
+                                    $status,
+                                    $selected,
+                                    $style,
+                                    $this->htmlSpecialchars(tr($label)));
+      }
+    }
+    return tr('Status')
+         . ': <select name="status">' . implode($status_options) . '</select>';
   }
 
   function buildOptions ($type) {
@@ -221,7 +279,12 @@ class DisplayPublication extends DisplayBackend
         }
         return $licenses;
         break;
-      
+
+      case 'status_translation':
+        global $STATUS_TRANSLATION_OPTIONS;
+        return $STATUS_TRANSLATION_OPTIONS;
+        break;
+
       case 'type':
           $type = 'sourcetype';
           $querystr = sprintf("SELECT id, name FROM Term WHERE category='%s' AND status >= 0 ORDER BY ord, name",
@@ -268,13 +331,19 @@ class DisplayPublication extends DisplayBackend
     $this->view_options['type'] = $type_options = $this->buildOptions('type');
     $this->view_options['translator'] = $this->translator_options = $this->buildOptions('translator');
     $this->view_options['lang'] = $this->buildOptions('lang');
+    $this->view_options['status_translation'] = $this->status_translation_options
+      = array('' => tr('-- please select --')) + $this->buildOptions('status_translation');
     $this->view_options['license'] = $license_options = $this->buildOptions('license');
     $languages_ordered = array('' => tr('-- please select --')) + $this->view_options['lang'];
 
     $publisher_options = $this->buildOptions('publisher');
     $record->add_fields(array(
         new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => TRUE)),
-        new Field(array('name' => 'status', 'type' => 'hidden', 'datatype' => 'int', 'default' => 0)),
+//        new Field(array('name' => 'status', 'type' => 'hidden', 'datatype' => 'int', 'default' => 0)),
+        new Field(array('name' => 'status', 'type' => 'select',
+                        'options' => array_keys($this->status_options),
+                        'labels' => array_values($this->status_options),
+                        'datatype' => 'int', 'default' => $this->status_default)),
         new Field(array('name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => TRUE)),
         new Field(array('name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => TRUE, 'noupdate' => TRUE)),
         new Field(array('name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()')),
@@ -304,6 +373,7 @@ class DisplayPublication extends DisplayBackend
                         'options' => array_merge(array(''), array_keys($this->translator_options)),
                         'labels' => array_merge(array(tr('-- none --')), array_values($this->translator_options)),
                         'datatype' => 'int', 'null' => TRUE)),
+        new Field(array('name' => 'status_translation', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($this->status_translation_options), 'labels' => array_values($this->status_translation_options), 'null' => TRUE)),
         new Field(array('name' => 'place_identifier', 'id' => 'place_identifier', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlenght' => 255, 'null' => TRUE)),
         new Field(array('name' => 'indexingdate', 'type' => 'date', 'incomplete' => TRUE, 'datatype' => 'date', 'null' => TRUE)),
         new Field(array('name' => 'displaydate', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
@@ -325,8 +395,9 @@ class DisplayPublication extends DisplayBackend
     $add_publisher_button = sprintf('<input type="button" value="%s" onclick="window.open(\'%s\')" />',
                                     tr('add new Holding Institution'), htmlspecialchars($this->page->buildLink(array('pn' => 'publisher', 'edit' => -1))));
     return array(
-      'id' => FALSE, 'status' => FALSE, // hidden fields
+      'id' => FALSE, // 'status' => FALSE, // hidden fields
 
+      'status' => array('label' => 'Status'),
       'type' => array('label' => 'Source Type'),
 
       /* 'isbn' => array('label' => 'ISBN'),
@@ -352,6 +423,7 @@ class DisplayPublication extends DisplayBackend
 
       'lang' => array('label' => 'Quellsprache'),
       'translator' => array('label' => 'Translator'),
+      'status_translation' => array('label' => 'Translation Status'),
 
       'place_identifier' => array('label' => 'Primärort (Getty-Identifier)'),
       'indexingdate' => array('label' => 'Primärdatum (JJJJ oder TT.MM.JJJJ)'),
@@ -496,6 +568,9 @@ EOT;
         if (array_key_exists($key, $resolve_options)) {
           // var_dump($key);
           $view_rows[$key]['options'] = $this->buildOptions($resolve_options[$key]);
+        }
+        else if (isset($this->view_options[$key])) {
+          $view_rows[$key]['options'] = $this->view_options[$key];
         }
       }
     }
@@ -688,13 +763,84 @@ EOT;
     return $ret;
   }
 
-  function buildListingCell (&$row, $col_index, $val = NULL) {
-    global $ITEM_STATUS;
+  function buildSearchFields ($options = array()) {
+    $options['status_translation'] = '';
 
+    $search = sprintf('<input type="text" name="search" value="%s" size="40" />',
+                      $this->htmlSpecialchars(array_key_exists('search', $this->search) ?  $this->search['search'] : ''));
+    /*
+    $search .= sprintf('<label><input type="hidden" name="fulltext" value="0" /><input type="checkbox" name="fulltext" value="1"%s /> %s</label>',
+                       $this->search_fulltext ? ' checked="checked"' : '',
+                       tr('Fulltext'));
+    */
+
+    $search .=  '<br />' . $this->buildStatusOptions();
+
+    $select_fields = array('status');
+
+    if (method_exists($this, 'buildOptions')) {
+      foreach ($options as $name => $option_label) {
+         $select_fields[] = $name;
+        // Betreuer - TODO: make a bit more generic
+        $select_options = array('<option value="">' . tr('-- all --') . '</option>');
+        foreach ($this->buildOptions($name) as $id => $label) {
+          $selected = isset($this->search[$name])
+              && $this->search[$name] !== ''
+              && $this->search[$name] == $id
+          ? ' selected="selected"' : '';
+          $select_options[] = sprintf('<option value="%s"%s>%s</option>',
+                                      $id, $selected,
+                                      htmlspecialchars(tr($label)));
+        }
+        $search .= ' ' . tr($option_label)
+                 . sprintf(': <select name="%s">%s</select>',
+                           $name, implode($select_options));
+      }
+    }
+
+    // clear the search
+    $select_fields_json = json_encode($select_fields);
+    $url_clear = $this->page->BASE_PATH . 'media/clear.gif';
+    $search .= <<<EOT
+      <script>
+      function clear_search() {
+        var form = document.forms['search'];
+        if (null != form) {
+          var textfields = ['search'];
+          for (var i = 0; i < textfields.length; i++) {
+            if (null != form.elements[textfields[i]])
+              form.elements[textfields[i]].value = '';
+          }
+          var selectfields = ${select_fields_json};
+          for (var i = 0; i < selectfields.length; i++) {
+            if (null != form.elements[selectfields[i]])
+              form.elements[selectfields[i]].selectedIndex = 0;
+          }
+          var radiofields = ['fulltext'];
+          for (var i = 0; i < radiofields.length; i++) {
+            if (null != form.elements[radiofields[i]]) {
+                form.elements[radiofields[i]][1].checked = false;
+            }
+          }
+        }
+      }
+      </script>
+      <a title="Clear search fields" href="javascript:clear_search();"><img src="$url_clear" border="0" /></a>
+EOT;
+    $search .= ' <input class="submit" type="submit" value="' . tr('Search') . '" />';
+
+    return $search;
+  }
+
+  function buildListingCell (&$row, $col_index, $val = NULL) {
     $val = NULL;
     if ($col_index == count($this->fields_listing) - 1) {
+      $val = (isset($row[$col_index]) && array_key_exists($row[$col_index], $this->status_options))
+              ? $this->status_options[$row[$col_index]] . '&nbsp;' : '';
+
       $url_preview = $this->page->buildLink(array('pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_VIEW) => $row[0]));
-      $val = sprintf('<div style="text-align:right;">[<a href="%s">%s</a>]</div>',
+      $val = sprintf('<div style="text-align:right; white-space:nowrap">%s[<a href="%s">%s</a>]</div>',
+                     $val,
                      htmlspecialchars($url_preview),
                      tr('view'));
     }
