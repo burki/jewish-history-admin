@@ -278,9 +278,11 @@ $GETTEXT_MESSAGES = array (
 'finalized' => 'abgeschlossen',
 'Peer Review' => 'Begutachtung',
 'Markup' => 'Auszeichnung',
+'Transcript and Markup' => 'Transkript und Auszeichnung',
 'Bibliography' => 'Literatur',
 'Translation' => 'Übersetzung',
 'Translation Markup' => 'Auszeichnung Übersetzung',
+'Digitization' => 'Digitalisat',
 'Source' => 'Quelle',
 'ready for publishing' => 'kann veröffentlicht werden',
 );

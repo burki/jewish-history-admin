@@ -173,6 +173,7 @@ CREATE TABLE Publication (
   type          INT NOT NULL,                   #
   flags         INT DEFAULT 0,                  #
   status        INT DEFAULT 0,                  # -1: removed, 0: proofread, 1: publish
+  status_flags  INT DEFAULT 0,
   isbn          VARCHAR(13) NULL,               #
   title         VARCHAR(255) NOT NULL,          #
   subtitle      VARCHAR(511) NULL,
@@ -197,6 +198,12 @@ CREATE TABLE Publication (
   place_identifier VARCHAR(255) NULL,           #
   indexingdate  DATE NULL,
   displaydate VARCHAR(127) NULL,                #
+
+  comment_digitization  TEXT NULL,
+  comment_markup  TEXT NULL,
+  comment_bibliography  TEXT NULL,
+  comment_translation  TEXT NULL,
+  comment_translation_markup  TEXT NULL,
 
   # Common
   comment       TEXT NULL,                      # internal comment

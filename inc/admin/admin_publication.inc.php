@@ -6,7 +6,7 @@
  *
  * (c) 2007-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2016-02-24 dbu
+ * Version: 2016-02-25 dbu
  *
  * Changes:
  *
@@ -349,6 +349,19 @@ class DisplayPublication extends DisplayBackend
         new Field(array('name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()')),
         new Field(array('name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => TRUE)),
         new Field(array('name' => 'type', 'id' => 'type', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($type_options), 'labels' => array_values($type_options))),
+
+        new Field(array('name' => 'status_flags', 'type' => 'checkbox', 'datatype' => 'bitmap', 'null' => TRUE, 'default' => 0,
+                              'labels' => array(
+                                                0x01 => tr('Digitization') . ' ' . tr('finalized'),
+                                                0x02 => tr('Transcript and Markup') . ' ' . tr('finalized'),
+                                                0x04 => tr('Bibliography') . ' ' . tr('finalized'),
+                                                0x08 => tr('Translation') . ' ' . tr('finalized'),
+                                                0x10 => tr('Translation Markup') . ' ' . tr('finalized'),
+                                                0x20 => tr('ready for publishing'),
+                                                ),
+                             )
+                       ),
+
        // new Field(array('name' => 'isbn', 'id' => 'isbn', 'type' => 'text', 'size' => 20, 'datatype' => 'char', 'maxlength' => 17, 'null' => TRUE)),
         new Field(array('name' => 'author', 'id' => 'author', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
         new Field(array('name' => 'editor', 'id' => 'editor', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
@@ -385,16 +398,23 @@ class DisplayPublication extends DisplayBackend
         new Field(array('name' => 'attribution_de', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 3, 'null' => TRUE, 'nodbfield' => TRUE)),
         new Field(array('name' => 'attribution_en', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 3, 'null' => TRUE, 'nodbfield' => TRUE)),
 
+        new Field(array('name' => 'comment_digitization', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE)),
+        new Field(array('name' => 'comment_markup', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE)),
+        new Field(array('name' => 'comment_bibliography', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE)),
+        new Field(array('name' => 'comment_translation', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE)),
+        new Field(array('name' => 'comment_translation_markup', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE)),
+
         new Field(array('name' => 'comment', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 15, 'null' => TRUE)),
       ));
 
     return $record;
   }
 
-  function getEditRows () {
+  function getEditRows ($mode = 'edit') {
     $add_publisher_button = sprintf('<input type="button" value="%s" onclick="window.open(\'%s\')" />',
                                     tr('add new Holding Institution'), htmlspecialchars($this->page->buildLink(array('pn' => 'publisher', 'edit' => -1))));
-    return array(
+
+    $rows = array(
       'id' => FALSE, // 'status' => FALSE, // hidden fields
 
       'status' => array('label' => 'Status'),
@@ -430,17 +450,58 @@ class DisplayPublication extends DisplayBackend
       'displaydate' => array('label' => 'Übersteuerung Primärdatum (z.B. "um 1600")'),
 
       '<hr noshade="noshade" />',
-      'license' => array('label' => 'License'),
-
-      'attribution_de' => array('label' => 'Attribution (German)'),
-      'attribution_en' => array('label' => 'Attribution (English)'),
-
-      '<hr noshade="noshade" />',
-
-      'comment' => array('label' => 'Internal notes and comments'),
-
-      isset($this->form) ? $this->form->show_submit(ucfirst(tr('save'))) : 'FALSE'
     );
+
+    $additional = array(
+        'license' => array('label' => 'License'),
+        'attribution_de' => array('label' => 'Attribution (German)'),
+        'attribution_en' => array('label' => 'Attribution (English)'),
+    );
+
+    if ('edit' == $mode) {
+      $status_flags = $this->form->field('status_flags');
+    }
+    else {
+      $status_flags_value = $this->record->get_value('status_flags');
+    }
+
+    foreach (array(
+                   'digitization' => array('label' => 'Digitization', 'mask' => 0x1),
+                   'markup' => array('label' => 'Transcript and Markup', 'mask' => 0x02),
+                   'bibliography' => array('label' => 'Bibliography', 'mask' => 0x04),
+                   'translation' => array('label' => 'Translation', 'mask' => 0x08),
+                   'translation_markup' => array('label' => 'Translation Markup', 'mask' => 0x10),
+                   )
+             as $key => $options)
+    {
+      if ('edit' == $mode) {
+        $finalized = $status_flags->show($options['mask']) . '<br />';
+      }
+      else {
+        $finalized = (0 != ($status_flags_value & $options['mask']) ? tr('finalized') . '<br />' : '');
+      }
+      $additional['comment_' . $key] = array(
+        'label' => $options['label'],
+        'value' => $finalized
+          . ('edit' == $mode
+                                  ? $this->getFormField('comment_' . $key)
+                                  : $this->record->get_value('comment_' . $key))
+      );
+    }
+
+    $rows = array_merge($rows, $additional);
+
+    $rows = array_merge($rows,
+      array(
+
+        '<hr noshade="noshade" />',
+
+        'comment' => array('label' => 'Internal notes and comments'),
+
+        isset($this->form) ? $this->form->show_submit(ucfirst(tr('save'))) : 'FALSE',
+      ));
+
+    return $rows;
   }
 
   function renderEditForm ($rows, $name = 'detail') {
@@ -549,7 +610,7 @@ EOT;
                              'translator' => 'translator',
                              );
 
-    $rows = $this->getEditRows();
+    $rows = $this->getEditRows('view');
     if (isset($rows['title'])) {
       unset($rows['title']);
     }
@@ -808,18 +869,20 @@ EOT;
         if (null != form) {
           var textfields = ['search'];
           for (var i = 0; i < textfields.length; i++) {
-            if (null != form.elements[textfields[i]])
+            if (null != form.elements[textfields[i]]) {
               form.elements[textfields[i]].value = '';
+            }
           }
           var selectfields = ${select_fields_json};
           for (var i = 0; i < selectfields.length; i++) {
-            if (null != form.elements[selectfields[i]])
+            if (null != form.elements[selectfields[i]]) {
               form.elements[selectfields[i]].selectedIndex = 0;
+            }
           }
           var radiofields = ['fulltext'];
           for (var i = 0; i < radiofields.length; i++) {
             if (null != form.elements[radiofields[i]]) {
-                form.elements[radiofields[i]][1].checked = false;
+              form.elements[radiofields[i]][1].checked = false;
             }
           }
         }

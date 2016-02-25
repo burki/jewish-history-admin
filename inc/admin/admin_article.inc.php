@@ -6,7 +6,7 @@
  *
  * (c) 2009-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2016-02-24 dbu
+ * Version: 2016-02-25 dbu
  *
  * Changes:
  *
@@ -535,11 +535,14 @@ EOT;
       $slug_button = sprintf(' <input type="button" value="%s" onclick="generateSlug()" />',
                              tr('generate'));
     }
+
     $rows = parent::getEditRows($mode);
+
     $rows = array_merge_at($rows,
       array(
             'section' => array('label' => 'Section'),
       ), 'user');
+
     $rows = array_merge_at($rows,
       array(
             'slug' => array('label' => 'Ordnername',
@@ -552,6 +555,7 @@ EOT;
             'translator' => array('label' => 'Translator'),
             'status_translation' => array('label' => 'Translation Status'),
       ), 'status');
+
     $rows = array_merge_at($rows,
       array(
             'reviewer_request' => array(
