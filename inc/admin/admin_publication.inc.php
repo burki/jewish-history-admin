@@ -6,7 +6,7 @@
  *
  * (c) 2007-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2016-02-25 dbu
+ * Version: 2016-03-03 dbu
  *
  * Changes:
  *
@@ -163,7 +163,7 @@ class DisplayPublication extends DisplayBackend
   var $table = 'Publication';
   var $fields_listing = array('id', 'IFNULL(author,editor)', 'title',
                               'YEAR(publication_date) AS year',
-                              'status');
+                              'status', 'status_flags');
 
   var $status_options;
   var $status_default = '-99';
@@ -185,6 +185,7 @@ class DisplayPublication extends DisplayBackend
                             'title' => 'Title',
                             'year' => 'Year',
                             'status' => 'Status',
+                            '' => '',
                             );
   var $view_after_edit = TRUE;
 
@@ -897,13 +898,31 @@ EOT;
 
   function buildListingCell (&$row, $col_index, $val = NULL) {
     $val = NULL;
-    if ($col_index == count($this->fields_listing) - 1) {
-      $val = (isset($row[$col_index]) && array_key_exists($row[$col_index], $this->status_options))
-              ? $this->status_options[$row[$col_index]] . '&nbsp;' : '';
-
+    if ($col_index == count($this->fields_listing) - 2) {
+      $val = (isset($row[$col_index]) && array_key_exists($row['status'], $this->status_options))
+              ? $this->status_options[$row['status']] . '&nbsp;' : '';
+      if (isset($row['status_flags'])) {
+        $status_labels = array();
+        $status_flag_labels = array(
+                                                0x01 => tr('Digitization') . ' ' . tr('finalized'),
+                                                0x02 => tr('Transcript and Markup') . ' ' . tr('finalized'),
+                                                0x04 => tr('Bibliography') . ' ' . tr('finalized'),
+                                                0x08 => tr('Translation') . ' ' . tr('finalized'),
+                                                0x10 => tr('Translation Markup') . ' ' . tr('finalized'),
+                                                0x20 => tr('ready for publishing'),
+        );
+        foreach ($status_flag_labels as $mask => $label) {
+          $status_labels[] = sprintf('<li class="%s"><a href="#" title="%s">%s</a></li>',
+                                     0 != ($row['status_flags'] & $mask) ? 'active' : 'inactive',
+                                     $label,
+                                     mb_substr($label, 0, 1, $this->charset));
+        }
+        $val .= '<ul class="status">' . implode('', $status_labels) . '</ul>';
+      }
+    }
+    else if ($col_index == count($this->fields_listing) - 1) {
       $url_preview = $this->page->buildLink(array('pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_VIEW) => $row[0]));
-      $val = sprintf('<div style="text-align:right; white-space:nowrap">%s[<a href="%s">%s</a>]</div>',
-                     $val,
+      $val = sprintf('[<a href="%s">%s</a>]',
                      htmlspecialchars($url_preview),
                      tr('view'));
     }

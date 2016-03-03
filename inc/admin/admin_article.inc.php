@@ -6,7 +6,7 @@
  *
  * (c) 2009-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2016-02-25 dbu
+ * Version: 2016-03-03 dbu
  *
  * Changes:
  *
@@ -109,8 +109,8 @@ class DisplayArticle extends DisplayMessage
     $array = $this->fields_listing;
     $this->fields_listing = array_merge(array_slice($array, 0, $index),
                                         array("CONCAT(R.lastname, ' ', R.firstname) AS referee",
-                                              // 'T.name AS section',
                                               $this->table . '.section AS section',
+                                              $this->table . '.status_flags AS status_flags',
                                               ),
                                         array_slice($array, $index, count($array) - 1));
     $this->cols_listing = array_merge_at($this->cols_listing,
@@ -739,10 +739,9 @@ EOT;
         $xls_row[] = $val;
       }
       $this->xls_data[] = $xls_row;
+      return;
     }
-    else {
-      return parent::buildListingRow($row);
-    }
+    return parent::buildListingRow($row);
   }
 
   function getImageDescriptions () {

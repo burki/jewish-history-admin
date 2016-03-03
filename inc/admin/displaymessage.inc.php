@@ -636,18 +636,37 @@ EOT;
     return $search;
   }
 
+  /* attention - only fits admin_article */
   function buildListingCell (&$row, $col_index, $val = NULL) {
     $val = NULL;
 
     if (count($this->cols_listing) - 3 == $col_index && !empty($this->view_options['section'])) {
       $sections = array();
-      foreach (preg_split('/\s*,\s/', $row[$col_index]) as $section) {
+      foreach (preg_split('/\s*,\s/', $row['section']) as $section) {
         $sections[] = $this->view_options['section'][$section];
       }
       $val = implode(', ', $sections);
     }
     else if (count($this->cols_listing) - 2 == $col_index) {
-      $val = (isset($row[$col_index]) ? $this->status_options[$row[$col_index]] : '');
+      $val = (isset($row['status']) ? $this->status_options[$row['status']] : '');
+      if (isset($row['status_flags'])) {
+        $status_labels = array();
+        $status_flag_labels = array(
+                                                        0x01 => tr('Peer Review') . ' ' . tr('finalized'),
+                                                0x02 => tr('Markup') . ' ' . tr('finalized'),
+                                                0x04 => tr('Bibliography') . ' ' . tr('finalized'),
+                                                0x08 => tr('Translation') . ' ' . tr('finalized'),
+                                                0x10 => tr('Translation Markup') . ' ' . tr('finalized'),
+                                                0x20 => tr('ready for publishing'),
+        );
+        foreach ($status_flag_labels as $mask => $label) {
+          $status_labels[] = sprintf('<li class="%s"><a href="#" title="%s">%s</a></li>',
+                                     0 != ($row['status_flags'] & $mask) ? 'active' : 'inactive',
+                                     $label,
+                                     mb_substr($label, 0, 1, $this->charset));
+        }
+        $val .= '<ul class="status">' . implode('', $status_labels) . '</ul>';
+      }
     }
     else if (count($this->cols_listing) - 1 == $col_index) {
       $action = TABLEMANAGER_VIEW;
@@ -659,9 +678,12 @@ EOT;
       $name = $this->workflow->name($action);
       $url_preview = $this->page->buildLink(array('pn' => $this->page->name, $name => $row[0]));
       $val = sprintf('<div style="text-align:right">%s&nbsp;[<a href="%s">%s</a>]</div>',
-                     $row[count($this->cols_listing) - 1],
+                     $row['reviewer_deadline'],
                      htmlspecialchars($url_preview),
                      tr($name));
+    }
+    else if (count($this->cols_listing) == $col_index) {
+      return null;
     }
 
     return parent::buildListingCell($row, $col_index, $val);

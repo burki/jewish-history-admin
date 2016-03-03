@@ -28,22 +28,22 @@ class DisplayRoot extends PageDisplay
         'title' => 'Articles'
       ),
       array(
+        'name' => 'publication',
+        'title' => 'Sources'
+      ),
+      array(
         'name' => 'author',
         'title' => 'Authors',
+        'privs' => $RIGHTS_ADMIN | $RIGHTS_EDITOR,
+      ),
+      array(
+        'name' => 'publisher',
+        'title' => 'Holding Institutions',
         'privs' => $RIGHTS_ADMIN | $RIGHTS_EDITOR,
       ),
       'communication' => array(
         'name' => 'communication',
         'title' => 'Communication',
-        'privs' => $RIGHTS_ADMIN | $RIGHTS_EDITOR,
-      ),
-      array(
-        'name' => 'publication',
-        'title' => 'Sources'
-      ),
-      array(
-        'name' => 'publisher',
-        'title' => 'Holding Institutions',
         'privs' => $RIGHTS_ADMIN | $RIGHTS_EDITOR,
       ),
       array(

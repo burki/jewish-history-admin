@@ -139,6 +139,33 @@ td.listing, td.form {
   max-width: 125px;
 }
 
+
+ul.status {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+ul.status > li {
+  display: inline;
+}
+
+ul.status > li.active {
+  background-color: #f4f4f4;
+}
+
+ul.status > li > a {
+  padding-right: 2px;
+  padding-left: 2px;
+  color: #e0e0e0;
+  text-decoration: none;
+}
+
+ul.status > li.active > a {
+  background-color: #c0c0c0;
+  color: #fff;
+}
+
 /* page elements */
 #menuAccount {
   float: right;
