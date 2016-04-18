@@ -184,7 +184,7 @@ function strip_specialchars($txt) {
 
 function format_mailbody ($txt) {
   $paras = preg_split('/\n\s*\n/', $txt);
-  for ($i=0; $i < count($paras); $i++) {
+  for ($i = 0; $i < count($paras); $i++) {
     $paras[$i] = wordwrap($paras[$i], MAIL_LINELENGTH, "\r\n");
   }
   return strip_specialchars(join("\r\n\r\n", $paras));
@@ -218,7 +218,8 @@ class AuthorListing
 
     $tables = 'User';
     $fields = array(
-        'User.id AS id', 'status', 'email', 'firstname', 'lastname', 'title', 'position',
+        'User.id AS id', 'status', 'status_flags',
+        'email', 'firstname', 'lastname', 'title', 'position',
         'UNIX_TIMESTAMP(created) AS created',
         'UNIX_TIMESTAMP(subscribed) AS subscribed',
         'UNIX_TIMESTAMP(unsubscribed) AS unsubscribed',
@@ -244,7 +245,7 @@ class AuthorListing
       $where_conditions[] = 'User.country=Country.cc';
     }
 
-    $querystr = "SELECT ".implode(', ', $fields)
+    $querystr = "SELECT " . implode(', ', $fields)
               . " FROM $tables"
               . " WHERE " . implode(' AND ', $where_conditions);
 
@@ -282,7 +283,7 @@ class AuthorListing
     }
     if ($append_country && !empty($record['cc'])) {
       $zipcode_town .= $separator
-        .(isset($country_shortnames[$record['cc']]) ? $country_shortnames[$record['cc']] : Countries::name($record['cc']));
+        . (isset($country_shortnames[$record['cc']]) ? $country_shortnames[$record['cc']] : Countries::name($record['cc']));
     }
     return $zipcode_town;
   }
@@ -386,7 +387,8 @@ class AuthorListing
 
     // title
     $edit = $show_edit
-      ? ' <span class="regular">[<a href="' . htmlspecialchars($view->page->buildLink(array('pn' => 'author', (isset($view->workflow) ? $view->workflow->name(TABLEMANAGER_EDIT) : 'edit') => $this->id)))
+      ? ' <span class="regular">'
+        . '[<a href="' . htmlspecialchars($view->page->buildLink(array('pn' => 'author', (isset($view->workflow) ? $view->workflow->name(TABLEMANAGER_EDIT) : 'edit') => $this->id)))
         . '">' . tr('edit') . '</a>]</span>'
       : '';
 
@@ -439,7 +441,8 @@ class AuthorListing
 
     if (isset($this->record['email'])) {
       $top[] = $this->buildEntry($view, $this->record['email']
-                                 . (TRUE || 'admin' == $mode ? ' ' . $this->buildSubscriptionAction($view, $this->record['status'], 'email') : ''), '<!--Subscription -->E-mail', FALSE);
+                                 . (TRUE || 'admin' == $mode
+                                    ? ' ' . $this->buildSubscriptionAction($view, $this->record['status'], 'email') : ''), '<!--Subscription -->E-mail', FALSE);
     }
 
     if (count($top) > 0) {
@@ -572,8 +575,24 @@ class AuthorListing
         }
       }
 
-      // get all messages involved
 
+      if (isset($this->record['status_flags'])) {
+        $status_labels = array();
+        foreach (array(
+                       'cv' => array('label' => 'CV', 'mask' => 0x1),
+                       )
+                 as $key => $options)
+        {
+          if (0 != ($this->record['status_flags'] & $options['mask'])) {
+            $status_labels[] = $options['label'] . ' ' . tr('finalized');
+          }
+        }
+        if (!empty($status_labels)) {
+          $review[] = $this->buildEntry($view, implode('<br />', $status_labels), '');
+        }
+      }
+
+      // get all messages involved
       if (count($review) > 0) {
         $ret .= $this->buildSection($view, 'Contributor Info')
               . implode('<br />', $review);

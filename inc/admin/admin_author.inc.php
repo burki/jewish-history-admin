@@ -4,9 +4,9 @@
  *
  * Manage the authors
  *
- * (c) 2006-2015 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-11-16 dbu
+ * Version: 2016-03-03 dbu
  *
  * Changes:
  *
@@ -71,6 +71,23 @@ class AuthorFlow extends TableManagerFlow
 
 class AuthorRecord extends TableManagerRecord
 {
+  function store ($args = '') {
+    $name_parts = [];
+
+    $lastname = $this->get_value('lastname');
+    if (!empty($lastname)) {
+      $name_parts[] = $lastname;
+    }
+    $firstname = $this->get_value('firstname');
+    if (!empty($firstname)) {
+      $name_parts[] = $firstname;
+    }
+
+    $slugify = new \Cocur\Slugify\Slugify();
+    $this->set_value('slug', $slugify->slugify(join(', ', $name_parts), '-'));
+
+    return parent::store($args);
+  }
 
   function delete ($id) {
     $dbconn = $this->params['dbconn'];
@@ -85,13 +102,15 @@ class AuthorRecord extends TableManagerRecord
 
 }
 
-class AuthorQueryConditionBuilder extends TableManagerQueryConditionBuilder {
+class AuthorQueryConditionBuilder extends TableManagerQueryConditionBuilder
+{
 
   function buildStatusCondition () {
     $num_args = func_num_args();
     if ($num_args <= 0) {
       return;
     }
+
     $fields = func_get_args();
 
     if (isset($this->term) && '' !== $this->term) {
@@ -218,6 +237,7 @@ class DisplayAuthor extends DisplayTable
         new Field(array('name' => 'title', 'type' => 'text', 'datatype' => 'char', 'size' => 8, 'maxlength' => 20, 'null' => TRUE)),
         new Field(array('name' => 'lastname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80)),
         new Field(array('name' => 'firstname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+        new Field(array('name' => 'slug', 'type' => 'hidden', 'datatype' => 'char', 'null' => TRUE)),
 
         new Field(array('name' => 'position', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
         new Field(array('name' => 'email_work', 'type' => 'email', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
@@ -251,6 +271,11 @@ class DisplayAuthor extends DisplayTable
           new Field(array('name' => 'review_suggest', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
 
           new Field(array('name' => 'comment', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE, 'noupdate' => !$this->is_internal)),
+          new Field(array('name' => 'status_flags', 'type' => 'checkbox', 'datatype' => 'bitmap', 'null' => TRUE, 'default' => 0,
+                              'labels' => array(
+                                                0x01 => tr('CV') . ' ' . tr('finalized'),
+                                                ),
+                             ))
         ));
     }
 
@@ -261,7 +286,7 @@ class DisplayAuthor extends DisplayTable
     return new AuthorQueryConditionBuilder($term);
   }
 
-  function getEditRows () {
+  function getEditRows ($mode = 'edit') {
     $rows = array(
         'id' => FALSE,
         'flags' => FALSE,
@@ -302,6 +327,34 @@ class DisplayAuthor extends DisplayTable
     ));
 
     if ($this->is_internal) {
+      $additional = array();
+      if ('edit' == $mode) {
+        $status_flags = $this->form->field('status_flags');
+      }
+      else {
+        $status_flags_value = $this->record->get_value('status_flags');
+      }
+
+      foreach (array(
+                     'cv' => array('label' => 'CV', 'mask' => 0x1),
+                     )
+               as $key => $options)
+      {
+        if ('edit' == $mode) {
+          $finalized = $status_flags->show($options['mask']) . '<br />';
+        }
+        else {
+          $finalized = (0 != ($status_flags_value & $options['mask']) ? tr('finalized') . '<br />' : '');
+        }
+        $additional['comment_' . $key] = array(
+          'label' => $options['label'],
+          'value' => $finalized
+            /* . ('edit' == $mode
+                                    ? $this->getFormField('comment_' . $key)
+                                    : $this->record->get_value('comment_' . $key)) */
+        );
+      }
+
       $rows = array_merge($rows,
         array(
         /* 'expectations' => array('label' => 'Expectations'),
@@ -311,6 +364,12 @@ class DisplayAuthor extends DisplayTable
         'review' => array('label' => 'Willing to contribute'),
         'review_areas' => array('label' => 'Contribution areas'),
         'review_suggest' => array('label' => 'Article suggestion'),
+      ));
+
+      $rows = array_merge($rows, $additional);
+
+      $rows = array_merge($rows,
+        array(
         '<hr noshade="noshade" />',
         'comment' => array('label' => 'Internal notes and comment'),
         ));

@@ -1,6 +1,7 @@
 CREATE TABLE User (
   id int(11) NOT NULL auto_increment,
   status int(11) NOT NULL DEFAULT 0,
+  status_flags  INT DEFAULT 0,
   changed timestamp NULL NULL,
   created datetime NULL,
   ip varchar(16) NULL,
@@ -10,6 +11,7 @@ CREATE TABLE User (
   email varchar(255) NULL,
   firstname varchar(255) NULL,
   lastname varchar(255) NULL,
+  slug VARCHAR(255) NULL,
   sex enum('F','M') NULL,
   title varchar(50) NULL,
   position varchar(255) NULL,

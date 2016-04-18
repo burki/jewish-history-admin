@@ -64,7 +64,7 @@ class ArticleQueryConditionBuilder extends MessageQueryConditionBuilder
 class MessageWithPublicationRecord extends MessageRecord
 {
   function store ($args = '') {
-    $stored = parent::store($args = '');
+    $stored = parent::store($args);
 
     if ($stored) {
       $publication = $this->get_value('publication');
