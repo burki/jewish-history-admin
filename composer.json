@@ -1,12 +1,15 @@
 {
     "config": {
-       "vendor-dir": "lib/"
+       "vendor-dir": "lib/",
+        "platform": {
+            "php": "5.4.45"
+        }
     },
 
     "repositories": [
         {
             "type": "pear",
-            "url": "http://pear.php.net"
+            "url": "https://pear.php.net"
         }
     ],
 
@@ -27,8 +30,8 @@
         "pear-pear.php.net/Text_Wiki" : "*",
         "pear-pear.php.net/XML_Util" : "*"
     },
+
     "autoload": {
         "psr-4": { "OxGarage\\": "lib/OxGarage/" }
     }
-
 }

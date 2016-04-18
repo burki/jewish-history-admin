@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "294b1a715869eccab386af12fc54722c",
-    "content-hash": "b72bcdfc81095132c5bbbe790b19a445",
+    "hash": "262f5e576fb67c14eb4cede1fd85d17a",
+    "content-hash": "bcde55d568411107f8ab39003c55f568",
     "packages": [
         {
             "name": "cocur/slugify",
@@ -460,16 +460,16 @@
         },
         {
             "name": "sabre/uri",
-            "version": "1.0.1",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fruux/sabre-uri.git",
-                "reference": "6bae7efdd9dfcfdb3edfc4362741e59ce4b64f42"
+                "reference": "9012116434d84ef6e5e37a89dfdbfbe2204a8704"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fruux/sabre-uri/zipball/6bae7efdd9dfcfdb3edfc4362741e59ce4b64f42",
-                "reference": "6bae7efdd9dfcfdb3edfc4362741e59ce4b64f42",
+                "url": "https://api.github.com/repos/fruux/sabre-uri/zipball/9012116434d84ef6e5e37a89dfdbfbe2204a8704",
+                "reference": "9012116434d84ef6e5e37a89dfdbfbe2204a8704",
                 "shasum": ""
             },
             "require": {
@@ -507,7 +507,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2015-04-29 03:47:26"
+            "time": "2016-03-08 02:29:27"
         },
         {
             "name": "sabre/xml",
@@ -662,16 +662,16 @@
         },
         {
             "name": "zendframework/zendframework1",
-            "version": "1.12.17",
+            "version": "1.12.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zendframework/zf1.git",
-                "reference": "9f0bbc8b626bf35030afd766d9a7e506864e8e0b"
+                "reference": "bc3f2652f305fc43565af1570db83dda05578e4f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zf1/zipball/9f0bbc8b626bf35030afd766d9a7e506864e8e0b",
-                "reference": "9f0bbc8b626bf35030afd766d9a7e506864e8e0b",
+                "url": "https://api.github.com/repos/zendframework/zf1/zipball/bc3f2652f305fc43565af1570db83dda05578e4f",
+                "reference": "bc3f2652f305fc43565af1570db83dda05578e4f",
                 "shasum": ""
             },
             "require": {
@@ -705,7 +705,7 @@
                 "ZF1",
                 "framework"
             ],
-            "time": "2015-11-23 15:11:10"
+            "time": "2016-04-13 15:32:30"
         }
     ],
     "packages-dev": [],
@@ -719,5 +719,8 @@
     "platform": {
         "php": ">=5.3.0"
     },
-    "platform-dev": []
+    "platform-dev": [],
+    "platform-overrides": {
+        "php": "5.4.45"
+    }
 }
