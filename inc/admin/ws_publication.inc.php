@@ -4,9 +4,9 @@
  *
  * Webservices for managing publications (books)
  *
- * (c) 2007-2015 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-10-29 dbu
+ * Version: 2016-05-31 dbu
  *
  * Changes:
  *
@@ -21,7 +21,7 @@ class WsPublication extends WsHandler
     $action = array_key_exists('action', $_GET)
       && in_array($_GET['action'], $valid_actions)
       ? $_GET['action'] : $valid_actions[0];
-    $action_name = $action.'Action';
+    $action_name = $action . 'Action';
 
     return $this->$action_name();
   }
@@ -54,16 +54,18 @@ class WsPublication extends WsHandler
             if (isset($id_publication) && $id_publication == $bibitem['source_id']) {
               $client_params['from_db'] = FALSE;
               $bibitem_external = $biblio_client->fetchByIsbn($isbn, $client_params);
-              if (isset($bibitem_external))
+              if (isset($bibitem_external)) {
                 $bibitem = $bibitem_external;
+              }
             }
           }
           $status = isset($bibitem['source']) && $bibitem['source'] == 'from_db' ? 2 : 1;
           $msg = 'Success';
           $response = &$bibitem;
         }
-        else
+        else {
           $msg = 'Error in looking up ' . $isbn;
+        }
       }
     }
 
@@ -92,20 +94,21 @@ class WsPublication extends WsHandler
           $parts[] = "isbn = '$normalized_isbn';
           else */
 
-        for ($j = 0; $j < count($fields); $j++)
+        for ($j = 0; $j < count($fields); $j++) {
           $parts[$j] = $fields[$j]
-          .sprintf(" REGEXP '[[:<:]]%s'", $dbconn->escape_string($words[$i]));
+                     . sprintf(" REGEXP '[[:<:]]%s'", $dbconn->escape_string($words[$i]));
+        }
 
-        $words[$i] = '('.implode(' OR ', $parts).')';
+        $words[$i] = '(' . implode(' OR ', $parts) . ')';
       }
-      $querystr = sprintf("SELECT id, title, subtitle, author, editor FROM Publication WHERE status >= 0 AND %s", implode(' AND ', $words))
-        ." ORDER BY CONCAT(IFNULL(author, ''), editor), title";
+      $querystr = sprintf("SELECT id, title, subtitle, author, editor FROM Publication WHERE status <> %d AND %s",
+                          STATUS_DELETED, implode(' AND ', $words))
+                . " ORDER BY CONCAT(IFNULL(author, ''), editor), title";
       $dbconn->query($querystr);
-
 
       while ($dbconn->next_record()) {
         $publication = (isset($dbconn->Record['author']) ? $dbconn->Record['author'] : $dbconn->Record['editor'])
-          .': '.$dbconn->Record['title'];
+                     . ': ' . $dbconn->Record['title'];
         $entries[] = array('id' => $dbconn->Record['id'], 'item' => $publication);
       }
     }
