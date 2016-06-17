@@ -27,6 +27,7 @@ CREATE TABLE User (
   supervisor varchar(255) NULL,
   description text null,
   description_de text null,
+  gnd VARCHAR(10) NULL,
   areas text,
   expectations text,
   knownthrough varchar(255) NULL,

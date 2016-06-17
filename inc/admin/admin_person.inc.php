@@ -388,18 +388,11 @@ EOT;
           var service = new SeeAlsoCollection();
           service.services = {
             'pndaks' : new SeeAlsoService('http://beacon.findbuch.de/seealso/pnd-aks/')
-            /* ,
-            'pndwpde' : new SeeAlsoService('http://ws.gbv.de/beacon/?seealso=pndwpde'),
-            'pnd2kubikat' : new SeeAlsoService('http://beacon.findbuch.de/seealso/pnd-kubikat?'),
-            'pnd2gso' : new SeeAlsoService('http://ws.gbv.de/seealso/pnd2gso'),
-            'pndndb' : new SeeAlsoService('http://ws.gbv.de/beacon/?seealso=pndndb'),
-            'pnd2kalliope' : new SeeAlsoService('http://beacon.findbuch.de/pnd-resolver/kalliope?')
-            */
-           };
-           service.views = { 'seealso-ul' : new SeeAlsoUL({ /* preHTML : '<h3>Externe Angebote</h3>', */
+          };
+          service.views = { 'seealso-ul' : new SeeAlsoUL({ /* preHTML : '<h3>Externe Angebote</h3>', */
                                                             linkTarget: '_blank',
                                                             maxItems: 100 }) };
-           service.replaceTagsOnLoad();
+          service.replaceTagsOnLoad();
 
 EOT;
           $rows['gnd']['value'] .= $ret = <<<EOT

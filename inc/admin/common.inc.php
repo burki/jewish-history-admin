@@ -4,9 +4,9 @@
  *
  * Common stuff for the admin pages
  *
- * (c) 2006-2015 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-07-21 dbu
+ * Version: 2015-06-17 dbu
  *
  * Changes:
  *
@@ -227,7 +227,7 @@ class AuthorListing
         // contact
         'email_work', 'institution', 'address', 'zip', 'place', 'country AS cc', 'phone', 'fax',
         // public
-        'url', 'description_de', 'description',
+        'url', 'gnd', 'description_de', 'description',
         // personal
         'supervisor', 'areas', 'expectations', 'knownthrough', 'forum',
         // review
@@ -504,14 +504,21 @@ class AuthorListing
         'url' => 'Homepage',
         'description_de' => 'Public CV (de)',
         'description' => 'Public CV (en)',
+        'gnd' => 'GND',
     );
     foreach ($public_fields as $field => $label) {
       if (!empty($this->record[$field])) {
-        $value = 'url' == $field
-          ? $this->formatUrl($this->record[$field])
-          : $this->record[$field];
+        if ('url' == $field) {
+          $value = $this->formatUrl($this->record[$field]);
+        }
+        else if ('gnd' == $field) {
+          $value = $this->formatUrl('http://d-nb.info/gnd/' . $this->record[$field]);
+        }
+        else {
+          $value = $this->record[$field];
+        }
 
-        $public[] = $this->buildEntry($view, $value, $label, 'url' != $field);
+        $public[] = $this->buildEntry($view, $value, $label, !in_array($field, array('url', 'gnd')));
       }
     }
 

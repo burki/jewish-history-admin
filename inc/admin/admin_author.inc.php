@@ -6,7 +6,7 @@
  *
  * (c) 2006-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2016-03-03 dbu
+ * Version: 2016-06-17 dbu
  *
  * Changes:
  *
@@ -144,6 +144,10 @@ class DisplayAuthor extends DisplayTable
   function __construct (&$page) {
     parent::__construct($page, new AuthorFlow($page));
 
+    $this->script_url[] = 'script/jquery-1.9.1.min.js';
+    $this->script_url[] = 'script/jquery-noconflict.js';
+    $this->script_url[] = 'script/jquery-ui-1.10.3.custom.min.js';
+
     $this->status_deleted = AuthorListing::$status_deleted;
 
     if ($page->lang() != 'en_US') {
@@ -235,8 +239,8 @@ class DisplayAuthor extends DisplayTable
 
         new Field(array('name' => 'sex', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($sex_options), 'labels' => array_values($sex_options))),
         new Field(array('name' => 'title', 'type' => 'text', 'datatype' => 'char', 'size' => 8, 'maxlength' => 20, 'null' => TRUE)),
-        new Field(array('name' => 'lastname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80)),
-        new Field(array('name' => 'firstname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+        new Field(array('name' => 'lastname', 'id' => 'lastname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80)),
+        new Field(array('name' => 'firstname', 'id' => 'firstname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
         new Field(array('name' => 'slug', 'type' => 'hidden', 'datatype' => 'char', 'null' => TRUE)),
 
         new Field(array('name' => 'position', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
@@ -252,6 +256,7 @@ class DisplayAuthor extends DisplayTable
         new Field(array('name' => 'fax', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 40, 'null' => TRUE)),
         new Field(array('name' => 'url', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => TRUE)),
 //        new Field(array('name' => 'supervisor', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => TRUE)),
+        new Field(array('name' => 'gnd', 'id' => 'gnd', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
         new Field(array('name' => 'description', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
         new Field(array('name' => 'description_de', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
         new Field(array('name' => 'areas', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
@@ -287,6 +292,86 @@ class DisplayAuthor extends DisplayTable
   }
 
   function getEditRows ($mode = 'edit') {
+    $gnd_search = '';
+    if ('edit' == $mode) {
+      $gnd_search = sprintf('<input value="GND Anfrage nach Name, Vorname" type="button" onclick="%s" /><span id="spinner"></span><br />',
+                            "jQuery('#gnd').autocomplete('enable');jQuery('#gnd').autocomplete('search', jQuery('#lastname').val() + ', ' + jQuery('#firstname').val())");
+      $this->script_ready[] = <<<EOT
+
+    jQuery('#gnd').autocomplete({
+      // source: availablePnds,
+      type: 'post',
+      source: './admin_ws.php?pn=person&action=lookupGnd&_debug=1',
+      minChars: 2,
+      search: function(event, ui) {
+        if (jQuery('#gnd').autocomplete('option', 'disabled'))
+          return false;
+
+        var output = jQuery('#spinner');
+        if (null != output) {
+          output.html('<img src="./media/ajax-loader.gif" alt="running" />');
+        }
+      },
+      response: function(event,ui) { // was open
+        var output = jQuery('#spinner');
+        if (null != output) {
+          output.html('');
+        }
+      },
+      focus: function(event, ui) {
+        jQuery('#gnd').val(ui.item.value);
+        return false;
+      },
+      change: function(event, ui) {
+        var output = jQuery('#spinner');
+        if (null != output) {
+          output.html('');
+        }
+      },
+      select: function(event, ui) {
+        jQuery('#gnd').val(ui.item.value);
+                // try to fetch more info by gnd
+                jQuery.ajax({ url: './admin_ws.php?pn=person&action=fetchBiographyByGnd&_debug=1',
+                              data: { gnd: ui.item.value },
+                              dataType: 'json',
+                              success: function (data) {
+                                var mapping = {dateOfBirth: 'birthdate',
+                                               placeOfBirth: 'birthplace',
+                                               placeOfResidence: 'actionplace',
+                                               dateOfDeath: 'deathdate',
+                                               placeOfDeath: 'deathplace',
+                                               academicTitle: 'title',
+                                               biographicalInformation: 'occupation'};
+                                for (key in mapping) {
+                                  if (null != data[key]) {
+                                    var field = jQuery('#' + mapping[key]);
+                                    if (null != field) {
+                                      var val = data[key];
+                                      if (val != null && ('dateOfBirth' == key || 'dateOfDeath' == key)) {
+                                        var parts = val.split(/\-/);
+                                        val = val.split(/\-/).reverse().join('.');
+                                      }
+                                      field.val(val);
+                                    }
+                                  }
+                                }
+                              }});
+
+        return false;
+      },
+      close: function(event, ui) {
+        jQuery('#gnd').autocomplete('disable');
+        var output = jQuery('#spinner');
+        if (null != output) {
+          output.html('');
+        }
+      }
+
+    })
+    .autocomplete('disable');
+EOT;
+    }
+
     $rows = array(
         'id' => FALSE,
         'flags' => FALSE,
@@ -309,7 +394,10 @@ class DisplayAuthor extends DisplayTable
         'lastname' => array('label' => 'Last Name'),
         'firstname' => array('label' => 'First Name'),
         'position' => array('label' => 'Position'),
-        $this->form->show_submit(tr('Store')).'<hr noshade="noshade" />',
+        'gnd' => array('label' => 'GND-Nr',
+                       'description' => 'Identifikator der Gemeinsamen Normdatei, vgl. http://de.wikipedia.org/wiki/Hilfe:GND',),
+        (isset($this->form) ? $gnd_search . $this->form->show_submit(tr('Store')) : '')
+        . '<hr noshade="noshade" />',
         'email_work' => array('label' => 'Institutional E-Mail'),
         'institution' => array('label' => 'Institution'),
         'address' => array('label' => 'Address'),
@@ -534,7 +622,7 @@ EOT;
            && ('0' === $this->search['status'] || -3 == $this->search['status'])) {
           if (isset($row['comment'])) {
             $val = (isset($val) ? $val . '<br />' : '')
-              .$this->formatText($row['comment']);
+                 . $this->formatText($row['comment']);
           }
         }
         break;
