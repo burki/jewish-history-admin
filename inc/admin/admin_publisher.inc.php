@@ -142,6 +142,7 @@ class DisplayPublisher extends DisplayTable
       new Field(array('name' => 'url', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => TRUE)),
       new Field(array('name' => 'email', 'type' => 'email', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
       new Field(array('name' => 'url', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => TRUE)),
+      new Field(array('name' => 'gnd', 'id' => 'gnd', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
       new Field(array('name' => 'name_contact', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 127, 'null' => TRUE)),
       new Field(array('name' => 'phone_contact', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
       new Field(array('name' => 'fax_contact', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 40, 'null' => TRUE)),
@@ -158,8 +159,8 @@ class DisplayPublisher extends DisplayTable
     return $changed . parent::renderEditForm($rows, $name);
   }
 
-  function getEditRows () {
-    return array(
+  function getEditRows ($mode = 'edit') {
+    $rows = array(
       'id' => FALSE, 'status' => FALSE, // hidden fields
 
       'name' => array('label' => 'Name'),
@@ -175,6 +176,8 @@ class DisplayPublisher extends DisplayTable
       'phone' => array('label' => 'Telephone (general)'),
       'fax' => array('label' => 'Fax (general)'),
       'url' => array('label' => 'Homepage'),
+      'gnd' => array('label' => 'GND-Nr',
+                     'description' => 'Identifikator der Gemeinsamen Normdatei, vgl. http://de.wikipedia.org/wiki/Hilfe:GND',),
 
       '<hr noshade="noshade" />'
       // . '<b>' . tr('Review department') . '</b>'
@@ -189,6 +192,16 @@ class DisplayPublisher extends DisplayTable
 
       isset($this->form) ? $this->form->show_submit(ucfirst(tr('save'))) : 'FALSE'
     );
+
+    if ('view' == $mode) {
+      $gnd = $this->record->get_value('gnd');
+      if (!empty($gnd)) {
+        $rows['gnd']['value'] = sprintf('<a href="http://d-nb.info/gnd/%s" target="_blank">%s</a>',
+                                        $gnd, $gnd);
+      }
+    }
+
+    return $rows;
   }
 
   function getViewFormats () {
@@ -196,7 +209,7 @@ class DisplayPublisher extends DisplayTable
   }
 
   function buildViewRows () {
-    $rows = $this->getEditRows();
+    $rows = $this->getEditRows('view');
     if (isset($rows['name'])) {
       unset($rows['name']);
     }

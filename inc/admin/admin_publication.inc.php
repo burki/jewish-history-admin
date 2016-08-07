@@ -374,7 +374,7 @@ class DisplayPublication extends DisplayBackend
                         'options' => array_merge(array(''), array_keys($publisher_options)),
                         'labels' => array_merge(array('-- select a holding institution --'), array_values($publisher_options)), 'datatype' => 'int')),
         // new Field(array('name' => 'publisher', 'id' => 'publisher', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 127, 'null' => TRUE)),
-        new Field(array('name' => 'archive_location', 'id' => 'archive_location', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+        new Field(array('name' => 'archive_location', 'id' => 'archive_location', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 383, 'null' => TRUE)),
         new Field(array('name' => 'publication_date', 'id' => 'publication_date', 'type' => 'date', 'incomplete' => TRUE, 'datatype' => 'date', 'null' => 1)),
         new Field(array('name' => 'binding', 'id' => 'binding', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 50, 'null' => TRUE)),
         new Field(array('name' => 'pages', 'id' => 'pages', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 50, 'null' => TRUE)),

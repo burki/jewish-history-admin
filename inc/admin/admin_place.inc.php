@@ -4,9 +4,9 @@
  *
  * Manage the Place-table
  *
- * (c) 2015 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2015-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-05-10 dbu
+ * Version: 2016-07-05 dbu
  *
  * TODO:
  *
@@ -26,7 +26,7 @@ class PlaceFlow extends TableManagerFlow
   function init ($page) {
     $ret = parent::init($page);
     if (TABLEMANAGER_DELETE == $ret) {
-      $dbconn = new DB();
+      $dbconn = new DB_Presentation();
       foreach (self::$TABLES_RELATED as $from_where) {
         $querystr = sprintf("SELECT COUNT(*) AS count FROM %s",
                             $from_where);
@@ -51,32 +51,65 @@ class PlaceFlow extends TableManagerFlow
   }
 }
 
+class PlaceRecord extends TableManagerRecord
+{
+  var $languages = array('de', 'en');
+
+  function store ($args = '') {
+    $alternateName = array();
+    foreach ($this->languages as $language) {
+      $value = $this->get_value('name_variant_' . $language);
+      if (!empty($value)) {
+        $alternateName[$language] = trim($value);
+      }
+    }
+    $this->set_value('alternateName', json_encode($alternateName));
+    return parent::store($args);
+  }
+
+  function fetch ($args, $datetime_style = '') {
+    $fetched = parent::fetch($args, $datetime_style);
+    if ($fetched) {
+      $alternateName = json_decode($this->get_value('alternateName'), TRUE);
+      foreach ($this->languages as $language) {
+        if (isset($alternateName) && FALSE !== $alternateName && array_key_exists($language, $alternateName)) {
+          $this->set_value('name_variant_' . $language, $alternateName[$language]);
+        }
+      }
+    }
+    return $fetched;
+  }
+
+}
+
 class DisplayPlace extends DisplayBackend
 {
-  var $table = 'Place';
-  var $fields_listing = array('Place.id AS id',
-                              "Place.name AS name",
-                              "parent_path",
-                              'Place.tgn AS tgn',
+  var $table = 'place';
+  var $fields_listing = array('place.id AS id',
+                              "place.name AS name",
+                              "place.type AS type",
+                              // "parent_path",
+                              'place.tgn AS tgn',
                               /* 'COUNT(DISTINCT Item.id) AS count',
                               'COUNT(DISTINCT Media.id) AS how_many_media',
                               */
-                              'Place.created AS created',
-                              'Place.status AS status',
+                              'place.created_at AS created',
+                              'place.status AS status',
                               );
   var $joins_listing = array(
                              // ' LEFT OUTER JOIN ItemPlace ON ItemPlace.id_place=Place.id LEFT OUTER JOIN Item ON ItemPlace.id_item=Item.id AND Item.status >= 0' /* AND Item.collection <> 33' */,
                              // " LEFT OUTER JOIN Media ON Media.item_id=Item.id AND Media.type = 0 AND Media.name='preview00'"
                              );
-  var $group_by_listing = 'Place.id';
+  var $group_by_listing = 'place.id';
   var $distinct_listing = TRUE;
   var $order = array('name' => array('name', 'name DESC'),
                      // 'count' => array('count DESC', 'count'),
                      // 'how_many_media' => array('how_many_media DESC', 'how_many_media'),
-                     'created' => array('created DESC, Place.id desc', 'created, Place.id'),
+                     'created' => array('created_at DESC, place.id desc', 'created_at, place.id'),
                     );
   var $cols_listing = array('name' => 'Name',
-                            'parent_path' => 'Uebergeordnet',
+                            'type' => 'Typ',
+                            // 'parent_path' => 'Uebergeordnet',
                             'tgn' => 'TGN',
                             // 'count' => 'Erfasste Werke',
                             // 'how_many_media' => 'Erfasste Bilder',
@@ -94,14 +127,6 @@ class DisplayPlace extends DisplayBackend
     parent::__construct($page, $workflow);
 
     if ('xls' == $page->display) {
-      /*
-      $this->fields_listing = array_merge(array_slice($this->fields_listing, 0, -2),
-                                          array('Place.vgbild AS vgbild'),
-                                          array_slice($this->fields_listing, -2));
-
-      $this->cols_listing = array_merge_at($this->cols_listing, array('vgbild' => 'VG Bild-Kunst'), 'how_many_media');
-      */
-
       $this->cols_listing_count = count($this->fields_listing) - 1;
     }
 
@@ -124,7 +149,7 @@ class DisplayPlace extends DisplayBackend
     }
 
     $this->condition = array(
-      sprintf('Place.status <> %d', $this->status_deleted),
+      sprintf('place.status <> %d', $this->status_deleted),
       array('name' => 'status', 'method' => 'buildStatusCondition', 'args' => 'status', 'persist' => 'session'),
       $search_condition,
     );
@@ -134,11 +159,14 @@ class DisplayPlace extends DisplayBackend
   }
 
   function instantiateRecord ($table = '', $dbconn = '') {
-    $record = parent::instantiateRecord($table);
+    $record = new PlaceRecord(array('tables' => $this->table, 'dbconn' => new DB_Presentation()));
 
     $type_options = array('' => '--',
+                          'root' => tr('Welt'),
+                          'continent' => tr('Continent'),
                           'nation' => tr('Nation'),
                           'country' => tr('Country'),
+                          'state' => tr('State'),
                           'inhabited place' => tr('Inhabited Place'),
                           'neighborhood' => tr('Neighborhood'),
                           'historical region' => tr('Historical Region')
@@ -153,26 +181,31 @@ class DisplayPlace extends DisplayBackend
         new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => TRUE)),
         new Field(array('name' => 'type', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($type_options), 'labels' => array_values($type_options), 'null' => TRUE)),
 
-        new Field(array('name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'UTC_TIMESTAMP()', 'noupdate' => TRUE)),
-        new Field(array('name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'noupdate' => TRUE)),
-        new Field(array('name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'UTC_TIMESTAMP()')),
-        new Field(array('name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'])),
+        new Field(array('name' => 'created_at', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'UTC_TIMESTAMP()', 'noupdate' => TRUE)),
+        // new Field(array('name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'noupdate' => TRUE)),
+        new Field(array('name' => 'changed_at', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'UTC_TIMESTAMP()')),
+        // new Field(array('name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'])),
 
         new Field(array('name' => 'name', 'id' => 'name', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80)),
 
-        new Field(array('name' => 'name_variant', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 40, 'rows' => 2, 'null' => TRUE)),
+        new Field(array('name' => 'alternateName', 'type' => 'hidden', 'datatype' => 'char', 'null' => TRUE)),
+        new Field(array('name' => 'name_variant_de', 'type' => 'text', 'datatype' => 'char', 'size' => 40, 'null' => TRUE, 'nodbfield' => true)),
+        new Field(array('name' => 'name_variant_en', 'type' => 'text', 'datatype' => 'char', 'size' => 40, 'null' => TRUE, 'nodbfield' => true)),
 
         new Field(array('name' => 'country_code', 'id' => 'country', 'type' => 'select', 'datatype' => 'char', 'null' => TRUE, 'options' => array_keys($countries_ordered), 'labels' => array_values($countries_ordered),
                         'data-placeholder' => $label_select_country, 'null' => TRUE)),
 
         new Field(array('name' => 'tgn', 'id' => 'tgn', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
-        new Field(array('name' => 'tgn_parent', 'id' => 'tgn_parent', 'type' => 'hidden', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
-        new Field(array('name' => 'parent_path', 'id' => 'parent_path', 'type' => 'hidden', 'datatype' => 'char', 'size' => 40, 'null' => TRUE)),
+        // new Field(array('name' => 'tgn_parent', 'id' => 'tgn_parent', 'type' => 'hidden', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
+        // new Field(array('name' => 'parent_path', 'id' => 'parent_path', 'type' => 'hidden', 'datatype' => 'char', 'size' => 40, 'null' => TRUE)),
+        new Field(array('name' => 'geonames', 'id' => 'geonames', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
 
+        /*
         new Field(array('name' => 'latitude', 'id' => 'latitude', 'type' => 'hidden', 'datatype' => 'char', 'size' => 15, 'null' => TRUE)),
         new Field(array('name' => 'longitude', 'id' => 'longitude', 'type' => 'hidden', 'datatype' => 'char', 'size' => 15, 'null' => TRUE)),
+        */
 
-        new Field(array('name' => 'comment_internal', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
+        // new Field(array('name' => 'comment_internal', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
     ));
 
     if ($this->page->isAdminUser()) {
@@ -190,20 +223,25 @@ class DisplayPlace extends DisplayBackend
   function getEditRows ($mode = 'edit') {
     $tgn_search = '';
     if (false && 'edit' == $mode) {
-      $tgn_search = sprintf('<input value="GND Anfrage nach Name, Vorname" type="button" onclick="%s" /><span id="spinner"></span><br />',
+      $tgn_search = sprintf('<input value="TGN Anfrage nach Name, Vorname" type="button" onclick="%s" /><span id="spinner"></span><br />',
                             "jQuery('#tgn').autocomplete('enable');jQuery('#tgn').autocomplete('search', jQuery('#lastname').val() + ', ' + jQuery('#firstname').val())");
     }
     $rows = array(
       'id' => FALSE, 'status' => FALSE,
       'type' => array('label' => 'Place Type'),
       'name' => array('label' => 'Name'),
-      'name_variant' => array('label' => 'Additional Names or Name Variants',
+      'name_variant_de' => array('label' => 'Deutscher Name',
+                              'description' => "Please enter additional names or spellings"),
+      'name_variant_en' => array('label' => 'Englischer Name',
                               'description' => "Please enter additional names or spellings"),
       'tgn' => array('label' => 'Getty Thesaurus of Name',
                      'description' => 'Identifikator',
                      ),
       'tgn_parent' => FALSE,
-      'parent_path' => ('edit' == $mode ? FALSE : array('label' => 'Uebergeordnet')),
+      // 'parent_path' => ('edit' == $mode ? FALSE : array('label' => 'Uebergeordnet')),
+      'geonames' => array('label' => 'GeoNames',
+                     'description' => 'Identifikator',
+                     ),
       (isset($this->form) ? $tgn_search . $this->form->show_submit(tr('Store')) : '')
       . '<hr noshade="noshade" />',
 
@@ -220,7 +258,7 @@ class DisplayPlace extends DisplayBackend
     if ('edit' == $mode) {
       $this->script_url[] = 'script/moment.min.js';
 
-      // for chosen and GND-Calls
+      // for chosen and TGN-Calls
       $this->script_code .= <<<EOT
 
     function showHideFields (show, hide) {
@@ -344,18 +382,11 @@ EOT;
           var service = new SeeAlsoCollection();
           service.services = {
             'pndaks' : new SeeAlsoService('http://beacon.findbuch.de/seealso/pnd-aks/')
-            /* ,
-            'pndwpde' : new SeeAlsoService('http://ws.gbv.de/beacon/?seealso=pndwpde'),
-            'pnd2kubikat' : new SeeAlsoService('http://beacon.findbuch.de/seealso/pnd-kubikat?'),
-            'pnd2gso' : new SeeAlsoService('http://ws.gbv.de/seealso/pnd2gso'),
-            'pndndb' : new SeeAlsoService('http://ws.gbv.de/beacon/?seealso=pndndb'),
-            'pnd2kalliope' : new SeeAlsoService('http://beacon.findbuch.de/pnd-resolver/kalliope?')
-            */
-           };
-           service.views = { 'seealso-ul' : new SeeAlsoUL({ /* preHTML : '<h3>Externe Angebote</h3>', */
+          };
+          service.views = { 'seealso-ul' : new SeeAlsoUL({ /* preHTML : '<h3>Externe Angebote</h3>', */
                                                             linkTarget: '_blank',
                                                             maxItems: 100 }) };
-           service.replaceTagsOnLoad();
+          service.replaceTagsOnLoad();
 
 EOT;
           $rows['tgn']['value'] .= $ret = <<<EOT
@@ -372,6 +403,15 @@ EOT;
 
   function buildViewTitle (&$record) {
     return $this->formatText($record->get_value('name'));
+  }
+
+  function buildViewFooter ($found = TRUE) {
+    $tgn = $this->record->get_value('tgn');
+    $publications = !empty($tgn)
+      ? $this->buildRelatedPublications('http://vocab.getty.edu/tgn/' . $tgn)
+      : '';
+
+    return $publications . parent::buildViewFooter($found);
   }
 
   function buildViewAdditional (&$record, $uploadHandler) {
@@ -537,6 +577,14 @@ EOT;
     return array($TYPE_PLACE, array());
   }
 
+  function doListingQuery ($page_size = 0, $page_id = 0) {
+    $dbconn_orig = $this->page->dbconn;
+    $this->page->dbconn = new DB_Presentation();
+    $ret = parent::doListingQuery($page_size, $page_id);
+    $this->page->dbconn = $dbconn_orig;
+    return $ret;
+  }
+
   function buildMerge () {
     $name = 'merge';
 
@@ -556,7 +604,7 @@ EOT;
     }
     $ret = FALSE;
 
-    $dbconn = new DB();
+    $dbconn = new DB_Presentation();
     switch ($action) {
       case 'merge':
         $record_new = $this->buildRecord();
@@ -654,7 +702,7 @@ EOT;
                        'preferredName' => 'name',
                        'type' => 'type',
                        'tgn_parent' => 'tgn_parent',
-                       'parentPath' => 'parent_path',
+                       // 'parentPath' => 'parent_path',
                        'latitude' => 'latitude',
                        'longitude' => 'longitude',
                        ) as $src => $dst)
@@ -670,15 +718,6 @@ EOT;
 
     }
     return $ret;
-  }
-
-  function buildViewFooter ($found = TRUE) {
-    $tgn = $this->record->get_value('tgn');
-    $publications = !empty($tgn)
-      ? $this->buildRelatedPublications('http://vocab.getty.edu/tgn/' . $tgn)
-      : '';
-
-    return $publications . parent::buildViewFooter($found);
   }
 
   function buildContent () {

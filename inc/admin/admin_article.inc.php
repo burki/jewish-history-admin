@@ -347,6 +347,7 @@ class DisplayArticle extends DisplayMessage
         new Field(array('name' => 'publisher_request', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
         new Field(array('name' => 'publisher_received', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
 
+        new Field(array('name' => 'slug_de', 'id' => 'slug_de', 'type' => 'text', 'datatype' => 'char', 'size' => 45, 'maxlength' => 200, 'null' => TRUE)),
         new Field(array('name' => 'slug', 'id' => 'slug', 'type' => 'text', 'datatype' => 'char', 'size' => 45, 'maxlength' => 200, 'null' => TRUE)),
         // new Field(array('name' => 'url', 'id' => 'url', 'type' => 'text', 'datatype' => 'char', 'size' => 65, 'maxlength' => 200, 'null' => TRUE)),
         // new Field(array('name' => 'urn', 'id' => 'urn', 'type' => 'text', 'datatype' => 'char', 'size' => 45, 'maxlength' => 200, 'null' => TRUE)),
@@ -481,7 +482,7 @@ class DisplayArticle extends DisplayMessage
 
   function setSlug (originalRequest, obj) {
     if (obj.status > 0) {
-      var field = \$('slug');
+      var field = \$('slug_de');
       if (null != field) {
         field.value = obj.title_slug;
       }
@@ -545,10 +546,11 @@ EOT;
 
     $rows = array_merge_at($rows,
       array(
-            'slug' => array('label' => 'Ordnername',
+            'slug_de' => array('label' => 'Kurz-URL (de)',
                             'value' => 'edit' == $mode
-                            ? $this->getFormField('slug') . $slug_button
-                            : $this->record->get_value('slug')),
+                            ? $this->getFormField('slug_de') . $slug_button
+                            : $this->record->get_value('slug_de')),
+            'slug' => array('label' => 'Kurz-URL (en)'),
             'editor' => array('label' => 'Article Editor'),
             'referee' => array('label' => 'Referee'),
             'lang' => array('label' => 'Quellsprache'),

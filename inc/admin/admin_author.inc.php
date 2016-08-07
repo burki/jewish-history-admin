@@ -19,6 +19,13 @@ class AuthorFlow extends TableManagerFlow
 {
   const MERGE    = 1010;
 
+  static $TABLES_RELATED = array(
+          'editor' => array('Message'),
+          'referee' => array('Message'),
+          'translator' => array('Message', 'Publication'),
+          'user_id' => array('MessageUser'),
+  );
+
   var $user;
   var $is_internal = FALSE;
 
@@ -727,6 +734,16 @@ EOT;
           $record_new->set_value('changed', 'NOW()');
           $record_new->store();
         }
+
+        // assign related from old to new
+        foreach (AuthorFlow::$TABLES_RELATED as $field => $tables) {
+          foreach ($tables as $table) {
+            $querystr = sprintf("UPDATE %s SET %s=%d WHERE %s=%d",
+                                $table, $field, $id_new, $field, $id);
+            $this->page->dbconn->query($querystr);
+          }
+        }
+
         $querystr = sprintf("UPDATE User SET status=%d WHERE id=%d",
                            AuthorListing::$status_deleted, $id);
         $this->page->dbconn->query($querystr);

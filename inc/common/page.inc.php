@@ -346,7 +346,6 @@ class Page
     }
   }
 
-
   function processLoginAuthLocal () {
     global $RIGHTS_EDITOR;
 

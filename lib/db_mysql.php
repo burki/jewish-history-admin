@@ -432,13 +432,12 @@ class DB_Sql
     $this->query("SHOW TABLES");
     $i=0;
     while ($info=mysql_fetch_row($this->Query_ID))
-     {
+    {
       $return[$i]["table_name"]= $info[0];
       $return[$i]["tablespace_name"]=$this->Database;
       $return[$i]["database"]=$this->Database;
       $i++;
-     }
-   return $return;
+    }
+    return $return;
   }
 }
-?>

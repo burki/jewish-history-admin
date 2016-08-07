@@ -131,6 +131,7 @@ CREATE TABLE Publisher (
   fax varchar(30) NULL,
   email VARCHAR(255) NULL,                      # contact-email
   url varchar(255) NULL,
+  gnd VARCHAR(20) NULL,
 
   # contact person
   name_contact  VARCHAR(127) NULL,              # contact person
@@ -188,7 +189,7 @@ CREATE TABLE Publication (
   publication_date DATE NULL,                   # year(-month(-day))
   publisher_id  INT NULL REFERENCES Publisher.id, #
   publisher     VARCHAR(127) NULL,              # TODO: should we normalize
-  archive_location VARCHAR(127) NULL,           # for manuscripts
+  archive_location VARCHAR(511) NULL,           # for manuscripts
   place         VARCHAR(127) NULL,              #
   listprice     VARCHAR(50) NULL,               #
   url           VARCHAR(511) NULL,              # link to TOC and similar things

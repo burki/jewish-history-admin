@@ -21,17 +21,17 @@ class PersonFlow extends TableManagerFlow
   const MERGE = 1010;
   const IMPORT = 1100;
 
-  static $TABLES_RELATED = array("MediaEntity JOIN Person ON CONCAT('http://d-nb.info/gnd/', Person.gnd) = MediaEntity.uri AND Person.id=?");
+  static $TABLES_RELATED = array("MediaEntity JOIN person ON CONCAT('http://d-nb.info/gnd/', person.gnd) = MediaEntity.uri AND person.id=?");
 
   function init ($page) {
     $ret = parent::init($page);
     if (TABLEMANAGER_DELETE == $ret) {
-      $dbconn = new DB();
+      $dbconn = new DB_Presentation();
       foreach (self::$TABLES_RELATED as $from_where) {
         $querystr = sprintf("SELECT COUNT(*) AS count FROM %s",
                             $from_where);
         $querystr = preg_replace('/\?/', $this->id, $querystr);
-        $dbconn->query($querystr, array($this->id));
+        $dbconn->query($querystr);
         if ($dbconn->next_record()
             && ($row = $dbconn->Record)
             && $row['count'] > 0)
@@ -53,27 +53,27 @@ class PersonFlow extends TableManagerFlow
 
 class DisplayPerson extends DisplayBackend
 {
-  var $table = 'Person';
-  var $fields_listing = array('Person.id AS id',
-                              "CONCAT(lastname, ', ', IFNULL(firstname, '')) AS name",
+  var $table = 'person';
+  var $fields_listing = array('person.id AS id',
+                              "CONCAT(familyName, ', ', IFNULL(givenName, '')) AS name",
                               "CONCAT(IFNULL(YEAR(birthdate), ''), IF(deathdate IS NOT NULL, CONCAT('-', YEAR(deathdate)), '')) AS lifespan",
-                              'Person.gnd AS gnd',
+                              'person.gnd AS gnd',
                               /* 'COUNT(DISTINCT Item.id) AS count',
                               'COUNT(DISTINCT Media.id) AS how_many_media',
                               */
-                              'Person.created AS created',
-                              'Person.status AS status',
+                              'person.created_at AS created',
+                              'person.status AS status',
                               );
   var $joins_listing = array(
                              // ' LEFT OUTER JOIN ItemPerson ON ItemPerson.id_person=Person.id LEFT OUTER JOIN Item ON ItemPerson.id_item=Item.id AND Item.status >= 0' /* AND Item.collection <> 33' */,
                              // " LEFT OUTER JOIN Media ON Media.item_id=Item.id AND Media.type = 0 AND Media.name='preview00'"
                              );
-  var $group_by_listing = 'Person.id';
+  var $group_by_listing = 'person.id';
   var $distinct_listing = TRUE;
-  var $order = array('name' => array('lastname, firstname', 'lastname DESC, firstname DESC'),
+  var $order = array('name' => array('familyName, givenName', 'familyName DESC, givenName DESC'),
                      // 'count' => array('count DESC', 'count'),
                      // 'how_many_media' => array('how_many_media DESC', 'how_many_media'),
-                     'created' => array('created DESC, Person.id desc', 'created, Person.id'),
+                     'created' => array('created_at DESC, person.id desc', 'created_at, person.id'),
                     );
   var $cols_listing = array('name' => 'Name',
                             'lifespan' => 'Lebensdaten',
@@ -117,14 +117,14 @@ class DisplayPerson extends DisplayBackend
     $this->page->setSessionValue('fulltext', $this->search_fulltext);
 
     if ($this->search_fulltext) {
-      $search_condition = array('name' => 'search', 'method' => 'buildFulltextCondition', 'args' => 'lastname,firstname,gnd', 'persist' => 'session');
+      $search_condition = array('name' => 'search', 'method' => 'buildFulltextCondition', 'args' => 'familyName,givenName,gnd', 'persist' => 'session');
     }
     else {
-      $search_condition = array('name' => 'search', 'method' => 'buildLikeCondition', 'args' => 'lastname,firstname,gnd', 'persist' => 'session');
+      $search_condition = array('name' => 'search', 'method' => 'buildLikeCondition', 'args' => 'familyName,givenName,gnd', 'persist' => 'session');
     }
 
     $this->condition = array(
-      sprintf('Person.status <> %d', $this->status_deleted),
+      sprintf('person.status <> %d', $this->status_deleted),
       array('name' => 'status', 'method' => 'buildStatusCondition', 'args' => 'status', 'persist' => 'session'),
       $search_condition,
     );
@@ -134,7 +134,7 @@ class DisplayPerson extends DisplayBackend
   }
 
   function instantiateRecord ($table = '', $dbconn = '') {
-    $record = parent::instantiateRecord($table);
+    $record = parent::instantiateRecord($table, new DB_Presentation());
 
     $label_select_country = tr('-- please select --');
     $countries_ordered = array('' => $label_select_country)
@@ -146,38 +146,40 @@ class DisplayPerson extends DisplayBackend
       array(
         new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => TRUE)),
 
-        new Field(array('name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'UTC_TIMESTAMP()', 'noupdate' => TRUE)),
-        new Field(array('name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'noupdate' => TRUE)),
-        new Field(array('name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'UTC_TIMESTAMP()')),
-        new Field(array('name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'])),
+        new Field(array('name' => 'created_at', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'UTC_TIMESTAMP()', 'noupdate' => TRUE)),
+        // new Field(array('name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'noupdate' => TRUE)),
+        new Field(array('name' => 'changed_at', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'UTC_TIMESTAMP()')),
+        // new Field(array('name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'])),
 
-        new Field(array('name' => 'sex', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($sex_options), 'labels' => array_values($sex_options), 'null' => TRUE)),
-        new Field(array('name' => 'title', 'id' => 'title', 'type' => 'text', 'datatype' => 'char', 'size' => 8, 'maxlength' => 20, 'null' => TRUE)),
+        new Field(array('name' => 'gender', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($sex_options), 'labels' => array_values($sex_options), 'null' => TRUE)),
+        new Field(array('name' => 'honoricPrefix', 'id' => 'title', 'type' => 'text', 'datatype' => 'char', 'size' => 8, 'maxlength' => 20, 'null' => TRUE)),
 
-        new Field(array('name' => 'lastname', 'id' => 'lastname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80)),
-        new Field(array('name' => 'firstname', 'id' => 'firstname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+        new Field(array('name' => 'familyName', 'id' => 'lastname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80)),
+        new Field(array('name' => 'givenName', 'id' => 'firstname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
 
-        new Field(array('name' => 'name_variant', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 40, 'rows' => 2, 'null' => TRUE)),
+        new Field(array('name' => 'additionalName', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 40, 'rows' => 2, 'null' => TRUE)),
 
         new Field(array('name' => 'birthdate', 'id' => 'birthdate', 'type' => 'date', 'incomplete' => TRUE, 'datatype' => 'date', 'null' => TRUE)),
-        new Field(array('name' => 'birthplace', 'id' => 'birthplace', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+        // new Field(array('name' => 'birthplace', 'id' => 'birthplace', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
 
         new Field(array('name' => 'deathdate', 'id' => 'deathdate', 'type' => 'date', 'incomplete' => TRUE, 'datatype' => 'date', 'null' => TRUE)),
-        new Field(array('name' => 'deathplace', 'id' => 'deathplace', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+        // new Field(array('name' => 'deathplace', 'id' => 'deathplace', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
 
-        new Field(array('name' => 'birthdeath_note', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
-        new Field(array('name' => 'actionplace', 'id' => 'actionplace', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+        // new Field(array('name' => 'birthdeath_note', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+        // new Field(array('name' => 'actionplace', 'id' => 'actionplace', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
 
+        /*
         new Field(array('name' => 'country', 'id' => 'country', 'type' => 'select', 'datatype' => 'char', 'null' => TRUE, 'options' => array_keys($countries_ordered), 'labels' => array_values($countries_ordered),
                         'data-placeholder' => $label_select_country, 'default' => 'DE', 'null' => TRUE)),
+        */
 
-        new Field(array('name' => 'study', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
-        new Field(array('name' => 'profession', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
-        new Field(array('name' => 'occupation', 'id' => 'occupation', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+        // new Field(array('name' => 'study', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+        // new Field(array('name' => 'profession', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+        new Field(array('name' => 'jobTitle', 'id' => 'occupation', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 200, 'null' => TRUE)),
 
-        new Field(array('name' => 'cv', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 40, 'rows' => 5, 'null' => TRUE)),
+        // new Field(array('name' => 'cv', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 40, 'rows' => 5, 'null' => TRUE)),
 
-        new Field(array('name' => 'url', 'type' => 'text', 'datatype' => 'char', 'size' => 65, 'maxlength' => 200, 'null' => TRUE)),
+        // new Field(array('name' => 'url', 'type' => 'text', 'datatype' => 'char', 'size' => 65, 'maxlength' => 200, 'null' => TRUE)),
 
         new Field(array('name' => 'gnd', 'id' => 'gnd', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
 
@@ -186,11 +188,13 @@ class DisplayPerson extends DisplayBackend
         // new Field(array('name' => 'contact', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 5, 'null' => TRUE)),
         // new Field(array('name' => 'inheritor', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 5, 'null' => TRUE)),
 
+        /*
         new Field(array('name' => 'literature', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 5, 'null' => TRUE)),
         new Field(array('name' => 'archive', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 5, 'null' => TRUE)),
         new Field(array('name' => 'estate', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 5, 'null' => TRUE)),
 
         new Field(array('name' => 'comment_internal', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
+        */
     ));
 
     if ($this->page->isAdminUser()) {
@@ -214,35 +218,38 @@ class DisplayPerson extends DisplayBackend
     $rows = array(
       'id' => FALSE, 'status' => FALSE,
       'sex_title' => array('label' => 'Sex / (Academic) Title',
-                           'fields' => array('sex', 'title')),
-      'lastname' => array('label' => 'Last Name'),
-      'firstname' => array('label' => 'First Name(s)'),
-      'name_variant' => array('label' => 'Additional Names or Name Variants',
+                           'fields' => array('gender', 'title')),
+      'familyName' => array('label' => 'Last Name'),
+      'givenName' => array('label' => 'First Name(s)'),
+      'additionalNames' => array('label' => 'Additional Names or Name Variants',
                               'description' => "Please enter additional names or spellings such as:\n[Earlier Name]\n[Later Name]\n[Real Name]\n[Pseud.]\n%Name at Birth [not %Maiden Name!]\n%Wrong Name Forms"),
       'gnd' => array('label' => 'GND-Nr',
                      'description' => 'Identifikator der Gemeinsamen Normdatei, vgl. http://de.wikipedia.org/wiki/Hilfe:GND',),
       (isset($this->form) ? $gnd_search . $this->form->show_submit(tr('Store')) : '')
       . '<hr noshade="noshade" />',
 
-      'birth' => array('label' => 'Birth Date / Place',
+      'birth' => array('label' => 'Birth Date', // 'Birth Date / Place',
                        'fields' => array('birthdate', 'birthplace')),
-      'death' => array('label' => 'Death Date / Place',
+      'death' => array('label' => 'Death Date', // 'Death Date / Place',
                        'fields' => array('deathdate', 'deathplace')),
+      /*
       'birthdeath_note' => array('label' => 'Notes Life Span',
                                  'description' => 'You can add additional notes concerning the dating and the places of birth/death',
                                  ),
       'actionplace' => array('label' => 'Place(s) of Activity'),
       'country' => array('label' => 'Nationality'),
+      */
 
       '<hr noshade="noshade" />',
 
-      'study' => array('label' => 'Fields of Study'),
+      /* 'study' => array('label' => 'Fields of Study'),
       'profession' => array('label' => 'Occupational Title',
                             'description' => 'eine normierte Berufs- oder Tätigkeitsbezeichnung aus der SWD, die für die Person besonders charakteristisch ist',
-                            ),
-      'occupation' => array('label' => 'Job Title',
+                            ), */
+      'jobTitle' => array('label' => 'Job Title',
                             'description' => 'Beruf/Tätigkeitsbezeichnung als freier Text',
                             ),
+      /*
       'cv' => array('label' => 'CV'),
 
       '<hr noshade="noshade" />',
@@ -260,6 +267,8 @@ class DisplayPerson extends DisplayBackend
 
       '<hr noshade="noshade" />',
       'comment_internal' => array('label' => 'Internal notes and comments'),
+      */
+
       (isset($this->form) ? $this->form->show_submit(tr('Store')) : ''),
     );
 
@@ -408,7 +417,7 @@ EOT;
   }
 
   function buildViewTitle (&$record) {
-    return $this->formatText($record->get_value('lastname') . ', ' . $record->get_value('firstname'));
+    return $this->formatText($record->get_value('familyName') . ', ' . $record->get_value('givenName'));
   }
 
   function buildViewFooter ($found = TRUE) {
@@ -619,6 +628,14 @@ EOT;
     return array($TYPE_PERSON, $images);
   }
 
+  function doListingQuery ($page_size = 0, $page_id = 0) {
+    $dbconn_orig = $this->page->dbconn;
+    $this->page->dbconn = new DB_Presentation();
+    $ret = parent::doListingQuery($page_size, $page_id);
+    $this->page->dbconn = $dbconn_orig;
+    return $ret;
+  }
+
   function buildMerge () {
     $name = 'merge';
 
@@ -631,18 +648,20 @@ EOT;
       return FALSE;
     $action = NULL;
     if (array_key_exists('with', $_POST)
-        && intval($_POST['with']) > 0) {
+        && intval($_POST['with']) > 0)
+    {
       $action = 'merge';
       $id_new = intval($_POST['with']);
     }
     $ret = FALSE;
 
-    $dbconn = new DB();
+    $dbconn = new DB_Presentation();
     switch ($action) {
       case 'merge':
         $record_new = $this->buildRecord();
-        if (!$record_new->fetch($id_new))
+        if (!$record_new->fetch($id_new)) {
           return FALSE;
+        }
 
         foreach (PersonFlow::$TABLES_RELATED as $table => $key_field) {
           $querystr = sprintf("UPDATE %s SET %s=%d WHERE %s=%d",
@@ -651,16 +670,17 @@ EOT;
         }
         $this->page->redirect(array('pn' => $this->page->name, 'delete' => $id));
         break;
+
       default:
         $orig = sprintf('%s%s',
-                  $record->get_value('lastname'),
-                  '' != $record->get_value('firstname')
-                  ? ', ' .$record->get_value('firstname') : '');
+                  $record->get_value('familyName'),
+                  '' != $record->get_value('givenName')
+                  ? ', ' .$record->get_value('givenName') : '');
         return sprintf('%s cannot be deleted since there are entries connected to this person',
                        $orig);
 
         // show replacements
-        $querystr = sprintf("SELECT id, lastname, firstname, status, UNIX_TIMESTAMP(created) AS created_timestamp FROM Person WHERE id<>%d AND status >= 0 ORDER BY lastname, firstname, status DESC, created DESC",
+        $querystr = sprintf("SELECT id, familyName, givenName, status, UNIX_TIMESTAMP(created_at) AS created_timestamp FROM Person WHERE id<>%d AND status >= 0 ORDER BY familyName, givenName, status DESC, created_at DESC",
                     $id);
         $stmt = $dbconn->query($querystr);
         $replace = '';
@@ -668,8 +688,8 @@ EOT;
         while (FALSE !== $stmt && ($row = $stmt->fetch())) {
           $replace .= sprintf('<option value="%d">%s</option>',
                               $row['id'],
-                              $this->htmlSpecialchars($row['lastname']
-                                  . (!empty($row['firstname']) ? ', ' . $row['firstname'] : '')));
+                              $this->htmlSpecialchars($row['familyName']
+                                  . (!empty($row['givenName']) ? ', ' . $row['givenName'] : '')));
         }
         if (!empty($replace)) {
           $ret = sprintf('<form method="post" action="%s">',
@@ -737,8 +757,8 @@ EOT;
                        'placeOfBirth' => 'birthplace',
                        'dateOfDeath' => 'deathdate',
                        'placeOfDeath' => 'deathplace',
-                       'forename' => 'firstname',
-                       'surname' => 'lastname',
+                       'forename' => 'givenName',
+                       'surname' => 'familyName',
                        'biographicalInformation' => 'cv') as $src => $dst)
         {
           $value = isset($bio->$src) ? $bio->$src : null;
