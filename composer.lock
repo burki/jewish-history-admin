@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "75861a620c8f32120ce67ee00e27bc4e",
-    "content-hash": "bcde55d568411107f8ab39003c55f568",
+    "hash": "18f4a41df5df4bf3e9a230198a89832f",
+    "content-hash": "06da578f3dba199df4dc347599b0aa2d",
     "packages": [
         {
             "name": "cocur/slugify",
@@ -511,16 +511,16 @@
         },
         {
             "name": "sabre/xml",
-            "version": "0.4.3",
+            "version": "1.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fruux/sabre-xml.git",
-                "reference": "c8b93c5335504f838e5bc7bdd7438514f36ce640"
+                "reference": "f48d98c22a4a4bef76cabb5968ffaddbb2bb593e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fruux/sabre-xml/zipball/c8b93c5335504f838e5bc7bdd7438514f36ce640",
-                "reference": "c8b93c5335504f838e5bc7bdd7438514f36ce640",
+                "url": "https://api.github.com/repos/fruux/sabre-xml/zipball/f48d98c22a4a4bef76cabb5968ffaddbb2bb593e",
+                "reference": "f48d98c22a4a4bef76cabb5968ffaddbb2bb593e",
                 "shasum": ""
             },
             "require": {
@@ -533,13 +533,17 @@
             },
             "require-dev": {
                 "phpunit/phpunit": "*",
-                "squizlabs/php_codesniffer": "*"
+                "sabre/cs": "~0.0.2"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
                     "Sabre\\Xml\\": "lib/"
-                }
+                },
+                "files": [
+                    "lib/Deserializer/functions.php",
+                    "lib/Serializer/functions.php"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -551,9 +555,14 @@
                     "email": "me@evertpot.com",
                     "homepage": "http://evertpot.com/",
                     "role": "Developer"
+                },
+                {
+                    "name": "Markus Staab",
+                    "email": "markus.staab@redaxo.de",
+                    "role": "Developer"
                 }
             ],
-            "description": "The Sabre XML parser is the only XML library that you may not hate.",
+            "description": "sabre/xml is an XML library that you may not hate.",
             "homepage": "https://sabre.io/xml/",
             "keywords": [
                 "XMLReader",
@@ -561,7 +570,7 @@
                 "dom",
                 "xml"
             ],
-            "time": "2015-04-01 20:52:53"
+            "time": "2016-05-19 21:56:49"
         },
         {
             "name": "semsol/arc2",
@@ -609,23 +618,23 @@
         },
         {
             "name": "swiftmailer/swiftmailer",
-            "version": "v5.4.2",
+            "version": "v5.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/swiftmailer/swiftmailer.git",
-                "reference": "d8db871a54619458a805229a057ea2af33c753e8"
+                "reference": "4cc92842069c2bbc1f28daaaf1d2576ec4dfe153"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/swiftmailer/swiftmailer/zipball/d8db871a54619458a805229a057ea2af33c753e8",
-                "reference": "d8db871a54619458a805229a057ea2af33c753e8",
+                "url": "https://api.github.com/repos/swiftmailer/swiftmailer/zipball/4cc92842069c2bbc1f28daaaf1d2576ec4dfe153",
+                "reference": "4cc92842069c2bbc1f28daaaf1d2576ec4dfe153",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
             "require-dev": {
-                "mockery/mockery": "~0.9.1,<0.9.4"
+                "mockery/mockery": "~0.9.1"
             },
             "type": "library",
             "extra": {
@@ -658,20 +667,20 @@
                 "mail",
                 "mailer"
             ],
-            "time": "2016-05-01 08:45:47"
+            "time": "2016-07-08 11:51:25"
         },
         {
             "name": "zendframework/zendframework1",
-            "version": "1.12.18",
+            "version": "1.12.19",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zendframework/zf1.git",
-                "reference": "bc3f2652f305fc43565af1570db83dda05578e4f"
+                "reference": "be2113109240b6682d90c25a05b6ae79927954f3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zf1/zipball/bc3f2652f305fc43565af1570db83dda05578e4f",
-                "reference": "bc3f2652f305fc43565af1570db83dda05578e4f",
+                "url": "https://api.github.com/repos/zendframework/zf1/zipball/be2113109240b6682d90c25a05b6ae79927954f3",
+                "reference": "be2113109240b6682d90c25a05b6ae79927954f3",
                 "shasum": ""
             },
             "require": {
@@ -705,14 +714,16 @@
                 "ZF1",
                 "framework"
             ],
-            "time": "2016-04-13 15:32:30"
+            "time": "2016-07-13 15:11:57"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "kriswallsmith/buzz": 0
+        "semsol/arc2": 0,
+        "kriswallsmith/buzz": 0,
+        "sabre/xml": 0
     },
     "prefer-stable": false,
     "prefer-lowest": false,

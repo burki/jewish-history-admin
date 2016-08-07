@@ -20,11 +20,11 @@
 
         "zendframework/zendframework1": "~1.12",
         "cocur/slugify": "~1.0",
-        "semsol/arc2": "2.2.*",
+        "semsol/arc2": "@stable",
         "easyrdf/easyrdf": "~0.9",
         "ml/json-ld": "~1.0",
         "kriswallsmith/buzz": "@stable",
-        "sabre/xml": "0.4.3",
+        "sabre/xml": "@stable",
 
         "pear-pear.php.net/PEAR" : "*",
         "pear-pear.php.net/Text_Wiki" : "*",
