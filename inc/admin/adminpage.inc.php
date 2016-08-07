@@ -4,9 +4,9 @@
  *
  * Page class for admin-section
  *
- * (c) 2009-2015 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-04-01 dbu
+ * Version: 2016-08-07 dbu
  *
  * Changes:
  *
@@ -51,7 +51,7 @@ class AdminPage extends Page
 $URL_REWRITE = array(); // don't do rewrites for the backend
 
 $SITE_DESCRIPTION = array(
-    'title' => 'Key-Documents of German-Jewish History',
+    'title' => 'Hamburg Key-Documents of German-Jewish History',
     'structure' => array(
         'root' => array(
             'title' => 'Administration',

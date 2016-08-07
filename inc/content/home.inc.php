@@ -4,9 +4,9 @@
  *
  * Start page
  *
- * (c) 2010-2015 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2010-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-03-24 dbu
+ * Version: 2016-08-08 dbu
  *
  * Changes:
  *
@@ -17,7 +17,7 @@ class HomeDisplay extends FrontendDisplay
 {
   function buildContent () {
     $content = <<<EOT
-  <h3>„Schlüsseldokumente zur deutsch-jüdischen Geschichte von der frühen Neuzeit bis in die Gegenwart“</h3>
+  <h3>„Hamburger Schlüsseldokumente zur deutsch-jüdischen Geschichte“</h3>
 
   <figure style="float: left;">
     <img src="./media/online_quellenedition.jpg" alt="" width="350">

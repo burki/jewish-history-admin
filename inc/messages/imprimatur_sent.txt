@@ -1,0 +1,44 @@
+%salutation_name_de%,
+
+wir hoffen, Sie verbringen einen schönen Sommer, wenn auch das Wetter nicht allerorten mitspielt. Bei uns ist allmählich alles auf den bevorstehenden Historikertag und damit auf den Launch der Online-Edition eingestellt. Nun ist es nämlich bald soweit: Die Online-Quellen-Edition „Hamburger Schlüsseldokumente zur deutsch-jüdischen Geschichte“ wird am 22.9. beim Historikertag live geschaltet: Alle Einführungstexte sind geschrieben und nur wenige befinden sich noch in der Überarbeitung. Die Quelleninterpretationen, mit denen wir Ende September bereits online gehen können (nach Ablauf des ersten Förderjahres werden das noch nicht alle sein), befinden sich in der Übersetzung und/oder in der technischen Auszeichnung bzw. werden teilweise bereits zur Imprimatur verschickt. Die Website selbst nimmt Gestalt an und Sie sind herzlich eingeladen, sich darauf schon einmal – in aller Vertraulichkeit bitte, da sie noch in einer Entwurfsversion ist  – umzusehen und uns etwaige Fehler o.ä. gerne zu melden!
+
+Wir sind also wohlgemut, dass wir am 22. September einen schönen Anlass zum Feiern haben werden.
+
+Zuvor möchten wir Sie bitten, sich Ihren Beitrag unter beigefügtem Link noch einmal anzusehen:
+
+    <http://juedische-geschichte-online.net/design/beitrag/jgo:article-%id_review%>
+
+Bitte achten Sie dabei auf folgende Punkte:
+
+1) Richtigkeit Ihres Textes in der '''deutschen Version'''. Bitte beachten Sie hierbei, dass wir nur noch geringfügige Änderungen umsetzen können, da die Texte bereits für die Onlineversion bearbeitet, also z.B. technisch ausgezeichnet wurden. Die '''englische''' Version befindet sich gerade in der technischen Auszeichnung, hier erhalten Sie die Imprimaturanfrage voraussichtlich gegen Ende August. Vielleicht können Sie sich darauf bereits einstellen. (Bitte beachten Sie: wir haben, um die Texte für den Bildschirm lesbarer zu machen, z.T. Zwischenüberschriften eingefügt. Außerdem wurden einige zentrale und regelmäßig wiederkehrende Begriffe editionsübergreifend vereinheitlicht.)
+
+2) Bitte kontrollieren Sie auch das Transkript der von Ihnen interpretierten Quelle.
+
+3) Überprüfen Sie bitte auch, ob die Angaben zu Ihrer Person korrekt sind (auch hier zunächst in der deutschen; die englische Version dann mit der Imprimaturanfrage zur Übersetzung).
+
+Bitte behandeln Sie diesen Link (noch bis zum 22. September) unbedingt vertraulich, die Website ist in einer vorläufigen und ständig in Veränderung begriffenen Version, die noch weit davon entfernt ist, zitationsfähig zu sein. Dennoch lässt sich bereits ein Eindruck gewinnen, wie die Edition sich später präsentieren wird.
+
+Falls Sie noch Änderungswünsche haben sollten, teilen Sie uns diese bitte bis spätestens zum 25. August mit.
+
+Wir kennzeichnen alle Texte der Edition mit Creative Commons-Lizenzverträgen. Ihr Interpretationstext steht standardmäßig unter der CC-Lizenz „Creative Commons Namensnennung - Nicht kommerziell - Keine Bearbeitungen 4.0 International Lizenz“, d.h. er darf unter Nennung Ihres Namens in unveränderter Form zu nicht-kommerziellen Zwecken, beispielsweise zu Unterrichtszwecken, verwendet werden (https://creativecommons.org/licenses/by-nc-nd/4.0/deed.de).
+
+Möchten Sie zusätzlich auch Exzerpte oder Bearbeitungungen Ihres Textes erlauben, können Sie Ihren Text alternativ unter der „Creative Commons Namensnennung - Weitergabe unter gleichen Bedingungen 4.0 International“ (https://creativecommons.org/licenses/by-sa/4.0/deed.de) veröffentlichen.
+
+Falls Sie eine andere Lizenz wünschen, teilen Sie uns dies bitte ebenso bis zum 25. August mit.
+
+Näher Informationen zu den CC-Lizenzen finden Sie hier: http://de.creativecommons.org/was-ist-cc/
+
+Falls wir bis zum 25. August nichts von Ihnen gehört haben, gehen wir davon aus, dass Sie mit der Veröffentlichung ihres Textes in der jetzigen Form und der CC-Lizenz einverstanden sind. Lassen Sie uns auch an dieser Stelle nochmal Danke sagen für Ihre Bereitschaft, eine Quelleninterpretation zu dieser Edition beizusteuern!
+
+Wir würden uns sehr freuen, Sie am 22.9. um 18 Uhr im Lichthof der Staatsbibliothek in Hamburg begrüßen und mit Ihnen die Live-Schaltung der Online-Edition feiern zu können – eine Einladung hierzu folgt noch, aber bitte merken Sie sich doch schon jetzt den Termin vor!
+
+Herzliche Grüße und eine geruhsame und zugleich kreative Sommerpause wünschen Ihnen
+das Hamburger Projektteam
+
+Daniel Burckhardt, Inka Le-Huu, Anna Menny, Miriam Rürup und Nina Zellerhoff
+
+--
+Institut für die Geschichte der deutschen Juden
+Beim Schlump 83, 20144 Hamburg
+E-Mail: %email_from%
+Tel.: %phone_from%

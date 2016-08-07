@@ -7,7 +7,7 @@
  *
  * (c) 2009-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2016-02-24 dbu
+ * Version: 2016-08-07 dbu
  *
  * Changes:
  *
@@ -50,7 +50,7 @@ define('STATUS_USER_DELETED', -100); // -1 stands for rejected
 define('MAIL_LINELENGTH', 72);
 
 $SITE = array(
-  'pagetitle' => 'Key-Documents of German-Jewish History',
+  'pagetitle' => 'Hamburg Key-Documents of German-Jewish History',
 );
 
 $COUNTRIES_FEATURED = array('DE', 'AT', 'CH', 'UK', 'US', 'CA',
@@ -86,7 +86,7 @@ $MAIL_SETTINGS = array(
   'bcc_change_notify'    => 'burckhardtd@geschichte.hu-berlin.de',
 
   // further stuff
-  'subject_prepend'      => 'Key-Documents of German-Jewish History - ',
+  'subject_prepend'      => 'Hamburg Key-Documents of German-Jewish History - ',
 );
 
 function compute_bytes ($val) {

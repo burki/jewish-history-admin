@@ -4,9 +4,9 @@
  *
  * Class for managing communication
  *
- * (c) 2008-2015 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-02-13 dbu
+ * Version: 2016-08-07 dbu
  *
  * Changes:
  *
@@ -24,6 +24,7 @@ class DisplayCommunication extends DisplayTable
     'reviewer_reminder' => 30,
     'referee_request' => 40,
     'publisher_vouchercopy' => 50,
+    'imprimatur_sent' => 60,
   );
 
   var $page_size = 30;
@@ -126,6 +127,7 @@ class DisplayCommunication extends DisplayTable
         'reviewer_reminder' => 'Erinnerung Artikel f&#252;r',
         'referee_request' => 'Gutachteranfrage',
         'publisher_vouchercopy' => 'Link zur Rezension bei',
+        'imprimatur_sent' => 'Imprimatur Ihres Textes f&#252;r die Online-Quellen-Edition',
       );
 
       switch ($_GET['mode']) {
@@ -135,6 +137,7 @@ class DisplayCommunication extends DisplayTable
         case 'reviewer_reminder':
         case 'referee_request':
         case 'publisher_vouchercopy':
+        case 'imprimatur_sent':
             global $SITE;
             $this->defaults['subject'] =
               (array_key_exists($_GET['mode'], $SUBJECT) ? $SUBJECT[$_GET['mode']] . ' ' : '')

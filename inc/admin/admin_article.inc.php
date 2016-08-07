@@ -6,7 +6,7 @@
  *
  * (c) 2009-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2016-03-03 dbu
+ * Version: 2016-08-07 dbu
  *
  * Changes:
  *
@@ -347,6 +347,8 @@ class DisplayArticle extends DisplayMessage
         new Field(array('name' => 'publisher_request', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
         new Field(array('name' => 'publisher_received', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
 
+        new Field(array('name' => 'imprimatur_sent', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
+
         new Field(array('name' => 'slug_de', 'id' => 'slug_de', 'type' => 'text', 'datatype' => 'char', 'size' => 45, 'maxlength' => 200, 'null' => TRUE)),
         new Field(array('name' => 'slug', 'id' => 'slug', 'type' => 'text', 'datatype' => 'char', 'size' => 45, 'maxlength' => 200, 'null' => TRUE)),
         // new Field(array('name' => 'url', 'id' => 'url', 'type' => 'text', 'datatype' => 'char', 'size' => 65, 'maxlength' => 200, 'null' => TRUE)),
@@ -531,6 +533,8 @@ EOT;
                                       tr('send letter'), htmlspecialchars($this->page->buildLink(array('pn' => 'communication', 'edit' => -1))));
       $reviewer_reminder_button = sprintf(' <input type="button" value="%s" onclick="generateCommunication(\'%s\', \'reviewer_reminder\')" />',
                                           tr('send letter'), htmlspecialchars($this->page->buildLink(array('pn' => 'communication', 'edit' => -1))));
+      $imprimatur_sent_button = sprintf(' <input type="button" value="%s" onclick="generateCommunication(\'%s\', \'imprimatur_sent\')" />',
+                                          tr('send letter'), htmlspecialchars($this->page->buildLink(array('pn' => 'communication', 'edit' => -1))));
       $urn_button = sprintf(' <input type="button" value="%s" onclick="generateUrn(\'xx\')" />',
                             tr('generate'));
       $slug_button = sprintf(' <input type="button" value="%s" onclick="generateSlug()" />',
@@ -593,6 +597,12 @@ EOT;
                   : $this->record->get_value('publisher_request')
             ),
             'publisher_received' => array('label' => 'Holding Institution response'),
+            'imprimatur_sent' => array(
+                'label' => 'Imprimatur sent to author',
+                'value' => 'edit' == $mode ?
+                  $this->getFormField('imprimatur_sent') . $imprimatur_sent_button
+                  : $this->record->get_value('imprimatur_sent')
+            ),
             /* 'url' => array('label' => 'Permanent URL'),
             'urn' => array('label' => 'URN', 'value' => 'edit' == $mode ?
                   $this->getFormField('urn').$urn_button
