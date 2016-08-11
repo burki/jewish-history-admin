@@ -357,6 +357,7 @@ class DisplayArticle extends DisplayMessage
         new Field(array('name' => 'license', 'id' => 'license', 'type' => 'select',
                         'options' => array_keys($license_options),
                         'labels' => array_values($license_options), 'datatype' => 'char', 'null' => TRUE)),
+        new Field(array('name' => 'comment_imprimatur', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE)),
         new Field(array('name' => 'comment_review', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE)),
         new Field(array('name' => 'comment_markup', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE)),
         new Field(array('name' => 'comment_bibliography', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE)),
@@ -652,6 +653,8 @@ EOT;
       'label' => 'Source',
       'value' => $finalized,
     );
+
+    $additional['comment_imprimatur'] = array('label' => 'R&uuml;ckmeldung Imprimatur');
 
     $rows = array_merge_at($rows, $additional, 'users');
 

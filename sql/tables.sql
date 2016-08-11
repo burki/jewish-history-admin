@@ -92,6 +92,7 @@ CREATE TABLE Message (
   referee_deadline DATETIME NULL,
   publisher_vouchercopy DATETIME NULL,
   imprimatur_sent DATETIME NULL,
+  comment_imprimatur TEXT NULL,
   comment_review  TEXT NULL,
   comment_markup  TEXT NULL,
   comment_bibliography  TEXT NULL,

@@ -37,6 +37,11 @@ class MailerFactory
             }
             if (defined('SMTP_ENCRYPTION')) {
                 $transport->setEncryption(SMTP_ENCRYPTION);
+                // see https://github.com/swiftmailer/swiftmailer/issues/544
+                $https = array();
+                $https['ssl']['verify_peer'] = FALSE;
+                $https['ssl']['verify_peer_name'] = FALSE;
+                $transport->setStreamOptions($https);
             }
         }
         else {

@@ -6,7 +6,7 @@ Wir sind also wohlgemut, dass wir am 22. September einen schönen Anlass zum Fei
 
 Zuvor möchten wir Sie bitten, sich Ihren Beitrag unter beigefügtem Link noch einmal anzusehen:
 
-    <http://juedische-geschichte-online.net/design/beitrag/jgo:article-%id_review%>
+    <http://juedische-geschichte-online.net/beitrag/jgo:article-%id_review%>
 
 Bitte achten Sie dabei auf folgende Punkte:
 
@@ -22,7 +22,7 @@ Falls Sie noch Änderungswünsche haben sollten, teilen Sie uns diese bitte bis 
 
 Wir kennzeichnen alle Texte der Edition mit Creative Commons-Lizenzverträgen. Ihr Interpretationstext steht standardmäßig unter der CC-Lizenz „Creative Commons Namensnennung - Nicht kommerziell - Keine Bearbeitungen 4.0 International Lizenz“, d.h. er darf unter Nennung Ihres Namens in unveränderter Form zu nicht-kommerziellen Zwecken, beispielsweise zu Unterrichtszwecken, verwendet werden (https://creativecommons.org/licenses/by-nc-nd/4.0/deed.de).
 
-Möchten Sie zusätzlich auch Exzerpte oder Bearbeitungungen Ihres Textes erlauben, können Sie Ihren Text alternativ unter der „Creative Commons Namensnennung - Weitergabe unter gleichen Bedingungen 4.0 International“ (https://creativecommons.org/licenses/by-sa/4.0/deed.de) veröffentlichen.
+Möchten Sie zusätzlich auch Exzerpte oder Bearbeitungen Ihres Textes erlauben, können Sie Ihren Text alternativ unter der „Creative Commons Namensnennung - Weitergabe unter gleichen Bedingungen 4.0 International“ (https://creativecommons.org/licenses/by-sa/4.0/deed.de) veröffentlichen.
 
 Falls Sie eine andere Lizenz wünschen, teilen Sie uns dies bitte ebenso bis zum 25. August mit.
 
