@@ -6,7 +6,7 @@
  *
  * (c) 2009-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2016-08-07 dbu
+ * Version: 2016-08-23 dbu
  *
  * Changes:
  *
@@ -93,6 +93,10 @@ $SITE_DESCRIPTION = array(
         ),
         'place' => array(
             'title' => 'Normdata: Places',
+            'anonymous' => FALSE,
+        ),
+        'organization' => array(
+            'title' => 'Normdata: Organizations',
             'anonymous' => FALSE,
         ),
         'term' => array(
