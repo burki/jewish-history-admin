@@ -4,9 +4,9 @@
  *
  * Start page
  *
- * (c) 2010-2015 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2010-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-05-10 dbu
+ * Version: 2016-08-24 dbu
  *
  * Changes:
  *
@@ -53,12 +53,17 @@ class DisplayRoot extends PageDisplay
       ),
       array(
         'name' => 'person',
-        'title' => 'Personennamen',
+        'title' => 'Normdata: Person',
         'privs' => $RIGHTS_ADMIN,
       ),
       array(
         'name' => 'place',
-        'title' => 'Ortsnamen',
+        'title' => 'Normdata: Places',
+        'privs' => $RIGHTS_ADMIN,
+      ),
+      array(
+        'name' => 'organization',
+        'title' => 'Normdata: Organizations',
         'privs' => $RIGHTS_ADMIN,
       ),
       array(

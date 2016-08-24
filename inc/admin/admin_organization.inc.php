@@ -173,6 +173,8 @@ class DisplayOrganization extends DisplayBackend
         new Field(array('name' => 'name_variant_de', 'type' => 'text', 'datatype' => 'char', 'size' => 40, 'null' => TRUE, 'nodbfield' => true)),
         new Field(array('name' => 'name_variant_en', 'type' => 'text', 'datatype' => 'char', 'size' => 40, 'null' => TRUE, 'nodbfield' => true)),
 
+        new Field(array('name' => 'url', 'type' => 'text', 'datatype' => 'char', 'size' => 65, 'maxlength' => 200, 'null' => TRUE)),
+
         new Field(array('name' => 'gnd', 'id' => 'gnd', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
         // new Field(array('name' => 'tgn_parent', 'id' => 'tgn_parent', 'type' => 'hidden', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
         // new Field(array('name' => 'parent_path', 'id' => 'parent_path', 'type' => 'hidden', 'datatype' => 'char', 'size' => 40, 'null' => TRUE)),
@@ -214,9 +216,10 @@ class DisplayOrganization extends DisplayBackend
                      'description' => 'Identifikator der Gemeinsamen Normdatei, vgl. http://de.wikipedia.org/wiki/Hilfe:GND',),
       (isset($this->form) ? $gnd_search . $this->form->show_submit(tr('Store')) : '')
       . '<hr noshade="noshade" />',
+      'url' => array('label' => 'Homepage'),
 
       '<hr noshade="noshade" />',
-      'comment_internal' => array('label' => 'Internal notes and comments'),
+      // 'comment_internal' => array('label' => 'Internal notes and comments'),
       (isset($this->form) ? $this->form->show_submit(tr('Store')) : ''),
     );
 

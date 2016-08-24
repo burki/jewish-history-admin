@@ -4,9 +4,9 @@
  *
  * Manage the Person-table
  *
- * (c) 2009-2015 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-05-13 dbu
+ * Version: 2016-08-24 dbu
  *
  * TODO:
  *
@@ -179,7 +179,7 @@ class DisplayPerson extends DisplayBackend
 
         // new Field(array('name' => 'cv', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 40, 'rows' => 5, 'null' => TRUE)),
 
-        // new Field(array('name' => 'url', 'type' => 'text', 'datatype' => 'char', 'size' => 65, 'maxlength' => 200, 'null' => TRUE)),
+        new Field(array('name' => 'url', 'type' => 'text', 'datatype' => 'char', 'size' => 65, 'maxlength' => 200, 'null' => TRUE)),
 
         new Field(array('name' => 'gnd', 'id' => 'gnd', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
 
@@ -245,16 +245,19 @@ class DisplayPerson extends DisplayBackend
       /* 'study' => array('label' => 'Fields of Study'),
       'profession' => array('label' => 'Occupational Title',
                             'description' => 'eine normierte Berufs- oder Tätigkeitsbezeichnung aus der SWD, die für die Person besonders charakteristisch ist',
-                            ), */
+                            ),
       'jobTitle' => array('label' => 'Job Title',
                             'description' => 'Beruf/Tätigkeitsbezeichnung als freier Text',
                             ),
+      */
       /*
       'cv' => array('label' => 'CV'),
 
       '<hr noshade="noshade" />',
+      */
       'url' => array('label' => 'Homepage'),
 
+      /*
       '<hr noshade="noshade" />',
       'collection' => array('label' => 'Collections'),
       'archive' => array('label' => 'Archival Materials'),
