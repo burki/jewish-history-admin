@@ -286,5 +286,9 @@ $GETTEXT_MESSAGES = array (
 'Digitization' => 'Digitalisat',
 'Source' => 'Quelle',
 'ready for publishing' => 'kann veröffentlicht werden',
+'Primary Place (Getty-Identifier)' => 'Primärort (Getty-Identifier)',
+'Primary Place Coordinate Override (Latitude,Longitude, e.g "52.516667,13.4")' => 'Übersteuerung Primärort Geo-Koord. (Breite, Länge, z.B. "52.516667,13.4")',
+'Primary Date (YYYY or DD.MM.YYY)' => 'Primärdatum (JJJJ oder TT.MM.JJJJ)',
+'Primary Date Override (e.g. "around 1600")' => 'Übersteuerung Primärdatum (z.B. "um 1600")',
 );
 

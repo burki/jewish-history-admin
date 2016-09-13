@@ -6,7 +6,7 @@
  *
  * (c) 2007-2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2016-03-03 dbu
+ * Version: 2016-09-13 dbu
  *
  * Changes:
  *
@@ -380,7 +380,7 @@ class DisplayPublication extends DisplayBackend
         new Field(array('name' => 'pages', 'id' => 'pages', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 50, 'null' => TRUE)),
         new Field(array('name' => 'listprice', 'id' => 'listprice', 'type' => 'text', 'size' =>60, 'datatype' => 'char', 'maxlength' => 50, 'null' => TRUE)),
         new Field(array('name' => 'image_url', 'id' => 'image', 'type' => 'hidden', 'datatype' => 'char', 'null' => TRUE, 'nodbfield' => TRUE)),
-        new Field(array('name' => 'url', 'id' => 'toc_url', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlenght' => 255, 'null' => TRUE)),
+        new Field(array('name' => 'url', 'id' => 'toc_url', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 255, 'null' => TRUE)),
 
         new Field(array('name' => 'lang', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($languages_ordered), 'labels' => array_values($languages_ordered), 'null' => TRUE)),
         new Field(array('name' => 'translator', 'type' => 'select',
@@ -388,7 +388,8 @@ class DisplayPublication extends DisplayBackend
                         'labels' => array_merge(array(tr('-- none --')), array_values($this->translator_options)),
                         'datatype' => 'int', 'null' => TRUE)),
         new Field(array('name' => 'status_translation', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($this->status_translation_options), 'labels' => array_values($this->status_translation_options), 'null' => TRUE)),
-        new Field(array('name' => 'place_identifier', 'id' => 'place_identifier', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlenght' => 255, 'null' => TRUE)),
+        new Field(array('name' => 'place_identifier', 'id' => 'place_identifier', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 255, 'null' => TRUE)),
+        new Field(array('name' => 'place_geo', 'id' => 'place_geo', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 255, 'null' => TRUE)),
         new Field(array('name' => 'indexingdate', 'type' => 'date', 'incomplete' => TRUE, 'datatype' => 'date', 'null' => TRUE)),
         new Field(array('name' => 'displaydate', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
 
@@ -446,9 +447,10 @@ class DisplayPublication extends DisplayBackend
       'translator' => array('label' => 'Translator'),
       'status_translation' => array('label' => 'Translation Status'),
 
-      'place_identifier' => array('label' => 'Primärort (Getty-Identifier)'),
-      'indexingdate' => array('label' => 'Primärdatum (JJJJ oder TT.MM.JJJJ)'),
-      'displaydate' => array('label' => 'Übersteuerung Primärdatum (z.B. "um 1600")'),
+      'place_identifier' => array('label' => 'Primary Place (Getty-Identifier)'),
+      'place_geo' => array('label' => 'Primary Place Coordinate Override (Latitude,Longitude, e.g "52.516667,13.4")'),
+      'indexingdate' => array('label' => 'Primary Date (YYYY or DD.MM.YYY)'),
+      'displaydate' => array('label' => 'Primary Date Override (e.g. "around 1600")'),
 
       '<hr noshade="noshade" />',
     );

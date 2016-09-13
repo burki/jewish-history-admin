@@ -51,6 +51,42 @@ class PersonFlow extends TableManagerFlow
   }
 }
 
+class PersonRecord extends TableManagerRecord
+{
+  var $languages = array('de', 'en');
+  var $localizedFields = array('description' => 'description');
+
+  function store ($args = '') {
+    foreach ($this->localizedFields as $db_field => $form_field) {
+      $values = array();
+      foreach ($this->languages as $language) {
+        $value = $this->get_value($form_field . '_' . $language);
+        if (!empty($value)) {
+          $values[$language] = trim($value);
+        }
+      }
+      $this->set_value($db_field, json_encode($values));
+    }
+    return parent::store($args);
+  }
+
+  function fetch ($args, $datetime_style = '') {
+    $fetched = parent::fetch($args, $datetime_style);
+    if ($fetched) {
+      foreach ($this->localizedFields as $db_field => $form_field) {
+        $values = json_decode($this->get_value($db_field), TRUE);
+        foreach ($this->languages as $language) {
+          if (isset($values) && FALSE !== $values && array_key_exists($language, $values)) {
+            $this->set_value($form_field . '_' . $language, $values[$language]);
+          }
+        }
+      }
+    }
+    return $fetched;
+  }
+
+}
+
 class DisplayPerson extends DisplayBackend
 {
   var $table = 'person';
@@ -134,7 +170,7 @@ class DisplayPerson extends DisplayBackend
   }
 
   function instantiateRecord ($table = '', $dbconn = '') {
-    $record = parent::instantiateRecord($table, new DB_Presentation());
+    $record = new PersonRecord(array('tables' => $this->table, 'dbconn' => new DB_Presentation()));
 
     $label_select_country = tr('-- please select --');
     $countries_ordered = array('' => $label_select_country)
@@ -154,7 +190,7 @@ class DisplayPerson extends DisplayBackend
         new Field(array('name' => 'gender', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($sex_options), 'labels' => array_values($sex_options), 'null' => TRUE)),
         new Field(array('name' => 'honoricPrefix', 'id' => 'title', 'type' => 'text', 'datatype' => 'char', 'size' => 8, 'maxlength' => 20, 'null' => TRUE)),
 
-        new Field(array('name' => 'familyName', 'id' => 'lastname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80)),
+        new Field(array('name' => 'familyName', 'id' => 'lastname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
         new Field(array('name' => 'givenName', 'id' => 'firstname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
 
         new Field(array('name' => 'additionalName', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 40, 'rows' => 2, 'null' => TRUE)),
@@ -182,8 +218,12 @@ class DisplayPerson extends DisplayBackend
         new Field(array('name' => 'url', 'type' => 'text', 'datatype' => 'char', 'size' => 65, 'maxlength' => 200, 'null' => TRUE)),
 
         new Field(array('name' => 'gnd', 'id' => 'gnd', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
+        new Field(array('name' => 'djh', 'id' => 'djh', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 30, 'null' => TRUE)),
+        new Field(array('name' => 'stolpersteine', 'id' => 'djh', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
 
-        // new Field(array('name' => 'collection', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 5, 'null' => TRUE)),
+        new Field(array('name' => 'description', 'type' => 'hidden', 'datatype' => 'char', 'null' => TRUE)),
+        new Field(array('name' => 'description_de', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE, 'nodbfield' => true)),
+        new Field(array('name' => 'description_en', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE, 'nodbfield' => true)),
 
         // new Field(array('name' => 'contact', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 5, 'null' => TRUE)),
         // new Field(array('name' => 'inheritor', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 5, 'null' => TRUE)),
@@ -222,7 +262,7 @@ class DisplayPerson extends DisplayBackend
       'familyName' => array('label' => 'Last Name'),
       'givenName' => array('label' => 'First Name(s)'),
       'additionalNames' => array('label' => 'Additional Names or Name Variants',
-                              'description' => "Please enter additional names or spellings such as:\n[Earlier Name]\n[Later Name]\n[Real Name]\n[Pseud.]\n%Name at Birth [not %Maiden Name!]\n%Wrong Name Forms"),
+                                 'description' => "Please enter additional names or spellings such as:\n[Earlier Name]\n[Later Name]\n[Real Name]\n[Pseud.]\n%Name at Birth [not %Maiden Name!]\n%Wrong Name Forms"),
       'gnd' => array('label' => 'GND-Nr',
                      'description' => 'Identifikator der Gemeinsamen Normdatei, vgl. http://de.wikipedia.org/wiki/Hilfe:GND',),
       (isset($this->form) ? $gnd_search . $this->form->show_submit(tr('Store')) : '')
@@ -255,10 +295,15 @@ class DisplayPerson extends DisplayBackend
 
       '<hr noshade="noshade" />',
       */
+      'djh' => array('label' => 'DJH-ID'),
+      'stolpersteine' => array('label' => 'Stolpersteine-ID'),
       'url' => array('label' => 'Homepage'),
 
-      /*
       '<hr noshade="noshade" />',
+      'description_de' => array('label' => 'Short Bio (de)'),
+      'description_en' => array('label' => 'Short Bio (en)'),
+
+      /*
       'collection' => array('label' => 'Collections'),
       'archive' => array('label' => 'Archival Materials'),
       'literature' => array('label' => 'Publications'),

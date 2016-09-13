@@ -6,7 +6,7 @@
  *
  * (c) 2016 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2016-08-23 dbu
+ * Version: 2016-08-28 dbu
  *
  * TODO:
  *
@@ -54,26 +54,32 @@ class OrganizationFlow extends TableManagerFlow
 class OrganizationRecord extends TableManagerRecord
 {
   var $languages = array('de', 'en');
+  var $localizedFields = array('alternateName' => 'name_variant',
+                               'description' => 'description');
 
   function store ($args = '') {
-    $alternateName = array();
-    foreach ($this->languages as $language) {
-      $value = $this->get_value('name_variant_' . $language);
-      if (!empty($value)) {
-        $alternateName[$language] = trim($value);
+    foreach ($this->localizedFields as $db_field => $form_field) {
+      $values = array();
+      foreach ($this->languages as $language) {
+        $value = $this->get_value($form_field . '_' . $language);
+        if (!empty($value)) {
+          $values[$language] = trim($value);
+        }
       }
+      $this->set_value($db_field, json_encode($values));
     }
-    $this->set_value('alternateName', json_encode($alternateName));
     return parent::store($args);
   }
 
   function fetch ($args, $datetime_style = '') {
     $fetched = parent::fetch($args, $datetime_style);
     if ($fetched) {
-      $alternateName = json_decode($this->get_value('alternateName'), TRUE);
-      foreach ($this->languages as $language) {
-        if (isset($alternateName) && FALSE !== $alternateName && array_key_exists($language, $alternateName)) {
-          $this->set_value('name_variant_' . $language, $alternateName[$language]);
+      foreach ($this->localizedFields as $db_field => $form_field) {
+        $values = json_decode($this->get_value($db_field), TRUE);
+        foreach ($this->languages as $language) {
+          if (isset($values) && FALSE !== $values && array_key_exists($language, $values)) {
+            $this->set_value($form_field . '_' . $language, $values[$language]);
+          }
         }
       }
     }
@@ -173,7 +179,14 @@ class DisplayOrganization extends DisplayBackend
         new Field(array('name' => 'name_variant_de', 'type' => 'text', 'datatype' => 'char', 'size' => 40, 'null' => TRUE, 'nodbfield' => true)),
         new Field(array('name' => 'name_variant_en', 'type' => 'text', 'datatype' => 'char', 'size' => 40, 'null' => TRUE, 'nodbfield' => true)),
 
+        new Field(array('name' => 'foundingDate', 'id' => 'foundingDate', 'type' => 'date', 'incomplete' => TRUE, 'datatype' => 'date', 'null' => TRUE)),
+        new Field(array('name' => 'dissolutionDate', 'id' => 'dissolutionDate', 'type' => 'date', 'incomplete' => TRUE, 'datatype' => 'date', 'null' => TRUE)),
+
         new Field(array('name' => 'url', 'type' => 'text', 'datatype' => 'char', 'size' => 65, 'maxlength' => 200, 'null' => TRUE)),
+
+        new Field(array('name' => 'description', 'type' => 'hidden', 'datatype' => 'char', 'null' => TRUE)),
+        new Field(array('name' => 'description_de', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE, 'nodbfield' => true)),
+        new Field(array('name' => 'description_en', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE, 'nodbfield' => true)),
 
         new Field(array('name' => 'gnd', 'id' => 'gnd', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
         // new Field(array('name' => 'tgn_parent', 'id' => 'tgn_parent', 'type' => 'hidden', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
@@ -212,11 +225,20 @@ class DisplayOrganization extends DisplayBackend
                               'description' => "Please enter additional names or spellings"),
       'name_variant_en' => array('label' => 'Englischer Name',
                               'description' => "Please enter additional names or spellings"),
+
       'gnd' => array('label' => 'GND-Nr',
                      'description' => 'Identifikator der Gemeinsamen Normdatei, vgl. http://de.wikipedia.org/wiki/Hilfe:GND',),
       (isset($this->form) ? $gnd_search . $this->form->show_submit(tr('Store')) : '')
       . '<hr noshade="noshade" />',
+      'foundingDate' => array('label' => 'Founding Date',
+                       'fields' => array('foundingDate')),
+      'dissolutionDate' => array('label' => 'Dissolution Date',
+                       'fields' => array('dissolutionDate')),
+
       'url' => array('label' => 'Homepage'),
+
+      'description_de' => array('label' => 'Short Description (de)'),
+      'description_en' => array('label' => 'Short Description (en)'),
 
       '<hr noshade="noshade" />',
       // 'comment_internal' => array('label' => 'Internal notes and comments'),
