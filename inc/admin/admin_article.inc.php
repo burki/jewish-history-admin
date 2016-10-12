@@ -233,9 +233,9 @@ class DisplayArticle extends DisplayMessage
         break;
 
       case 'license':
-        global $LICENSE_OPTIONS;
+        global $LICENSE_OPTIONS_ARTICLE;
         $licenses = array();
-        foreach ($LICENSE_OPTIONS as $key => $label) {
+        foreach ($LICENSE_OPTIONS_ARTICLE as $key => $label) {
           $licenses[$key] = tr($label);
         }
         return $licenses;

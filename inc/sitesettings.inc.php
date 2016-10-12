@@ -190,6 +190,13 @@ $LICENSE_OPTIONS = array(
     'PD' => 'Public Domain',
 );
 
+$LICENSE_OPTIONS_ARTICLE = array(
+    ''  => '-- unknown --',
+    'restricted' => 'restricted (republish only with consent)',
+    'CC BY-NC-ND' => 'Creative Commons BY-NC-ND',
+    'CC BY-SA' => 'Creative Commons BY-SA',
+);
+
 // $MESSAGE_TYPES
 $MESSAGE_REVIEW_PUBLICATION = 100;
 
