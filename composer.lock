@@ -229,17 +229,17 @@
         },
         {
             "name": "ml/json-ld",
-            "version": "1.0.5",
+            "version": "1.0.7",
             "target-dir": "ML/JsonLD",
             "source": {
                 "type": "git",
                 "url": "https://github.com/lanthaler/JsonLD.git",
-                "reference": "2f7f00a9daed844289135cc1cc99a75fc72a5438"
+                "reference": "f9dfe184f0da9ce0e0ffdddabf6d93d01787ac91"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/lanthaler/JsonLD/zipball/2f7f00a9daed844289135cc1cc99a75fc72a5438",
-                "reference": "2f7f00a9daed844289135cc1cc99a75fc72a5438",
+                "url": "https://api.github.com/repos/lanthaler/JsonLD/zipball/f9dfe184f0da9ce0e0ffdddabf6d93d01787ac91",
+                "reference": "f9dfe184f0da9ce0e0ffdddabf6d93d01787ac91",
                 "shasum": ""
             },
             "require": {
@@ -274,7 +274,7 @@
                 "JSON-LD",
                 "jsonld"
             ],
-            "time": "2016-01-17 17:39:22"
+            "time": "2016-10-10 08:57:56"
         },
         {
             "name": "pear-pear.php.net/Archive_Tar",
@@ -574,16 +574,16 @@
         },
         {
             "name": "semsol/arc2",
-            "version": "2.2.6",
+            "version": "2.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/semsol/arc2.git",
-                "reference": "75158bd470e264439dd6773b75f023becdeb78c4"
+                "reference": "1cba0487e764b4d7e22913e995f7525192a226c5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/semsol/arc2/zipball/75158bd470e264439dd6773b75f023becdeb78c4",
-                "reference": "75158bd470e264439dd6773b75f023becdeb78c4",
+                "url": "https://api.github.com/repos/semsol/arc2/zipball/1cba0487e764b4d7e22913e995f7525192a226c5",
+                "reference": "1cba0487e764b4d7e22913e995f7525192a226c5",
                 "shasum": ""
             },
             "require": {
@@ -614,7 +614,7 @@
                 "RDF",
                 "sparql"
             ],
-            "time": "2015-11-24 06:22:45"
+            "time": "2016-10-07 13:56:26"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -671,16 +671,16 @@
         },
         {
             "name": "zendframework/zendframework1",
-            "version": "1.12.19",
+            "version": "1.12.20",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zendframework/zf1.git",
-                "reference": "be2113109240b6682d90c25a05b6ae79927954f3"
+                "reference": "737ef159654fbbef37cf9af742b2c8f9690c2ece"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zf1/zipball/be2113109240b6682d90c25a05b6ae79927954f3",
-                "reference": "be2113109240b6682d90c25a05b6ae79927954f3",
+                "url": "https://api.github.com/repos/zendframework/zf1/zipball/737ef159654fbbef37cf9af742b2c8f9690c2ece",
+                "reference": "737ef159654fbbef37cf9af742b2c8f9690c2ece",
                 "shasum": ""
             },
             "require": {
@@ -714,7 +714,7 @@
                 "ZF1",
                 "framework"
             ],
-            "time": "2016-07-13 15:11:57"
+            "time": "2016-09-08 14:50:34"
         }
     ],
     "packages-dev": [],
