@@ -372,10 +372,14 @@
   {
     var $field;
 
-    function Field ($field = '') {
+    function __construct ($field = '') {
       if (is_array($field)) {
         $this->field = $field;
       }
+    }
+
+    function Field ($field = '') {
+      self::__construct($field);
     }
 
     function sql_value ($datatype, $value) {
@@ -963,9 +967,13 @@
   {
     var $record;
 
-    // constructor
-    function Form ($record = '') {
+    function __construct ($record = '') {
       die('Form is an abstract class. Instantiate a derived class (e.g FormHTML instead)');
+    }
+
+    // legacy constructor
+    function Form ($record = '') {
+      self::__construct($record);
     }
 
     // accessor function
@@ -996,11 +1004,15 @@
     var $field;
     var $_trans;
 
-    function FormField ($form, $name) {
-      if (gettype($form) == 'object') {
+    function __construct ($form, $name) {
+      if (is_object($form)) {
         $this->form = $form;
       }
       $this->name = $name;
+    }
+
+    function FormField ($form, $name) {
+      self::__construct($form, $name);
     }
 
     // utility functions
@@ -1090,14 +1102,17 @@
 
   class FormFieldText extends FormField
   {
-
     var $DEFAULT_SIZE = 32;
     var $DEFAULT_SIZE_INT = 7;
     var $DEFAULT_SIZE_DECIMAL = 7; // TODO: make this dependent of field settings
 
-    function FormFieldText ($form, $name) {
+    function __construct ($form, $name) {
       $this->form = $form;
       $this->name = $name;
+    }
+
+    function FormFieldText ($form, $name) {
+      self::__construct($form, $name);
     }
 
     function show ($params = '') {
@@ -1164,9 +1179,13 @@
 
   class FormFieldTextarea extends FormField
   {
-    function FormFieldTextarea ($form, $name) {
+    function __construct ($form, $name) {
       $this->form = $form;
       $this->name = $name;
+    }
+
+    function FormFieldTextarea ($form, $name) {
+      self::__construct($form, $name);
     }
 
     function show ($params = '') {
@@ -1214,9 +1233,13 @@
     var $VALIDATE_LEVEL = 2;
     var $USE_ZEND_VALIDATOR = FALSE;
 
-    function FormFieldEmail ($form, $name) {
+    function __construct ($form, $name) {
       $this->form = $form;
       $this->name = $name;
+    }
+
+    function FormFieldEmail ($form, $name) {
+      self::__construct($form, $name);
     }
 
     function validate (&$invalid) {
@@ -1250,9 +1273,13 @@
     var $DEFAULT_SIZE = 16;
     var $datetime_parser;
 
-    function FormFieldDatetime ($form, $name) {
+    function __construct ($form, $name) {
       $this->form = $form;
       $this->name = $name;
+    }
+
+    function FormFieldDatetime ($form, $name) {
+      self::__construct($form, $name);
     }
 
     function parse_datetime ($datetime_string, $datetime_style = '', $century_window = 50) {
@@ -1368,9 +1395,13 @@
     var $DEFAULT_SIZE = 12;
     var $datetime_parser;
 
-    function FormFieldDate ($form, $name) {
+    function __construct ($form, $name) {
       $this->form = $form;
       $this->name = $name;
+    }
+
+    function FormFieldDate ($form, $name) {
+      self::__construct($form, $name);
     }
 
     function parse_datetime ($datetime_string, $datetime_style = '', $century_window = 50) {
@@ -1546,11 +1577,15 @@
   {
     var $multiple = FALSE;
 
-    function FormFieldSelect ($form, $name) {
+    function __construct ($form, $name) {
       if (gettype($form) == 'object') {
         $this->form = $form;
       }
       $this->name = $name;
+    }
+
+    function FormFieldSelect ($form, $name) {
+      self::__construct($form, $name);
     }
 
     function show ($args = '') {
@@ -1659,11 +1694,15 @@
 
   class FormFieldHidden extends FormField
   {
-    function FormFieldHidden ($form, $name) {
+    function __construct ($form, $name) {
       if (gettype($form) == 'object') {
         $this->form = $form;
       }
       $this->name = $name;
+    }
+
+    function FormFieldHidden ($form, $name) {
+      self::__construct($form, $name);
     }
 
     function show ($params = '') {
@@ -1705,9 +1744,13 @@
   {
     var $DEFAULT_SIZE = 32;
 
-    function FormFieldPassword ($form, $name) {
+    function __construct ($form, $name) {
       $this->form = $form;
       $this->name = $name;
+    }
+
+    function FormFieldPassword ($form, $name) {
+      self::__construct($form, $name);
     }
 
     function show ($params = '') {
@@ -1752,10 +1795,14 @@
   class FormFieldCheckbox extends FormField
   {
 
-    function FormFieldCheckbox ($form, $name) {
+    function __construct ($form, $name) {
       $this->form = $form;
       $this->name = $name;
       $this->show_hidden = 1;
+    }
+
+    function FormFieldCheckbox ($form, $name) {
+      self::__construct($form, $name);
     }
 
     function show ($which = -1, $args = '') {
@@ -1819,9 +1866,13 @@
   class FormFieldRadio extends FormField
   {
 
-    function FormFieldRadio ($form, $name) {
+    function __construct ($form, $name) {
       $this->form = $form;
       $this->name = $name;
+    }
+
+    function FormFieldRadio ($form, $name) {
+      self::__construct($form, $name);
     }
 
     function show ($which = '', $args = ' ') {
@@ -1886,12 +1937,16 @@
     var $params;
     var $invalid;
 
-    function FormHTML ($params, $record = '') {
+    function __construct ($params, $record = '') {
       $this->params = $params;
       $this->invalid = array(); // no errors to start with
       if (!(gettype($record) == 'string' && $record == '')) {
         $this->record = $record;
       }
+    }
+
+    function FormHTML ($params, $record = '') {
+      self::__construct($params, $record);
     }
 
     function invalid () {

@@ -9,6 +9,11 @@
  *
  */
 
+if (!function_exists('\mysql_connect')) {
+  // include php7-mysql-shim
+  require_once __DIR__ . '/mysql.php';
+};
+
 class DB_Sql
 {
   /* public: connection parameters */
@@ -44,9 +49,13 @@ class DB_Sql
   static $Benchmark = false;
   static $Benchmark_Queries = array();
 
-  /* public: constructor */
-  function DB_Sql($query = "") {
+  function __construct($query = "") {
     $this->query($query);
+  }
+
+  /* legacy constructor */
+  function DB_Sql($query = "") {
+    self::__construct($query);
   }
 
   function current_date () {
@@ -113,7 +122,7 @@ class DB_Sql
       $Password = $this->Password;
 
     /* establish connection, select database */
-    if (0 == $this->Link_ID) {
+    if (0 === $this->Link_ID) {
 
       $this->Link_ID = $this->Persistent_Connection
         ? @mysql_pconnect($Host, $User, $Password)

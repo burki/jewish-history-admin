@@ -17,7 +17,7 @@
 /**
  * "master" class for handling the management and convenience
  */
-require_once 'Text/Wiki.php';
+@require_once 'Text/Wiki.php';
 
 /**
  * Base Text_Wiki handler class extension for BBCode
@@ -87,17 +87,22 @@ class Text_Wiki_CmsCode extends Text_Wiki {
     );
 
     /**
-     * Constructor: just adds the path to BBCode rules
+     * Constructor: adds the path to CmsCode rules and adjusts the delimeter
      *
      * @access public
      * @param array $rules The set of rules to load for this object.
      */
-    function Text_Wiki_CmsCode($rules = null)
+    function __construct($rules = null)
     {
         parent::Text_Wiki($rules);
         # $this->delim defaults to "\xFF"; which is a bad idea since that is
         # small y diaresis
         $this->delim = "\x7F";
-        $this->addPath('parse', $this->fixPath(dirname(__FILE__)).'CmsCode');
+        $this->addPath('parse', $this->fixPath(dirname(__FILE__)) . 'CmsCode');
+    }
+
+    function Text_Wiki_CmsCode($rules = null)
+    {
+		self::__construct($rules);
     }
 }
