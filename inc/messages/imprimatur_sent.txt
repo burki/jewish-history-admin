@@ -1,21 +1,41 @@
 %salutation_name_de%,
 
-Nächste Woche Donnerstag ist es soweit: Die Online-Quellenedition wird im Rahmen des Historikertages live geschaltet.
-Vor einigen Wochen hatten wir uns ja bereits mit der Bitte um Freigabe ihres Beitrags auf Deutsch an sie gewandt. Heute möchten wir Ihnen den Link zur englischen Übersetzung ihres Beitrags zusenden:
+Vor etwa einem Jahr konnten wir im Rahmen des Historikertags in Hamburg den feierlichen Launch der Schlüsseldokumente-Edition feiern, die seitdem unter http://juedische-geschichte-online.net/ zu erreichen ist. Wie bislang, wird die Edition auch in Zukunft regelmäßig um weitere Beiträge ergänzt werden.
 
-    <http://jewish-history-online.net/article/jgo:article-%id_review%>
+Wir freuen uns, dass nun auch Ihr Beitrag auf seinem Weg zur Veröffentlichung ist und möchten Sie bitten, diesen unter beigefügtem Link noch einmal anzusehen, bevor wir ihn in die Übersetzung geben bzw. veröffentlichen:
 
-Wir hoffen sehr, dass Ihnen diese Präsentation gefällt. Geben Sie uns bitte umgehend Bescheid, wenn Ihnen noch ein schwerwiegender Fehler auffällt, damit wir diesen noch vor der Live-Schaltung der Seite eliminieren können. Sollte sie zu einem späteren Zeitpunkt Änderungswünsche haben, melden Sie sich gerne. Als Online-Publikation haben wir die Möglichkeit fortlaufend Änderungen vorzunehmen.
+    <http://juedische-geschichte-online.net/beitrag/jgo:article-%id_review%>
 
-Wir würden uns sehr freuen, Sie am 22.9. um 18 Uhr im Lichthof der Staatsbibliothek in Hamburg begrüßen und mit Ihnen die Live-Schaltung der Online-Edition feiern zu können!
+Bitte achten Sie dabei auf folgende Punkte:
 
-Herzliche Grüße
+1) Richtigkeit Ihres Textes in der '''deutschen Version'''. Bitte beachten Sie hierbei, dass wir nur noch geringfügige Änderungen umsetzen können, da die Texte bereits für die Onlineversion bearbeitet, also z.B. technisch ausgezeichnet wurden. . Sobald wir von Ihnen das OK für die '''deutsche Version''' haben, geben wir Ihren Text in die '''englische Übersetzung''', die wir Ihnen dann ebenfalls zur finalen Abnahme vorlegen werden.
 
-das Hamburger Projektteam
+Bitte beachten Sie auch, dass wir, um die Texte für den Bildschirm lesbarer zu machen, z.T. Zwischenüberschriften eingefügt haben. Außerdem wurden einige zentrale und regelmäßig wiederkehrende Begriffe editionsübergreifend vereinheitlicht.
 
-Daniel Burckhardt, Inka Le-Huu, Anna Menny, Miriam Rürup und Nina Zellerhoff
+2) Bitte kontrollieren Sie auch das Transkript der von Ihnen interpretierten Quelle.
 
-P.S: Auch wenn es sich um eine Online-Edition handelt, haben wir eine Begleitbroschüre erstellt. Bitte teilen Sie uns doch Ihre Postadresse mit, damit wir Ihnen die Begleitbroschüre zusenden können.
+3) Überprüfen Sie bitte auch, ob die Angaben zu Ihrer Person korrekt sind (auch hier zunächst in der '''deutschen Version'''; die englische Version folgt dann mit der Imprimaturanfrage zur Übersetzung).
+
+Falls Sie noch Änderungswünsche haben sollten, teilen Sie uns diese bitte bis '''innerhalb von 14 Tagen''' mit.
+
+Wir kennzeichnen alle Texte der Edition mit Creative Commons-Lizenzverträgen. Ihr Interpretationstext steht standardmäßig unter der CC-Lizenz „Creative Commons Namensnennung - Nicht kommerziell - Keine Bearbeitungen 4.0 International Lizenz“, d.h. er darf unter Nennung Ihres Namens in unveränderter Form zu nicht-kommerziellen Zwecken, beispielsweise zu Unterrichtszwecken, verwendet werden (https://creativecommons.org/licenses/by-nc-nd/4.0/deed.de).
+
+Möchten Sie zusätzlich auch Exzerpte oder Bearbeitungen Ihres Textes erlauben, können Sie Ihren Text alternativ unter der „Creative Commons Namensnennung - Weitergabe unter gleichen Bedingungen 4.0 International“ (https://creativecommons.org/licenses/by-sa/4.0/deed.de) veröffentlichen.
+
+Falls Sie eine andere Lizenz wünschen, teilen Sie uns dies bitte ebenso innerhalb von 14 Tagen mit.
+
+Nähere Informationen zu den CC-Lizenzen finden Sie hier: http://de.creativecommons.org/was-ist-cc/
+
+Falls wir nichts von Ihnen hören, gehen wir davon aus, dass Sie mit der Veröffentlichung ihres Textes in der jetzigen Form und der o.g. CC-Lizenz einverstanden sind.
+
+Wir würden uns freuen, wenn Sie Ihren Beitrag auch in Ihre Publikationslisten-/angaben aufnehmen würden. Eine entsprechende Zitationsempfehlung finden Sie am Ende des Beitrags.
+
+Vor allem aber möchten wir uns noch einmal herzlich für Ihre Bereitschaft bedanken, eine Quelleninterpretation beizusteuern und damit zum Gelingen dieser Edition beizutragen!
+
+
+Herzliche Grüße wünscht Ihnen das Hamburger Projektteam
+
+Daniel Burckhardt, Anna Menny und Miriam Rürup
 --
 Institut für die Geschichte der deutschen Juden
 Beim Schlump 83, 20144 Hamburg
