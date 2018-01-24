@@ -1,6 +1,6 @@
 %salutation_name_de%,
 
-Vor etwa einem Jahr konnten wir im Rahmen des Historikertags in Hamburg den feierlichen Launch der Schlüsseldokumente-Edition feiern, die seitdem unter http://juedische-geschichte-online.net/ zu erreichen ist. Wie bislang, wird die Edition auch in Zukunft regelmäßig um weitere Beiträge ergänzt werden.
+Im September 2016 konnten wir im Rahmen des Historikertags in Hamburg den feierlichen Launch der Schlüsseldokumente-Edition feiern, die seitdem unter http://juedische-geschichte-online.net/ zu erreichen ist. Wie bislang, wird die Edition auch in Zukunft regelmäßig um weitere Beiträge und neue Features ergänzt werden.
 
 Wir freuen uns, dass nun auch Ihr Beitrag auf seinem Weg zur Veröffentlichung ist und möchten Sie bitten, diesen unter beigefügtem Link noch einmal anzusehen, bevor wir ihn in die Übersetzung geben bzw. veröffentlichen:
 
@@ -8,7 +8,7 @@ Wir freuen uns, dass nun auch Ihr Beitrag auf seinem Weg zur Veröffentlichung i
 
 Bitte achten Sie dabei auf folgende Punkte:
 
-1) Richtigkeit Ihres Textes in der '''deutschen Version'''. Bitte beachten Sie hierbei, dass wir nur noch geringfügige Änderungen umsetzen können, da die Texte bereits für die Onlineversion bearbeitet, also z.B. technisch ausgezeichnet wurden. . Sobald wir von Ihnen das OK für die '''deutsche Version''' haben, geben wir Ihren Text in die '''englische Übersetzung''', die wir Ihnen dann ebenfalls zur finalen Abnahme vorlegen werden.
+1) Richtigkeit Ihres Textes in der '''deutschen Version'''. Bitte beachten Sie hierbei, dass wir nur noch geringfügige Änderungen umsetzen können, da die Texte bereits für die Onlineversion bearbeitet, also z.B. technisch ausgezeichnet wurden. Sobald wir von Ihnen das OK für die '''deutsche Version''' haben, geben wir Ihren Text in die '''englische Übersetzung''', die wir Ihnen dann ebenfalls zur finalen Abnahme vorlegen werden.
 
 Bitte beachten Sie auch, dass wir, um die Texte für den Bildschirm lesbarer zu machen, z.T. Zwischenüberschriften eingefügt haben. Außerdem wurden einige zentrale und regelmäßig wiederkehrende Begriffe editionsübergreifend vereinheitlicht.
 
@@ -18,15 +18,17 @@ Bitte beachten Sie auch, dass wir, um die Texte für den Bildschirm lesbarer zu 
 
 Falls Sie noch Änderungswünsche haben sollten, teilen Sie uns diese bitte bis '''innerhalb von 14 Tagen''' mit.
 
-Wir kennzeichnen alle Texte der Edition mit Creative Commons-Lizenzverträgen. Ihr Interpretationstext steht standardmäßig unter der CC-Lizenz „Creative Commons Namensnennung - Nicht kommerziell - Keine Bearbeitungen 4.0 International Lizenz“, d.h. er darf unter Nennung Ihres Namens in unveränderter Form zu nicht-kommerziellen Zwecken, beispielsweise zu Unterrichtszwecken, verwendet werden (https://creativecommons.org/licenses/by-nc-nd/4.0/deed.de).
+Wir kennzeichnen alle Texte der Edition mit Creative Commons-Lizenzverträgen. Ihr Interpretationstext steht standardmäßig unter der CC-Lizenz „Creative Commons Namensnennung - Nicht kommerziell - Keine Bearbeitungen 4.0 International Lizenz (CC BY-NC-ND)“, d.h. er darf unter Nennung Ihres Namens in unveränderter Form zu nicht-kommerziellen Zwecken, beispielsweise zu Unterrichtszwecken, verwendet werden (https://creativecommons.org/licenses/by-nc-nd/4.0/deed.de).
 
-Möchten Sie zusätzlich auch Exzerpte oder Bearbeitungen Ihres Textes erlauben, können Sie Ihren Text alternativ unter der „Creative Commons Namensnennung - Weitergabe unter gleichen Bedingungen 4.0 International“ (https://creativecommons.org/licenses/by-sa/4.0/deed.de) veröffentlichen.
+Möchten Sie in Einklang mit der Berliner Erklärung über den offenen Zugang zu wissenschaftlichem Wissen auch Exzerpte oder Bearbeitungen Ihres Textes erlauben – so wie es die DFG empfiehlt –, können Sie Ihren Text alternativ unter der „Creative Commons Namensnennung - Weitergabe unter gleichen Bedingungen 4.0 International“ (https://creativecommons.org/licenses/by-sa/4.0/deed.de) veröffentlichen. Ausführliche Informationen bietet der DFG Appell zur Nutzung offener Lizenzen in der Wissenschaft (http://www.dfg.de/foerderung/info_wissenschaft/2014/info_wissenschaft_14_68/).
 
-Falls Sie eine andere Lizenz wünschen, teilen Sie uns dies bitte ebenso innerhalb von 14 Tagen mit.
+Falls Sie eine andere Lizenz als die CC BY-NC-ND 4.0 wünschen, teilen Sie uns dies bitte ebenso innerhalb von 14 Tagen mit.
 
 Nähere Informationen zu den CC-Lizenzen finden Sie hier: http://de.creativecommons.org/was-ist-cc/
 
-Falls wir nichts von Ihnen hören, gehen wir davon aus, dass Sie mit der Veröffentlichung ihres Textes in der jetzigen Form und der o.g. CC-Lizenz einverstanden sind.
+Falls wir nichts von Ihnen hören, gehen wir davon aus, dass Sie mit der Veröffentlichung Ihres Textes in der jetzigen Form und der o.g. CC-Lizenz einverstanden sind.
+
+Erlauben Sie uns abschließend noch einen Hinweis auf eine mögliche Meldung Ihrer Beiträge bei der VG Wort: Da die gegenwärtigen Zugriffszahlen nicht hoch genug sind, um die für die reguläre Ausschüttung erforderliche Mindestabrufzahl zu erreichen, haben wir uns vorerst dagegen entschieden, eine Zählmarke der VG Wort einzubauen. Dies bietet Ihnen die Möglichkeit, Ihren Text selbst für die METIS Sonderausschüttung zu melden (https://tom.vgwort.de/Documents/pdfs/manuals/info_sonderausschuettung_neu.pdf).
 
 Wir würden uns freuen, wenn Sie Ihren Beitrag auch in Ihre Publikationslisten-/angaben aufnehmen würden. Eine entsprechende Zitationsempfehlung finden Sie am Ende des Beitrags.
 
@@ -41,3 +43,4 @@ Institut für die Geschichte der deutschen Juden
 Beim Schlump 83, 20144 Hamburg
 E-Mail: %email_from%
 Tel.: %phone_from%
+Twitter: @keydocuments
