@@ -4,6 +4,9 @@
   xpath-default-namespace="http://www.tei-c.org/ns/1.0"
   version="2.0">
 
+  <!-- converter fails on this tag that we use for audio/video -->
+  <xsl:template match="media"></xsl:template>
+
   <xsl:template match="@*|node()">
     <xsl:copy>
       <xsl:apply-templates select="@*|node()"/>
