@@ -107,6 +107,10 @@ $SITE_DESCRIPTION = array(
             'title' => 'TEI nach HTML',
             'anonymous' => FALSE,
         ),
+        'zotero' => array(
+            'title' => 'Zotero Sync',
+            'anonymous' => FALSE,
+        ),
         'account' => array(
             'title' => 'Account',
             'anonymous' => FALSE,

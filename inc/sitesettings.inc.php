@@ -5,9 +5,9 @@
  * Sitewide settings
  * (put machine dependent stuff like hardwired paths, logins and passwords in inc/local.inc.php)
  *
- * (c) 2009-2016 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2017 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2016-08-07 dbu
+ * Version: 2017-08-02 dbu
  *
  * Changes:
  *
@@ -53,17 +53,18 @@ $SITE = array(
   'pagetitle' => 'Hamburg Key-Documents of German-Jewish History',
 );
 
-$COUNTRIES_FEATURED = array('DE', 'AT', 'CH', 'UK', 'US', 'CA',
-                            'FR', 'IT', 'ES', 'NL', 'BE',
-                            'DK', 'SE', 'NO', 'FI',
-                            'AU', 'JP');
+$COUNTRIES_FEATURED = array(
+    'DE', 'AT', 'CH', 'UK', 'US', 'CA',
+    'FR', 'IT', 'ES', 'NL', 'BE',
+    'DK', 'SE', 'NO', 'FI',
+    'AU', 'JP',
+);
 $GLOBALS['LANGUAGES_FEATURED'] = array('ger', 'eng', 'fre', 'ita', 'spa', 'heb', 'yid');
 
-$GLOBALS['THESAURI'] =
-    array(
-          'section' => 'Section',
-          'sourcetype' => 'Source Type',
-          );
+$GLOBALS['THESAURI'] = array(
+    'section' => 'Section',
+    'sourcetype' => 'Source Type',
+);
 
 
 $MAIL_SETTINGS = array(
@@ -94,15 +95,18 @@ function compute_bytes ($val) {
       return 0;
     }
     $val = trim($val);
-    $last = strtolower($val[strlen($val)-1]);
-    switch ($last) {
+    $last = $val[strlen($val)-1];
+    switch (strtolower($last)) {
       // The 'G' modifier is available since PHP 5.1.0
       case 'g':
-          $val *= 1024;
+        $val = rtrim($val, $last);
+        $val *= 1024;
       case 'm':
-          $val *= 1024;
+        $val = rtrim($val, $last);
+        $val *= 1024;
       case 'k':
-          $val *= 1024;
+        $val = rtrim($val, $last);
+        $val *= 1024;
     }
 
     return $val;
@@ -114,20 +118,20 @@ if (!defined('UPLOAD_MAX_FILE_SIZE')) {
 }
 
 $MEDIA_EXTENSIONS = array(
-                          'image/gif' => '.gif', 'image/jpeg' => '.jpg', 'image/png' => '.png',
+    'image/gif' => '.gif', 'image/jpeg' => '.jpg', 'image/png' => '.png',
 
-                          'application/pdf' => '.pdf',
+    'application/pdf' => '.pdf',
 
-                          'audio/mpeg' => '.mp3',
-                          'video/mp4' => '.mp4',
+    'audio/mpeg' => '.mp3',
+    'video/mp4' => '.mp4',
 
-                          'text/rtf' => '.rtf',
-                          'application/vnd.oasis.opendocument.text' => '.odt',
-                          'application/msword' => '.doc',
-                          'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => '.docx',
+    'text/rtf' => '.rtf',
+    'application/vnd.oasis.opendocument.text' => '.odt',
+    'application/msword' => '.doc',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => '.docx',
 
-                          'application/xml' => '.xml',
-                          );
+    'application/xml' => '.xml',
+);
 
 $STATUS_REMOVED = '-1';
 $STATUS_EDIT = '0';
@@ -186,6 +190,7 @@ $LICENSE_OPTIONS = array(
     'restricted' => 'restricted (display only)',
     'regular' => 'regular (download for private and educational use)',
     'CC BY-NC-ND' => 'Creative Commons BY-NC-ND',
+    'CC BY-NC-SA' => 'Creative Commons BY-NC-SA',
     'CC BY-SA' => 'Creative Commons BY-SA',
     'PD' => 'Public Domain',
 );

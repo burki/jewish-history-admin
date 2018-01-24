@@ -201,11 +201,11 @@ class PageDisplayBase
   function formatText ($txt) {
     $encoder = $this->instantiateEncoder(FALSE);
 
-    return preg_replace('/\n/', '<br />', trim($this->adjustCharacters($encoder->transform($txt))));
+    return preg_replace('/\n/', '<br />', trim($this->adjustCharacters(@$encoder->transform($txt))));
   }
 
   function convertToPlain ($txt) {
-    $encoder = Text_Wiki_CmsCode::factory('CmsCode');
+    $encoder = @Text_Wiki_CmsCode::factory('CmsCode');
     if ('utf-8' == $this->charset) {
       $encoder->setFormatConf('Plain', 'charset', 'UTF-8');
     }

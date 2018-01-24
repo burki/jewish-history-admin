@@ -61,7 +61,6 @@ class AdminOnlyFlow extends TableManagerFlow
 
     // there is no listing for regular users
     return TABLEMANAGER_EDIT;
-
   }
 }
 

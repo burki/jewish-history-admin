@@ -41,8 +41,7 @@ class GndService
             return NULL;
         }
 
-
-        $persons = array();
+        $persons = [];
 
         $entries = json_decode($response->getBody(), TRUE);
         foreach ($entries as $entry) {
@@ -54,7 +53,7 @@ class GndService
             }
 
             $types = is_array($entry['@type'])
-                ? $entry['@type'] : array($entry['@type']);
+                ? $entry['@type'] : [$entry['@type']];
 
             if (!in_array('http://d-nb.info/standards/elementset/gnd#DifferentiatedPerson', $types)) {
                 continue;
@@ -63,15 +62,16 @@ class GndService
             $gnd = $entry['gndIdentifier'];
             if (self::isGnd($gnd)) {
                 // var_dump($entry);
-                $person = array('gnd' => $gnd,
-                                'name' => $entry['preferredNameForThePerson'],
-                                );
+                $person = [
+                    'gnd' => $gnd,
+                    'name' => $entry['preferredNameForThePerson'],
+                ];
 
-                $lifespan = array('', '');
+                $lifespan = ['', ''];
                 $lifespan_set = FALSE;
                 if (!empty($entry['dateOfBirth'])) {
                     $lifespan[0] = is_array($entry['dateOfBirth'])
-                        ? $entry['dateOfBirth']['@value']
+                        ? @$entry['dateOfBirth']['@value']
                         : $entry['dateOfBirth'];
                     $lifespan_set = TRUE;
                 }
@@ -102,7 +102,7 @@ class GndService
         require_once 'Zend/Http/Client.php';
 
         $client = new Zend_Http_Client('http://193.30.112.134/F/?func=find-a-0&local_base=hbz10',
-                                       array('maxredirects' => 0, 'timeout' => 30));
+                                       ['maxredirects' => 0, 'timeout' => 30]);
 
         try {
             $response = $client->request();
@@ -116,11 +116,11 @@ class GndService
                 throw new Exception('form not found in body: ' . $body);
 
             $client->setUri($matches[1]);
-            $client->setParameterGet(array(
+            $client->setParameterGet([
                 'func'  => 'find-a',
                 'find_code' => 'WPE',
                 'request' => $fullname,
-                ));
+            ]);
 
             $response = $client->request();
             if (200 != $response->getStatus()) {
@@ -133,7 +133,7 @@ class GndService
 
         $body = $response->getBody();
 
-        $persons = array();
+        $persons = [];
         if (preg_match_all('#<noscript>[\s\n]*<tr valign\=baseline>(.*?)</tr>#s', $body, $matches, PREG_PATTERN_ORDER)) {
           foreach ($matches[1] as $match) {
             if (preg_match_all('#<td class=td1[^>]*>(.*?)</td>#', $match, $record, PREG_PATTERN_ORDER)) {
@@ -141,11 +141,12 @@ class GndService
                 if (count($record) >= 6) {
                     $number = self::cleanTd($record[5]);
                     if (self::isGnd($number)) {
-                        $persons[] = array('gnd' => $number,
-                                           'name' => self::cleanTd($record[2]),
-                                           'lifespan' => self::cleanTd($record[3]),
-                                           'profession' => self::cleanTd($record['4']),
-                                           );
+                        $persons[] = [
+                            'gnd' => $number,
+                            'name' => self::cleanTd($record[2]),
+                            'lifespan' => self::cleanTd($record[3]),
+                            'profession' => self::cleanTd($record['4']),
+                        ];
                     }
                     else {
                         // ignore: var_dump($number . ' is not a PPN');

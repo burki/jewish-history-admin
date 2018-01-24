@@ -3,6 +3,7 @@ CREATE TABLE User (
   status int(11) NOT NULL DEFAULT 0,
   status_flags  INT DEFAULT 0,
   changed timestamp NULL NULL,
+  changed_by    INT NULL,                        #
   created datetime NULL,
   ip varchar(16) NULL,
   subscribed date NULL,
@@ -331,3 +332,47 @@ CREATE TABLE Place (
   changed       DATETIME NULL,                  # when it was changed
   changed_by    INT NULL                        #
 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+
+CREATE TABLE Zotero (
+  id            INT AUTO_INCREMENT PRIMARY KEY, # unique id
+
+  zoteroKey     VARCHAR(13) NOT NULL,           #
+  zoteroModified DATETIME NOT NULL,
+  zoteroVersion INT NOT NULL DEFAULT 0,
+  zoteroData    LONGTEXT NOT NULL,
+
+  corresp       VARCHAR(127),
+
+  itemType      VARCHAR(127) NOT NULL,          #
+  flags         INT DEFAULT 0,                  #
+  status        INT DEFAULT 0,                  # -1: removed, 0: proofread, 1: publish
+  status_flags  INT DEFAULT 0,
+  title         VARCHAR(1023) NOT NULL,          #
+  subtitle      VARCHAR(511) NULL,
+  author        VARCHAR(255) NULL,              #
+  editor        VARCHAR(255) NULL,              #
+  series        VARCHAR(255) NULL,              #
+  series_number  VARCHAR(50) NULL,               #
+  volume        VARCHAR(50) NULL,
+  number_of_volumes VARCHAR(50) NULL,
+  edition       VARCHAR(50) NULL,               #
+  place         VARCHAR(127) NULL,              #
+  publisher_id  INT NULL REFERENCES Publisher.id, #
+  publisher     VARCHAR(127) NULL,              # TODO: should we normalize
+  publication_date VARCHAR(50) NULL,            # year(-month(-day))
+  num_pages     VARCHAR(50) NULL,               #
+  lang          VARCHAR(5) NULL,
+  isbn          VARCHAR(13) NULL,               #
+  url           VARCHAR(511) NULL,              # link to TOC and similar things
+  archive       VARCHAR(511) NULL,           # for manuscripts
+  archive_location VARCHAR(511) NULL,           # for manuscripts
+  extra         VARCHAR(511) NULL,
+  listprice     VARCHAR(50) NULL,               #
+
+  # Common
+  comment       TEXT NULL,                      # internal comment
+  changed       TIMESTAMP NULL,                 # last changed
+  changed_by    INT NULL,                       # ref to User.id: who created the entry
+  created       TIMESTAMP,                      # when it was created
+  created_by    INT NULL                        # ref to User.id: who created the entry
+) ENGINE=MyISAM CHARACTER SET utf8 COLLATE utf8_unicode_ci;

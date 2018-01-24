@@ -35,8 +35,12 @@ class TableManagerFlow
   var $id;
   var $view_after_edit;
 
-  function TableManagerFlow ($view_after_edit = FALSE) {
+  function __construct ($view_after_edit = FALSE) {
     $this->view_after_edit = $view_after_edit;
+  }
+
+  function TableManagerFlow ($view_after_edit = FALSE) {
+    self::__construct($view_after_edit);
   }
 
   function init ($page) {
@@ -97,8 +101,12 @@ class TableManagerQueryConditionBuilder
 {
   var $term;
 
-  function TableManagerQueryConditionBuilder ($term) {
+  function __construct ($term) {
     $this->term = $term;
+  }
+
+  function TableManagerQueryConditionBuilder ($term) {
+    self::__construct($term);
   }
 
   static function mysqlParseFulltextBoolean ($search) {

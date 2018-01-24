@@ -4,9 +4,9 @@
  *
  * Manage the authors
  *
- * (c) 2006-2016 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2017 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2016-06-17 dbu
+ * Version: 2017-03-20 dbu
  *
  * Changes:
  *
@@ -20,10 +20,10 @@ class AuthorFlow extends TableManagerFlow
   const MERGE    = 1010;
 
   static $TABLES_RELATED = array(
-          'editor' => array('Message'),
-          'referee' => array('Message'),
-          'translator' => array('Message', 'Publication'),
-          'user_id' => array('MessageUser'),
+    'editor' => array('Message'),
+    'referee' => array('Message'),
+    'translator' => array('Message', 'Publication'),
+    'user_id' => array('MessageUser'),
   );
 
   var $user;
@@ -106,7 +106,6 @@ class AuthorRecord extends TableManagerRecord
 
     return $dbconn->affected_rows() > 0;
   }
-
 }
 
 class AuthorQueryConditionBuilder extends TableManagerQueryConditionBuilder
@@ -131,7 +130,6 @@ class AuthorQueryConditionBuilder extends TableManagerQueryConditionBuilder
       return $ret;
     }
   }
-
 }
 
 class DisplayAuthor extends DisplayTable
@@ -236,6 +234,7 @@ class DisplayAuthor extends DisplayTable
         new Field(array('name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => 1)),
 /*        new Field(array('name' => 'editor', 'type' => 'hidden', 'datatype' => 'int', 'null' => TRUE)),*/
         new Field(array('name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()')),
+        new Field(array('name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => TRUE)),
 
         new Field(array('name' => 'email', 'type' => 'email', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE, 'noupdate' => !$this->is_internal)),
         new Field(array('name' => 'status', 'type' => 'select', 'options' => array_keys($status_options), 'labels' => array_values($status_options), 'datatype' => 'int', 'default' => -10, 'noupdate' => !$this->is_internal, 'null' => !$this->is_internal)),
@@ -380,10 +379,10 @@ EOT;
     }
 
     $rows = array(
-        'id' => FALSE,
-        'flags' => FALSE,
-        'email' => array('label' => 'E-mail'),
-        'status' => array('label' => 'Newsletter'),
+      'id' => FALSE,
+      'flags' => FALSE,
+      'email' => array('label' => 'E-mail'),
+      'status' => array('label' => 'Newsletter'),
     );
 
     if (FALSE && $this->is_internal) {
@@ -397,7 +396,8 @@ EOT;
     }
 
     $rows = array_merge($rows, array(
-        array('label' => 'Salutation / Academic Title', 'fields' => array('sex', 'title')),
+      array(
+        'label' => 'Salutation / Academic Title', 'fields' => array('sex', 'title')),
         'lastname' => array('label' => 'Last Name'),
         'firstname' => array('label' => 'First Name'),
         'position' => array('label' => 'Position'),
@@ -480,6 +480,12 @@ EOT;
         $this->form->show_submit(tr('Store')),
       )
     );
+  }
+
+  function renderEditForm ($rows, $name = 'detail') {
+    $changed = isset($this->id) ? $this->buildChangedBy() : '';
+
+    return $changed . parent::renderEditForm($rows, $name);
   }
 
   function buildView () {
@@ -819,7 +825,7 @@ EOT;
   function buildContent () {
     if (AuthorFlow::MERGE == $this->step) {
       $res = $this->buildMerge();
-      if ('boolean' == gettype($res)) {
+      if (is_bool($res)) {
         if ($res) {
           $this->step = TABLEMANAGER_VIEW;
         }

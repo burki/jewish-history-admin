@@ -90,9 +90,9 @@ class ImageUploadHandler
             // find matching files
             if ($dh = opendir($folder)) {
               while (($fname = readdir($dh)) !== false) {
-                if (preg_match('/^'.$basename.$ord.'/', $fname)) {
+                if (preg_match('/^' . $basename . $ord . '/', $fname)) {
                   if ($ord_orig == intval($ord)) {
-                    unlink($folder.$fname);
+                    unlink($folder . $fname);
                   }
                   else {
                     $fname_new = preg_replace("/^{$basename}$ord/",
@@ -126,8 +126,8 @@ class ImageUploadHandler
                         $options = array()) {
     global $UPLOAD_TRANSLATE;
 
-    $multiple_new = array_key_exists('multiple_new', $options)
-      ? $options['multiple_new'] : TRUE;
+    $images = array();
+
     $append_number = array_key_exists('append_number', $options)
       ? $options['append_number'] : $max_images != 1;
     $legacy = array_key_exists('legacy', $options)
@@ -135,7 +135,6 @@ class ImageUploadHandler
     $img_title = array_key_exists('title', $options)
 		? $options['title'] : NULL;
 
-    $images = array();
 
     if (isset($this->dbconn)) {
       $dbconn = & $this->dbconn;

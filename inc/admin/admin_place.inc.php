@@ -4,9 +4,9 @@
  *
  * Manage the Place-table
  *
- * (c) 2015-2016 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2015-2017 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2016-07-05 dbu
+ * Version: 2017-01-09 dbu
  *
  * TODO:
  *
@@ -56,7 +56,7 @@ class PlaceRecord extends TableManagerRecord
   var $languages = array('de', 'en');
 
   function store ($args = '') {
-    $alternateName = array();
+    $alternateName = [];
     foreach ($this->languages as $language) {
       $value = $this->get_value('name_variant_' . $language);
       if (!empty($value)) {
@@ -64,6 +64,19 @@ class PlaceRecord extends TableManagerRecord
       }
     }
     $this->set_value('alternateName', json_encode($alternateName));
+
+    $additional = json_decode($this->get_value('additional'), true);
+    if (false == $additional) {
+      $additional = [];
+    }
+    foreach ([ 'boundaryCode' ] as $key) {
+      $value = $this->get_value($key);
+      if (!empty($value)) {
+        $additional[$key] = trim($value);
+      }
+    }
+    $this->set_value('additional', json_encode($additional));
+
     return parent::store($args);
   }
 
@@ -71,9 +84,19 @@ class PlaceRecord extends TableManagerRecord
     $fetched = parent::fetch($args, $datetime_style);
     if ($fetched) {
       $alternateName = json_decode($this->get_value('alternateName'), TRUE);
-      foreach ($this->languages as $language) {
-        if (isset($alternateName) && FALSE !== $alternateName && array_key_exists($language, $alternateName)) {
-          $this->set_value('name_variant_' . $language, $alternateName[$language]);
+      if (isset($alternateName) && FALSE !== $alternateName) {
+        foreach ($this->languages as $language) {
+          if (array_key_exists($language, $alternateName)) {
+            $this->set_value('name_variant_' . $language, $alternateName[$language]);
+          }
+        }
+      }
+      $additional = json_decode($this->get_value('additional'), TRUE);
+      if (isset($additional) && FALSE !== $additional) {
+        foreach ([ 'boundaryCode' ] as $key) {
+          if (array_key_exists($key, $additional)) {
+            $this->set_value($key, $additional[$key]);
+          }
         }
       }
     }
@@ -166,17 +189,29 @@ class DisplayPlace extends DisplayBackend
                           'continent' => tr('Continent'),
                           'nation' => tr('Nation'),
                           'country' => tr('Country'),
+                          'autonomous republic' => tr('Autonomous Republic'),
+                          'governorate' => tr('Governorate'),
                           'state' => tr('State'),
+                          'national district' => tr('National District'),
                           'province' => tr('Province'),
                           'region' => tr('Region'),
+                          'canton' => tr('Canton'),
+                          'oblast' => tr('Oblast'),
+                          'voivodeship' => tr('Voivodeship'),
+                          'county' => tr('County'),
+                          'unitary authority' => tr('Unitary authority'),
+                          'municipality' => tr('Municipality'),
                           'autonomous city' => tr('Autonomous City'),
                           'autonomous community' => tr('Autonomous Community'),
                           'special city' => tr('Special City'),
                           'inhabited place' => tr('Inhabited Place'),
+                          'district' => tr('District'),
                           'neighborhood' => tr('Neighborhood'),
                           'general region' => tr('General Region'),
                           'historical region' => tr('Historical Region'),
+                          'former group of political entitites' => tr('Former group of political entitites'),
                           'former primary political entity' => tr('Former primary political entity'),
+                          'deserted settlement' => tr('Deserted Settlement'),
                           'sea' => tr('Sea'),
                           'peninsula' => tr('Peninsula'),
                           'island' => tr('Island'),
@@ -210,8 +245,11 @@ class DisplayPlace extends DisplayBackend
         new Field(array('name' => 'tgn', 'id' => 'tgn', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
         // new Field(array('name' => 'tgn_parent', 'id' => 'tgn_parent', 'type' => 'hidden', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
         // new Field(array('name' => 'parent_path', 'id' => 'parent_path', 'type' => 'hidden', 'datatype' => 'char', 'size' => 40, 'null' => TRUE)),
+        new Field(array('name' => 'gnd', 'id' => 'gnd', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
         new Field(array('name' => 'geonames', 'id' => 'geonames', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
 
+        new Field(array('name' => 'boundaryCode', 'type' => 'text', 'datatype' => 'char', 'size' => 40, 'null' => TRUE, 'nodbfield' => true)),
+        new Field(array('name' => 'additional', 'type' => 'hidden', 'datatype' => 'char', 'null' => TRUE)),
         /*
         new Field(array('name' => 'latitude', 'id' => 'latitude', 'type' => 'hidden', 'datatype' => 'char', 'size' => 15, 'null' => TRUE)),
         new Field(array('name' => 'longitude', 'id' => 'longitude', 'type' => 'hidden', 'datatype' => 'char', 'size' => 15, 'null' => TRUE)),
@@ -235,7 +273,7 @@ class DisplayPlace extends DisplayBackend
   function getEditRows ($mode = 'edit') {
     $tgn_search = '';
     if (false && 'edit' == $mode) {
-      $tgn_search = sprintf('<input value="TGN Anfrage nach Name, Vorname" type="button" onclick="%s" /><span id="spinner"></span><br />',
+      $tgn_search = sprintf('<input value="TGN Anfrage nach Name" type="button" onclick="%s" /><span id="spinner"></span><br />',
                             "jQuery('#tgn').autocomplete('enable');jQuery('#tgn').autocomplete('search', jQuery('#lastname').val() + ', ' + jQuery('#firstname').val())");
     }
     $rows = array(
@@ -243,14 +281,17 @@ class DisplayPlace extends DisplayBackend
       'type' => array('label' => 'Place Type'),
       'name' => array('label' => 'Name'),
       'name_variant_de' => array('label' => 'Deutscher Name',
-                              'description' => "Please enter additional names or spellings"),
+                                 'description' => "Please enter additional names or spellings"),
       'name_variant_en' => array('label' => 'Englischer Name',
-                              'description' => "Please enter additional names or spellings"),
+                                 'description' => "Please enter additional names or spellings"),
       'tgn' => array('label' => 'Getty Thesaurus of Name',
                      'description' => 'Identifikator',
                      ),
       'tgn_parent' => FALSE,
       // 'parent_path' => ('edit' == $mode ? FALSE : array('label' => 'Uebergeordnet')),
+      'gnd' => array('label' => 'GND',
+                     'description' => 'Identifikator',
+                     ),
       'geonames' => array('label' => 'GeoNames',
                      'description' => 'Identifikator',
                      ),
@@ -258,6 +299,8 @@ class DisplayPlace extends DisplayBackend
       . '<hr noshade="noshade" />',
 
       'country_code' => array('label' => 'Country'),
+      'boundaryCode' => array('label' => 'Boundary Code (ISO 3166-2)'),
+      'additional' => FALSE,
 
       'longitude' => FALSE,
       'latitude' => FALSE,
@@ -378,7 +421,7 @@ EOT;
 
         $rows['tgn']['value'] .= '</li>';
 
-        $external = array();
+        $external = [];
         foreach ($PND_LINKS as $url => $title) {
           $url_final = sprintf($url, $tgn);
           $external[] = sprintf('<li><a href="%s" target="_blank">%s</a></li>',
@@ -586,7 +629,7 @@ EOT;
   function getImageDescriptions () {
     global $TYPE_PLACE;
 
-    return array($TYPE_PLACE, array());
+    return array($TYPE_PLACE, []);
   }
 
   function doListingQuery ($page_size = 0, $page_id = 0) {

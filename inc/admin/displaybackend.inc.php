@@ -342,6 +342,8 @@ class DisplayBackend extends DisplayTable
   function buildView () {
     $this->id = $this->workflow->primaryKey();
     $record = $this->buildRecord();
+    $ret = '';
+
     if ($found = $record->fetch($this->id)) {
       $this->record = &$record;
       $uploadHandler = $this->instantiateUploadHandler();
@@ -360,8 +362,8 @@ class DisplayBackend extends DisplayTable
       if (isset($uploadHandler)) {
         $ret .= $this->renderUpload($uploadHandler);
       }
-
     }
+    
     $ret .= $this->buildViewFooter($found);
 
     return $ret;
