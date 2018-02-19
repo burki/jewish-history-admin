@@ -4,9 +4,9 @@
  *
  * Manage the articles
  *
- * (c) 2009-2016 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2016-08-07 dbu
+ * Version: 2018-02-19 dbu
  *
  * Changes:
  *
@@ -15,7 +15,8 @@
 require_once INC_PATH . 'common/classes.inc.php';
 require_once INC_PATH . 'admin/displaymessage.inc.php';
 
-class ArticleQueryConditionBuilder extends MessageQueryConditionBuilder
+class ArticleQueryConditionBuilder
+extends MessageQueryConditionBuilder
 {
   static function buildOverdueExpression () {
     return 'CASE Message.status'
@@ -40,7 +41,7 @@ class ArticleQueryConditionBuilder extends MessageQueryConditionBuilder
 
     if (isset($this->term) && '' !== $this->term) {
       if (100 == $this->term) {
-        // ueberfaellig
+        // overdue
         $ret = 'CURRENT_DATE() >= ' . self::buildOverdueExpression();
       }
       else {
@@ -53,6 +54,7 @@ class ArticleQueryConditionBuilder extends MessageQueryConditionBuilder
           // ." OR ".$fields[0]. " = -3" // uncomment for open requests
           ." OR (".$fields[0]." = 2 AND hold <= CURRENT_DATE()))";
       } */
+
       return $ret;
     }
 
@@ -61,7 +63,8 @@ class ArticleQueryConditionBuilder extends MessageQueryConditionBuilder
 
 }
 
-class MessageWithPublicationRecord extends MessageRecord
+class MessageWithPublicationRecord
+extends MessageRecord
 {
   function store ($args = '') {
     $stored = parent::store($args);
@@ -86,7 +89,8 @@ class MessageWithPublicationRecord extends MessageRecord
   }
 }
 
-class DisplayArticle extends DisplayMessage
+class DisplayArticle
+extends DisplayMessage
 {
   // var $show_xls_export = TRUE;
   var $status_options;
@@ -107,33 +111,42 @@ class DisplayArticle extends DisplayMessage
     $this->view_options['section'] = $this->section_options = $this->buildOptions('section');
     $index = 3;
     $array = $this->fields_listing;
-    $this->fields_listing = array_merge(array_slice($array, 0, $index),
-                                        array("CONCAT(R.lastname, ' ', R.firstname) AS referee",
-                                              $this->table . '.section AS section',
-                                              $this->table . '.status_flags AS status_flags',
-                                              ),
-                                        array_slice($array, $index, count($array) - 1));
-    $this->cols_listing = array_merge_at($this->cols_listing,
-                                         array('referee' => 'Referee',
-                                               'section' => 'Section'),
-                                         'contributor');
-    $this->condition[] = array('name' => 'status_translation',
-                               'method' => 'buildEqualCondition',
-                               'args' => $this->table . '.status_translation',
-                               'persist' => 'session');
-    $this->condition[] = array('name' => 'referee',
-                               'method' => 'buildEqualCondition',
-                               'args' => $this->table . '.referee',
-                               'persist' => 'session');
-    $this->condition[] = array('name' => 'section',
-                               'method' => 'buildSectionCondition',
-                               'args' => $this->table . '.section',
-                               'persist' => 'session');
-    $this->order['referee'] = array('referee', 'referee DESC');
-    $this->order['section'] = array('section', 'section DESC');
+    $this->fields_listing = array_merge(array_slice($array, 0, $index), [
+        "CONCAT(R.lastname, ' ', R.firstname) AS referee",
+        $this->table . '.section AS section',
+        $this->table . '.status_flags AS status_flags',
+      ],
+      array_slice($array, $index, count($array) - 1));
 
-    $this->order['date'] = array('IF(0 = reviewer_deadline + 0, published, reviewer_deadline) DESC', 'IF(0 = reviewer_deadline + 0, published, reviewer_deadline)');
-    $this->fields_listing[count($this->fields_listing) -1 ] = "DATE(reviewer_deadline) AS reviewer_deadline";
+    $this->cols_listing = array_merge_at($this->cols_listing, [
+      'referee' => 'Referee', 'section' => 'Section'], 'contributor');
+
+    $this->condition[] = [
+      'name' => 'status_translation',
+      'method' => 'buildEqualCondition',
+      'args' => $this->table . '.status_translation',
+      'persist' => 'session',
+    ];
+    $this->condition[] = [
+      'name' => 'referee',
+      'method' => 'buildEqualCondition',
+      'args' => $this->table . '.referee',
+      'persist' => 'session',
+    ];
+    $this->condition[] = [
+      'name' => 'section',
+      'method' => 'buildSectionCondition',
+      'args' => $this->table . '.section',
+      'persist' => 'session',
+    ];
+    $this->order['referee'] = [ 'referee', 'referee DESC' ];
+    $this->order['section'] = [ 'section', 'section DESC' ];
+
+    $this->order['date'] =[
+      'IF(0 = reviewer_deadline + 0, published, reviewer_deadline) DESC',
+      'IF(0 = reviewer_deadline + 0, published, reviewer_deadline)',
+    ];
+    $this->fields_listing[count($this->fields_listing) - 1] = "DATE(reviewer_deadline) AS reviewer_deadline";
     $this->cols_listing['date'] = 'Author deadline';
   }
 
@@ -142,12 +155,12 @@ class DisplayArticle extends DisplayMessage
   }
 
   function constructFulltextCondition () {
-    $this->condition[] = array(
-                               'name' => 'search',
-                               'method' => 'buildFulltextCondition',
-                               'args' => 'subject,User.firstname,User.lastname,body',
-                               'persist' => 'session',
-                               );
+    $this->condition[] = [
+      'name' => 'search',
+      'method' => 'buildFulltextCondition',
+      'args' => 'subject,User.firstname,User.lastname,body',
+      'persist' => 'session',
+    ];
   }
 
   function init () {
@@ -158,6 +171,7 @@ class DisplayArticle extends DisplayMessage
 
     if (!$this->checkAction(TABLEMANAGER_EDIT)) {
       $this->listing_default_action = TABLEMANAGER_VIEW;
+
       return $ret;
     }
 
@@ -201,11 +215,11 @@ class DisplayArticle extends DisplayMessage
   }
 
   function instantiateRecord ($table = '', $dbconn = '') {
-    return new MessageWithPublicationRecord(array('tables' => $this->table, 'dbconn' => $this->page->dbconn));
+    return new MessageWithPublicationRecord([ 'tables' => $this->table, 'dbconn' => $this->page->dbconn ]);
   }
 
   function buildStatusOptions ($options = NULL, $show_all = true) {
-    $options = array('100' => '_&#252;berf&#228;llig_') + $this->status_options;
+    $options = [ '100' => '_&#252;berf&#228;llig_' ] + $this->status_options;
     return parent::buildStatusOptions($options);
   }
 
@@ -224,25 +238,29 @@ class DisplayArticle extends DisplayMessage
           }
           $languages_ordered['&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;'] = FALSE; // separator
         }
+
         foreach ($languages as $iso639_2 => $name) {
           if (!isset($languages_ordered[$iso639_2])) {
             $languages_ordered[$iso639_2] = $name;
           }
         }
+
         return $languages_ordered;
         break;
 
       case 'license':
         global $LICENSE_OPTIONS_ARTICLE;
-        $licenses = array();
+        $licenses = [];
         foreach ($LICENSE_OPTIONS_ARTICLE as $key => $label) {
           $licenses[$key] = tr($label);
         }
+
         return $licenses;
         break;
 
       case 'status_translation':
         global $STATUS_TRANSLATION_OPTIONS;
+
         return $STATUS_TRANSLATION_OPTIONS;
         break;
 
@@ -273,7 +291,7 @@ class DisplayArticle extends DisplayMessage
           break;
     }
     $dbconn->query($querystr);
-    $options = array();
+    $options = [];
     while ($dbconn->next_record()) {
       $label = 'section' == $type
         ? $dbconn->Record['name']
@@ -297,73 +315,73 @@ class DisplayArticle extends DisplayMessage
     $this->view_options['referee'] = $this->referee_options = $this->buildOptions('referee');
     $this->view_options['translator'] = $this->translator_options = $this->buildOptions('translator');
     $this->view_options['lang'] = $this->buildOptions('lang');
-    $languages_ordered = array('' => tr('-- please select --')) + $this->view_options['lang'];
+    $languages_ordered = [ '' => tr('-- please select --') ] + $this->view_options['lang'];
     $this->view_options['status_translation'] = $this->status_translation_options
-      = array('' => tr('-- please select --')) + $this->buildOptions('status_translation');
+      = [ '' => tr('-- please select --') ] + $this->buildOptions('status_translation');
     $this->view_options['license'] = $license_options = $this->buildOptions('license');
 
-    $record->add_fields(array(
-        new Field(array('name' => 'status_flags', 'type' => 'checkbox', 'datatype' => 'bitmap', 'null' => TRUE, 'default' => 0,
-                              'labels' => array(
-                                                0x01 => tr('Peer Review') . ' ' . tr('finalized'),
-                                                0x02 => tr('Markup') . ' ' . tr('finalized'),
-                                                0x04 => tr('Bibliography') . ' ' . tr('finalized'),
-                                                0x08 => tr('Translation') . ' ' . tr('finalized'),
-                                                0x10 => tr('Translation Markup') . ' ' . tr('finalized'),
-                                                0x20 => tr('ready for publishing'),
-                                                ),
-                             )
-                       ),
-        new Field(array('name' => 'publication', 'type' => 'hidden', 'datatype' => 'int',
-                        'nodbfield' => TRUE, 'null' => TRUE)),
-        new Field(array('name' => 'section', 'type' => 'select',
-                        'options' => array_merge(array(/*''*/), array_keys($this->section_options)),
-                        'labels' => array_merge(array(/*tr('-- please select --')*/), array_values($this->section_options)),
-                        /* 'datatype' => 'int', 'multiple' => FALSE, */
-                        'datatype' => 'char', 'multiple' => TRUE, 'class' => 'chosen-select',
-                        'null' => FALSE)),
-        new Field(array('name' => 'editor', 'type' => 'select',
-                        'options' => array_merge(array(''), array_keys($this->editor_options)),
-                        'labels' => array_merge(array(tr('-- none --')), array_values($this->editor_options)),
-                        'datatype' => 'int', 'null' => TRUE)),
-        new Field(array('name' => 'referee', 'type' => 'select',
-                        'options' => array_merge(array(''), array_keys($this->referee_options)),
-                        'labels' => array_merge(array(tr('-- none --')), array_values($this->referee_options)),
-                        'datatype' => 'int', 'null' => TRUE)),
-        new Field(array('name' => 'lang', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($languages_ordered), 'labels' => array_values($languages_ordered), 'null' => TRUE)),
-        new Field(array('name' => 'translator', 'type' => 'select',
-                        'options' => array_merge(array(''), array_keys($this->translator_options)),
-                        'labels' => array_merge(array(tr('-- none --')), array_values($this->translator_options)),
-                        'datatype' => 'int', 'null' => TRUE)),
-        new Field(array('name' => 'status_translation', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($this->status_translation_options), 'labels' => array_values($this->status_translation_options), 'null' => TRUE)),
+    $record->add_fields([
+      new Field([ 'name' => 'status_flags', 'type' => 'checkbox', 'datatype' => 'bitmap', 'null' => TRUE, 'default' => 0,
+                  'labels' => [
+                    0x01 => tr('Peer Review') . ' ' . tr('finalized'),
+                    0x02 => tr('Markup') . ' ' . tr('finalized'),
+                    0x04 => tr('Bibliography') . ' ' . tr('finalized'),
+                    0x08 => tr('Translation') . ' ' . tr('finalized'),
+                    0x10 => tr('Translation Markup') . ' ' . tr('finalized'),
+                    0x20 => tr('ready for publishing'),
+                   ]]),
+      new Field([ 'name' => 'publication', 'type' => 'hidden', 'datatype' => 'int',
+                  'nodbfield' => TRUE, 'null' => TRUE ]),
+      new Field([ 'name' => 'section', 'type' => 'select',
+                  'options' => array_merge([ /*''*/ ], array_keys($this->section_options)),
+                  'labels' => array_merge([ /*tr('-- please select --')*/ ], array_values($this->section_options)),
+                  /* 'datatype' => 'int', 'multiple' => FALSE, */
+                  'datatype' => 'char', 'multiple' => TRUE, 'class' => 'chosen-select',
+                  'null' => FALSE ]),
+      new Field([ 'name' => 'editor', 'type' => 'select',
+                  'options' => array_merge([ '' ], array_keys($this->editor_options)),
+                  'labels' => array_merge([ tr('-- none --') ], array_values($this->editor_options)),
+                  'datatype' => 'int', 'null' => TRUE ]),
+      new Field([ 'name' => 'referee', 'type' => 'select',
+                  'options' => array_merge([ '' ], array_keys($this->referee_options)),
+                  'labels' => array_merge([ tr('-- none --') ], array_values($this->referee_options)),
+                  'datatype' => 'int', 'null' => TRUE ]),
+      new Field([ 'name' => 'lang', 'type' => 'select', 'datatype' => 'char',
+                   'options' => array_keys($languages_ordered),
+                   'labels' => array_values($languages_ordered), 'null' => TRUE ]),
+      new Field([ 'name' => 'translator', 'type' => 'select',
+                      'options' => array_merge([ '' ], array_keys($this->translator_options)),
+                      'labels' => array_merge([ tr('-- none --') ], array_values($this->translator_options)),
+                      'datatype' => 'int', 'null' => TRUE ]),
+      new Field([ 'name' => 'status_translation', 'type' => 'select', 'datatype' => 'char',
+                  'options' => array_keys($this->status_translation_options),
+                  'labels' => array_values($this->status_translation_options), 'null' => TRUE ]),
 
-        new Field(array('name' => 'reviewer_request', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
-        new Field(array('name' => 'reviewer_sent', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
-        new Field(array('name' => 'reviewer_deadline', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
-        new Field(array('name' => 'reviewer_received', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
-        new Field(array('name' => 'referee_sent', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
-        new Field(array('name' => 'referee_deadline', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
+      new Field([ 'name' => 'modified', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE ]),
+      new Field([ 'name' => 'reviewer_request', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE ]),
+      new Field([ 'name' => 'reviewer_sent', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE ]),
+      new Field([ 'name' => 'reviewer_deadline', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE ]),
+      new Field([ 'name' => 'reviewer_received', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE ]),
+      new Field([ 'name' => 'referee_sent', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE ]),
+      new Field([ 'name' => 'referee_deadline', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE ]),
 
-        new Field(array('name' => 'publisher_request', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
-        new Field(array('name' => 'publisher_received', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
+      new Field([ 'name' => 'publisher_request', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE ]),
+      new Field([ 'name' => 'publisher_received', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE ]),
 
-        new Field(array('name' => 'imprimatur_sent', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
+      new Field([ 'name' => 'imprimatur_sent', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE ]),
 
-        new Field(array('name' => 'slug_de', 'id' => 'slug_de', 'type' => 'text', 'datatype' => 'char', 'size' => 45, 'maxlength' => 200, 'null' => TRUE)),
-        new Field(array('name' => 'slug', 'id' => 'slug', 'type' => 'text', 'datatype' => 'char', 'size' => 45, 'maxlength' => 200, 'null' => TRUE)),
-        // new Field(array('name' => 'url', 'id' => 'url', 'type' => 'text', 'datatype' => 'char', 'size' => 65, 'maxlength' => 200, 'null' => TRUE)),
-        // new Field(array('name' => 'urn', 'id' => 'urn', 'type' => 'text', 'datatype' => 'char', 'size' => 45, 'maxlength' => 200, 'null' => TRUE)),
-        // new Field(array('name' => 'tags', 'id' => 'urn', 'type' => 'text', 'datatype' => 'char', 'size' => 45, 'maxlength' => 200, 'null' => TRUE)),
-        new Field(array('name' => 'license', 'id' => 'license', 'type' => 'select',
-                        'options' => array_keys($license_options),
-                        'labels' => array_values($license_options), 'datatype' => 'char', 'null' => TRUE)),
-        new Field(array('name' => 'comment_imprimatur', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE)),
-        new Field(array('name' => 'comment_review', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE)),
-        new Field(array('name' => 'comment_markup', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE)),
-        new Field(array('name' => 'comment_bibliography', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE)),
-        new Field(array('name' => 'comment_translation', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE)),
-        new Field(array('name' => 'comment_translation_markup', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE)),
-    ));
+      new Field([ 'name' => 'slug_de', 'id' => 'slug_de', 'type' => 'text', 'datatype' => 'char', 'size' => 45, 'maxlength' => 200, 'null' => TRUE ]),
+      new Field([ 'name' => 'slug', 'id' => 'slug', 'type' => 'text', 'datatype' => 'char', 'size' => 45, 'maxlength' => 200, 'null' => TRUE ]),
+      new Field([ 'name' => 'license', 'id' => 'license', 'type' => 'select',
+                  'options' => array_keys($license_options),
+                  'labels' => array_values($license_options), 'datatype' => 'char', 'null' => TRUE ]),
+      new Field([ 'name' => 'comment_imprimatur', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE ]),
+      new Field([ 'name' => 'comment_review', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE ]),
+      new Field([ 'name' => 'comment_markup', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE ]),
+      new Field([ 'name' => 'comment_bibliography', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE ]),
+      new Field([ 'name' => 'comment_translation', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE ]),
+      new Field([ 'name' => 'comment_translation_markup', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE ]),
+    ]);
 
     if (!isset($this->workflow->id)) {
       // for new entries, a subject or publication-id may be passed along
@@ -387,11 +405,11 @@ class DisplayArticle extends DisplayMessage
       $this->script_code .= <<<EOT
     // for chosen
     jQuery(document).ready(function() {
-      jQuery('.chosen-select').chosen({width: "95%"});
+      jQuery('.chosen-select').chosen({ width: "95%" });
     }); //
 
 
-  function generateCommunication (url, mode) {
+    function generateCommunication (url, mode) {
       var form = document.forms['detail'];
       if (null != form) {
         var params = {
@@ -444,174 +462,132 @@ class DisplayArticle extends DisplayMessage
 
         window.open(url);
       }
-  }
-
-  function generateSlug() {
-    var subject = \$('subject');
-    if (null === subject) {
-      return;
     }
 
-    title = subject.value;
-    if ("" == title) {
-      alert('Bitte tragen Sie erst einen Titel ein');
-      return;
-    }
+    function generateSlug() {
+      var subject = \$('subject');
+      if (null === subject) {
+        return;
+      }
 
+      title = subject.value;
+      if ("" == title) {
+        alert('Bitte tragen Sie erst einen Titel ein');
+        return;
+      }
 
-    var url = '{$url_ws}';
-    var pars = 'pn=article&action=generateSlug&title=' + encodeURIComponent(title);
+      var url = '{$url_ws}';
+      var pars = 'pn=article&action=generateSlug&title=' + encodeURIComponent(title);
 
-    var form = document.forms['detail'];
-    if (null != form && null != form.elements['user_id']) {
-      var user_id = form.elements['user_id'].value;
-      if ("" != user_id) {
-        user_id = + user_id;
-        if (!isNaN(user_id)) {
-          pars += '&user_id=' + user_id;
+      var form = document.forms['detail'];
+      if (null != form && null != form.elements['user_id']) {
+        var user_id = form.elements['user_id'].value;
+        if ("" != user_id) {
+          user_id = + user_id;
+          if (!isNaN(user_id)) {
+            pars += '&user_id=' + user_id;
+          }
         }
       }
+
+      var myAjax = new Ajax.Request(url, {
+        method: 'get',
+        parameters: pars,
+        onComplete: setSlug
+      });
     }
 
-
-    var myAjax = new Ajax.Request(
-          url,
-          {
-              method: 'get',
-              parameters: pars,
-              onComplete: setSlug
-          });
-  }
-
-  function setSlug (originalRequest, obj) {
-    if (obj.status > 0) {
-      var field = \$('slug_de');
-      if (null != field) {
-        field.value = obj.title_slug;
+    function setSlug (originalRequest, obj) {
+      if (obj.status > 0) {
+        var field = \$('slug_de');
+        if (null != field) {
+          field.value = obj.title_slug;
+        }
+      }
+      else {
+        alert('ret: ' + obj.msg + ' ' + obj.status);
       }
     }
-    else {
-      alert('ret: ' + obj.msg + ' ' + obj.status);
-    }
-  }
-
-  function generateUrn() {
-    var permalink = \$F('url');
-    if ("" == permalink) {
-      alert('Bitte tragen Sie erst eine URL ins Feld "Permanent URL" ein');
-      return;
-    }
-    var url = '{$url_ws}';
-    var pars = 'pn=article&action=generateUrn&url=' + escape(permalink);
-
-    var myAjax = new Ajax.Request(
-          url,
-          {
-              method: 'get',
-              parameters: pars,
-              onComplete: setUrn
-          });
-  }
-
-  function setUrn (originalRequest, obj) {
-    if (obj.status > 0) {
-      var field = \$('urn');
-      if (null != field) {
-        field.value = obj.urn;
-      }
-    }
-    else {
-      alert('ret: ' + obj.msg + ' ' + obj.status);
-    }
-  }
 
 EOT;
       $publisher_request_button = sprintf(' <input type="button" value="%s" onclick="generateCommunication(\'%s\', \'publisher_request\')" />',
-                                          tr('send letter'), htmlspecialchars($this->page->buildLink(array('pn' => 'communication', 'edit' => -1))));
+                                          tr('send letter'), htmlspecialchars($this->page->buildLink([ 'pn' => 'communication', 'edit' => -1 ])));
       $reviewer_request_button = sprintf(' <input type="button" value="%s" onclick="generateCommunication(\'%s\', \'reviewer_request\')" />',
-                                         tr('send letter'), htmlspecialchars($this->page->buildLink(array('pn' => 'communication', 'edit' => -1))));
+                                         tr('send letter'), htmlspecialchars($this->page->buildLink([ 'pn' => 'communication', 'edit' => -1 ])));
       $reviewer_sent_button = sprintf(' <input type="button" value="%s" onclick="generateCommunication(\'%s\', \'reviewer_sent\')" />',
-                                      tr('send letter'), htmlspecialchars($this->page->buildLink(array('pn' => 'communication', 'edit' => -1))));
+                                      tr('send letter'), htmlspecialchars($this->page->buildLink([ 'pn' => 'communication', 'edit' => -1 ])));
       $reviewer_reminder_button = sprintf(' <input type="button" value="%s" onclick="generateCommunication(\'%s\', \'reviewer_reminder\')" />',
-                                          tr('send letter'), htmlspecialchars($this->page->buildLink(array('pn' => 'communication', 'edit' => -1))));
+                                          tr('send letter'), htmlspecialchars($this->page->buildLink([ 'pn' => 'communication', 'edit' => -1 ])));
       $imprimatur_sent_button = sprintf(' <input type="button" value="%s" onclick="generateCommunication(\'%s\', \'imprimatur_sent\')" />',
-                                          tr('send letter'), htmlspecialchars($this->page->buildLink(array('pn' => 'communication', 'edit' => -1))));
-      $urn_button = sprintf(' <input type="button" value="%s" onclick="generateUrn(\'xx\')" />',
-                            tr('generate'));
+                                          tr('send letter'), htmlspecialchars($this->page->buildLink([ 'pn' => 'communication', 'edit' => -1 ])));
       $slug_button = sprintf(' <input type="button" value="%s" onclick="generateSlug()" />',
                              tr('generate'));
     }
 
     $rows = parent::getEditRows($mode);
 
-    $rows = array_merge_at($rows,
-      array(
-            'section' => array('label' => 'Section'),
-      ), 'user');
+    $rows = array_merge_at($rows, [
+        'section' => [ 'label' => 'Section' ],
+      ], 'user');
 
-    $rows = array_merge_at($rows,
-      array(
-            'slug_de' => array('label' => 'Kurz-URL (de)',
-                            'value' => 'edit' == $mode
-                            ? $this->getFormField('slug_de') . $slug_button
-                            : $this->record->get_value('slug_de')),
-            'slug' => array('label' => 'Kurz-URL (en)'),
-            'editor' => array('label' => 'Article Editor'),
-            'referee' => array('label' => 'Referee'),
-            'lang' => array('label' => 'Quellsprache'),
-            'translator' => array('label' => 'Translator'),
-            'status_translation' => array('label' => 'Translation Status'),
-      ), 'status');
+    $rows = array_merge_at($rows, [
+        'slug_de' => [
+          'label' => 'Kurz-URL (de)',
+          'value' => 'edit' == $mode
+            ? $this->getFormField('slug_de') . $slug_button
+            : $this->record->get_value('slug_de')
+        ],
+        'slug' => [ 'label' => 'Kurz-URL (en)' ],
+        'editor' => [ 'label' => 'Article Editor' ],
+        'referee' => [ 'label' => 'Referee' ],
+        'lang' => [ 'label' => 'Quellsprache' ],
+        'translator' => [ 'label' => 'Translator' ],
+        'status_translation' => [ 'label' => 'Translation Status' ],
+      ], 'status');
 
-    $rows = array_merge_at($rows,
-      array(
-            'reviewer_request' => array(
-                'label' => 'Author contacted',
-                'value' => 'edit' == $mode ?
-                  $this->getFormField('reviewer_request') . $reviewer_request_button
-                  : $this->record->get_value('reviewer_request')
-            ),
-            'reviewer_sent' => array(
-                'label' => 'Author accepted',
-                'value' => 'edit' == $mode ?
-                  $this->getFormField('reviewer_sent') . $reviewer_sent_button
-                  : $this->record->get_value('reviewer_sent')
-            ),
-            'reviewer_deadline' => array(
-                'label' => 'Author deadline',
-                'value' => 'edit' == $mode ?
-                  $this->getFormField('reviewer_deadline') . $reviewer_reminder_button
-                  : $this->record->get_value('reviewer_deadline')
-            ),
-            'reviewer_received' => array('label' => 'Article received'),
-            'referee_sent' => array('label' => 'Article sent to referee'),
-            'referee_deadline' => array(
-                'label' => 'Referee deadline',
-                'value' => 'edit' == $mode ?
-                  $this->getFormField('referee_deadline') // .$reviewer_reminder_button
-                  : $this->record->get_value('referee_deadline')
-            ),
-            'publisher_request' => array(
-                'label' => 'Holding Institution request',
-                'value' => 'edit' == $mode ?
-                  $this->getFormField('publisher_request') . $publisher_request_button
-                  : $this->record->get_value('publisher_request')
-            ),
-            'publisher_received' => array('label' => 'Holding Institution response'),
-            'imprimatur_sent' => array(
-                'label' => 'Imprimatur sent to author',
-                'value' => 'edit' == $mode ?
-                  $this->getFormField('imprimatur_sent') . $imprimatur_sent_button
-                  : $this->record->get_value('imprimatur_sent')
-            ),
-            /* 'url' => array('label' => 'Permanent URL'),
-            'urn' => array('label' => 'URN', 'value' => 'edit' == $mode ?
-                  $this->getFormField('urn').$urn_button
-                  : $this->record->get_value('urn')),
-            'tags' => array('label' => 'Feed Tag(s)'), */
-      ), 'published');
+    $rows = array_merge_at($rows, [
+      'modified' => array('label' => 'Last Modified Date'),
+      'reviewer_request' => [
+      'label' => 'Author contacted',
+      'value' => 'edit' == $mode
+        ? $this->getFormField('reviewer_request') . $reviewer_request_button
+        : $this->record->get_value('reviewer_request')
+      ],
+      'reviewer_sent' => [
+        'label' => 'Author accepted',
+        'value' => 'edit' == $mode
+          ? $this->getFormField('reviewer_sent') . $reviewer_sent_button
+          : $this->record->get_value('reviewer_sent')
+      ],
+      'reviewer_deadline' => [
+        'label' => 'Author deadline',
+        'value' => 'edit' == $mode
+          ? $this->getFormField('reviewer_deadline') . $reviewer_reminder_button
+          : $this->record->get_value('reviewer_deadline')
+      ],
+      'reviewer_received' => [ 'label' => 'Article received' ],
+      'referee_sent' => [ 'label' => 'Article sent to referee' ],
+      'referee_deadline' =>[
+        'label' => 'Referee deadline',
+        'value' => 'edit' == $mode
+          ? $this->getFormField('referee_deadline') // .$reviewer_reminder_button
+          : $this->record->get_value('referee_deadline')
+      ],
+      'publisher_request' => [
+        'label' => 'Holding Institution request',
+        'value' => 'edit' == $mode
+          ? $this->getFormField('publisher_request') . $publisher_request_button
+          : $this->record->get_value('publisher_request')
+      ],
+      'publisher_received' => [ 'label' => 'Holding Institution response' ],
+      'imprimatur_sent' => [
+        'label' => 'Imprimatur sent to author',
+        'value' => 'edit' == $mode
+          ? $this->getFormField('imprimatur_sent') . $imprimatur_sent_button
+          : $this->record->get_value('imprimatur_sent')
+      ]], 'published');
 
-    $additional = array('license' => array('label' => 'License'));
+    $additional = [ 'license' => [ 'label' => 'License' ] ];
     if ('edit' == $mode) {
       $status_flags = $this->form->field('status_flags');
     }
@@ -619,14 +595,13 @@ EOT;
       $status_flags_value = $this->record->get_value('status_flags');
     }
 
-    foreach (array(
-                   'review' => array('label' => 'Peer Review', 'mask' => 0x1),
-                   'markup' => array('label' => 'Markup', 'mask' => 0x02),
-                   'bibliography' => array('label' => 'Bibliography', 'mask' => 0x04),
-                   'translation' => array('label' => 'Translation', 'mask' => 0x08),
-                   'translation_markup' => array('label' => 'Translation Markup', 'mask' => 0x10),
-                   )
-             as $key => $options)
+    foreach ([
+        'review' => [ 'label' => 'Peer Review', 'mask' => 0x1 ],
+        'markup' => [ 'label' => 'Markup', 'mask' => 0x02 ],
+        'bibliography' => [ 'label' => 'Bibliography', 'mask' => 0x04 ],
+        'translation' => [ 'label' => 'Translation', 'mask' => 0x08 ],
+        'translation_markup' => [ 'label' => 'Translation Markup', 'mask' => 0x10 ],
+      ] as $key => $options)
     {
       if ('edit' == $mode) {
         $finalized = $status_flags->show($options['mask']) . '<br />';
@@ -634,13 +609,13 @@ EOT;
       else {
         $finalized = (0 != ($status_flags_value & $options['mask']) ? tr('finalized') . '<br />' : '');
       }
-      $additional['comment_' . $key] = array(
+      $additional['comment_' . $key] = [
         'label' => $options['label'],
         'value' => $finalized
           . ('edit' == $mode
-                                  ? $this->getFormField('comment_' . $key)
-                                  : $this->record->get_value('comment_' . $key))
-      );
+             ? $this->getFormField('comment_' . $key)
+             : $this->record->get_value('comment_' . $key)),
+      ];
     }
 
     if ('edit' == $mode) {
@@ -649,12 +624,12 @@ EOT;
     else {
       $finalized = (0 != ($status_flags_value & 0x20) ? tr('ready for publishing') . '<br />' : '');
     }
-    $additional['status_source'] = array(
+    $additional['status_source'] = [
       'label' => 'Source',
       'value' => $finalized,
-    );
+    ];
 
-    $additional['comment_imprimatur'] = array('label' => 'R&uuml;ckmeldung Imprimatur');
+    $additional['comment_imprimatur'] = [ 'label' => 'R&uuml;ckmeldung Imprimatur' ];
 
     $rows = array_merge_at($rows, $additional, 'users');
 
@@ -672,7 +647,7 @@ EOT;
 
     $url_ws = $this->page->BASE_URL . 'admin_ws.php?pn=publication&action=matchPublication';
 
-    $url_submit = $this->page->buildLink(array('pn' => $this->page->name, 'view' => $this->id));
+    $url_submit = $this->page->buildLink([ 'pn' => $this->page->name, 'view' => $this->id ]);
     $publication_selector = <<<EOT
 <form name="publicationSelector" action="$url_submit" method="post"><input type="hidden" name="publication_add" /><input type="text" id="publication" name="add_publication" style="width:400px; border: 1px solid black;" value="" /><div id="autocomplete_choices" class="autocomplete"></div><script type="text/javascript">new Ajax.Autocompleter('publication', 'autocomplete_choices', '$url_ws', {paramName: 'fulltext', minChars: 2, afterUpdateElement : function (text, li) { if (li.id != '') { var form = document.forms['publicationSelector']; if (null != form) {form.elements['publication_add'].value = li.id; form.submit(); } } }});</script></form>
 EOT;
@@ -681,8 +656,8 @@ EOT;
     $dbconn = &$this->page->dbconn;
     $dbconn->query($querystr);
     $publications = '';
-    $params_remove = array('pn' => $this->page->name, 'view' => $this->id);
-    $params_view = array('pn' => 'publication');
+    $params_remove = [ 'pn' => $this->page->name, 'view' => $this->id ];
+    $params_view = [ 'pn' => 'publication' ];
     while ($dbconn->next_record()) {
       if (empty($publications)) {
         $publications = '<ul id="publications" class="sortableList">';
@@ -735,16 +710,17 @@ EOT;
     return $ret;
   }
 
-  function buildSearchFields ($options = array()) {
+  function buildSearchFields ($options = []) {
     $options['status_translation'] = '';
     $options['section'] = 'Section';
     $options['referee'] = 'Referee';
+
     return parent::buildSearchFields($options);
   }
 
   function buildListingRow (&$row) {
     if ('xls' == $this->page->display) {
-      $xls_row = array();
+      $xls_row = [];
       for ($i = 0; $i < $this->cols_listing_count; $i++) {
         $val = $row[$i];
         if (count($this->cols_listing) - 2 == $i && isset($val)) {
@@ -754,43 +730,45 @@ EOT;
         $xls_row[] = $val;
       }
       $this->xls_data[] = $xls_row;
+
       return;
     }
+
     return parent::buildListingRow($row);
   }
 
   function getImageDescriptions () {
     global $TYPE_MESSAGE;
 
-    $images = array(
-          'document' => array(
-                        'title' => tr('Dokumente (Texte, Bilder, ...)'),
-                        'multiple' => TRUE,
-                        'imgparams' => array('max_width' => 300, 'max_height' => 300,
-                                             'scale' => 'down',
-                                             'keep' => 'large',
-                                             'keep_orig' => TRUE,
-                                             'title' => 'File',
-                                             'pdf' => TRUE,
-                                             'audio' => TRUE,
-                                             'video' => TRUE,
-                                             'office' => TRUE,
-                                             'xml' => TRUE,
-                                             ),
-                        'labels' => array(
-                                          'source' => 'Source',
-                                          'displaydate' => 'Creation Date',
-                                          ),
-                        ),
-          );
+    $images = [
+      'document' => [
+        'title' => tr('Dokumente (Texte, Bilder, ...)'),
+        'multiple' => TRUE,
+        'imgparams' =>[
+          'max_width' => 300, 'max_height' => 300,
+          'scale' => 'down',
+          'keep' => 'large',
+          'keep_orig' => TRUE,
+          'title' => 'File',
+          'pdf' => TRUE,
+          'audio' => TRUE,
+          'video' => TRUE,
+          'office' => TRUE,
+          'xml' => TRUE,
+        ],
+        'labels' => [
+          'source' => 'Source',
+          'displaydate' => 'Creation Date',
+        ],
+      ],
+    ];
 
-    return array($TYPE_MESSAGE, $images);
+    return [ $TYPE_MESSAGE, $images ];
   }
-
 }
 
 $display = new DisplayArticle($page);
 if (FALSE === $display->init()) {
-  $page->redirect(array('pn' => ''));
+  $page->redirect([ 'pn' => '' ]);
 }
 $page->setDisplay($display);

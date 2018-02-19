@@ -4,9 +4,9 @@
  *
  * Base-Class for managing messages
  *
- * (c) 2007-2016 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2016-02-22 dbu
+ * Version: 2018-02-19 dbu
  *
  * Changes:
  *
@@ -14,13 +14,15 @@
 
 require_once INC_PATH . 'admin/displaybackend.inc.php';
 
-class MessageQueryConditionBuilder extends TableManagerQueryConditionBuilder
+class MessageQueryConditionBuilder
+extends TableManagerQueryConditionBuilder
 {
   function buildStatusCondition () {
     $num_args = func_num_args();
     if ($num_args <= 0) {
       return;
     }
+
     $fields = func_get_args();
 
     if (isset($this->term) && '' !== $this->term) {
@@ -32,11 +34,11 @@ class MessageQueryConditionBuilder extends TableManagerQueryConditionBuilder
           // ." OR ".$fields[0]. " = -3" // uncomment for open requests
           ." OR (".$fields[0]." = 2 AND hold <= CURRENT_DATE()))";
       } */
+
       return $ret;
     }
-    else {
-      return  $fields[0] . '<>-1';
-    }
+
+    return  $fields[0] . '<> -1';
   }
 
   function buildEqualCondition () {
@@ -44,12 +46,14 @@ class MessageQueryConditionBuilder extends TableManagerQueryConditionBuilder
     if ($num_args <= 0) {
       return;
     }
+
     $fields = func_get_args();
 
     if (isset($this->term) && '' !== $this->term) {
       $ret = $fields[0] . '=' . intval($this->term);
       return $ret;
     }
+
     return;
   }
 
@@ -58,33 +62,35 @@ class MessageQueryConditionBuilder extends TableManagerQueryConditionBuilder
     if ($num_args <= 0) {
       return;
     }
+
     $fields = func_get_args();
 
     if (isset($this->term) && '' !== $this->term) {
       $ret = $fields[0] . " REGEXP '[[:<:]]" . intval($this->term) . "[[:>:]]'";
       return $ret;
     }
+
     return;
   }
-
 }
 
-class DisplayMessageFlow extends DisplayBackendFlow
+class DisplayMessageFlow
+extends DisplayBackendFlow
 {
-
 }
 
-class MessageRecord extends TablemanagerRecord
+class MessageRecord
+extends TablemanagerRecord
 {
   var $datetime_style = '';
-  var $users = array();
+  var $users = [];
 
   function store ($args = '') {
     $stored = parent::store($args);
     if ($stored) {
       $message_id = $this->get_value('id');
 
-      $users = array();
+      $users = [];
       $user_id = $this->get_value('user_id');
       $users[] = isset($user_id) && $user_id > 0 ? $user_id : '';
 
@@ -106,10 +112,10 @@ class MessageRecord extends TablemanagerRecord
         $dbconn->query($querystr);
 
         $ord = 0;
-        $stored = array();
+        $stored = [];
         foreach ($users as $user_id) {
           if (!isset($stored[$user_id])) {
-            $sql_values = array();
+            $sql_values = [];
             $sql_values['name'] = 0 == $ord && !empty($_POST['user']) ? sprintf("'%s'", addslashes($_POST['user'])) : 'NULL';
             /* foreach (array('email', 'institution') as $name) {
               $value = 0 == $ord ? $this->get_value('user_' . $name) : NULL;
@@ -145,8 +151,8 @@ class MessageRecord extends TablemanagerRecord
                           $message_id);
       $dbconn->query($querystr);
       $first = TRUE;
-      $users_options = array();
-      $users_labels = array();
+      $users_options = [];
+      $users_labels = [];
       while ($dbconn->next_record()) {
         if ($first) {
           $this->set_value('user_id', $dbconn->Record['user_id']);
@@ -185,63 +191,75 @@ class MessageRecord extends TablemanagerRecord
 
     return $dbconn->affected_rows() > 0;
   }
-
 }
 
-class DisplayMessage extends DisplayBackend
+class DisplayMessage
+extends DisplayBackend
 {
   var $page_size = 30;
   var $table = 'Message';
-  var $fields_listing = array('Message.id AS id', 'subject',
-                              "CONCAT(User.lastname, ' ', User.firstname) AS fullname",
-//                              "CONCAT(U.lastname, ' ', U.firstname) AS editor",
-                              'Message.status AS status', "DATE(published) AS published");
-  var $joins_listing = array('LEFT OUTER JOIN MessageUser ON MessageUser.message_id=Message.id AND MessageUser.ord=0',
-                             'LEFT OUTER JOIN User ON MessageUser.user_id=User.id',
-//                             'LEFT OUTER JOIN User U ON Message.editor=U.id',
-                             );
+  var $fields_listing = [
+    'Message.id AS id', 'subject',
+    "CONCAT(User.lastname, ' ', User.firstname) AS fullname",
+    // "CONCAT(U.lastname, ' ', U.firstname) AS editor",
+    'Message.status AS status', "DATE(published) AS published",
+  ];
+  var $joins_listing = [
+    'LEFT OUTER JOIN MessageUser ON MessageUser.message_id=Message.id AND MessageUser.ord=0',
+    'LEFT OUTER JOIN User ON MessageUser.user_id=User.id',
+    // 'LEFT OUTER JOIN User U ON Message.editor=U.id',
+  ];
 
-  var $cols_listing = array('id' => 'ID', 'subject' => 'Title',
-                            'contributor' => 'Contributor',
-//                            'editor' => 'Editor',
-                            'status' => 'Status',
-                            'date' => 'Publication');
+  var $cols_listing = [
+    'id' => 'ID', 'subject' => 'Title',
+    'contributor' => 'Contributor',
+    // 'editor' => 'Editor',
+    'status' => 'Status',
+    'date' => 'Publication',
+  ];
   var $idcol_listing = TRUE;
 
   var $search_fulltext = NULL;
 
-  var $tinymce_fields = NULL; // changed to array() if browser supports
+  var $tinymce_fields = NULL; // changed to [] if browser supports
 
-  var $condition = array();
-  var $order = array('id' => array('id DESC', 'id'),
-                     'subject' => array('subject', 'subject DESC'),
-                     'contributor' => array('fullname', 'fullname DESC'),
-//                     'editor' => array('editor', 'editor DESC'),
-                     'status' => array('Message.status', 'Message.status DESC'),
-                     'date' => array('IF(0 = published + 0, Message.changed, published) DESC', 'IF(0 = published + 0, Message.changed, published)'),
-                     );
+  var $condition = [];
+  var $order = [
+    'id' => array('id DESC', 'id'),
+    'subject' => array('subject', 'subject DESC'),
+    'contributor' => array('fullname', 'fullname DESC'),
+    // 'editor' => array('editor', 'editor DESC'),
+    'status' => [ 'Message.status', 'Message.status DESC' ],
+    'date' => [
+      'IF(0 = published + 0, Message.changed, published) DESC',
+      'IF(0 = published + 0, Message.changed, published)',
+    ],
+  ];
 
-  var $status_options = array (
+  var $status_options = [
     '-59' => 'eingegangen',
     '-45' => 'ver&#246;ffentlichungsbereit',
     '1'   => 'ver&#246;ffentlicht',
     '-109' => 'abgelehnt',
-  );
+  ];
   var $status_default = '-59';
   var $status_deleted = '-1';
 
-  var $view_options = array();
+  var $view_options = [];
 
   function __construct (&$page, $workflow = NULL) {
     parent::__construct($page, isset($workflow) ? $workflow : new DisplayMessageFlow($page));
+
     if (isset($this->type)) {
       $this->condition[] = sprintf('type=%d', intval($this->type));
     }
 
-    $this->condition[] = array('name' => 'status',
-                               'method' => 'buildStatusCondition',
-                               'args' => $this->table . '.status',
-                               'persist' => 'session');
+    $this->condition[] = [
+      'name' => 'status',
+      'method' => 'buildStatusCondition',
+      'args' => $this->table . '.status',
+      'persist' => 'session',
+    ];
     /*
     $this->condition[] = array('name' => 'editor',
                                'method' => 'buildEqualCondition',
@@ -259,10 +277,12 @@ class DisplayMessage extends DisplayBackend
       $this->constructFulltextCondition();
     }
     else {
-      $this->condition[] = array('name' => 'search',
-                                 'method' => 'buildLikeCondition',
-                                 'args' => 'subject,User.firstname,User.lastname',
-                                 'persist' => 'session');
+      $this->condition[] = [
+        'name' => 'search',
+        'method' => 'buildLikeCondition',
+        'args' => 'subject,User.firstname,User.lastname',
+        'persist' => 'session',
+      ];
     }
 
     if ($page->lang() != 'en_US') {
@@ -271,10 +291,12 @@ class DisplayMessage extends DisplayBackend
   }
 
   function constructFulltextCondition () {
-    $this->condition[] = array('name' => 'search',
-                               'method' => 'buildFulltextCondition',
-                               'args' => 'subject,User.firstname,User.lastname,body',
-                               'persist' => 'session');
+    $this->condition[] = [
+      'name' => 'search',
+      'method' => 'buildFulltextCondition',
+      'args' => 'subject,User.firstname,User.lastname,body',
+      'persist' => 'session',
+    ];
   }
 
   function instantiateRecord ($table = '', $dbconn = '') {
@@ -289,25 +311,25 @@ class DisplayMessage extends DisplayBackend
     $record = parent::buildRecord($name);
     $record->datetime_style = $this->datetime_style;
 
-    $record->add_fields(array(
-        new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => TRUE)),
-        new Field(array('name' => 'type', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->type)),
-        new Field(array('name' => 'status', 'type' => 'select',
-                        'options' => array_keys($this->status_options),
-                        'labels' => array_values($this->status_options),
-                        'datatype' => 'int', 'default' => $this->status_default)),
-        new Field(array('name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => TRUE)),
-        new Field(array('name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => TRUE, 'noupdate' => TRUE)),
-        new Field(array('name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()')),
-        new Field(array('name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => TRUE)),
-        new Field(array('name' => 'published', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
-        new Field(array('name' => 'subject', 'id' => 'subject', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 160)),
-        new Field(array('name' => 'user', 'type' => 'text', 'nodbfield' => TRUE, 'null' => TRUE)),
-        new Field(array('name' => 'user_id', 'type' => 'int', 'nodbfield' => TRUE, 'null' => TRUE)),
-        new Field(array('name' => 'users', 'type' => 'select', 'multiple' => TRUE, 'nodbfield' => TRUE, 'null' => TRUE)),
-        new Field(array('name' => 'body', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 20, 'null' => TRUE)),
-        new Field(array('name' => 'comment', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 15, 'null' => TRUE)),
-      ));
+    $record->add_fields([
+      new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => TRUE)),
+      new Field(array('name' => 'type', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->type)),
+      new Field(array('name' => 'status', 'type' => 'select',
+                      'options' => array_keys($this->status_options),
+                      'labels' => array_values($this->status_options),
+                      'datatype' => 'int', 'default' => $this->status_default)),
+      new Field(array('name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => TRUE)),
+      new Field(array('name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => TRUE, 'noupdate' => TRUE)),
+      new Field(array('name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()')),
+      new Field(array('name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => TRUE)),
+      new Field(array('name' => 'published', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
+      new Field(array('name' => 'subject', 'id' => 'subject', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 160)),
+      new Field(array('name' => 'user', 'type' => 'text', 'nodbfield' => TRUE, 'null' => TRUE)),
+      new Field(array('name' => 'user_id', 'type' => 'int', 'nodbfield' => TRUE, 'null' => TRUE)),
+      new Field(array('name' => 'users', 'type' => 'select', 'multiple' => TRUE, 'nodbfield' => TRUE, 'null' => TRUE)),
+      new Field(array('name' => 'body', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 20, 'null' => TRUE)),
+      new Field(array('name' => 'comment', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 15, 'null' => TRUE)),
+    ]);
 
     return $record;
   }
@@ -409,8 +431,9 @@ class DisplayMessage extends DisplayBackend
           }
         }
       }
-      else
+      else {
         alert('ret: ' + obj.msg + obj.status);
+      }
     }
 
 new Ajax.Autocompleter('user', 'autocomplete_choices', '$url_ws', {paramName: 'fulltext', minChars: 3, afterUpdateElement : function (text, li) { if(li.id != '') { var form = document.forms['detail']; if (null != form) { form.elements['user_id'].value = li.id; fetchUser(li.id); } } }});</script>
@@ -478,7 +501,7 @@ EOT;
       }
     }
 
-    return array(
+    return [
       'id' => FALSE, 'type' => FALSE, // hidden fields
       'user' => array('label' => 'Contributor', 'value' => $user_value),
       'subject' => array('label' => 'Title'),
@@ -491,7 +514,7 @@ EOT;
       'comment' => array('label' => 'Internal notes and comments'),
 
       isset($this->form) ? $this->form->show_submit(ucfirst(tr('save'))) : 'FALSE',
-    );
+    ];
   }
 
   function renderEditForm ($rows, $name = 'detail') {
@@ -502,7 +525,7 @@ EOT;
     if (isset($this->tinymce_fields) && count($this->tinymce_fields) > 0) {
       $this->script_url[] = 'script/tiny_mce/tiny_mce.js';
       $this->script_code .= <<<EOT
-tinyMCE.init({
+  tinyMCE.init({
     mode : "exact",
     elements : "body",
     theme : "advanced",
@@ -516,10 +539,10 @@ tinyMCE.init({
     browsers : "msie,gecko,opera",
     convert_urls : false,
     extended_valid_elements : "a[href|target|title],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]"
-});
+  });
 
-function myInsertLink (href, target, title, onclick, action) {
-    var result = new Array();
+  function myInsertLink (href, target, title, onclick, action) {
+    var result = new [];
 
     // Do some custom logic
     result['href'] = prompt('URL:', href);
@@ -528,8 +551,7 @@ function myInsertLink (href, target, title, onclick, action) {
     result['onclick'] = "";
 
     return result;
-}
-
+  }
 
 EOT;
 
@@ -567,11 +589,12 @@ EOT;
                                     $this->htmlSpecialchars(tr($label)));
       }
     }
+
     return tr('Status')
          . ': <select name="status">' . implode($status_options) . '</select>';
   }
 
-  function buildSearchFields ($options = array()) {
+  function buildSearchFields ($options = []) {
     $search = sprintf('<input type="text" name="search" value="%s" size="40" />',
                       $this->htmlSpecialchars(array_key_exists('search', $this->search) ?  $this->search['search'] : ''));
     $search .= sprintf('<label><input type="hidden" name="fulltext" value="0" /><input type="checkbox" name="fulltext" value="1"%s /> %s</label>',
@@ -641,7 +664,7 @@ EOT;
     $val = NULL;
 
     if (count($this->cols_listing) - 3 == $col_index && !empty($this->view_options['section'])) {
-      $sections = array();
+      $sections = [];
       foreach (preg_split('/\s*,\s/', $row['section']) as $section) {
         $sections[] = $this->view_options['section'][$section];
       }
@@ -650,15 +673,15 @@ EOT;
     else if (count($this->cols_listing) - 2 == $col_index) {
       $val = (isset($row['status']) ? $this->status_options[$row['status']] : '');
       if (isset($row['status_flags'])) {
-        $status_labels = array();
-        $status_flag_labels = array(
-                                                        0x01 => tr('Peer Review') . ' ' . tr('finalized'),
-                                                0x02 => tr('Markup') . ' ' . tr('finalized'),
-                                                0x04 => tr('Bibliography') . ' ' . tr('finalized'),
-                                                0x08 => tr('Translation') . ' ' . tr('finalized'),
-                                                0x10 => tr('Translation Markup') . ' ' . tr('finalized'),
-                                                0x20 => tr('ready for publishing'),
-        );
+        $status_labels = [];
+        $status_flag_labels = [
+          0x01 => tr('Peer Review') . ' ' . tr('finalized'),
+          0x02 => tr('Markup') . ' ' . tr('finalized'),
+          0x04 => tr('Bibliography') . ' ' . tr('finalized'),
+          0x08 => tr('Translation') . ' ' . tr('finalized'),
+          0x10 => tr('Translation Markup') . ' ' . tr('finalized'),
+          0x20 => tr('ready for publishing'),
+        ];
         foreach ($status_flag_labels as $mask => $label) {
           $status_labels[] = sprintf('<li class="%s"><a href="#" title="%s">%s</a></li>',
                                      0 != ($row['status_flags'] & $mask) ? 'active' : 'inactive',
@@ -688,5 +711,4 @@ EOT;
 
     return parent::buildListingCell($row, $col_index, $val);
   }
-
 }

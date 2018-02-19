@@ -83,6 +83,7 @@ CREATE TABLE Message (
   referee       INT NULL,                       #
   translator    INT NULL,                       #
 
+  modified     DATETIME NULL,                   #
   publisher_request DATETIME NULL,
   publisher_received DATETIME NULL,
   reviewer_request DATETIME NULL,

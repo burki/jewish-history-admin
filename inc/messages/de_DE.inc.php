@@ -195,6 +195,7 @@ $GETTEXT_MESSAGES = array (
 'Article Editor' => 'betreuender Redakteur',
 'List Date' => 'Listendatum',
 'Publication Date' => 'Veröffentlichungsdatum',
+'Last Modified Date' => 'Datum letzte Änderung',
 'Review copy requested' => 'Rezensionsexemplar angefordert',
 'Review copy received' => 'Rezensionsexemplar erhalten',
 'Reviewer contacted' => 'Rezensenten angefragt',
