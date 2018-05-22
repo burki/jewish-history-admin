@@ -3,7 +3,8 @@
        "vendor-dir": "lib/",
         "platform": {
             "php": "5.4.45"
-        }
+        },
+        "secure-http" : false
     },
 
     "repositories": [
