@@ -4,9 +4,9 @@
  *
  * show transformed XML
  *
- * (c) 2015 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2015-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-05-09 dbu
+ * Version: 2018-05-22 dbu
  *
  * Changes:
  */
@@ -30,12 +30,14 @@ $display = new PageDisplay($page);
 if (!array_key_exists('media_id', $_GET)) {
   die('media_id missing');
 }
+
 $querystr = sprintf("SELECT item_id, type, name, mimetype FROM Media WHERE id=%d",
                     $_GET['media_id']);
 $dbconn->query($querystr);
 if (!$dbconn->next_record() || 'application/xml' != $dbconn->Record['mimetype']) {
   die('invalid media_id');
 }
+
 $img = $dbconn->Record;
 $fname = $display->buildImgFname($img['item_id'], $img['type'], $img['name'], $img['mimetype']);
 if (array_key_exists('format', $_GET) && in_array($_GET['format'], array('docx'))) {
@@ -63,5 +65,6 @@ function tranform($fname_xml, $fname_xsl = 'dtabf.xsl') {
                   realpath($fname_xml),
                   realpath($xslt_dir . $fname_xsl));
   $res = `$cmd`;
+
   return $res;
 }
