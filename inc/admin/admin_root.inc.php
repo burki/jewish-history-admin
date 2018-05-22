@@ -4,16 +4,17 @@
  *
  * Start page
  *
- * (c) 2010-2016 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2010-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2016-08-24 dbu
+ * Version: 2018-05-22 dbu
  *
  * Changes:
  *
  */
 
 
-class DisplayRoot extends PageDisplay
+class DisplayRoot
+extends PageDisplay
 {
   function buildTasklist () {
     return ''; // '<p>There are no current tasks.</p>';
@@ -22,56 +23,63 @@ class DisplayRoot extends PageDisplay
   function buildActions () {
     global $RIGHTS_EDITOR, $RIGHTS_ADMIN;
 
-    $actions = array(
-      array(
+    $actions = [
+      [
         'name' => 'article',
         'title' => 'Articles'
-      ),
-      array(
+      ],
+      [
         'name' => 'publication',
         'title' => 'Sources'
-      ),
-      array(
+      ],
+      [
         'name' => 'author',
         'title' => 'Authors',
         'privs' => $RIGHTS_ADMIN | $RIGHTS_EDITOR,
-      ),
-      array(
+      ],
+      [
         'name' => 'publisher',
         'title' => 'Holding Institutions',
         'privs' => $RIGHTS_ADMIN | $RIGHTS_EDITOR,
-      ),
-      'communication' => array(
+      ],
+      'communication' => [
         'name' => 'communication',
         'title' => 'Communication',
         'privs' => $RIGHTS_ADMIN | $RIGHTS_EDITOR,
-      ),
-      array(
+      ],
+      [
         'name' => 'term',
         'title' => 'Wertelisten',
         'privs' => $RIGHTS_ADMIN,
-      ),
-      array(
+      ],
+      /*
+      [
         'name' => 'person',
         'title' => 'Normdata: Person',
         'privs' => $RIGHTS_ADMIN,
-      ),
-      array(
+      ],
+      [
         'name' => 'place',
         'title' => 'Normdata: Places',
         'privs' => $RIGHTS_ADMIN,
-      ),
-      array(
+      ],
+      [
         'name' => 'organization',
         'title' => 'Normdata: Organizations',
         'privs' => $RIGHTS_ADMIN,
-      ),
-      array(
+      ],
+      [
+        'name' => 'event',
+        'title' => 'Normdata: Event',
+        'privs' => $RIGHTS_ADMIN,
+      ],
+      */
+      [
         'name' => 'account',
         'title' => 'Accounts',
         'privs' => $RIGHTS_ADMIN,
-      ),
-    );
+      ],
+    ];
 
     $ret = '';
     foreach ($actions as $action) {
@@ -85,6 +93,7 @@ class DisplayRoot extends PageDisplay
               . '</a></li>';
       }
     }
+
     if (!empty($ret)) {
       $ret .= '</ul>';
     }
@@ -115,7 +124,6 @@ EOT;
       ? $this->buildWorkplaceInternal()
       : $this->buildWorkplaceExternal();
   } // buildContent
-
 }
 
 $page->setDisplay(new DisplayRoot($page));

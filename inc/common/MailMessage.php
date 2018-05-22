@@ -4,9 +4,9 @@
  *
  * lightweight wrapper around Swift-Mailer 4.x
  *
- * (c) 2007-2014 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-03-11 dbu
+ * Version: 2018-05-22 dbu
  *
  * Changes:
  *
@@ -25,6 +25,7 @@ class MailerFactory
             if (!defined('SMTP_HOST')) {
                 throw new Exception('MailerFactory::__construct: You have to define SMTP_HOST on Windows Systems');;
             }
+
             $transport = Swift_SmtpTransport::newInstance(SMTP_HOST);
             if (defined('SMTP_USERNAME')) {
                 $transport->setUsername(SMTP_USERNAME);
@@ -32,13 +33,15 @@ class MailerFactory
                     $transport->setPassword(SMTP_PASSWORD);
                 }
             }
+
             if (defined('SMTP_PORT')) {
                 $transport->setPort(SMTP_PORT);
             }
+
             if (defined('SMTP_ENCRYPTION')) {
                 $transport->setEncryption(SMTP_ENCRYPTION);
                 // see https://github.com/swiftmailer/swiftmailer/issues/544
-                $https = array();
+                $https = [];
                 $https['ssl']['verify_peer'] = FALSE;
                 $https['ssl']['verify_peer_name'] = FALSE;
                 $transport->setStreamOptions($https);
@@ -64,7 +67,7 @@ class MailerFactory
 class MailMessage
 {
     private static $swift = NULL;
-    public static $mailer_config = array();
+    public static $mailer_config = [];
 
     public $message;
     public $recipients;
@@ -76,6 +79,7 @@ class MailMessage
             $mailer_factory = new MailerFactory(self::$mailer_config);
             self::$swift = $mailer_factory->getInstance();
         }
+
         return self::$swift;
     }
 
@@ -112,8 +116,10 @@ class MailMessage
     }
 
     public function addToBlocked ($address) {
-        if (!isset($this->blocked))
+        if (!isset($this->blocked)) {
             $this->blocked = new Swift_RecipientList();
+        }
+
         return $this->blocked->addTo($address);
     }
 
@@ -127,8 +133,9 @@ class MailMessage
 
     public function setHeader ($name, $value) {
         $headers = $this->message->getHeaders();
-        if (isset($headers))
+        if (isset($headers)) {
             return $headers->addTextHeader($name, $value);
+        }
     }
 
     public function attachPlain ($body_plain) {
@@ -235,7 +242,7 @@ class MailMessage
         if (isset($from)) {
             $mail->setFrom($from);
         }
+        
         return $mail->send(); // number sent
     }
-
 }

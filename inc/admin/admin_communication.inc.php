@@ -4,9 +4,9 @@
  *
  * Class for managing communication
  *
- * (c) 2008-2016 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2016-08-07 dbu
+ * Version: 2018-05-22 dbu
  *
  * Changes:
  *
@@ -15,9 +15,10 @@
 require_once INC_PATH . 'common/tablemanager.inc.php';
 require_once INC_PATH . 'admin/common.inc.php';
 
-class DisplayCommunication extends DisplayTable
+class DisplayCommunication
+extends DisplayTable
 {
-  static $TYPE_MAP = array(
+  static $TYPE_MAP = [
     'publisher_request' => 0,
     'reviewer_request' => 10,
     'reviewer_sent' => 20,
@@ -25,20 +26,20 @@ class DisplayCommunication extends DisplayTable
     'referee_request' => 40,
     'publisher_vouchercopy' => 50,
     'imprimatur_sent' => 60,
-  );
+  ];
 
   var $page_size = 30;
   var $table = 'Communication';
-  var $fields_listing = array('id', 'to_email', 'subject', 'IFNULL(sent,changed)'); // , 'status');
+  var $fields_listing = [ 'id', 'to_email', 'subject', 'IFNULL(sent,changed)' ]; // , 'status' ];
 
-  var $condition = array(
+  var $condition = [
     array('name' => 'search', 'method' => 'buildLikeCondition', 'args' => 'to_email'),
-  );
-  var $order = array(array('sent DESC'));
+  ];
+  var $order = [ array('sent DESC') ];
   var $view_after_edit = TRUE;
   var $listing_default_action = TABLEMANAGER_VIEW;
 
-  var $defaults = array();
+  var $defaults = [];
   var $publications;
 
   function init () {
@@ -84,7 +85,7 @@ class DisplayCommunication extends DisplayTable
       }
 
       // set the publications for bibinfo and publication_request
-      $publications = array();
+      $publications = [];
       if (array_key_exists('id_publication', $_GET) && preg_match('/\d/', $_GET['id_publication'])) {
         $publications = preg_split('/\s*,\s*/', $_GET['id_publication']);
       }
@@ -110,7 +111,7 @@ class DisplayCommunication extends DisplayTable
                             implode(',', $this->publications));
 
         $dbconn->query($querystr);
-        $to_emails = array();
+        $to_emails = [];
         while ($dbconn->next_record()) {
           $to_emails[] = $dbconn->Record['to_email'];
         }
@@ -120,7 +121,7 @@ class DisplayCommunication extends DisplayTable
         }
       }
 
-      $SUBJECT = array(
+      $SUBJECT = [
         'publisher_request' => 'Anfrage Quelle f&#252;r',
         'reviewer_request' => 'Artikel f&#252;r',
         'reviewer_sent' => 'Artikel f&#252;r',
@@ -128,7 +129,7 @@ class DisplayCommunication extends DisplayTable
         'referee_request' => 'Gutachteranfrage',
         'publisher_vouchercopy' => 'Link zur Rezension bei',
         'imprimatur_sent' => 'Imprimatur Ihres Textes f&#252;r die Online-Quellen-Edition',
-      );
+      ];
 
       switch ($_GET['mode']) {
         case 'publisher_request':
@@ -138,18 +139,18 @@ class DisplayCommunication extends DisplayTable
         case 'referee_request':
         case 'publisher_vouchercopy':
         case 'imprimatur_sent':
-            global $SITE;
-            $this->defaults['subject'] =
-              (array_key_exists($_GET['mode'], $SUBJECT) ? $SUBJECT[$_GET['mode']] . ' ' : '')
-              . tr($SITE['pagetitle']);
-            $fname_template = INC_PATH . 'messages/' . $_GET['mode'] . '.txt';
-            if (FALSE !== ($template = @file_get_contents($fname_template))) {
-              // fill in template
-              $this->defaults['body'] = preg_replace_callback('|\%([a-z_0-9]+)\%|',
-                                                              array($this, 'replacePlaceholder'),
-                                                              $template);
-            }
-            break;
+          global $SITE;
+          $this->defaults['subject'] =
+            (array_key_exists($_GET['mode'], $SUBJECT) ? $SUBJECT[$_GET['mode']] . ' ' : '')
+            . tr($SITE['pagetitle']);
+          $fname_template = INC_PATH . 'messages/' . $_GET['mode'] . '.txt';
+          if (FALSE !== ($template = @file_get_contents($fname_template))) {
+            // fill in template
+            $this->defaults['body'] = preg_replace_callback('|\%([a-z_0-9]+)\%|',
+                                                            array($this, 'replacePlaceholder'),
+                                                            $template);
+          }
+          break;
       }
     }
 
@@ -234,7 +235,7 @@ class DisplayCommunication extends DisplayTable
   }
 
   private function fetchUser ($id) {
-    static $_users = array();
+    static $_users = [];
 
     if (!isset($_users[$id])) {
       $dbconn = & $this->page->dbconn;
@@ -250,7 +251,7 @@ class DisplayCommunication extends DisplayTable
   }
 
   private function fetchMessage ($id) {
-    static $_messages = array();
+    static $_messages = [];
 
     if (!isset($_messages[$id])) {
       $dbconn = & $this->page->dbconn;
@@ -271,97 +272,86 @@ class DisplayCommunication extends DisplayTable
       case 'name_from':
       case 'email_from':
       case 'phone_from':
-          $user = $this->fetchUser($this->page->user['id']);
-          if (isset($user)) {
-            switch ($matches[1]) {
-              case 'email_from':
-                $ret = $user['email'];
-                break;
-              case 'phone_from':
-                $ret = $user['phone'];
-                break;
-              default:
-                $ret = (!empty($user['firstname']) ? $user['firstname'].' ' : '')
-                     . $user['lastname'];
-            }
+        $user = $this->fetchUser($this->page->user['id']);
+        if (isset($user)) {
+          switch ($matches[1]) {
+            case 'email_from':
+              $ret = $user['email'];
+              break;
+            case 'phone_from':
+              $ret = $user['phone'];
+              break;
+            default:
+              $ret = (!empty($user['firstname']) ? $user['firstname'].' ' : '')
+                   . $user['lastname'];
           }
-          break;
+        }
+        break;
 
       case 'salutation_name_de':
-          if (isset($this->defaults['to_id'])) {
-            $user = $this->fetchUser($this->defaults['to_id']);
-            if (isset($user)) {
-              $ret = ('F' == $user['sex'] ? 'Sehr geehrte Frau' : 'Sehr geehrter Herr')
-                   . ' ' . $user['lastname'];
-            }
+        if (isset($this->defaults['to_id'])) {
+          $user = $this->fetchUser($this->defaults['to_id']);
+          if (isset($user)) {
+            $ret = ('F' == $user['sex'] ? 'Sehr geehrte Frau' : 'Sehr geehrter Herr')
+                 . ' ' . $user['lastname'];
           }
-          if (empty($ret)) {
-            $ret = 'Sehr geehrte/r Herr/Frau';
-          }
-          break;
+        }
+        if (empty($ret)) {
+          $ret = 'Sehr geehrte/r Herr/Frau';
+        }
+        break;
 
       case 'reviewer_sex_de':
-          if (isset($this->defaults['to_id'])) {
-            $user = $this->fetchUser($this->defaults['to_id']);
-          }
-          $ret = isset($user) && 'F' == $user['sex']
-            ? ' Autorin' : 'n Autoren';
-          break;
+        if (isset($this->defaults['to_id'])) {
+          $user = $this->fetchUser($this->defaults['to_id']);
+        }
+        $ret = isset($user) && 'F' == $user['sex']
+          ? ' Autorin' : 'n Autoren';
+        break;
 
       case 'bibinfo':
-          if (count($this->publications) > 0) {
-            require_once INC_PATH . 'common/biblioservice.inc.php';
-            $biblio_client = BiblioService::getInstance();
-            foreach ($this->publications as $id) {
-              if (intval($id) > 0) {
-                $citation = $biblio_client->buildCitation(intval($id));
-                if (isset($citation)) {
-                  $ret = (!empty($ret) ? $ret . "\n\n" : '')
-                       . $citation;
-                }
+        if (count($this->publications) > 0) {
+          require_once INC_PATH . 'common/biblioservice.inc.php';
+          $biblio_client = BiblioService::getInstance();
+          foreach ($this->publications as $id) {
+            if (intval($id) > 0) {
+              $citation = $biblio_client->buildCitation(intval($id));
+              if (isset($citation)) {
+                $ret = (!empty($ret) ? $ret . "\n\n" : '')
+                     . $citation;
               }
             }
           }
-          break;
+        }
+        break;
 
       case 'reviewer_info':
-          if (isset($this->defaults['reviewer_id'])) {
-            $user = $this->fetchUser($this->defaults['reviewer_id']);
+        if (isset($this->defaults['reviewer_id'])) {
+          $user = $this->fetchUser($this->defaults['reviewer_id']);
+        }
+        if (isset($user)) {
+          $ret = (!empty($user['firstname']) ? $user['firstname'].' ' : '')
+               . $user['lastname'];
+          if (!empty($user['institution'])) {
+            $ret .= ', ' . $user['institution'];
           }
-          if (isset($user)) {
-            $ret = (!empty($user['firstname']) ? $user['firstname'].' ' : '')
-                 . $user['lastname'];
-            if (!empty($user['institution'])) {
-              $ret .= ', ' . $user['institution'];
-            }
-          }
-          break;
+        }
+        break;
 
-      /*
-      case 'review_url':
-          if (isset($this->defaults['message_id'])) {
-            $message = $this->fetchMessage($this->defaults['message_id']);
-            $issue = isset($message) ? $message['yearmonth'] : 0;
-            $ret = sprintf('http://www.kritikon.de/issue/%d/%d',
-                           $issue,
-                           $this->defaults['message_id']);
-          }
-          break;
-      */
       case 'review_date':
-          if (isset($this->defaults['message_id'])) {
-            $message = $this->fetchMessage($this->defaults['message_id']);
-            if (!empty($message['published_display'])) {
-              $ret = ' am ' . $message['published_display'];
-            }
+        if (isset($this->defaults['message_id'])) {
+          $message = $this->fetchMessage($this->defaults['message_id']);
+          if (!empty($message['published_display'])) {
+            $ret = ' am ' . $message['published_display'];
           }
-          break;
+        }
+        break;
 
       default:
-          if (array_key_exists($matches[1], $_GET)) {
-            $ret = $_GET[$matches[1]];
-          }
-          break;
+        if (array_key_exists($matches[1], $_GET)) {
+          $ret = $_GET[$matches[1]];
+        }
+        break;
     }
 
     return $ret;
@@ -376,7 +366,7 @@ class DisplayCommunication extends DisplayTable
       return;
     }
 
-    $record->add_fields(array(
+    $record->add_fields([
       new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => TRUE)),
       new Field(array('name' => 'sent', 'type' => 'hidden', 'datatype' => 'function', 'null' => TRUE, 'noupdate' => TRUE)),
       new Field(array('name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => TRUE)),
@@ -398,7 +388,7 @@ class DisplayCommunication extends DisplayTable
 
       new Field(array('name' => 'subject', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'default' => array_key_exists('subject', $this->defaults) ? $this->defaults['subject'] : '')),
       new Field(array('name' => 'body', 'type' => 'textarea', 'datatype' => 'char', 'default' => array_key_exists('body', $this->defaults) ? $this->defaults['body'] : '', 'cols' => 65, 'rows' => 20)),
-    ));
+    ]);
 
     return $record;
   }
@@ -423,25 +413,25 @@ class DisplayCommunication extends DisplayTable
         ? $this->record->get_value('from_email') : '';
     }
 
-    $rows = array(
+    $rows = [
       'id' => FALSE, 'status' => FALSE, 'message_id' => FALSE, 'type' => FALSE, // hidden fields
 
       'from_id' => FALSE, 'from_email' => array('label' => 'From'),
       'to_id' => FALSE, 'to_email' => array('label' => 'To'),
-    );
+    ];
 
     if (!empty($flags_value)) {
-      $rows['flags'] = array('label' => 'Options', 'value' => $flags_value);
+      $rows['flags'] = [ 'label' => 'Options', 'value' => $flags_value ];
     }
 
-    $rows = $rows + array(
+    $rows = $rows + [
       'subject' => array('label' => 'Subject'),
       'body' => array('label' => 'Body'),
 
       '<hr noshade="noshade" />',
 
       isset($this->form) ? $this->form->show_submit(ucfirst(tr('preview'))) : 'FALSE'
-    );
+    ];
 
     return $rows;
   }
@@ -452,7 +442,7 @@ class DisplayCommunication extends DisplayTable
 
   function buildEditButton () {
     return sprintf(' <span class="regular">[<a href="%s">' . tr('edit') . '</a>]</span>',
-                   htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_EDIT) => $this->id))));
+                   htmlspecialchars($this->page->buildLink([ 'pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_EDIT) => $this->id ])));
   }
 
   function buildViewRows () {
@@ -463,7 +453,7 @@ class DisplayCommunication extends DisplayTable
 
     $formats = $this->getViewFormats();
 
-    $view_rows = array();
+    $view_rows = [];
 
     foreach ($rows as $key => $descr)
       if ($descr !== FALSE && gettype($key) == 'string') {
@@ -489,7 +479,7 @@ class DisplayCommunication extends DisplayTable
       $ret .= '<p class="message">' . $this->page->msg . '</p>';
     }
 
-    $fields = array();
+    $fields = [];
     if ('array' == gettype($rows)) {
       foreach ($rows as $key => $row_descr) {
         if ('string' == gettype($row_descr)) {
@@ -578,7 +568,6 @@ class DisplayCommunication extends DisplayTable
       $this->record->fetch($this->id);
       return $this->record->get_value('sent');
     }
-
   }
 
   function buildView () {
@@ -624,7 +613,6 @@ class DisplayCommunication extends DisplayTable
       if (isset($uploadHandler)) {
         $ret .= $this->renderUpload($uploadHandler);
       }
-
     }
 
     return $ret;
@@ -644,12 +632,11 @@ class DisplayCommunication extends DisplayTable
 
     return $ret;
   } // buildSearchBar
-
 }
 
 $display = new DisplayCommunication($page);
 if (FALSE === $display->init()) {
-  $page->redirect(array('pn' => ''));
+  $page->redirect([ 'pn' => '' ]);
 }
 
 $page->setDisplay($display);

@@ -94,7 +94,8 @@ class Text_Wiki_CmsCode extends Text_Wiki {
      */
     function __construct($rules = null)
     {
-        parent::Text_Wiki($rules);
+        parent::__construct($rules);
+
         # $this->delim defaults to "\xFF"; which is a bad idea since that is
         # small y diaresis
         $this->delim = "\x7F";

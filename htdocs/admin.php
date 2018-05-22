@@ -2,11 +2,11 @@
 /*
  * admin.php
  *
- * admin system: http://juedische-geschichte-online.net/admin.php
+ * Back-end for http://juedische-geschichte-online.net/
  *
- * (c) 2008-2015 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-05-02 dbu
+ * Version: 2018-05-22 dbu
  *
  * Changes:
  *

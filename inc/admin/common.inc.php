@@ -4,15 +4,14 @@
  *
  * Common stuff for the admin pages
  *
- * (c) 2006-2016 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-06-17 dbu
+ * Version: 2018-05-22 dbu
  *
  * Changes:
  *
  */
 
-// require_once 'XML/Util.php';
 require_once INC_PATH . 'common/classes.inc.php';
 
 function send_mail ($msg) {
@@ -29,6 +28,7 @@ Subject: <?php echo $msg['subject'] ?>
   <?php
     return 1;
   }
+
   return mail($msg['to'], $msg['subject'], $msg['body'], $msg['headers']);
 }
 
@@ -38,6 +38,7 @@ function is_associative($array) {
   }
 
   $keys = array_keys($array);
+
   return array_keys($keys) !== $keys;
 }
 
@@ -66,6 +67,7 @@ function translit_7bit ($str) {
   $str = iconv('UTF-8', 'us-ascii//TRANSLIT', $str);
 
   $str = preg_replace('/\\"([aou])/i', "\\1e", $str);
+
   return preg_replace("/[`'".'\\"]/', '', $str);
 }
 
@@ -81,7 +83,7 @@ function replace_num_entity($ord) {
     }
 
     $no_bytes = 0;
-    $byte = array();
+    $byte = [];
 
     if ($ord < 128)
     {
@@ -173,12 +175,14 @@ function writeMultibyte (&$sheet, $row, $col, $str, $format = 0) {
   if (preg_match('/&#([0-9a-fx]+);/i', $str)) {
     return writeStringBIFF8($sheet, $row, $col, mb_convert_encoding(preg_replace_callback('/&#([0-9a-fx]+);/mi', 'replace_num_entity', $str), "UTF-16LE", "UTF-8"), $format);
   }
+
   return $sheet->write($row, $col, $str, $format);
 }
 
 function strip_specialchars($txt) {
   $match = array('/’/s', '/[“”]/s', '/—/s');
   $replace = array("'", '"', '-');
+
   return preg_replace($match, $replace, $txt, -1);
 }
 
@@ -187,21 +191,23 @@ function format_mailbody ($txt) {
   for ($i = 0; $i < count($paras); $i++) {
     $paras[$i] = wordwrap($paras[$i], MAIL_LINELENGTH, "\r\n");
   }
+
   return strip_specialchars(join("\r\n\r\n", $paras));
 }
 
 class AuthorListing
 {
   static $status_deleted = -100;
-  static $status_list = array(
-        0 => 'not subscribed',
-        /* -3 => 'outstanding request', */
-        1 => 'subscribed',
-        /* 2 => 'hold', */
-        -5 => 'signed off',
-        -1 => 'rejected',
-        -100 => 'deleted',
-    );
+  static $status_list = [
+    0 => 'not subscribed',
+    /* -3 => 'outstanding request', */
+    1 => 'subscribed',
+    /* 2 => 'hold', */
+    -5 => 'signed off',
+    -1 => 'rejected',
+    -100 => 'deleted',
+  ];
+
   var $id;
   var $record;
 
@@ -217,27 +223,27 @@ class AuthorListing
     }
 
     $tables = 'User';
-    $fields = array(
-        'User.id AS id', 'status', 'status_flags',
-        'email', 'firstname', 'lastname', 'title', 'position',
-        'UNIX_TIMESTAMP(created) AS created',
-        'UNIX_TIMESTAMP(subscribed) AS subscribed',
-        'UNIX_TIMESTAMP(unsubscribed) AS unsubscribed',
-        'UNIX_TIMESTAMP(hold) AS hold',
-        // contact
-        'email_work', 'institution', 'address', 'zip', 'place', 'country AS cc', 'phone', 'fax',
-        // public
-        'url', 'gnd', 'description_de', 'description',
-        // personal
-        'supervisor', 'areas', 'expectations', 'knownthrough', 'forum',
-        // review
-        'review', 'review_areas', 'review_suggest',
+    $fields = [
+      'User.id AS id', 'status', 'status_flags',
+      'email', 'firstname', 'lastname', 'title', 'position',
+      'UNIX_TIMESTAMP(created) AS created',
+      'UNIX_TIMESTAMP(subscribed) AS subscribed',
+      'UNIX_TIMESTAMP(unsubscribed) AS unsubscribed',
+      'UNIX_TIMESTAMP(hold) AS hold',
+      // contact
+      'email_work', 'institution', 'address', 'zip', 'place', 'country AS cc', 'phone', 'fax',
+      // public
+      'url', 'gnd', 'description_de', 'description',
+      // personal
+      'supervisor', 'areas', 'expectations', 'knownthrough', 'forum',
+      // review
+      'review', 'review_areas', 'review_suggest',
 
-        // internal
-        'comment',
-    );
+      // internal
+      'comment',
+    ];
 
-    $where_conditions = array("User.id =".$this->id);
+    $where_conditions = [ "User.id =" . $this->id ];
 
     if (defined('COUNTRIES_FROM_DB') && COUNTRIES_FROM_DB) {
       $tables .= ', Country';
@@ -252,8 +258,10 @@ class AuthorListing
     $dbconn->query($querystr);
     if ($dbconn->next_record()) {
       $this->record = $dbconn->Record;
+
       return TRUE;
     }
+
     return FALSE;
   }
 
@@ -262,7 +270,7 @@ class AuthorListing
   }
 
   function buildPlaceWithZip ($record, $append_country = TRUE) {
-    static $country_shortnames = array('UK' => 'UK', 'US' => 'USA');
+    static $country_shortnames = [ 'UK' => 'UK', 'US' => 'USA' ];
 
     $separator = ', ';
     $single = TRUE;
@@ -274,17 +282,21 @@ class AuthorListing
         case 1:
           $zipcode_town .= $separator . $record['zip'];
           break;
+
         case 2:
           $zipcode_town .= ($single ? ' ' : "\n") . $record['zip'];
           break;
+
         default:
           $zipcode_town = $record['zip'] . ' ' . $zipcode_town;
       }
     }
+
     if ($append_country && !empty($record['cc'])) {
       $zipcode_town .= $separator
         . (isset($country_shortnames[$record['cc']]) ? $country_shortnames[$record['cc']] : Countries::name($record['cc']));
     }
+
     return $zipcode_town;
   }
 
@@ -307,12 +319,14 @@ class AuthorListing
     }
 
     return '<a href="' . htmlspecialchars($url) . '" target="_blank">'
-          . htmlspecialchars($name) . '</a>';
+      . htmlspecialchars($name)
+      . '</a>';
   }
 
   function buildSection (&$view, $title) {
     return '<div style="margin-top: 1em; width: 100%; margin-bottom: 0.5em; border-bottom: 1px solid gray;"><span style="color: gray;">'
-      . $view->formatText(tr($title)) . '</span></div>';
+      . $view->formatText(tr($title))
+      . '</span></div>';
   }
 
   function buildEntry (&$view, $entry, $label = '', $format_entry = TRUE) {
@@ -327,47 +341,6 @@ class AuthorListing
 
   function buildSubscriptionAction (&$view, $status, $field = 'status') {
     return ''; // no subscription actions
-
-    $actions = array();
-
-    if ('email' == $field) {
-      switch ($status) {
-        case 1:
-        case 2:
-          $actions = array('change' => tr('change'));
-          break;
-      }
-    }
-    else {
-      switch ($status) {
-        case -10:
-        case 0:
-        case -5:
-          $actions = array(
-            'add' => tr('subscribe')
-          );
-          break;
-
-        case 1:
-          $actions = array(
-            'delete' => tr('unsubscribe'),
-            'nomail' => tr('suspend'),
-          );
-          break;
-
-        case 2:
-          $actions = array('mail' => tr('reactivate'));
-          break;
-      }
-    }
-
-    $ret = array();
-    foreach ($actions as $action => $label) {
-      $ret[] = sprintf('[<a href="%s">%s</a>]',
-                       htmlspecialchars($view->page->buildLink(array('pn' => 'author', 'listserv' => $this->id, 'action' => $action))), $label);
-    }
-
-    return implode(' ', $ret);
   }
 
   function build (&$view, $mode = 'default') {
@@ -383,12 +356,12 @@ class AuthorListing
 
     $show_edit = 'default' == $mode || 'admin' == $mode;
     $show_merge = 'admin' == $mode;
-    $show_delete = 'admin' == $mode && !in_array($this->record['status'], array(1, 2)); // delete only those not subscribed or on hold
+    $show_delete = 'admin' == $mode && !in_array($this->record['status'], [ 1, 2 ]); // delete only those not subscribed or on hold
 
     // title
     $edit = $show_edit
       ? ' <span class="regular">'
-        . '[<a href="' . htmlspecialchars($view->page->buildLink(array('pn' => 'author', (isset($view->workflow) ? $view->workflow->name(TABLEMANAGER_EDIT) : 'edit') => $this->id)))
+        . '[<a href="' . htmlspecialchars($view->page->buildLink([ 'pn' => 'author', (isset($view->workflow) ? $view->workflow->name(TABLEMANAGER_EDIT) : 'edit') => $this->id ]))
         . '">' . tr('edit') . '</a>]</span>'
       : '';
 
@@ -403,14 +376,15 @@ class AuthorListing
                           $this->id, AuthorListing::$status_deleted);
       $dbconn->query($querystr);
       if ($dbconn->next_record() && $dbconn->Record['count_candidate'] > 0) {
-        $merge = ' <span class="regular">[<a href="' . htmlspecialchars($view->page->buildLink(array('pn' => 'author', 'merge' => $this->id))) . '">'
+        $merge = ' <span class="regular">[<a href="' . htmlspecialchars($view->page->buildLink([ 'pn' => 'author', 'merge' => $this->id ])) . '">'
                . tr('merge')
                . '</a>]</span>';
       }
     }
+
     $delete = '';
     if ($show_delete) {
-      $url_delete = $view->page->buildLink(array('pn' => $view->page->name, 'delete' => $this->id));
+      $url_delete = $view->page->buildLink([ 'pn' => $view->page->name, 'delete' => $this->id ]);
       $delete = sprintf(' <span class="regular">[<a href="javascript:if (confirm(%s)) window.location.href=%s">',
                         "'" . tr('Do you want to delete this record (no undo)?') . "'",
                         "'" . htmlspecialchars($url_delete) . "'")
@@ -437,7 +411,7 @@ class AuthorListing
     }
 
     // top
-    $top = array();
+    $top = [];
 
     if (isset($this->record['email'])) {
       $top[] = $this->buildEntry($view, $this->record['email']
@@ -462,8 +436,8 @@ class AuthorListing
       }
     }
     // contact
-    $contact = array();
-    $institutional_fields = array('email_work' => 'Institutional E-Mail', 'institution' => 'Institution');
+    $contact = [];
+    $institutional_fields = [ 'email_work' => 'Institutional E-Mail', 'institution' => 'Institution' ];
     foreach ($institutional_fields as $field => $label) {
       if (!empty($this->record[$field])) {
         $contact[] = $this->buildEntry($view, $this->record[$field], $label);
@@ -471,7 +445,7 @@ class AuthorListing
     }
 
     // address
-    $address = array();
+    $address = [];
     if (isset($this->record['address'])) {
       $address[] = $this->record['address'];
     }
@@ -484,7 +458,7 @@ class AuthorListing
     }
 
     if ('admin' == $mode) {
-      $contact_fields = array('phone' => 'Phone', 'fax' => 'Fax');
+      $contact_fields = [ 'phone' => 'Phone', 'fax' => 'Fax' ];
       foreach ($contact_fields as $field => $label) {
         if (!empty($this->record[$field])) {
           $contact[] = $this->buildEntry($view, $this->record[$field], $label);
@@ -499,13 +473,13 @@ class AuthorListing
     }
 
     // public info
-    $public = array();
-    $public_fields = array(
-        'url' => 'Homepage',
-        'description_de' => 'Public CV (de)',
-        'description' => 'Public CV (en)',
-        'gnd' => 'GND',
-    );
+    $public = [];
+    $public_fields = [
+      'url' => 'Homepage',
+      'description_de' => 'Public CV (de)',
+      'description' => 'Public CV (en)',
+      'gnd' => 'GND',
+    ];
     foreach ($public_fields as $field => $label) {
       if (!empty($this->record[$field])) {
         if ('url' == $field) {
@@ -518,7 +492,7 @@ class AuthorListing
           $value = $this->record[$field];
         }
 
-        $public[] = $this->buildEntry($view, $value, $label, !in_array($field, array('url', 'gnd')));
+        $public[] = $this->buildEntry($view, $value, $label, !in_array($field, [ 'url', 'gnd' ]));
       }
     }
 
@@ -528,21 +502,20 @@ class AuthorListing
     }
 
     // personal info
-    $personal = array();
+    $personal = [];
 
-    $personal_fields = array(
-        'supervisor' => 'Supervisor',
-        'areas' => 'Areas of interest',
-    );
+    $personal_fields = [
+      'supervisor' => 'Supervisor',
+      'areas' => 'Areas of interest',
+    ];
 
     if ('admin' == $mode) {
       $personal_fields = array_merge(
-        $personal_fields,
-        array(
+        $personal_fields, [
           'expectations' => 'Expectations',
           'knownthrough' => 'How did you get to know us',
           'forum' => 'Other lists and fora',
-          ));
+        ]);
     }
 
     foreach ($personal_fields as $field => $label) {
@@ -562,12 +535,12 @@ class AuthorListing
 
     // review info
     if ('admin' == $mode) {
-      $review = array();
-      $review_fields = array(
-          'review' => 'Willing to contribute',
-          'review_areas' => 'Contribution areas',
-          'review_suggest' => 'Article suggestion',
-      );
+      $review = [];
+      $review_fields = [
+        'review' => 'Willing to contribute',
+        'review_areas' => 'Contribution areas',
+        'review_suggest' => 'Article suggestion',
+      ];
 
       foreach ($review_fields as $field => $label) {
         if (!empty($this->record[$field])) {
@@ -584,11 +557,10 @@ class AuthorListing
 
 
       if (isset($this->record['status_flags'])) {
-        $status_labels = array();
-        foreach (array(
-                       'cv' => array('label' => 'CV', 'mask' => 0x1),
-                       )
-                 as $key => $options)
+        $status_labels = [];
+        foreach ([
+            'cv' => [ 'label' => 'CV', 'mask' => 0x1 ],
+          ] as $key => $options)
         {
           if (0 != ($this->record['status_flags'] & $options['mask'])) {
             $status_labels[] = $options['label'] . ' ' . tr('finalized');

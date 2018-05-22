@@ -4,9 +4,9 @@
  *
  * Page class for admin-section
  *
- * (c) 2009-2016 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2016-08-23 dbu
+ * Version: 2018-02-20 dbu
  *
  * Changes:
  *
@@ -48,83 +48,75 @@ class AdminPage extends Page
 
 }
 
-$URL_REWRITE = array(); // don't do rewrites for the backend
+$URL_REWRITE = []; // don't do rewrites for the backend
 
-$SITE_DESCRIPTION = array(
+$SITE_DESCRIPTION = [
     'title' => 'Hamburg Key-Documents of German-Jewish History',
-    'structure' => array(
-        'root' => array(
+    'structure' => [
+        'root' => [
             'title' => 'Administration',
             'anonymous' => FALSE,
-        ),
-        'pwd' => array(
+        ],
+        'pwd' => [
             'title' => 'Recover Password',
             'anonymous' => TRUE,
-        ),
-        'author' => array(
+        ],
+        'author' => [
             'title' => 'Authors',
             'anonymous' => FALSE,
-        ),
-        /*
-        'review' => array(
-            'title' => 'Book Reviews',
-            'anonymous' => FALSE,
-        ),
-        */
-        'publication' => array(
-            'title' => 'Sources',
-            'anonymous' => FALSE,
-        ),
-        'article' => array(
+        ],
+        'article' => [
             'title' => 'Articles',
             'anonymous' => FALSE,
-        ),
-        'communication' => array(
+        ],
+        'publication' => [
+            'title' => 'Sources',
+            'anonymous' => FALSE,
+        ],
+        'communication' => [
             'title' => 'Communication',
             'anonymous' => FALSE,
-        ),
-        'publisher' => array(
+        ],
+        'publisher' => [
             'title' => 'Holding Institutions',
             'anonymous' => FALSE,
-        ),
-        'person' => array(
+        ],
+        'person' => [
             'title' => 'Normdata: Persons',
             'anonymous' => FALSE,
-        ),
-        'place' => array(
+        ],
+        'place' => [
             'title' => 'Normdata: Places',
             'anonymous' => FALSE,
-        ),
-        'organization' => array(
+        ],
+        'organization' => [
             'title' => 'Normdata: Organizations',
             'anonymous' => FALSE,
-        ),
-        'term' => array(
+        ],
+        'event' => [
+            'title' => 'Normdata: Event / Period',
+            'anonymous' => FALSE,
+        ],
+        'term' => [
             'title' => 'Wertelisten',
             'anonymous' => FALSE,
-        ),
-        'convert' => array(
+        ],
+        'convert' => [
             'title' => 'TEI nach HTML',
             'anonymous' => FALSE,
-        ),
-        'zotero' => array(
+        ],
+        'zotero' => [
             'title' => 'Zotero Sync',
             'anonymous' => FALSE,
-        ),
-        'account' => array(
+        ],
+        'account' => [
             'title' => 'Account',
             'anonymous' => FALSE,
-        ),
-        'system_information' => array(
+        ],
+        'system_information' => [
             'title' => 'System Information',
             'anonymous' => FALSE,
             'display' => FALSE,
-        ),
-        /*
-        'feed' => array(
-            'title' => 'Feed Tagging',
-            'anonymous' => FALSE,
-        ),
-        */
-    )
-);
+        ],
+    ],
+];

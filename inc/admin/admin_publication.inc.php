@@ -4,9 +4,9 @@
  *
  * Class for managing publications (sources)
  *
- * (c) 2007-2016 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2016-09-13 dbu
+ * Version: 2018-05-22 dbu
  *
  * Changes:
  *
@@ -16,9 +16,10 @@ require_once INC_PATH . 'admin/displaybackend.inc.php';
 
 require_once INC_PATH . 'common/biblioservice.inc.php';
 
-class PublicationRecord extends TableManagerRecord
+class PublicationRecord
+extends TableManagerRecord
 {
-  var $languages = array('de', 'en');
+  var $languages = [ 'de', 'en' ];
 
   function store ($args = '') {
     // remove dashes and convert x to upper from isbn
@@ -27,7 +28,7 @@ class PublicationRecord extends TableManagerRecord
       $this->set_value('isbn', BiblioService::normalizeIsbn($isbn));
     }
 
-    $attribution = array();
+    $attribution = [];
     foreach ($this->languages as $language) {
       $value = $this->get_value('attribution_' . $language);
       if (!empty($value)) {
@@ -161,32 +162,34 @@ class DisplayPublication extends DisplayBackend
 {
   var $page_size = 30;
   var $table = 'Publication';
-  var $fields_listing = array('id', 'IFNULL(author,editor)', 'title',
-                              'YEAR(publication_date) AS year',
-                              'status', 'status_flags');
+  var $fields_listing = [
+    'id', 'IFNULL(author,editor)', 'title',
+    'YEAR(publication_date) AS year',
+    'status', 'status_flags',
+  ];
 
   var $status_options;
   var $status_default = '-99';
   var $status_deleted = '-1';
 
-  var $condition = array(
-      array('name' => 'search', 'method' => 'buildLikeCondition', 'args' => 'title,author,editor'),
-      'Publication.status <> -1'
-      // alternative: buildFulltextCondition
-  );
-  var $order = array(
-                     'author' => array('IFNULL(author,editor)', 'IFNULL(author,editor) DESC'),
-                     'title' => array('title', 'title DESC'),
-                     'year' => array('YEAR(publication_date) DESC', 'YEAR(publication_date)'),
-                     'status' => array('Publication.status', 'Publication.status DESC'),
-                );
-  var $cols_listing = array(
-                            'author' => 'Author/Editor',
-                            'title' => 'Title',
-                            'year' => 'Year',
-                            'status' => 'Status',
-                            '' => '',
-                            );
+  var $condition = [
+    [ 'name' => 'search', 'method' => 'buildLikeCondition', 'args' => 'title,author,editor' ],
+    'Publication.status <> -1',
+    // alternative: buildFulltextCondition
+  ];
+  var $order = [
+    'author' => array('IFNULL(author,editor)', 'IFNULL(author,editor) DESC'),
+    'title' => array('title', 'title DESC'),
+    'year' => array('YEAR(publication_date) DESC', 'YEAR(publication_date)'),
+    'status' => array('Publication.status', 'Publication.status DESC'),
+  ];
+  var $cols_listing = [
+    'author' => 'Author/Editor',
+    'title' => 'Title',
+    'year' => 'Year',
+    'status' => 'Status',
+    '' => '',
+  ];
   var $view_after_edit = TRUE;
 
   function __construct (&$page) {
@@ -195,15 +198,19 @@ class DisplayPublication extends DisplayBackend
     $this->status_options = $this->view_options['status'] = $STATUS_SOURCE_OPTIONS;
     parent::__construct($page);
 
-    $this->condition[] = array('name' => 'status',
-                               'method' => 'buildEqualCondition',
-                               'args' => $this->table . '.status',
-                               'persist' => 'session');
+    $this->condition[] = [
+      'name' => 'status',
+      'method' => 'buildEqualCondition',
+      'args' => $this->table . '.status',
+      'persist' => 'session',
+    ];
 
-    $this->condition[] = array('name' => 'status_translation',
-                               'method' => 'buildEqualCondition',
-                               'args' => $this->table . '.status_translation',
-                               'persist' => 'session');
+    $this->condition[] = [
+      'name' => 'status_translation',
+      'method' => 'buildEqualCondition',
+      'args' => $this->table . '.status_translation',
+      'persist' => 'session',
+    ];
 
   }
 
@@ -221,7 +228,7 @@ class DisplayPublication extends DisplayBackend
   }
 
   function instantiateRecord ($table = '', $dbconn = '') {
-    return new PublicationRecord(array('tables' => $this->table, 'dbconn' => $this->page->dbconn));
+    return new PublicationRecord([ 'tables' => $this->table, 'dbconn' => $this->page->dbconn ]);
   }
 
   function buildStatusOptions ($options = NULL) {
@@ -229,7 +236,7 @@ class DisplayPublication extends DisplayBackend
       $options = & $this->status_options;
     }
 
-    $status_options = array('<option value="">' . tr('-- all --') . '</option>');
+    $status_options = [ '<option value="">' . tr('-- all --') . '</option>' ];
     foreach ($options as $status => $label) {
       if ($this->status_deleted != $status) {
         $selected = isset($this->search['status']) && $this->search['status'] !== ''
@@ -248,6 +255,7 @@ class DisplayPublication extends DisplayBackend
                                     $this->htmlSpecialchars(tr($label)));
       }
     }
+
     return tr('Status')
          . ': <select name="status">' . implode($status_options) . '</select>';
   }
@@ -274,7 +282,7 @@ class DisplayPublication extends DisplayBackend
 
       case 'license':
         global $LICENSE_OPTIONS;
-        $licenses = array();
+        $licenses = [];
         foreach ($LICENSE_OPTIONS as $key => $label) {
           $licenses[$key] = tr($label);
         }
@@ -287,32 +295,32 @@ class DisplayPublication extends DisplayBackend
         break;
 
       case 'type':
-          $type = 'sourcetype';
-          $querystr = sprintf("SELECT id, name FROM Term WHERE category='%s' AND status >= 0 ORDER BY ord, name",
-                              addslashes($type));
-          break;
+        $type = 'sourcetype';
+        $querystr = sprintf("SELECT id, name FROM Term WHERE category='%s' AND status >= 0 ORDER BY ord, name",
+                            addslashes($type));
+        break;
 
       case 'publisher':
-          $querystr = sprintf("SELECT id, name FROM %s WHERE status >= 0 ORDER BY name",
-                            $dbconn->escape_string(ucfirst($type)));
-          break;
+        $querystr = sprintf("SELECT id, name FROM %s WHERE status >= 0 ORDER BY name",
+                          $dbconn->escape_string(ucfirst($type)));
+        break;
 
       case 'referee':
       case 'translator':
-          global $RIGHTS_REFEREE, $RIGHTS_TRANSLATOR;
-          $querystr = "SELECT id, lastname, firstname FROM User";
-          $querystr .= sprintf(" WHERE 0 <> (privs & %d) AND status <> %d",
-                               'translator' == $type ? $RIGHTS_TRANSLATOR : $RIGHTS_REFEREE,
-                               STATUS_USER_DELETED);
-          $querystr .= " ORDER BY lastname, firstname";
-          break;
+        global $RIGHTS_REFEREE, $RIGHTS_TRANSLATOR;
+        $querystr = "SELECT id, lastname, firstname FROM User";
+        $querystr .= sprintf(" WHERE 0 <> (privs & %d) AND status <> %d",
+                             'translator' == $type ? $RIGHTS_TRANSLATOR : $RIGHTS_REFEREE,
+                             STATUS_USER_DELETED);
+        $querystr .= " ORDER BY lastname, firstname";
+        break;
     }
 
     if (isset($querystr)) {
       $dbconn->query($querystr);
-      $options = array();
+      $options = [];
       while ($dbconn->next_record()) {
-        $options[$dbconn->Record['id']] = in_array($type, array('sourcetype', 'publisher'))
+        $options[$dbconn->Record['id']] = in_array($type, [ 'sourcetype', 'publisher' ])
                 ? $dbconn->Record['name']
                 : $dbconn->Record['lastname'] . ', ' . $dbconn->Record['firstname'];
 
@@ -333,9 +341,9 @@ class DisplayPublication extends DisplayBackend
     $this->view_options['translator'] = $this->translator_options = $this->buildOptions('translator');
     $this->view_options['lang'] = $this->buildOptions('lang');
     $this->view_options['status_translation'] = $this->status_translation_options
-      = array('' => tr('-- please select --')) + $this->buildOptions('status_translation');
+      = [ '' => tr('-- please select --') ] + $this->buildOptions('status_translation');
     $this->view_options['license'] = $license_options = $this->buildOptions('license');
-    $languages_ordered = array('' => tr('-- please select --')) + $this->view_options['lang'];
+    $languages_ordered = [ '' => tr('-- please select --') ] + $this->view_options['lang'];
 
     $publisher_options = $this->buildOptions('publisher');
     $record->add_fields(array(
@@ -416,7 +424,7 @@ class DisplayPublication extends DisplayBackend
     $add_publisher_button = sprintf('<input type="button" value="%s" onclick="window.open(\'%s\')" />',
                                     tr('add new Holding Institution'), htmlspecialchars($this->page->buildLink(array('pn' => 'publisher', 'edit' => -1))));
 
-    $rows = array(
+    $rows = [
       'id' => FALSE, // 'status' => FALSE, // hidden fields
 
       'status' => array('label' => 'Status'),
@@ -453,13 +461,13 @@ class DisplayPublication extends DisplayBackend
       'displaydate' => array('label' => 'Primary Date Override (e.g. "around 1600")'),
 
       '<hr noshade="noshade" />',
-    );
+    ];
 
-    $additional = array(
-        'license' => array('label' => 'License'),
-        'attribution_de' => array('label' => 'Attribution (German)'),
-        'attribution_en' => array('label' => 'Attribution (English)'),
-    );
+    $additional = [
+      'license' => array('label' => 'License'),
+      'attribution_de' => array('label' => 'Attribution (German)'),
+      'attribution_en' => array('label' => 'Attribution (English)'),
+    ];
 
     if ('edit' == $mode) {
       $status_flags = $this->form->field('status_flags');
@@ -468,14 +476,13 @@ class DisplayPublication extends DisplayBackend
       $status_flags_value = $this->record->get_value('status_flags');
     }
 
-    foreach (array(
-                   'digitization' => array('label' => 'Digitization', 'mask' => 0x1),
-                   'markup' => array('label' => 'Transcript and Markup', 'mask' => 0x02),
-                   'bibliography' => array('label' => 'Bibliography', 'mask' => 0x04),
-                   'translation' => array('label' => 'Translation', 'mask' => 0x08),
-                   'translation_markup' => array('label' => 'Translation Markup', 'mask' => 0x10),
-                   )
-             as $key => $options)
+    foreach ([
+        'digitization' => array('label' => 'Digitization', 'mask' => 0x1),
+        'markup' => array('label' => 'Transcript and Markup', 'mask' => 0x02),
+        'bibliography' => array('label' => 'Bibliography', 'mask' => 0x04),
+        'translation' => array('label' => 'Translation', 'mask' => 0x08),
+        'translation_markup' => array('label' => 'Translation Markup', 'mask' => 0x10),
+      ] as $key => $options)
     {
       if ('edit' == $mode) {
         $finalized = $status_flags->show($options['mask']) . '<br />';
@@ -483,26 +490,25 @@ class DisplayPublication extends DisplayBackend
       else {
         $finalized = (0 != ($status_flags_value & $options['mask']) ? tr('finalized') . '<br />' : '');
       }
-      $additional['comment_' . $key] = array(
+
+      $additional['comment_' . $key] = [
         'label' => $options['label'],
         'value' => $finalized
           . ('edit' == $mode
                                   ? $this->getFormField('comment_' . $key)
                                   : $this->record->get_value('comment_' . $key))
-      );
+      ];
     }
 
     $rows = array_merge($rows, $additional);
 
-    $rows = array_merge($rows,
-      array(
+    $rows = array_merge($rows, [
+      '<hr noshade="noshade" />',
 
-        '<hr noshade="noshade" />',
+      'comment' => [ 'label' => 'Internal notes and comments' ],
 
-        'comment' => array('label' => 'Internal notes and comments'),
-
-        isset($this->form) ? $this->form->show_submit(ucfirst(tr('save'))) : 'FALSE',
-      ));
+      isset($this->form) ? $this->form->show_submit(ucfirst(tr('save'))) : 'FALSE',
+    ]);
 
     return $rows;
   }
@@ -581,24 +587,26 @@ EOT;
   function getImageDescriptions () {
     global $TYPE_PUBLICATION;
 
-    $images = array(
-          'source' => array(
-                        'title' => tr('Digitized Media / Transcript'),
-                        'multiple' => TRUE,
-                        'imgparams' => array('height' => 164,
-                                             'scale' => 'down',
-                                             'keep' => 'large',
-                                             'keep_orig' => TRUE,
-                                             'title' => 'File',
-                                             'pdf' => TRUE,
-                                             'audio' => TRUE,
-                                             'video' => TRUE,
-                                             'office' => TRUE,
-                                             'xml' => TRUE,
-                                             ),
-                        ));
+    $images = [
+      'source' => [
+        'title' => tr('Digitized Media / Transcript'),
+        'multiple' => TRUE,
+        'imgparams' => [
+          'height' => 164,
+          'scale' => 'down',
+          'keep' => 'large',
+          'keep_orig' => TRUE,
+          'title' => 'File',
+          'pdf' => TRUE,
+          'audio' => TRUE,
+          'video' => TRUE,
+          'office' => TRUE,
+          'xml' => TRUE,
+        ],
+      ],
+    ];
 
-    return array($TYPE_PUBLICATION, $images);
+    return [ $TYPE_PUBLICATION, $images ];
   }
 
   function getViewFormats () {
@@ -606,12 +614,12 @@ EOT;
   }
 
   function buildViewRows () {
-    $resolve_options = array(
-                             'type' => 'type',
-                             'publisher_id' => 'publisher',
-                             'lang' => 'lang',
-                             'translator' => 'translator',
-                             );
+    $resolve_options = [
+      'type' => 'type',
+      'publisher_id' => 'publisher',
+      'lang' => 'lang',
+      'translator' => 'translator',
+    ];
 
     $rows = $this->getEditRows('view');
     if (isset($rows['title'])) {
@@ -621,7 +629,7 @@ EOT;
 
     $formats = $this->getViewFormats();
 
-    $view_rows = array();
+    $view_rows = [];
 
     foreach ($rows as $key => $descr) {
       if ($descr !== FALSE && gettype($key) == 'string') {
@@ -682,11 +690,11 @@ EOT;
     if (!empty($this->page->msg)) {
       $ret .= '<p class="message">' . $this->page->msg . '</p>';
     }
-    $fields = array();
+    $fields = [];
     if ('array' == gettype($rows)) {
       foreach ($rows as $key => $row_descr) {
         if ('string' == gettype($row_descr)) {
-          $fields[] = array('&nbsp;', $row_descr);
+          $fields[] = [ '&nbsp;', $row_descr ];
         }
         else {
           $label = isset($row_descr['label']) ? tr($row_descr['label']).':' : '';
@@ -715,13 +723,14 @@ EOT;
               $field_value = implode(', ', $values);
             }
             $value = isset($row_descr['format']) && 'p' == $row_descr['format']
-                ? $this->formatParagraphs($field_value) : $this->formatText($field_value);
+              ? $this->formatParagraphs($field_value) : $this->formatText($field_value);
           }
 
           $fields[] = array($label, $value);
         }
       }
     }
+
     if (count($fields) > 0) {
       $ret .= $this->buildContentLineMultiple($fields);
     }
@@ -736,6 +745,7 @@ EOT;
       $authors = $record->get_value('editor');
       $editor = TRUE;
     }
+
     $author_short = '';
     if (!empty($authors)) {
       // $parts = preg_split('/\s*\;\s/', $authors);
@@ -790,10 +800,11 @@ EOT;
         }
         $params_view['view'] = $dbconn->Record['id'];
         $reviews .= sprintf('<li id="item_%d">', $dbconn->Record['id'])
-          .sprintf('<a href="%s">' . $this->formatText($dbconn->Record['subject']) . '</a>',
+          . sprintf('<a href="%s">' . $this->formatText($dbconn->Record['subject']) . '</a>',
                    htmlspecialchars($this->page->buildLink($params_view)))
-          .'</li>';
+          . '</li>';
       }
+
       if ($reviews_found) {
         $reviews .= '</ul>';
       }
@@ -801,14 +812,17 @@ EOT;
         global $JAVASCRIPT_CONFIRMDELETE;
 
         $this->script_code .= $JAVASCRIPT_CONFIRMDELETE;
-        $url_delete = $this->page->buildLink(array('pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_DELETE) => $this->id));
+        $url_delete = $this->page->buildLink([ 'pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_DELETE) => $this->id ]);
         $ret .= sprintf("<p>[<a href=\"javascript:confirmDelete('%s', '%s')\">%s</a>]</p>",
                         'Wollen Sie diese Quelle wirklich l&ouml;schen?\n(kein UNDO)',
                         htmlspecialchars($url_delete),
                         tr('delete Source'));
       }
-      $url_add = $this->page->buildLink(array('pn' => 'article', 'edit' => -1,
-                                              'subject' => $this->buildReviewSubject($record), 'publication' => $this->id));
+      $url_add = $this->page->buildLink([
+        'pn' => 'article', 'edit' => -1,
+        'subject' => $this->buildReviewSubject($record),
+        'publication' => $this->id,
+      ]);
       $ret .= '<h2>' . tr('Articles')
             . ($this->checkAction(TABLEMANAGER_EDIT)
                 ? ' <span class="regular">[<a href="' . htmlspecialchars($url_add).'">' . tr('add new') . '</a>]</span>'
@@ -827,7 +841,7 @@ EOT;
     return $ret;
   }
 
-  function buildSearchFields ($options = array()) {
+  function buildSearchFields ($options = []) {
     $options['status_translation'] = '';
 
     $search = sprintf('<input type="text" name="search" value="%s" size="40" />',
@@ -840,13 +854,13 @@ EOT;
 
     $search .=  '<br />' . $this->buildStatusOptions();
 
-    $select_fields = array('status');
+    $select_fields = [ 'status' ];
 
     if (method_exists($this, 'buildOptions')) {
       foreach ($options as $name => $option_label) {
          $select_fields[] = $name;
         // Betreuer - TODO: make a bit more generic
-        $select_options = array('<option value="">' . tr('-- all --') . '</option>');
+        $select_options = [ '<option value="">' . tr('-- all --') . '</option>' ];
         foreach ($this->buildOptions($name) as $id => $label) {
           $selected = isset($this->search[$name])
               && $this->search[$name] !== ''
@@ -904,15 +918,16 @@ EOT;
       $val = (isset($row[$col_index]) && array_key_exists($row['status'], $this->status_options))
               ? $this->status_options[$row['status']] . '&nbsp;' : '';
       if (isset($row['status_flags'])) {
-        $status_labels = array();
-        $status_flag_labels = array(
-                                                0x01 => tr('Digitization') . ' ' . tr('finalized'),
-                                                0x02 => tr('Transcript and Markup') . ' ' . tr('finalized'),
-                                                0x04 => tr('Bibliography') . ' ' . tr('finalized'),
-                                                0x08 => tr('Translation') . ' ' . tr('finalized'),
-                                                0x10 => tr('Translation Markup') . ' ' . tr('finalized'),
-                                                0x20 => tr('ready for publishing'),
-        );
+        $status_labels = [];
+        $status_flag_labels = [
+          0x01 => tr('Digitization') . ' ' . tr('finalized'),
+          0x02 => tr('Transcript and Markup') . ' ' . tr('finalized'),
+          0x04 => tr('Bibliography') . ' ' . tr('finalized'),
+          0x08 => tr('Translation') . ' ' . tr('finalized'),
+          0x10 => tr('Translation Markup') . ' ' . tr('finalized'),
+          0x20 => tr('ready for publishing'),
+        ];
+
         foreach ($status_flag_labels as $mask => $label) {
           $status_labels[] = sprintf('<li class="%s"><a href="#" title="%s">%s</a></li>',
                                      0 != ($row['status_flags'] & $mask) ? 'active' : 'inactive',
@@ -923,7 +938,7 @@ EOT;
       }
     }
     else if ($col_index == count($this->fields_listing) - 1) {
-      $url_preview = $this->page->buildLink(array('pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_VIEW) => $row[0]));
+      $url_preview = $this->page->buildLink([ 'pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_VIEW) => $row[0] ]);
       $val = sprintf('[<a href="%s">%s</a>]',
                      htmlspecialchars($url_preview),
                      tr('view'));
@@ -936,7 +951,7 @@ EOT;
 
 $display = new DisplayPublication($page);
 if (FALSE === $display->init()) {
-  $page->redirect(array('pn' => ''));
+  $page->redirect([ 'pn' => '' ]);
 }
 
 $page->setDisplay($display);

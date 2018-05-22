@@ -4,9 +4,9 @@
  *
  * Base Display class for Admin-pages
  *
- * (c) 2006-2015 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-02-13 dbu
+ * Version: 2018-05-22 dbu
  *
  * Changes:
  *
@@ -14,7 +14,8 @@
 
 require_once INC_PATH . 'common/pagedisplay.inc.php';
 
-class PageDisplay extends PageDisplayBase
+class PageDisplay
+extends PageDisplayBase
 {
   var $page;
   var $charset = 'utf-8';
@@ -25,7 +26,7 @@ class PageDisplay extends PageDisplayBase
   var $stylesheet = array('admin.css');
   var $span_range = NULL; // '[\x{3400}-\x{9faf}]';
   var $span_class = ''; // 'cn';
-  var $xls_data = array();
+  var $xls_data = [];
 
   function __construct (&$page) {
     global $RIGHTS_REFEREE, $RIGHTS_EDITOR;
@@ -63,10 +64,10 @@ class PageDisplay extends PageDisplayBase
 
   function buildFormRow ($left, $right = '') {
     return $this->buildContentLine($left, $right,
-                                   array('class_left' => 'form', 'class_right' => 'form'));
+                                   [ 'class_left' => 'form', 'class_right' => 'form' ]);
   }
 
-  function buildContentLine($left, $right, $params = array()) {
+  function buildContentLine($left, $right, $params = []) {
     $class_left = isset($params['class_left']) ? $params['class_left'] : 'leftFixedWidth';
     $class_right = isset($params['class_right']) ? $params['class_right'] : 'rightFixedWidth';
     if (empty($right)) {
@@ -84,7 +85,7 @@ EOT;
     return $ret;
   }
 
-  function buildContentLineMultiple ($lines, $params = array()) {
+  function buildContentLineMultiple ($lines, $params = []) {
     $ret = '';
 
     for ($i = 0; $i < count($lines); $i++) {
@@ -156,11 +157,13 @@ EOT;
     $url_enlarge = '';
 
     if ($attrs == '') {
-      $attrs = array();
+      $attrs = [];
     }
+
     if (!isset($attrs['alt'])) {
       $attrs['alt'] = '';
     }
+
     if ((array_key_exists('enlarge', $attrs) && $attrs['enlarge'])
         || (!isset($attrs['width']) && !isset($attrs['height'])))
     {
@@ -207,6 +210,7 @@ EOT;
         $attrstr .= ($attr.'="'.$value.'" ');
       }
     }
+
     if (isset($attrs['enlarge_only']) && (!empty($url_enlarge))) {
       $img_tag = $attrs['enlarge_only'];
     }
@@ -217,6 +221,7 @@ EOT;
     if (isset($attrs['caption']) && !empty($attrs['caption'])) {
       $img_tag .= $attrs['caption'];
     }
+
     if (!empty($url_enlarge)) {
       $img_tag = '<a href="#'
                . (isset($attrs['anchor']) ? $attrs['anchor'] : '')
@@ -230,6 +235,7 @@ EOT;
                . $img_tag
                . '</a>';
     }
+
     return $img_tag;
   }
 
@@ -343,13 +349,14 @@ EOT;
                                'type' => $media_type, 'name' => $name);
         }
       }
+
       return new ImageUploadHandler($this->workflow->primaryKey(), $media_type);
     }
   }
 
   function processUpload (&$imageUploadHandler) {
-    $action = $this->page->buildLink(array('pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_VIEW) => $this->id));
-    $upload_results = array();
+    $action = $this->page->buildLink([ 'pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_VIEW) => $this->id ]);
+    $upload_results = [];
     foreach ($this->images as $img_basename => $img_descr) {
       $img_params = $img_descr['imgparams'];
       if (isset($img_descr['multiple'])) {
@@ -371,7 +378,7 @@ EOT;
         $imageUploadHandler->delete($this->page->parameters['delete_img']);
       }
 
-      $options = array();
+      $options = [];
       if (isset($img_params['title'])) {
         $options['title'] = $img_params['title'];
       }
@@ -383,6 +390,7 @@ EOT;
         $upload_results[$img_basename] = $imageUploadHandler->process($imageUpload, $images);
       }
     }
+
     $this->upload_results = $upload_results;
   }
 
@@ -398,6 +406,7 @@ EOT;
 
       $ret .= $field->show($args);
     }
+
     return $ret;
   }
 
@@ -410,13 +419,13 @@ EOT;
     $first = TRUE;
 
     foreach ($this->images as $img_basename => $img_descr) {
-      $rows = array();
+      $rows = [];
       if (isset($img_descr['title'])) {
         $ret .= '<h3>' . $img_descr['title'] . '</h3>';
       }
 
       $upload_results = isset($this->upload_results[$img_basename])
-        ? $this->upload_results[$img_basename]: array();
+        ? $this->upload_results[$img_basename]: [];
       // var_dump($upload_results);
 
       $max_images = 1;
@@ -431,7 +440,7 @@ EOT;
 
       $img_params = $img_descr['imgparams'];
 
-      $options = array();
+      $options = [];
       if (isset($img_params['title'])) {
         $options['title'] = $img_params['title'];
       }
@@ -487,6 +496,7 @@ EOT;
           $rows[] = array('', '<input type="submit" value="' . ucfirst(tr('upload')) . '" />');
         } // if
       }
+
       foreach ($rows as $row) {
         if ('array' == gettype($row)) {
           $ret .= $this->buildContentLine(tr($row[0]), $row[1]);
@@ -524,7 +534,7 @@ EOT;
                     $url_main,
                     $this->page->BASE_PATH . 'media/logo.png',
                     $this->htmlSpecialchars(tr($SITE_DESCRIPTION['title'])));
-    $entries = array();
+    $entries = [];
 
     if (isset($this->page->path)) {
       foreach ($this->page->path as $entry) {
@@ -535,12 +545,13 @@ EOT;
 
       }
     }
+
     if (isset($this->step) && $this->step > 0) {
       $entries[] = tr($this->workflow->name($this->step));
     }
 
     if (count(Page::$languages) > 0) {
-      $languages = array();
+      $languages = [];
       foreach (Page::$languages as $lang => $label) {
         if ($lang != $this->page->lang()) {
           $label = '<a class="inverse" href="?lang=' . $lang . '">' . $this->formatText($label) . '</a>';
@@ -551,6 +562,7 @@ EOT;
 
         $languages[] = $label;
       }
+
       $ret .= '<div id="languages">' . implode(' ', $languages) . '</div>';
     }
 
@@ -591,5 +603,4 @@ EOT;
 
     echo $this->buildHtmlEnd();
   }
-
 }

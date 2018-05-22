@@ -12,6 +12,10 @@
             "url": "https://pear.php.net"
         },
         {
+            "url": "https://github.com/pear/Text_Wiki.git",
+            "type": "vcs"
+        },
+        {
             "url": "https://github.com/burki/zotero-api",
             "type": "git"
         }
@@ -31,8 +35,8 @@
         "sabre/xml": "@stable",
 
         "pear-pear.php.net/PEAR": "*",
-        "pear-pear.php.net/Text_Wiki": "*",
         "pear-pear.php.net/XML_Util": "*",
+        "pear/text_wiki": "*@dev",
 
         "burki/zotero-api": "dev-master",
         "sabre/dav": "~3.0"

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "041c35e6c7cccebf185b14b8d2cc4154",
+    "content-hash": "3393c21aace50bef049c49e047d9f9c6",
     "packages": [
         {
             "name": "burki/zotero-api",
@@ -680,32 +680,6 @@
             "description": "Structures_Graph is a package for creating and manipulating graph datastructures. It allows building of directed\nand undirected graphs, with data and metadata stored in nodes. The library provides functions for graph traversing\nas well as for characteristic extraction from the graph topology."
         },
         {
-            "name": "pear-pear.php.net/Text_Wiki",
-            "version": "1.2.1",
-            "dist": {
-                "type": "file",
-                "url": "http://pear.php.net/get/Text_Wiki-1.2.1.tgz",
-                "reference": null,
-                "shasum": null
-            },
-            "require": {
-                "php": ">=4.0.0.0"
-            },
-            "replace": {
-                "pear-pear/text_wiki": "== 1.2.1.0"
-            },
-            "type": "pear-library",
-            "autoload": {
-                "classmap": [
-                    ""
-                ]
-            },
-            "include-path": [
-                "/"
-            ],
-            "description": "The text transformation is done in 2 steps.\nThe chosen parser uses markup rules to tokenize the tags and content.\nRenderers output the tokens and text into the requested format.\nThe tokenized form replaces the tags by a protected byte value associated to an index in an options table. This form shares up to 50 rules by all parsers and renderers.\nThe package is intented for versatile transformers as well as converters.\nText_Wiki is delivered with its own parser, which is used by Yawiki or Horde's Wicked and three basic renderers: XHTML , LaTeX and plain text.\nStrong sanitizing of XHTML is default.\nParsers (* and Renderers) exist for BBCode, Cowiki (*), Dokuwiki (*), Mediawiki and Tikiwiki (*).\nIt is highly configurable and can be easily extended."
-        },
-        {
             "name": "pear-pear.php.net/XML_Util",
             "version": "1.4.3",
             "dist": {
@@ -734,6 +708,117 @@
                 "BSD License"
             ],
             "description": "Selection of methods that are often needed when working with XML documents.  Functionality includes creating of attribute lists from arrays, creation of tags, validation of XML names and more."
+        },
+        {
+            "name": "pear/pear_exception",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pear/PEAR_Exception.git",
+                "reference": "8c18719fdae000b690e3912be401c76e406dd13b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/pear/PEAR_Exception/zipball/8c18719fdae000b690e3912be401c76e406dd13b",
+                "reference": "8c18719fdae000b690e3912be401c76e406dd13b",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=4.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "*"
+            },
+            "type": "class",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "PEAR": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "include-path": [
+                "."
+            ],
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Helgi Thormar",
+                    "email": "dufuz@php.net"
+                },
+                {
+                    "name": "Greg Beaver",
+                    "email": "cellog@php.net"
+                }
+            ],
+            "description": "The PEAR Exception base class.",
+            "homepage": "https://github.com/pear/PEAR_Exception",
+            "keywords": [
+                "exception"
+            ],
+            "time": "2015-02-10T20:07:52+00:00"
+        },
+        {
+            "name": "pear/text_wiki",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pear/Text_Wiki.git",
+                "reference": "32fd5f483f34645f4efd96d385d8950ea26d4a2a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/pear/Text_Wiki/zipball/32fd5f483f34645f4efd96d385d8950ea26d4a2a",
+                "reference": "32fd5f483f34645f4efd96d385d8950ea26d4a2a",
+                "shasum": ""
+            },
+            "require": {
+                "pear/pear_exception": "*"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Text": "./"
+                }
+            },
+            "include-path": [
+                "./"
+            ],
+            "license": [
+                "LGPL"
+            ],
+            "authors": [
+                {
+                    "email": "pmjones@ciaweb.net",
+                    "name": "Paul Jones",
+                    "role": "Lead"
+                },
+                {
+                    "email": "papercrane@reversefold.com",
+                    "name": "Justin Patrin",
+                    "role": "Lead"
+                },
+                {
+                    "email": "del@babel.com.au",
+                    "name": "Del Elson",
+                    "role": "Developer"
+                }
+            ],
+            "description": "More info available on: http://pear.php.net/package/Text_Wiki",
+            "support": {
+                "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=Text_Wiki",
+                "source": "https://github.com/pear/Text_Wiki"
+            },
+            "time": "2017-09-04T04:17:21+00:00"
         },
         {
             "name": "psr/http-message",
@@ -1355,6 +1440,7 @@
         "semsol/arc2": 0,
         "kriswallsmith/buzz": 0,
         "sabre/xml": 0,
+        "pear/text_wiki": 20,
         "burki/zotero-api": 20
     },
     "prefer-stable": false,

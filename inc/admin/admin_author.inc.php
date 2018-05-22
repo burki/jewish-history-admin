@@ -4,9 +4,9 @@
  *
  * Manage the authors
  *
- * (c) 2006-2017 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2017-03-20 dbu
+ * Version: 2018-05-22 dbu
  *
  * Changes:
  *
@@ -15,16 +15,17 @@
 require_once INC_PATH . 'common/tablemanager.inc.php';
 require_once INC_PATH . 'admin/common.inc.php';
 
-class AuthorFlow extends TableManagerFlow
+class AuthorFlow
+extends TableManagerFlow
 {
   const MERGE    = 1010;
 
-  static $TABLES_RELATED = array(
+  static $TABLES_RELATED = [
     'editor' => array('Message'),
     'referee' => array('Message'),
     'translator' => array('Message', 'Publication'),
     'user_id' => array('MessageUser'),
-  );
+  ];
 
   var $user;
   var $is_internal = FALSE;
@@ -43,8 +44,10 @@ class AuthorFlow extends TableManagerFlow
     if ($this->is_internal) {
       if (isset($page->parameters['merge']) && ($id = intval($page->parameters['merge'])) > 0) {
         $this->id = $id;
+
         return self::MERGE;
       }
+
       return parent::init($page);
     }
     else {
@@ -53,6 +56,7 @@ class AuthorFlow extends TableManagerFlow
         $this->id = $id;
         return TABLEMANAGER_VIEW;
       }
+
       return FALSE;
     }
   }
@@ -76,7 +80,8 @@ class AuthorFlow extends TableManagerFlow
   }
 }
 
-class AuthorRecord extends TableManagerRecord
+class AuthorRecord
+extends TableManagerRecord
 {
   function store ($args = '') {
     $name_parts = [];
@@ -108,7 +113,8 @@ class AuthorRecord extends TableManagerRecord
   }
 }
 
-class AuthorQueryConditionBuilder extends TableManagerQueryConditionBuilder
+class AuthorQueryConditionBuilder
+extends TableManagerQueryConditionBuilder
 {
 
   function buildStatusCondition () {
@@ -127,21 +133,28 @@ class AuthorQueryConditionBuilder extends TableManagerQueryConditionBuilder
           // ." OR ".$fields[0]. " = -3" // uncomment for open requests
              . " OR (" . $fields[0] . " = 2 AND hold <= CURRENT_DATE()))";
       }
+
       return $ret;
     }
   }
 }
 
-class DisplayAuthor extends DisplayTable
+class DisplayAuthor
+extends DisplayTable
 {
   var $table = 'User';
-  var $fields_listing = array('User.id AS id', 'lastname', 'firstname', 'email',
-                              'status', 'UNIX_TIMESTAMP(User.created) AS created', 'comment');
+  var $fields_listing = [
+    'User.id AS id', 'lastname', 'firstname', 'email',
+    'status', 'UNIX_TIMESTAMP(User.created) AS created', 'comment',
+  ];
   var $joins_listing;
-  var $order = array('name' => array('lastname, firstname', 'lastname DESC, firstname DESC'),
-                     'created' => array('created DESC, User.id desc', 'created, User.id'),
-                    );
-  var $cols_listing = array('name' => 'Name', 'email' => 'E-Mail', 'status' => '', 'created' => 'Created');
+  var $order = [
+    'name' => array('lastname, firstname', 'lastname DESC, firstname DESC'),
+    'created' => array('created DESC, User.id desc', 'created, User.id'),
+  ];
+  var $cols_listing = [
+    'name' => 'Name', 'email' => 'E-Mail', 'status' => '', 'created' => 'Created',
+  ];
   var $page_size = 50;
   var $status_deleted;
   var $search_fulltext = NULL;
@@ -158,6 +171,7 @@ class DisplayAuthor extends DisplayTable
     if ($page->lang() != 'en_US') {
       $this->datetime_style = 'DD.MM.YYYY';
     }
+
     $this->messages['item_new'] = 'New Author';
     $this->search_fulltext = $this->page->getPostValue('fulltext');
     if (!isset($this->search_fulltext)) {
@@ -172,18 +186,18 @@ class DisplayAuthor extends DisplayTable
     }
 
     if ($this->search_fulltext) {
-      $search_condition = array('name' => 'search', 'method' => 'buildFulltextCondition', 'args' => 'lastname,firstname,email,institution,address,areas,description,review_areas', 'persist' => 'session');
+      $search_condition = [ 'name' => 'search', 'method' => 'buildFulltextCondition', 'args' => 'lastname,firstname,email,institution,address,areas,description,review_areas', 'persist' => 'session' ];
     }
     else {
-      $search_condition = array('name' => 'search', 'method' => 'buildLikeCondition', 'args' => 'lastname,firstname,email', 'persist' => 'session');
+      $search_condition = [ 'name' => 'search', 'method' => 'buildLikeCondition', 'args' => 'lastname,firstname,email', 'persist' => 'session' ];
     }
 
-    $this->condition = array(
+    $this->condition = [
       "User.status <> " . $this->status_deleted,
       array('name' => 'status', 'method' => 'buildStatusCondition', 'args' => 'status', 'persist' => 'session'),
       $search_condition,
       array('name' => 'review', 'method' => 'buildLikeCondition', 'args' => 'review', 'persist' => 'session'),
-    );
+    ];
   }
 
   function init () {
@@ -212,13 +226,14 @@ class DisplayAuthor extends DisplayTable
       }
       $countries_ordered['&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;'] = FALSE; // separator
     }
+
     foreach ($countries as $cc => $name) {
       if (!isset($countries_ordered[$cc])) {
         $countries_ordered[$cc] = $name;
       }
     }
 
-    $status_options = array();
+    $status_options = [];
     foreach (AuthorListing::$status_list as $val => $label) {
       $status_options[$val] = tr($label);
     }
@@ -226,68 +241,66 @@ class DisplayAuthor extends DisplayTable
     $sex_options = array('' => '--', 'F' => tr('Mrs.'), 'M' => tr('Mr.'));
     $review_options = array('' => tr('outstanding request'), 'Y' => tr('yes'), 'N' => tr('no'));
 
-    $record->add_fields(
-      array(
-        new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => TRUE)),
+    $record->add_fields([
+      new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => TRUE)),
 
 //        new Field(array('name' => 'creator', 'type' => 'hidden', 'datatype' => 'int', 'null' => TRUE, 'noupdate' => 1)),
-        new Field(array('name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => 1)),
+      new Field(array('name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => 1)),
 /*        new Field(array('name' => 'editor', 'type' => 'hidden', 'datatype' => 'int', 'null' => TRUE)),*/
-        new Field(array('name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()')),
-        new Field(array('name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => TRUE)),
+      new Field(array('name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()')),
+      new Field(array('name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => TRUE)),
 
-        new Field(array('name' => 'email', 'type' => 'email', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE, 'noupdate' => !$this->is_internal)),
-        new Field(array('name' => 'status', 'type' => 'select', 'options' => array_keys($status_options), 'labels' => array_values($status_options), 'datatype' => 'int', 'default' => -10, 'noupdate' => !$this->is_internal, 'null' => !$this->is_internal)),
+      new Field(array('name' => 'email', 'type' => 'email', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE, 'noupdate' => !$this->is_internal)),
+      new Field(array('name' => 'status', 'type' => 'select', 'options' => array_keys($status_options), 'labels' => array_values($status_options), 'datatype' => 'int', 'default' => -10, 'noupdate' => !$this->is_internal, 'null' => !$this->is_internal)),
 //        new Field(array('name' => 'status', 'type' => 'hidden', 'value' => 0, 'noupdate' => !$this->is_internal, 'null' => TRUE)),
-        new Field(array('name' => 'subscribed', 'type' => 'date', 'datatype' => 'date', 'null' => TRUE, 'noupdate' => !$this->is_internal)),
-        new Field(array('name' => 'unsubscribed', 'type' => 'date', 'datatype' => 'date', 'null' => TRUE, 'noupdate' => !$this->is_internal)),
-        /* new Field(array('name' => 'hold', 'type' => 'date', 'datatype' => 'date', 'null' => TRUE, 'noupdate' => !$this->is_internal)), */
+      new Field(array('name' => 'subscribed', 'type' => 'date', 'datatype' => 'date', 'null' => TRUE, 'noupdate' => !$this->is_internal)),
+      new Field(array('name' => 'unsubscribed', 'type' => 'date', 'datatype' => 'date', 'null' => TRUE, 'noupdate' => !$this->is_internal)),
+      /* new Field(array('name' => 'hold', 'type' => 'date', 'datatype' => 'date', 'null' => TRUE, 'noupdate' => !$this->is_internal)), */
 
-        new Field(array('name' => 'sex', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($sex_options), 'labels' => array_values($sex_options))),
-        new Field(array('name' => 'title', 'type' => 'text', 'datatype' => 'char', 'size' => 8, 'maxlength' => 20, 'null' => TRUE)),
-        new Field(array('name' => 'lastname', 'id' => 'lastname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80)),
-        new Field(array('name' => 'firstname', 'id' => 'firstname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
-        new Field(array('name' => 'slug', 'type' => 'hidden', 'datatype' => 'char', 'null' => TRUE)),
+      new Field(array('name' => 'sex', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($sex_options), 'labels' => array_values($sex_options))),
+      new Field(array('name' => 'title', 'type' => 'text', 'datatype' => 'char', 'size' => 8, 'maxlength' => 20, 'null' => TRUE)),
+      new Field(array('name' => 'lastname', 'id' => 'lastname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80)),
+      new Field(array('name' => 'firstname', 'id' => 'firstname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+      new Field(array('name' => 'slug', 'type' => 'hidden', 'datatype' => 'char', 'null' => TRUE)),
 
-        new Field(array('name' => 'position', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
-        new Field(array('name' => 'email_work', 'type' => 'email', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
-        new Field(array('name' => 'institution', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+      new Field(array('name' => 'position', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+      new Field(array('name' => 'email_work', 'type' => 'email', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+      new Field(array('name' => 'institution', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
 
-        new Field(array('name' => 'address', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 5, 'null' => TRUE)),
-        new Field(array('name' => 'place', 'type' => 'text', 'size' => 30, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
-        new Field(array('name' => 'zip', 'type' => 'text', 'datatype' => 'char', 'size' => 8, 'maxlength' => 8, 'null' => TRUE)),
-        new Field(array('name' => 'country', 'type' => 'select', 'datatype' => 'char', 'null' => TRUE, 'options' => array_keys($countries_ordered), 'labels' => array_values($countries_ordered), 'default' => 'DE', 'null' => TRUE)),
+      new Field(array('name' => 'address', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 5, 'null' => TRUE)),
+      new Field(array('name' => 'place', 'type' => 'text', 'size' => 30, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+      new Field(array('name' => 'zip', 'type' => 'text', 'datatype' => 'char', 'size' => 8, 'maxlength' => 8, 'null' => TRUE)),
+      new Field(array('name' => 'country', 'type' => 'select', 'datatype' => 'char', 'null' => TRUE, 'options' => array_keys($countries_ordered), 'labels' => array_values($countries_ordered), 'default' => 'DE', 'null' => TRUE)),
 
-        new Field(array('name' => 'phone', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 40, 'null' => TRUE)),
-        new Field(array('name' => 'fax', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 40, 'null' => TRUE)),
-        new Field(array('name' => 'url', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => TRUE)),
+      new Field(array('name' => 'phone', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 40, 'null' => TRUE)),
+      new Field(array('name' => 'fax', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 40, 'null' => TRUE)),
+      new Field(array('name' => 'url', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => TRUE)),
 //        new Field(array('name' => 'supervisor', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => TRUE)),
-        new Field(array('name' => 'gnd', 'id' => 'gnd', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
-        new Field(array('name' => 'description', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
-        new Field(array('name' => 'description_de', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
-        new Field(array('name' => 'areas', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
-        new Field(array('name' => 'ip', 'type' => 'hidden', 'datatype' => 'char', 'null' => TRUE, 'noupdate' => TRUE, 'value' => $_SERVER['REMOTE_ADDR'])),
+      new Field(array('name' => 'gnd', 'id' => 'gnd', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
+      new Field(array('name' => 'description', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
+      new Field(array('name' => 'description_de', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
+      new Field(array('name' => 'areas', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
+      new Field(array('name' => 'ip', 'type' => 'hidden', 'datatype' => 'char', 'null' => TRUE, 'noupdate' => TRUE, 'value' => $_SERVER['REMOTE_ADDR'])),
 
-    ));
+    ]);
 
     if ($this->is_internal) {
-      $record->add_fields(
-        array(
-          new Field(array('name' => 'knownthrough', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => TRUE)),
-          new Field(array('name' => 'expectations', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
-          new Field(array('name' => 'forum', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => TRUE)),
+      $record->add_fields([
+        new Field(array('name' => 'knownthrough', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => TRUE)),
+        new Field(array('name' => 'expectations', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
+        new Field(array('name' => 'forum', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => TRUE)),
 
-          new Field(array('name' => 'review', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($review_options), 'labels' => array_values($review_options), 'null' => TRUE)),
-          new Field(array('name' => 'review_areas', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
-          new Field(array('name' => 'review_suggest', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
+        new Field(array('name' => 'review', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($review_options), 'labels' => array_values($review_options), 'null' => TRUE)),
+        new Field(array('name' => 'review_areas', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
+        new Field(array('name' => 'review_suggest', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
 
-          new Field(array('name' => 'comment', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE, 'noupdate' => !$this->is_internal)),
-          new Field(array('name' => 'status_flags', 'type' => 'checkbox', 'datatype' => 'bitmap', 'null' => TRUE, 'default' => 0,
-                              'labels' => array(
-                                                0x01 => tr('CV') . ' ' . tr('finalized'),
-                                                ),
-                             ))
-        ));
+        new Field(array('name' => 'comment', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE, 'noupdate' => !$this->is_internal)),
+        new Field(array('name' => 'status_flags', 'type' => 'checkbox', 'datatype' => 'bitmap', 'null' => TRUE, 'default' => 0,
+                            'labels' => array(
+                                              0x01 => tr('CV') . ' ' . tr('finalized'),
+                                              ),
+                           ))
+       ]);
     }
 
     return $record;
@@ -378,26 +391,24 @@ class DisplayAuthor extends DisplayTable
 EOT;
     }
 
-    $rows = array(
+    $rows = [
       'id' => FALSE,
       'flags' => FALSE,
       'email' => array('label' => 'E-mail'),
       'status' => array('label' => 'Newsletter'),
-    );
+    ];
 
     if (FALSE && $this->is_internal) {
-      $rows = array_merge($rows,
-        array(
-          array('label' => 'Subscribed / Unsubscribed', 'fields' => array('subscribed', 'unsubscribed'), 'show_datetimestyle' => true),
-          'hold' => array('label' => 'Hold until', 'show_datetimestyle' => true),
-          $this->form->show_submit(tr('Store'))
-          . '<hr noshade="noshade" />',
-        ));
+      $rows = array_merge($rows, [
+        array('label' => 'Subscribed / Unsubscribed', 'fields' => array('subscribed', 'unsubscribed'), 'show_datetimestyle' => true),
+        'hold' => array('label' => 'Hold until', 'show_datetimestyle' => true),
+        $this->form->show_submit(tr('Store'))
+        . '<hr noshade="noshade" />',
+      ]);
     }
 
-    $rows = array_merge($rows, array(
-      array(
-        'label' => 'Salutation / Academic Title', 'fields' => array('sex', 'title')),
+    $rows = array_merge($rows, [
+        [ 'label' => 'Salutation / Academic Title', 'fields' => array('sex', 'title') ],
         'lastname' => array('label' => 'Last Name'),
         'firstname' => array('label' => 'First Name'),
         'position' => array('label' => 'Position'),
@@ -419,10 +430,10 @@ EOT;
         '<hr noshade="noshade" />',
         // 'supervisor' => array('label' => 'Supervisor'),
         'areas' => array('label' => 'Areas of interest'),
-    ));
+    ]);
 
     if ($this->is_internal) {
-      $additional = array();
+      $additional = [];
       if ('edit' == $mode) {
         $status_flags = $this->form->field('status_flags');
       }
@@ -430,10 +441,9 @@ EOT;
         $status_flags_value = $this->record->get_value('status_flags');
       }
 
-      foreach (array(
-                     'cv' => array('label' => 'CV', 'mask' => 0x1),
-                     )
-               as $key => $options)
+      foreach ([
+             'cv' => array('label' => 'CV', 'mask' => 0x1),
+          ] as $key => $options)
       {
         if ('edit' == $mode) {
           $finalized = $status_flags->show($options['mask']) . '<br />';
@@ -441,17 +451,17 @@ EOT;
         else {
           $finalized = (0 != ($status_flags_value & $options['mask']) ? tr('finalized') . '<br />' : '');
         }
-        $additional['comment_' . $key] = array(
+
+        $additional['comment_' . $key] = [
           'label' => $options['label'],
           'value' => $finalized
             /* . ('edit' == $mode
                                     ? $this->getFormField('comment_' . $key)
                                     : $this->record->get_value('comment_' . $key)) */
-        );
+        ];
       }
 
-      $rows = array_merge($rows,
-        array(
+      $rows = array_merge($rows, [
         /* 'expectations' => array('label' => 'Expectations'),
         'knownthrough' => array('label' => 'How did you get to know us'),
         'forum' => array('label' => 'Other lists and fora'),
@@ -459,15 +469,14 @@ EOT;
         'review' => array('label' => 'Willing to contribute'),
         'review_areas' => array('label' => 'Contribution areas'),
         'review_suggest' => array('label' => 'Article suggestion'),
-      ));
+      ]);
 
       $rows = array_merge($rows, $additional);
 
-      $rows = array_merge($rows,
-        array(
+      $rows = array_merge($rows, [
         '<hr noshade="noshade" />',
         'comment' => array('label' => 'Internal notes and comment'),
-        ));
+      ]);
     }
     else {
       $rows['email']['value'] = $this->record->get_value('email');
@@ -475,10 +484,9 @@ EOT;
     }
 
     return array_merge(
-      $rows,
-      array(
+      $rows, [
         $this->form->show_submit(tr('Store')),
-      )
+      ]
     );
   }
 
@@ -530,6 +538,7 @@ EOT;
                             $STATUS_OPTIONS[$dbconn->Record['status']])
           . '</li>';
       }
+
       if ($reviews_found) {
         $reviews .= '</ul>';
       }
@@ -539,6 +548,7 @@ EOT;
               . $reviews;
       }
     }
+
     return $ret;
   }
 
@@ -612,6 +622,7 @@ EOT;
             .$search.'</td></tr>';
 
     $ret .= '</form>';
+
     return $ret;
   } // buildSearchBar
 
@@ -678,6 +689,7 @@ EOT;
       $action = 'merge';
       $id_new = intval($this->page->parameters['with']);
     }
+
     if ($this->isPostback($name)) {
       $action = $this->page->getPostValue('action');
     }
@@ -834,6 +846,7 @@ EOT;
         return $res;
       }
     }
+
     return parent::buildContent();
   }
 }

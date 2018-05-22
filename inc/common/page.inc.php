@@ -4,9 +4,9 @@
  *
  * Functions to initialize the page (browser, session, login-stuff, ...)
  *
- * (c) 2009-2015 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-02-13 dbu
+ * Version: 2018-05-22 dbu
  *
  * Changes:
  *
@@ -19,15 +19,17 @@ function tr($msg) {
     // determine method
     $method = (defined('GETTEXT_AVAILABLE') && !GETTEXT_AVAILABLE) || !function_exists('gettext') ? 0 : 1;
   }
+
   if ($method) {
     return gettext($msg);
   }
+
   return Page::gettext($msg);
 }
 
 class Page
 {
-  static $languages = array('de_DE' => 'deutsch', 'en_US' => 'english');
+  static $languages = [ 'de_DE' => 'deutsch', 'en_US' => 'english' ];
   static $lang = 'en_US';
   static $locale = NULL;
   private static $init_lang = NULL;
@@ -35,7 +37,7 @@ class Page
   protected $gettext_utf8_encode = FALSE;
   var $name;
   var $include;
-  var $user = array();
+  var $user = [];
   var $login_preset;
   var $path;
   var $parameters;
@@ -132,7 +134,9 @@ class Page
     else {
       header('Expires: ' . gmdate('D, d M Y H:i:s', $when) . ' GMT');
     }
+
     header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');  // always modified
+
     if (!$cache) {
       header('Cache-Control: no-cache, must-revalidate');  // HTTP/1.1
       header('Cache-Control: post-check=0, pre-check=0');  // to make back-button work on IE for post-pages
@@ -141,11 +145,13 @@ class Page
     else {
       header('Pragma: cache');                          // HTTP/1.0
     }
+
     $expired = TRUE;
   }
 
   function identify () {
     global $AUTH_METHODS;
+
     if (empty($_SESSION['user'])) {
       foreach ($AUTH_METHODS as $method => $value) {
         // echo "Trying $method $value";
@@ -158,14 +164,17 @@ class Page
             }
             $done = TRUE;
             break;               // failed - go to next method
+
           case 'AUTH_FORCE':
             $this->setLogin($value);
             $done = TRUE;
             break;
+
           case 'AUTH_ANONYMOUS':
             $done = TRUE;
             break;
         }
+
         if ($done) {
           break;
         }
@@ -230,6 +239,7 @@ class Page
         }
       }
     }
+
     if (!empty(self::$lang)) {
       self::initGettext($this->gettext_utf8_encode);
     }
@@ -237,7 +247,8 @@ class Page
 
   function determinePage ($pn) {
     if (isset($this->site_description) && isset($this->site_description['structure'])) {
-      $path = array();
+      $path = [];
+
       foreach ($this->site_description['structure'] as $name => $descr) {
         if (count($path) == 0) {
           $path[] = $name;
@@ -250,6 +261,7 @@ class Page
           break;
         }
       }
+
       if (empty($this->name)) {
         $this->name = $path[0];
       }
@@ -266,19 +278,20 @@ class Page
   }
 
   function authenticate () {
-    /* $anonymous_pages = array(); // TODO: determine $anonymous_pages
+    /* $anonymous_pages = []; // TODO: determine $anonymous_pages
     if (!in_array($this->name, $anonymous_pages)) {
       $this->include = 'login';
     } */
   }
 
   function setParameters () {
-    $parameters = array();
+    $parameters = [];
     foreach ($_GET as $name => $value) {
       if ($name != 'logout' && $name != 'pn' && $name != 'frame') {
         $parameters[$name] = $value;
       }
     }
+
     if ($this->STRIP_SLASHES) {
       $parameters = array_map('stripslashes', $parameters);
     }
@@ -325,7 +338,7 @@ class Page
     $this->setParameters();
   } // init
 
-  function findUserById ($id, $additional_fields = array()) {
+  function findUserById ($id, $additional_fields = []) {
     if (empty($id)) {
       // immediately return on empty $id
       return;
@@ -398,16 +411,17 @@ class Page
       $_SESSION['user'] = $dbconn->Record;
       $success = TRUE;
     }
+
     return $success;
   }
 
   function clearLogin () {
-    $this->user = array();
+    $this->user = [];
     unset($_SESSION['user']);
   }
 
   function getLoginLocation ($issue = -1) {
-    $location_ids = array();
+    $location_ids = [];
 
     // this should probably be part of a user object later on
     $dbconn = isset($this->dbconn) ? $this->dbconn : new DB();
@@ -420,11 +434,12 @@ class Page
         $location_ids[] = $dbconn->Record['id_location'];
       }
     }
+
     if (count($location_ids) == 0) {
       return;
     }
 
-    $locations = array();
+    $locations = [];
     foreach ($location_ids as $id_location) {
       $querystr = "SELECT name, IssueLocation.flags AS flags, issue FROM IssueLocation, Location WHERE id_location=$id_location AND id_location=Location.id";
       if ($issue > 0) {
@@ -447,20 +462,23 @@ class Page
   }
 
   function getPostValue ($key) {
-    if (!isset($_POST[$key]))
+    if (!isset($_POST[$key])) {
       return;
+    }
 
     $val = $_POST[$key];
-    if ($this->STRIP_SLASHES)
+    if ($this->STRIP_SLASHES) {
       $val = is_array($val) ? array_map('stripslashes', $val) : stripslashes($val);
+    }
 
     return $val;
   }
 
   function getRequestValue ($key, $persist_session = false) {
     if (!isset($_REQUEST[$key])) {
-      if ($persist_session)
+      if ($persist_session) {
         return $this->getSessionValue($key);
+      }
 
       return;
     }
@@ -513,9 +531,11 @@ class Page
     if (strlen($pwd) < 6) {
       return -1;
     }
+
     if ($pwd != $pwd_confirm) {
       return -2;
     }
+
     return 1;
   }
 
@@ -532,8 +552,9 @@ class Page
 
         $pwd_crypted = crypt($pwd_plain, $salt);
       }
-      else
+      else {
         die('crypt_password: further crypt-methods not implemented yet');
+      }
     }
 
     return $pwd_crypted;
@@ -546,6 +567,7 @@ class Page
 
     if (defined('CRYPT_PWD') && CRYPT_PWD > 0) {
       $salt = substr($pwd_encoded, 0, CRYPT_PWD);
+
       return crypt($pwd_plain, $salt) == $pwd_encoded;
     }
 
@@ -565,10 +587,11 @@ class Page
   }
 
   function title () {
-    $titles = array();
+    $titles = [];
     if (isset($this->site_description) && isset($this->site_description['title'])) {
       $titles[] = tr($this->site_description['title']);
     }
+
     if (isset($this->path)) {
       $ignore = count($this->path) > 1 ? $this->path[0] : NULL;
       foreach ($this->path as $entry) {
@@ -601,16 +624,16 @@ class Page
     global $URL_REWRITE;
 
     $optstring = $anchor = '';
-    $prepend = array(); // e.g. mode/cat go directly after 'pn' with no key
-    $append = array(); // e.g. id goes last with no key
-    $skip = array(); // marks options to skip
+    $prepend = []; // e.g. mode/cat go directly after 'pn' with no key
+    $append = []; // e.g. id goes last with no key
+    $skip = []; // marks options to skip
     $base = $this->BASE_PATH; // may be overridden through $URL_REWRITE['host'];
 
     if (isset($options)) {
       if (gettype($options) == 'string' && $options != '') { // split get-options into ass. array
         // TODO: ignore a possible leading ?
         $args = split('&', $options);
-        $options = array();
+        $options = [];
         for ($i=0; $i < count($args); $i++) {
           $keyval = split('=', $args[$i], 2);
           $options[$keyval[0]] = count($keyval) == 2 ? $keyval[1] : '';
@@ -622,16 +645,18 @@ class Page
           $options['pn'] = 'root';
 
         foreach ($options as $key => $val) {
-          if (gettype($val) == 'string' && empty($val))
+          if (gettype($val) == 'string' && empty($val)) {
             continue;
+          }
           if ('anchor' == $key) {
             $anchor = '#' . $val;
           }
           else if ('pn' == $key && isset($URL_REWRITE[$val])) {
             if (gettype($URL_REWRITE[$val]) == 'string') {
               $rewrite = $URL_REWRITE[$val];
-              if (preg_match('/^http(s?)\:/', $rewrite))
+              if (preg_match('/^http(s?)\:/', $rewrite)) {
                 $base = '';
+              }
             }
             else {
               $rewrite = $val;
@@ -666,15 +691,16 @@ class Page
                        . $key . '=' . rawurlencode($val);
           }
         }
-
       }
     }
+
     if (isset($rewrite)) {
       $separator = '/';
       if (preg_match('/\?/', $rewrite)) {
         // TODO: this breaks together with $append
         $separator = !empty($opstring) ? '&' : '';
       }
+
       return $base
         . ($rewrite != '.' ? $rewrite.$separator : '')
         . (count($prepend) > 0 ? implode('/', $prepend).(!empty($optstring) ? '/' : '') : '')
@@ -734,5 +760,4 @@ EOT;
 EOT;
     exit;
   } // redirect
-
 } // class Page

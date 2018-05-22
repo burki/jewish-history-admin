@@ -4,9 +4,9 @@
  *
  * Abstract Base Display class
  *
- * (c) 2007-2015 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-11-04 dbu
+ * Version: 2018-05-22 dbu
  *
  * Changes:
  *
@@ -17,7 +17,7 @@ class PageDisplayBase
 {
   var $page;
   var $charset;
-  var $script_url = array();
+  var $script_url = [];
   var $script_code = '';
   var $style = '';
   var $image_wrap_div_class = '';
@@ -321,7 +321,7 @@ class PageDisplayBase
     $url_enlarge = '';
 
     if ($attrs == '') {
-      $attrs = array();
+      $attrs = [];
     }
     if (!isset($attrs['alt'])) {
       $attrs['alt'] = '';
@@ -488,7 +488,7 @@ class PageDisplayBase
   }
 
   function buildHtmlLinkTags () {
-    $tags = array(); // css, rss
+    $tags = []; // css, rss
     if (!empty($this->stylesheet)) {
       // link to stylesheet
       if (!is_array($this->stylesheet)) {

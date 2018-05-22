@@ -4,9 +4,9 @@
  *
  * Class for querying bibliographic information from the GBV
  *
- * (c) 2008-2013 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2013-08-29 dbu
+ * Version: 2018-05-22 dbu
  *
  * Usage:
  *
@@ -82,7 +82,7 @@ class BiblioService_GBV
      */
     public function getQueryString($params)
     {
-        $queryArray = array();
+        $queryArray = [];
         foreach ($params as $name => $value) {
             if (substr($name, 0, 1) == '_') {
                 continue;
@@ -169,7 +169,7 @@ class BiblioService_GBV
     }
 
     private function buildRecord ($record) {
-        $response = array();
+        $response = [];
 
         $record->registerXPathNamespace('srw', 'info:srw/schema/5/picaXML-v1.0');
         $fields = $record->xpath('srw:datafield');
@@ -250,7 +250,7 @@ class BiblioService_GBV
                 if ('array' != gettype($response[$prefix . '_given'])) {
                     $response[$prefix . '_given'] = array($response[$prefix . '_given']);
                 }
-                $persons = array();
+                $persons = [];
                 for ($i = 0; $i < count($response[$prefix . '_surname']); $i++) {
                     $fullname = trim($response[$prefix . '_surname'][$i]);
                     if (!empty($response[$prefix . '_given'][$i])) {
@@ -296,7 +296,7 @@ class BiblioService_GBV
         return $response;
     }
 
-    public function searchRetrieve($query, $params = array()) {
+    public function searchRetrieve($query, $params = []) {
         if (is_string($query)) {
             // TODO: check if it is an isbn
             $query = 'pica.isb=' . preg_replace('/[^0-9X]/', '', $query);
@@ -327,7 +327,7 @@ class BiblioService_GBV
                 return;
             }
 
-            $results = array();
+            $results = [];
             if ((int)$count <= 0) {
                 return $results;
             }

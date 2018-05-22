@@ -4,9 +4,9 @@
  *
  * Manage the Person-table
  *
- * (c) 2009-2016 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2016-08-24 dbu
+ * Version: 2018-05-22 dbu
  *
  * TODO:
  *
@@ -16,7 +16,8 @@
 
 require_once INC_PATH . 'admin/displaybackend.inc.php';
 
-class PersonFlow extends TableManagerFlow
+class PersonFlow
+extends TableManagerFlow
 {
   const MERGE = 1010;
   const IMPORT = 1100;
@@ -58,7 +59,7 @@ class PersonRecord extends TableManagerRecord
 
   function store ($args = '') {
     foreach ($this->localizedFields as $db_field => $form_field) {
-      $values = array();
+      $values = [];
       foreach ($this->languages as $language) {
         $value = $this->get_value($form_field . '_' . $language);
         if (!empty($value)) {
@@ -67,6 +68,7 @@ class PersonRecord extends TableManagerRecord
       }
       $this->set_value($db_field, json_encode($values));
     }
+
     return parent::store($args);
   }
 
@@ -82,43 +84,47 @@ class PersonRecord extends TableManagerRecord
         }
       }
     }
+
     return $fetched;
   }
-
 }
 
-class DisplayPerson extends DisplayBackend
+class DisplayPerson
+extends DisplayBackend
 {
   var $table = 'person';
-  var $fields_listing = array('person.id AS id',
-                              "CONCAT(familyName, ', ', IFNULL(givenName, '')) AS name",
-                              "CONCAT(IFNULL(YEAR(birthdate), ''), IF(deathdate IS NOT NULL, CONCAT('-', YEAR(deathdate)), '')) AS lifespan",
-                              'person.gnd AS gnd',
-                              /* 'COUNT(DISTINCT Item.id) AS count',
-                              'COUNT(DISTINCT Media.id) AS how_many_media',
-                              */
-                              'person.created_at AS created',
-                              'person.status AS status',
-                              );
-  var $joins_listing = array(
-                             // ' LEFT OUTER JOIN ItemPerson ON ItemPerson.id_person=Person.id LEFT OUTER JOIN Item ON ItemPerson.id_item=Item.id AND Item.status >= 0' /* AND Item.collection <> 33' */,
-                             // " LEFT OUTER JOIN Media ON Media.item_id=Item.id AND Media.type = 0 AND Media.name='preview00'"
-                             );
+  var $fields_listing = [
+    'person.id AS id',
+    "CONCAT(familyName, ', ', IFNULL(givenName, '')) AS name",
+    "CONCAT(IFNULL(YEAR(birthdate), ''), IF(deathdate IS NOT NULL, CONCAT('-', YEAR(deathdate)), '')) AS lifespan",
+    'person.gnd AS gnd',
+    /* 'COUNT(DISTINCT Item.id) AS count',
+    'COUNT(DISTINCT Media.id) AS how_many_media',
+    */
+    'person.created_at AS created',
+    'person.status AS status',
+  ];
+  var $joins_listing = [
+    // ' LEFT OUTER JOIN ItemPerson ON ItemPerson.id_person=Person.id LEFT OUTER JOIN Item ON ItemPerson.id_item=Item.id AND Item.status >= 0' /* AND Item.collection <> 33' */,
+    // " LEFT OUTER JOIN Media ON Media.item_id=Item.id AND Media.type = 0 AND Media.name='preview00'"
+  ];
   var $group_by_listing = 'person.id';
   var $distinct_listing = TRUE;
-  var $order = array('name' => array('familyName, givenName', 'familyName DESC, givenName DESC'),
-                     // 'count' => array('count DESC', 'count'),
-                     // 'how_many_media' => array('how_many_media DESC', 'how_many_media'),
-                     'created' => array('created_at DESC, person.id desc', 'created_at, person.id'),
-                    );
-  var $cols_listing = array('name' => 'Name',
-                            'lifespan' => 'Lebensdaten',
-                            'gnd' => 'GND',
-                            // 'count' => 'Erfasste Werke',
-                            // 'how_many_media' => 'Erfasste Bilder',
-                            'created' => 'Created',
-                            'status' => ''
-                            );
+  var $order = [
+    'name' => array('familyName, givenName', 'familyName DESC, givenName DESC'),
+    // 'count' => array('count DESC', 'count'),
+    // 'how_many_media' => array('how_many_media DESC', 'how_many_media'),
+    'created' => array('created_at DESC, person.id desc', 'created_at, person.id'),
+  ];
+  var $cols_listing = [
+    'name' => 'Name',
+    'lifespan' => 'Lebensdaten',
+    'gnd' => 'GND',
+    // 'count' => 'Erfasste Werke',
+    // 'how_many_media' => 'Erfasste Bilder',
+    'created' => 'Created',
+    'status' => ''
+  ];
   var $page_size = 50;
   var $search_fulltext = NULL;
   var $view_after_edit = TRUE;
@@ -170,7 +176,7 @@ class DisplayPerson extends DisplayBackend
   }
 
   function instantiateRecord ($table = '', $dbconn = '') {
-    $record = new PersonRecord(array('tables' => $this->table, 'dbconn' => new DB_Presentation()));
+    $record = new PersonRecord([ 'tables' => $this->table, 'dbconn' => new DB_Presentation() ]);
 
     $label_select_country = tr('-- please select --');
     $countries_ordered = array('' => $label_select_country)
@@ -178,64 +184,63 @@ class DisplayPerson extends DisplayBackend
 
     $sex_options = array('' => '--', 'M' => tr('male'), 'F' => tr('female'));
 
-    $record->add_fields(
-      array(
-        new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => TRUE)),
+    $record->add_fields([
+      new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => TRUE)),
 
-        new Field(array('name' => 'created_at', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'UTC_TIMESTAMP()', 'noupdate' => TRUE)),
-        // new Field(array('name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'noupdate' => TRUE)),
-        new Field(array('name' => 'changed_at', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'UTC_TIMESTAMP()')),
-        // new Field(array('name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'])),
+      new Field(array('name' => 'created_at', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'UTC_TIMESTAMP()', 'noupdate' => TRUE)),
+      // new Field(array('name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'noupdate' => TRUE)),
+      new Field(array('name' => 'changed_at', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'UTC_TIMESTAMP()')),
+      // new Field(array('name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'])),
 
-        new Field(array('name' => 'gender', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($sex_options), 'labels' => array_values($sex_options), 'null' => TRUE)),
-        new Field(array('name' => 'honoricPrefix', 'id' => 'title', 'type' => 'text', 'datatype' => 'char', 'size' => 8, 'maxlength' => 20, 'null' => TRUE)),
+      new Field(array('name' => 'gender', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($sex_options), 'labels' => array_values($sex_options), 'null' => TRUE)),
+      new Field(array('name' => 'honoricPrefix', 'id' => 'title', 'type' => 'text', 'datatype' => 'char', 'size' => 8, 'maxlength' => 20, 'null' => TRUE)),
 
-        new Field(array('name' => 'familyName', 'id' => 'lastname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
-        new Field(array('name' => 'givenName', 'id' => 'firstname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+      new Field(array('name' => 'familyName', 'id' => 'lastname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+      new Field(array('name' => 'givenName', 'id' => 'firstname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
 
-        new Field(array('name' => 'additionalName', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 40, 'rows' => 2, 'null' => TRUE)),
+      new Field(array('name' => 'additionalName', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 40, 'rows' => 2, 'null' => TRUE)),
 
-        new Field(array('name' => 'birthdate', 'id' => 'birthdate', 'type' => 'date', 'incomplete' => TRUE, 'datatype' => 'date', 'null' => TRUE)),
-        // new Field(array('name' => 'birthplace', 'id' => 'birthplace', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+      new Field(array('name' => 'birthdate', 'id' => 'birthdate', 'type' => 'date', 'incomplete' => TRUE, 'datatype' => 'date', 'null' => TRUE)),
+      // new Field(array('name' => 'birthplace', 'id' => 'birthplace', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
 
-        new Field(array('name' => 'deathdate', 'id' => 'deathdate', 'type' => 'date', 'incomplete' => TRUE, 'datatype' => 'date', 'null' => TRUE)),
-        // new Field(array('name' => 'deathplace', 'id' => 'deathplace', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+      new Field(array('name' => 'deathdate', 'id' => 'deathdate', 'type' => 'date', 'incomplete' => TRUE, 'datatype' => 'date', 'null' => TRUE)),
+      // new Field(array('name' => 'deathplace', 'id' => 'deathplace', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
 
-        // new Field(array('name' => 'birthdeath_note', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
-        // new Field(array('name' => 'actionplace', 'id' => 'actionplace', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+      // new Field(array('name' => 'birthdeath_note', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+      // new Field(array('name' => 'actionplace', 'id' => 'actionplace', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
 
-        /*
-        new Field(array('name' => 'country', 'id' => 'country', 'type' => 'select', 'datatype' => 'char', 'null' => TRUE, 'options' => array_keys($countries_ordered), 'labels' => array_values($countries_ordered),
-                        'data-placeholder' => $label_select_country, 'default' => 'DE', 'null' => TRUE)),
-        */
+      /*
+      new Field(array('name' => 'country', 'id' => 'country', 'type' => 'select', 'datatype' => 'char', 'null' => TRUE, 'options' => array_keys($countries_ordered), 'labels' => array_values($countries_ordered),
+                      'data-placeholder' => $label_select_country, 'default' => 'DE', 'null' => TRUE)),
+      */
 
-        // new Field(array('name' => 'study', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
-        // new Field(array('name' => 'profession', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
-        new Field(array('name' => 'jobTitle', 'id' => 'occupation', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 200, 'null' => TRUE)),
+      // new Field(array('name' => 'study', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+      // new Field(array('name' => 'profession', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+      new Field(array('name' => 'jobTitle', 'id' => 'occupation', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 200, 'null' => TRUE)),
 
-        // new Field(array('name' => 'cv', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 40, 'rows' => 5, 'null' => TRUE)),
+      // new Field(array('name' => 'cv', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 40, 'rows' => 5, 'null' => TRUE)),
 
-        new Field(array('name' => 'url', 'type' => 'text', 'datatype' => 'char', 'size' => 65, 'maxlength' => 200, 'null' => TRUE)),
+      new Field(array('name' => 'url', 'type' => 'text', 'datatype' => 'char', 'size' => 65, 'maxlength' => 200, 'null' => TRUE)),
 
-        new Field(array('name' => 'gnd', 'id' => 'gnd', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
-        new Field(array('name' => 'djh', 'id' => 'djh', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 30, 'null' => TRUE)),
-        new Field(array('name' => 'stolpersteine', 'id' => 'djh', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
+      new Field(array('name' => 'gnd', 'id' => 'gnd', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
+      new Field(array('name' => 'djh', 'id' => 'djh', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 30, 'null' => TRUE)),
+      new Field(array('name' => 'stolpersteine', 'id' => 'djh', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
 
-        new Field(array('name' => 'description', 'type' => 'hidden', 'datatype' => 'char', 'null' => TRUE)),
-        new Field(array('name' => 'description_de', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE, 'nodbfield' => true)),
-        new Field(array('name' => 'description_en', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE, 'nodbfield' => true)),
+      new Field(array('name' => 'description', 'type' => 'hidden', 'datatype' => 'char', 'null' => TRUE)),
+      new Field(array('name' => 'description_de', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE, 'nodbfield' => true)),
+      new Field(array('name' => 'description_en', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE, 'nodbfield' => true)),
 
-        // new Field(array('name' => 'contact', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 5, 'null' => TRUE)),
-        // new Field(array('name' => 'inheritor', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 5, 'null' => TRUE)),
+      // new Field(array('name' => 'contact', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 5, 'null' => TRUE)),
+      // new Field(array('name' => 'inheritor', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 5, 'null' => TRUE)),
 
-        /*
-        new Field(array('name' => 'literature', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 5, 'null' => TRUE)),
-        new Field(array('name' => 'archive', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 5, 'null' => TRUE)),
-        new Field(array('name' => 'estate', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 5, 'null' => TRUE)),
+      /*
+      new Field(array('name' => 'literature', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 5, 'null' => TRUE)),
+      new Field(array('name' => 'archive', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 5, 'null' => TRUE)),
+      new Field(array('name' => 'estate', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 5, 'null' => TRUE)),
 
-        new Field(array('name' => 'comment_internal', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
-        */
-    ));
+      new Field(array('name' => 'comment_internal', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
+      */
+    ]);
 
     if ($this->page->isAdminUser()) {
       // admins may publish People
@@ -255,6 +260,7 @@ class DisplayPerson extends DisplayBackend
       $gnd_search = sprintf('<input value="GND Anfrage nach Name, Vorname" type="button" onclick="%s" /><span id="spinner"></span><br />',
                             "jQuery('#gnd').autocomplete('enable');jQuery('#gnd').autocomplete('search', jQuery('#lastname').val() + ', ' + jQuery('#firstname').val())");
     }
+
     $rows = array(
       'id' => FALSE, 'status' => FALSE,
       'sex_title' => array('label' => 'Sex / (Academic) Title',
@@ -339,7 +345,7 @@ class DisplayPerson extends DisplayBackend
 
 EOT;
 
-     $this->script_ready[] = <<<EOT
+    $this->script_ready[] = <<<EOT
 
     jQuery('#gnd').autocomplete({
       // source: availablePnds,
@@ -429,16 +435,18 @@ EOT;
 
         $rows['gnd']['value'] .= '</li>';
 
-        $external = array();
+        $external = [];
         foreach ($PND_LINKS as $url => $title) {
           $url_final = sprintf($url, $gnd);
           $external[] = sprintf('<li><a href="%s" target="_blank">%s</a></li>',
                                 htmlspecialchars($url_final), $this->formatText($title));
 
         }
+
         if (count($external) > 0) {
           $rows['gnd']['value'] .= implode('', $external);
         }
+
         $rows['gnd']['value'] .= '</ul>';
 
         $this->script_code .= <<<EOT
@@ -511,6 +519,7 @@ EOT;
                           $this->formatText($row['collection']));
       }
     }
+
     if (!empty($works)) {
       $ret .= '<br style="clear: both" />' . $works;
     }
@@ -543,6 +552,7 @@ EOT;
                                 $this->formatText($row['location']));
       }
     }
+
     if (!empty($exhibitions)) {
       $ret .= '<br style="clear: both" />' . $exhibitions;
     }
@@ -580,8 +590,10 @@ EOT;
                                  $citation);
       }
     }
-    if (!empty($publications))
+
+    if (!empty($publications)) {
       $ret .= '<br style="clear: both" />' . $publications;
+    }
 
     return $ret . parent::buildViewAdditional($record, $uploadHandler);
   }
@@ -637,8 +649,7 @@ EOT;
   function getImageDescriptions () {
     global $TYPE_PERSON;
 
-    return array($TYPE_PERSON, array());
-
+    return [ $TYPE_PERSON, [] ];
 
     $images = array(
           'portrait' => array(
@@ -681,6 +692,7 @@ EOT;
     $this->page->dbconn = new DB_Presentation();
     $ret = parent::doListingQuery($page_size, $page_id);
     $this->page->dbconn = $dbconn_orig;
+
     return $ret;
   }
 
@@ -739,6 +751,7 @@ EOT;
                               $this->htmlSpecialchars($row['familyName']
                                   . (!empty($row['givenName']) ? ', ' . $row['givenName'] : '')));
         }
+
         if (!empty($replace)) {
           $ret = sprintf('<form method="post" action="%s">',
                          htmlspecialchars($this->page->buildLink($params_replace)))
@@ -822,8 +835,8 @@ EOT;
         $record->store();
         $ret .= ' -> ' . $bio->preferredName . '<br />';
       }
-
     }
+
     return $ret;
   }
 
@@ -839,6 +852,7 @@ EOT;
         return $res;
       }
     }
+
     if (PersonFlow::IMPORT == $this->step) {
       $res = $this->buildImport();
       if ('boolean' == gettype($res)) {
@@ -850,14 +864,14 @@ EOT;
         return $res;
       }
     }
+
     return parent::buildContent();
   }
-
 }
 
 $display = new DisplayPerson($page);
 if (FALSE === $display->init()) {
-  $page->redirect(array('pn' => ''));
+  $page->redirect([ 'pn' => '' ]);
 }
 
 $page->setDisplay($display);

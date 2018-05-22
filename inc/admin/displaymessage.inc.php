@@ -117,7 +117,7 @@ extends TablemanagerRecord
           if (!isset($stored[$user_id])) {
             $sql_values = [];
             $sql_values['name'] = 0 == $ord && !empty($_POST['user']) ? sprintf("'%s'", addslashes($_POST['user'])) : 'NULL';
-            /* foreach (array('email', 'institution') as $name) {
+            /* foreach ([ 'email', 'institution' ] as $name) {
               $value = 0 == $ord ? $this->get_value('user_' . $name) : NULL;
               $sql_values[$name] = !empty($value) ? sprintf("'%s'", addslashes($value)) : 'NULL';
             } */
@@ -225,10 +225,10 @@ extends DisplayBackend
 
   var $condition = [];
   var $order = [
-    'id' => array('id DESC', 'id'),
-    'subject' => array('subject', 'subject DESC'),
-    'contributor' => array('fullname', 'fullname DESC'),
-    // 'editor' => array('editor', 'editor DESC'),
+    'id' => [ 'id DESC', 'id' ],
+    'subject' => [ 'subject', 'subject DESC' ],
+    'contributor' => [ 'fullname', 'fullname DESC' ],
+    // 'editor' => [ 'editor', 'editor DESC' ],
     'status' => [ 'Message.status', 'Message.status DESC' ],
     'date' => [
       'IF(0 = published + 0, Message.changed, published) DESC',
@@ -261,11 +261,13 @@ extends DisplayBackend
       'persist' => 'session',
     ];
     /*
-    $this->condition[] = array('name' => 'editor',
-                               'method' => 'buildEqualCondition',
-                               'args' => $this->table . '.editor',
-                               'persist' => 'session');
-                               */
+    $this->condition[] = [
+      'name' => 'editor',
+      'method' => 'buildEqualCondition',
+      'args' => $this->table . '.editor',
+      'persist' => 'session',
+    ];
+    */
 
     $this->search_fulltext = $this->page->getPostValue('fulltext');
     if (!isset($this->search_fulltext)) {
@@ -300,7 +302,7 @@ extends DisplayBackend
   }
 
   function instantiateRecord ($table = '', $dbconn = '') {
-    return new MessageRecord(array('tables' => $this->table, 'dbconn' => $this->page->dbconn));
+    return new MessageRecord([ 'tables' => $this->table, 'dbconn' => $this->page->dbconn ]);
   }
 
   function buildRecord ($name = '') {
@@ -487,14 +489,14 @@ EOT;
       $user_value = $user;
       if (isset($user_id) && $user_id > 0) {
         $user_value = sprintf('<a href="%s">%s</a>',
-                              htmlspecialchars($this->page->buildLink(array('pn' => 'author', 'view' => $user_id))),
+                              htmlspecialchars($this->page->buildLink([ 'pn' => 'author', 'view' => $user_id ])),
                               $user_value);
       }
       $additional_user_value = '';
       if (!empty($this->record->users)) {
         foreach ($this->record->users as $user_id => $user_name) {
           $additional_user_value .= sprintf('<a href="%s">%s</a><br />',
-                                htmlspecialchars($this->page->buildLink(array('pn' => 'author', 'view' => $user_id))),
+                                htmlspecialchars($this->page->buildLink([ 'pn' => 'author', 'view' => $user_id ])),
                                 $this->htmlSpecialchars($user_name));
         }
 
@@ -503,15 +505,15 @@ EOT;
 
     return [
       'id' => FALSE, 'type' => FALSE, // hidden fields
-      'user' => array('label' => 'Contributor', 'value' => $user_value),
-      'subject' => array('label' => 'Title'),
-      'status' => array('label' => 'Editing Status'),
-      'published' => array('label' => 'Publication Date'),
+      'user' => [ 'label' => 'Contributor', 'value' => $user_value ],
+      'subject' => [ 'label' => 'Title' ],
+      'status' => [ 'label' => 'Editing Status' ],
+      'published' => [ 'label' => 'Publication Date' ],
       isset($this->form) ? $this->form->show_submit(ucfirst(tr('save'))) : 'FALSE',
 
-      'body' => array('label' => 'Text'),
-      'users' => array('label' => 'Additional Contributors', 'value' => $additional_user_value),
-      'comment' => array('label' => 'Internal notes and comments'),
+      'body' => [ 'label' => 'Text' ],
+      'users' => [ 'label' => 'Additional Contributors', 'value' => $additional_user_value ],
+      'comment' => [ 'label' => 'Internal notes and comments' ],
 
       isset($this->form) ? $this->form->show_submit(ucfirst(tr('save'))) : 'FALSE',
     ];
@@ -570,7 +572,7 @@ EOT;
       $options = & $this->status_options;
     }
 
-    $status_options = array('<option value="">' . tr('-- all --') . '</option>');
+    $status_options = [ '<option value="">' . tr('-- all --') . '</option>' ];
     foreach ($options as $status => $label) {
       if ($this->status_deleted != $status) {
         $selected = isset($this->search['status']) && $this->search['status'] !== ''
@@ -603,13 +605,13 @@ EOT;
 
     $search .=  '<br />' . $this->buildStatusOptions();
 
-    $select_fields = array('status');
+    $select_fields = [ 'status' ];
 
     if (method_exists($this, 'buildOptions')) {
       foreach ($options as $name => $option_label) {
          $select_fields[] = $name;
         // Betreuer - TODO: make a bit more generic
-        $select_options = array('<option value="">' . tr('-- all --') . '</option>');
+        $select_options = [ '<option value="">' . tr('-- all --') . '</option>' ];
         foreach ($this->buildOptions($name) as $id => $label) {
           $selected = isset($this->search[$name])
               && $this->search[$name] !== ''
@@ -699,7 +701,7 @@ EOT;
       }
 
       $name = $this->workflow->name($action);
-      $url_preview = $this->page->buildLink(array('pn' => $this->page->name, $name => $row[0]));
+      $url_preview = $this->page->buildLink([ 'pn' => $this->page->name, $name => $row[0] ]);
       $val = sprintf('<div style="text-align:right">%s&nbsp;[<a href="%s">%s</a>]</div>',
                      $row['reviewer_deadline'],
                      htmlspecialchars($url_preview),

@@ -4,9 +4,9 @@
  *
  * TEI to HTML converter (based on )
  *
- * (c) 2014 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2014-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2010-05-31 dbu
+ * Version: 2018-05-22 dbu
  *
  * Changes:
  *
@@ -17,10 +17,12 @@
 function decode_numericentity($t)
 {
     $convmap = array(0x0, 0x2FFFF, 0, 0xFFFF);
+
     return mb_decode_numericentity($t, $convmap, 'UTF-8');
 }
 
-class DisplayConvert extends PageDisplay
+class DisplayConvert
+extends PageDisplay
 {
   /**
    * Performs the XML to HTML processing operation.
@@ -33,11 +35,12 @@ class DisplayConvert extends PageDisplay
    *   before invoking it on the XML data document. Examples include namespace settings and
    *   XSL parameters.
    */
-   function teicontent_transform($xml, $path_to_xslt, $path_to_css = '', $params = array()) {
+   function teicontent_transform($xml, $path_to_xslt, $path_to_css = '', $params = []) {
 
     if (!$xml) {
       return $xml;
     }
+
     /*
     $nid = arg(1);
     $book = _teicontent_get_book_for_node($nid);
@@ -59,7 +62,7 @@ class DisplayConvert extends PageDisplay
     $dom = new DomDocument('1.0', 'UTF-8');
     @$valid = $dom->loadXML($xml);
     if (!$valid) {
-      //watchdog('TEI Content', "Invalid XML/TEI Content", array(), WATCHDOG_WARNING);
+      //watchdog('TEI Content', "Invalid XML/TEI Content", [], WATCHDOG_WARNING);
       return $xml;
     }
 
@@ -120,7 +123,6 @@ EOT;
 
     return $form . $html;
   } // buildContent
-
 }
 
 $page->setDisplay(new DisplayConvert($page));

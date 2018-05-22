@@ -4,9 +4,9 @@
  *
  * Simple base class for Ajax-Web Services
  *
- * (c) 2007-2010 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2010-06-03 dbu
+ * Version: 2018-05-22 dbu
  *
  * Changes:
  *
@@ -16,7 +16,7 @@
 class SearchSimpleParser
 {
   var $min_length = 1; // only non-empty stuff
-  var $output = array();
+  var $output = [];
 
  /**
   * Callback function (or mode / state), called by the Lexer. This one
@@ -48,7 +48,7 @@ class SearchSimpleParser
     switch ($state) {
       // Entering the variable reference
       case LEXER_ENTER:
-        $words = array();
+        $words = [];
         break;
 
       // Contents of the variable reference
@@ -68,6 +68,7 @@ class SearchSimpleParser
         }
         break;
     }
+
     return TRUE;
   }
 }
@@ -100,7 +101,7 @@ class WsHandlerFactory
   // private constructor
   private function __construct() {}
 
-  private static $class_map = array();
+  private static $class_map = [];
 
   static function getInstance ($name) {
     if (array_key_exists($name, self::$class_map)) {
@@ -190,9 +191,9 @@ class WsHandler
       $status = -1;
       $msg = 'Invalid action ' . $_GET['action'];
     }
+
     return new JsonResponse(array('status' => $status, 'msg' => $msg));
   }
-
 }
 
 class JsonResponse
@@ -206,13 +207,7 @@ class JsonResponse
   }
 
   static function encode ($valueToEncode) {
-    if (function_exists('json_encode')) {
-      return json_encode($valueToEncode);
-    }
-
-    require_once LIB_PATH . 'JSON.php';
-    $json = new Services_JSON();
-    return $json->encode($valueToEncode);
+    return json_encode($valueToEncode);
   }
 
   function sendJson () {
@@ -250,6 +245,7 @@ class AutocompleterResponse
   function htmlEncode ($txt) {
     $match   = array('/&(?!\#x?\d+;)/s', '/</s', '/>/s', '/"/s');
     $replace = array('&amp;', '&lt;', '&gt;', '&quot;');
+
     // return utf8_encode(preg_replace($match, $replace, $txt, -1));
     return preg_replace($match, $replace, $txt, -1); // data already in utf-8
   }
@@ -264,6 +260,7 @@ class AutocompleterResponse
       $ret .= '</li>';
     }
     $ret .= '</ul>';
+
     echo $ret;
   }
 }

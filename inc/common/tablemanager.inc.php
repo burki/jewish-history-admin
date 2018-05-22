@@ -4,9 +4,9 @@
  *
  * Base class to administrate Database items
  *
- * (c) 2006-2016 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2016-02-22 dbu
+ * Version: 2018-05-22 dbu
  *
  * TODO:
  *       the models TableManagerRecord->fetch()-method shouldn't need a style
@@ -144,9 +144,9 @@ class TableManagerQueryConditionBuilder
     if (count($parts) == 0) {
       return;
     }
-    $and_parts = array();
+    $and_parts = [];
     for ($i = 0; $i < count($parts); $i++) {
-      $or_parts = array();
+      $or_parts = [];
       for ($j = 0; $j < $num_args; $j++) {
         $or_parts[] = $fields[$j] . " LIKE '%" . addslashes($parts[$i]) . "%'";
       }
@@ -167,7 +167,7 @@ class TableManagerQueryConditionBuilder
 
     $fields = func_get_args();
 
-    $or_parts = array();
+    $or_parts = [];
     for ($j = 0; $j < $num_args; $j++) {
       $or_parts[] = $fields[$j] . " = '" . addslashes($this->term) . "'";
     }
@@ -354,7 +354,7 @@ class DisplayTable extends PageDisplay
 
     $this->setInput();
 
-    $this->invalid = array();
+    $this->invalid = [];
     if ($this->validateInput()) {
       $minor = $this->store(); // try to store it
     }
@@ -385,7 +385,7 @@ class DisplayTable extends PageDisplay
     $ret .= $this->form->show_start()
           . $this->renderEditFormHiddenFields($name)
           ;
-    $fields = array();
+    $fields = [];
     if ('array' == gettype($rows)) {
       foreach ($rows as $key => $row_descr) {
         if (isset($this->invalid[$key])) {
@@ -522,7 +522,7 @@ class DisplayTable extends PageDisplay
       else if (!empty($this->table)) {
         // query database for fields
         $res = $this->page->dbconn->metadata($this->table);
-        $fieldnames = array();
+        $fieldnames = [];
         for ($i = 0; $i < count($res); $i++) {
           $field = &$res[$i];
           $fieldname = $field['name'];
@@ -568,9 +568,9 @@ class DisplayTable extends PageDisplay
 
   function buildListingWhere () {
     $where = '';
-    $search_terms = array();
+    $search_terms = [];
     if (isset($this->condition)) {
-      $conditions = array();
+      $conditions = [];
       for ($i = 0; $i < count($this->condition); $i++) {
         if ('string' == gettype($this->condition[$i])) {
           $conditions[] = $this->condition[$i];
@@ -712,7 +712,7 @@ class DisplayTable extends PageDisplay
       }
       $querystr .= ' LIMIT ' . ($page_id * $page_size) . ', ' . $page_size;
       // fetch those rows
-      $rows = array();
+      $rows = [];
       $dbconn = &$this->page->dbconn;
       $dbconn->query($querystr);
       while ($dbconn->next_record()) {

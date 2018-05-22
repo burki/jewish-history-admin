@@ -4,9 +4,9 @@
  *
  * handle accounts
  *
- * (c) 2006-2015 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-11-16 dbu
+ * Version: 2018-05-22 dbu
  *
  *
  * Changes:
@@ -16,12 +16,14 @@
 require_once LIB_PATH . 'db_forms.php';        // form library
 require_once INC_PATH . 'common/tablemanager.inc.php';
 
-class AdminOnlyFlow extends TableManagerFlow
+class AdminOnlyFlow
+extends TableManagerFlow
 {
   var $user;
 
   function __construct ($page) {
     $this->user = $page->user;
+
     parent::TableManagerFlow();
   }
 
@@ -33,7 +35,7 @@ class AdminOnlyFlow extends TableManagerFlow
           && 'su' == $page->parameters['action'] && intval($page->parameters['id']) > 0)
       {
         if ($page->setLogin(intval($page->parameters['id']))) {
-          $page->redirect(array('pn' => 'root'));
+          $page->redirect([ 'pn' => '' ]);
           return TABLEMANAGER_EDIT;
         }
       }
@@ -68,51 +70,51 @@ class DisplayAccount extends DisplayTable
 {
   var $page_size = 50;
   var $table = 'User';
-  var $fields_listing = array('User.id AS id', 'User.email AS email', 'User.lastname AS lastname', 'User.firstname AS firstname', 'privs', 'UNIX_TIMESTAMP(User.created) AS created', 'privs');
-  var $cols_listing = array(
-                            'email' => 'E-Mail',
-                            'name' => 'Name',
-                            'privs' => 'Access rights',
-                            'created' => 'Created',
-                            '' => '',
-                            );
+  var $fields_listing = [
+    'User.id AS id', 'User.email AS email', 'User.lastname AS lastname', 'User.firstname AS firstname', 'privs', 'UNIX_TIMESTAMP(User.created) AS created', 'privs',
+  ];
+  var $cols_listing = [
+    'email' => 'E-Mail',
+    'name' => 'Name',
+    'privs' => 'Access rights',
+    'created' => 'Created',
+    '' => '',
+  ];
 
-  var $order = array(
-                     'name' => array('lastname, firstname', 'lastname DESC, firstname DESC'),
-                     'email' => array('email, User.id', 'email DESC, User.id DESC'),
-                     'privs' => array('privs DESC, User.id DESC', 'privs, User.id'),
-                     'created' => array('created DESC, User.id desc', 'created, User.id'),
-                    );
-  var $condition = array(
-      "User.status <> -100", // deleted user
-      array('name' => 'search', 'method' => 'buildLikeCondition', 'args' => 'email,lastname,firstname'),
-  );
+  var $order = [
+    'name' => array('lastname, firstname', 'lastname DESC, firstname DESC'),
+    'email' => array('email, User.id', 'email DESC, User.id DESC'),
+    'privs' => array('privs DESC, User.id DESC', 'privs, User.id'),
+    'created' => array('created DESC, User.id desc', 'created, User.id'),
+  ];
+  var $condition = [
+    "User.status <> -100", // deleted user
+    array('name' => 'search', 'method' => 'buildLikeCondition', 'args' => 'email,lastname,firstname'),
+  ];
 
   function instantiateRecord ($table = '', $dbconn = '') {
     $record = parent::instantiateRecord($table, $dbconn);
 
-    $record->add_fields(
-      array(
-        new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => TRUE)),
-        new Field(array('name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => TRUE)),
-        new Field(array('name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()')),
-        new Field(array('name' => 'email', 'type' => 'email', 'size' => 30, 'datatype' => 'char', 'maxlength' => 80, 'noupdate' => TRUE, 'null' => TRUE)),
-        new Field(array('name' => 'lastname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80)),
-        new Field(array('name' => 'firstname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
-        new Field(array('name' => 'pwd', 'type' => 'password', 'size' => 10, 'datatype' => 'char', 'maxlength' => 40, 'nodbfield' => TRUE, 'null' => 1)),
-        new Field(array('name' => 'pwd_confirm', 'type' => 'password', 'size' => 10, 'maxlength' => 40, 'nodbfield' => TRUE, 'null' => TRUE)),
-        new Field(array('name' => 'privs', 'type' => 'checkbox', 'datatype' => 'bitmap', 'null' => TRUE, 'default' => 0,
-                              'labels' => array('',
-                                                tr('System Editor'),
-                                                tr('System Administrator'),
-                                                '',
-                                                tr('Referee'),
-                                                tr('Translator'),
-                                                ),
-                             )
-                       ),
-        )
-      );
+    $record->add_fields([
+      new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => TRUE)),
+      new Field(array('name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => TRUE)),
+      new Field(array('name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()')),
+      new Field(array('name' => 'email', 'type' => 'email', 'size' => 30, 'datatype' => 'char', 'maxlength' => 80, 'noupdate' => TRUE, 'null' => TRUE)),
+      new Field(array('name' => 'lastname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80)),
+      new Field(array('name' => 'firstname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+      new Field(array('name' => 'pwd', 'type' => 'password', 'size' => 10, 'datatype' => 'char', 'maxlength' => 40, 'nodbfield' => TRUE, 'null' => 1)),
+      new Field(array('name' => 'pwd_confirm', 'type' => 'password', 'size' => 10, 'maxlength' => 40, 'nodbfield' => TRUE, 'null' => TRUE)),
+      new Field(array('name' => 'privs', 'type' => 'checkbox', 'datatype' => 'bitmap', 'null' => TRUE, 'default' => 0,
+                            'labels' => array('',
+                                              tr('System Editor'),
+                                              tr('System Administrator'),
+                                              '',
+                                              tr('Referee'),
+                                              tr('Translator'),
+                                              ),
+                           )
+                     ),
+    ]);
 
     return $record;
   }
@@ -195,6 +197,7 @@ class DisplayAccount extends DisplayTable
             $this->page->msg .= tr('Invalid password specified')
                               . '<br />';
         }
+
         $form->set_value('pwd', '');
         $form->set_value('pwd_confirm', '');
       }
@@ -212,7 +215,7 @@ class DisplayAccount extends DisplayTable
 
     $edit_self = ($this->form->get_value('id') == $this->page->user['id']);
 
-    $fields = array(
+    $fields = [
       'id' => TRUE,
       'email' => array('label' => $edit_self ? 'Your Account E-mail' : 'Account E-mail', 'value' => $this->record->get_value('email')),
       'lastname' => array('label' => 'Last Name'),
@@ -221,7 +224,7 @@ class DisplayAccount extends DisplayTable
                      . ':<br />(' . tr('Must be at least six characters') . ')'
                      ),
       'pwd_confirm' => array('label' => 'Confirm Password'),
-    );
+    ];
 
     if ($this->page->user['privs'] & $RIGHTS_ADMIN) {
       $privs = $this->form->field('privs');
@@ -233,7 +236,7 @@ class DisplayAccount extends DisplayTable
                   . $privs->show($rights_mask);
       }
       else {
-        $fields['privs'] = array('label' => 'Access rights', 'value' => $privs->show($rights_mask));
+        $fields['privs'] = [ 'label' => 'Access rights', 'value' => $privs->show($rights_mask) ];
       }
     }
 
@@ -251,7 +254,7 @@ class DisplayAccount extends DisplayTable
     switch ($col_index) {
       case 1:
         $val = sprintf('<a href="%s">%s</a>',
-                        htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, 'edit' => $row['id']))),
+                        htmlspecialchars($this->page->buildLink([ 'pn' => $this->page->name, 'edit' => $row['id'] ])),
                         $this->formatText($row['email']));
         break;
 
@@ -270,23 +273,24 @@ class DisplayAccount extends DisplayTable
         break;
 
       case count($this->fields_listing) - 3:
-        $parts = array();
-        foreach (array(
-                       $GLOBALS['RIGHTS_REFEREE'] => 'Hrsg',
-                       $GLOBALS['RIGHTS_TRANSLATOR'] => 'Über',
-                       $GLOBALS['RIGHTS_EDITOR'] => 'Ed',
-                       $GLOBALS['RIGHTS_ADMIN'] => 'Ad'
-                       )
-                 as $right => $short)
+        $parts = [];
+        foreach ([
+            $GLOBALS['RIGHTS_REFEREE'] => 'Hrsg',
+            $GLOBALS['RIGHTS_TRANSLATOR'] => 'Über',
+            $GLOBALS['RIGHTS_EDITOR'] => 'Ed',
+            $GLOBALS['RIGHTS_ADMIN'] => 'Ad'
+          ] as $right => $short)
         {
           if (0 != ($val & $right)) {
             $parts[] = $short;
           }
         }
+
         $val = '';
         if (count($parts) > 0) {
           $val = implode('|', $parts);
         }
+
         break;
 
       case count($this->fields_listing) - 1:
@@ -298,8 +302,10 @@ class DisplayAccount extends DisplayTable
         else {
           $val = '';
         }
+
         break;
     }
+
     return parent::buildListingCell($row, $col_index, $val);
   }
 
@@ -312,11 +318,10 @@ class DisplayAccount extends DisplayTable
 
     return $ret;
   }
-
 }
 
 $display = new DisplayAccount($page, new AdminOnlyFlow($page));
 if (FALSE === $display->init()) {
-  $page->redirect(array('pn' => ''));
+  $page->redirect([ 'pn' => '' ]);
 }
 $page->setDisplay($display);
