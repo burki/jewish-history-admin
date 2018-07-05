@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "3393c21aace50bef049c49e047d9f9c6",
+    "content-hash": "df2771e140772456ea345491fe26794a",
     "packages": [
         {
             "name": "burki/zotero-api",
@@ -554,160 +554,95 @@
             "time": "2018-01-28T12:53:52+00:00"
         },
         {
-            "name": "pear-pear.php.net/Archive_Tar",
-            "version": "1.4.3",
+            "name": "pear/console_getopt",
+            "version": "v1.4.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pear/Console_Getopt.git",
+                "reference": "82f05cd1aa3edf34e19aa7c8ca312ce13a6a577f"
+            },
             "dist": {
-                "type": "file",
-                "url": "https://pear.php.net/get/Archive_Tar-1.4.3.tgz",
-                "reference": null,
-                "shasum": null
+                "type": "zip",
+                "url": "https://api.github.com/repos/pear/Console_Getopt/zipball/82f05cd1aa3edf34e19aa7c8ca312ce13a6a577f",
+                "reference": "82f05cd1aa3edf34e19aa7c8ca312ce13a6a577f",
+                "shasum": ""
             },
-            "require": {
-                "php": ">=5.2.0.0"
-            },
-            "replace": {
-                "pear-pear/archive_tar": "== 1.4.3.0"
-            },
-            "type": "pear-library",
+            "type": "library",
             "autoload": {
-                "classmap": [
-                    ""
-                ]
+                "psr-0": {
+                    "Console": "./"
+                }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "include-path": [
-                "/"
-            ],
-            "license": [
-                "New BSD License"
-            ],
-            "description": "This class provides handling of tar files in PHP.\nIt supports creating, listing, extracting and adding to tar files.\nGzip support is available if PHP has the zlib extension built-in or\nloaded. Bz2 compression is also supported with the bz2 extension loaded."
-        },
-        {
-            "name": "pear-pear.php.net/Console_Getopt",
-            "version": "1.4.1",
-            "dist": {
-                "type": "file",
-                "url": "https://pear.php.net/get/Console_Getopt-1.4.1.tgz",
-                "reference": null,
-                "shasum": null
-            },
-            "require": {
-                "php": ">=5.4.0.0"
-            },
-            "replace": {
-                "pear-pear/console_getopt": "== 1.4.1.0"
-            },
-            "type": "pear-library",
-            "autoload": {
-                "classmap": [
-                    ""
-                ]
-            },
-            "include-path": [
-                "/"
+                "./"
             ],
             "license": [
                 "BSD-2-Clause"
             ],
-            "description": "This is a PHP implementation of &quot;getopt&quot; supporting both\nshort and long options."
+            "authors": [
+                {
+                    "name": "Greg Beaver",
+                    "email": "cellog@php.net",
+                    "role": "Helper"
+                },
+                {
+                    "name": "Andrei Zmievski",
+                    "email": "andrei@php.net",
+                    "role": "Lead"
+                },
+                {
+                    "name": "Stig Bakken",
+                    "email": "stig@php.net",
+                    "role": "Developer"
+                }
+            ],
+            "description": "More info available on: http://pear.php.net/package/Console_Getopt",
+            "time": "2015-07-20T20:28:12+00:00"
         },
         {
-            "name": "pear-pear.php.net/PEAR",
-            "version": "1.10.5",
+            "name": "pear/pear-core-minimal",
+            "version": "v1.10.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pear/pear-core-minimal.git",
+                "reference": "070f0b600b2caca2501e2c9b7e553016e4b0d115"
+            },
             "dist": {
-                "type": "file",
-                "url": "https://pear.php.net/get/PEAR-1.10.5.tgz",
-                "reference": null,
-                "shasum": null
+                "type": "zip",
+                "url": "https://api.github.com/repos/pear/pear-core-minimal/zipball/070f0b600b2caca2501e2c9b7e553016e4b0d115",
+                "reference": "070f0b600b2caca2501e2c9b7e553016e4b0d115",
+                "shasum": ""
             },
             "require": {
-                "ext-pcre": "*",
-                "ext-xml": "*",
-                "pear-pear.php.net/archive_tar": ">=1.4.0.0",
-                "pear-pear.php.net/console_getopt": ">=1.4.1.0",
-                "pear-pear.php.net/structures_graph": ">=1.1.0.0",
-                "pear-pear.php.net/xml_util": ">=1.3.0.0",
-                "php": ">=5.4.0.0"
-            },
-            "conflict": {
-                "pear-pear.php.net/pear_frontend_gtk": "<0.4.0.0",
-                "pear-pear.php.net/pear_frontend_web": "<=0.4.0.0"
+                "pear/console_getopt": "~1.4",
+                "pear/pear_exception": "~1.0"
             },
             "replace": {
-                "pear-pear/pear": "== 1.10.5.0"
+                "rsky/pear-core-min": "self.version"
             },
-            "type": "pear-library",
+            "type": "library",
             "autoload": {
-                "classmap": [
-                    ""
-                ]
+                "psr-0": {
+                    "": "src/"
+                }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "include-path": [
-                "/"
+                "src/"
             ],
             "license": [
-                "New BSD License"
+                "BSD-3-Clause"
             ],
-            "description": "The PEAR package contains:\n * the PEAR installer, for creating, distributing\n   and installing packages\n * the PEAR_Exception PHP5 error handling mechanism\n * the PEAR_ErrorStack advanced error handling mechanism\n * the PEAR_Error error handling mechanism\n * the OS_Guess class for retrieving info about the OS\n   where PHP is running on\n * the System class for quick handling of common operations\n   with files and directories\n * the PEAR base class\n  Features in a nutshell:\n  * full support for channels\n  * pre-download dependency validation\n  * new package.xml 2.0 format allows tremendous flexibility while maintaining BC\n  * support for optional dependency groups and limited support for sub-packaging\n  * robust dependency support\n  * full dependency validation on uninstall\n  * remote install for hosts with only ftp access - no more problems with\n    restricted host installation\n  * full support for mirroring\n  * support for bundling several packages into a single tarball\n  * support for static dependencies on a url-based package\n  * support for custom file roles and installation tasks"
-        },
-        {
-            "name": "pear-pear.php.net/Structures_Graph",
-            "version": "1.1.1",
-            "dist": {
-                "type": "file",
-                "url": "https://pear.php.net/get/Structures_Graph-1.1.1.tgz",
-                "reference": null,
-                "shasum": null
-            },
-            "require": {
-                "php": ">=5.3.0.0"
-            },
-            "replace": {
-                "pear-pear/structures_graph": "== 1.1.1.0"
-            },
-            "type": "pear-library",
-            "autoload": {
-                "classmap": [
-                    ""
-                ]
-            },
-            "include-path": [
-                "/"
+            "authors": [
+                {
+                    "name": "Christian Weiske",
+                    "email": "cweiske@php.net",
+                    "role": "Lead"
+                }
             ],
-            "license": [
-                "LGPL-3.0+"
-            ],
-            "description": "Structures_Graph is a package for creating and manipulating graph datastructures. It allows building of directed\nand undirected graphs, with data and metadata stored in nodes. The library provides functions for graph traversing\nas well as for characteristic extraction from the graph topology."
-        },
-        {
-            "name": "pear-pear.php.net/XML_Util",
-            "version": "1.4.3",
-            "dist": {
-                "type": "file",
-                "url": "https://pear.php.net/get/XML_Util-1.4.3.tgz",
-                "reference": null,
-                "shasum": null
-            },
-            "require": {
-                "ext-pcre": "*",
-                "php": ">=5.4.0.0"
-            },
-            "replace": {
-                "pear-pear/xml_util": "== 1.4.3.0"
-            },
-            "type": "pear-library",
-            "autoload": {
-                "classmap": [
-                    ""
-                ]
-            },
-            "include-path": [
-                "/"
-            ],
-            "license": [
-                "BSD License"
-            ],
-            "description": "Selection of methods that are often needed when working with XML documents.  Functionality includes creating of attribute lists from arrays, creation of tags, validation of XML names and more."
+            "description": "Minimal set of PEAR core files to be used as composer dependency",
+            "time": "2017-02-28T16:46:11+00:00"
         },
         {
             "name": "pear/pear_exception",
@@ -872,16 +807,16 @@
         },
         {
             "name": "react/promise",
-            "version": "v2.5.1",
+            "version": "v2.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/promise.git",
-                "reference": "62785ae604c8d69725d693eb370e1d67e94c4053"
+                "reference": "f4edc2581617431aea50430749db55cc3fc031b3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/promise/zipball/62785ae604c8d69725d693eb370e1d67e94c4053",
-                "reference": "62785ae604c8d69725d693eb370e1d67e94c4053",
+                "url": "https://api.github.com/repos/reactphp/promise/zipball/f4edc2581617431aea50430749db55cc3fc031b3",
+                "reference": "f4edc2581617431aea50430749db55cc3fc031b3",
                 "shasum": ""
             },
             "require": {
@@ -914,7 +849,7 @@
                 "promise",
                 "promises"
             ],
-            "time": "2017-03-25T12:08:31+00:00"
+            "time": "2018-06-13T15:59:06+00:00"
         },
         {
             "name": "sabre/dav",

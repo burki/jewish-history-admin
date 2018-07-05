@@ -9,10 +9,6 @@
 
     "repositories": [
         {
-            "type": "pear",
-            "url": "https://pear.php.net"
-        },
-        {
             "url": "https://github.com/pear/Text_Wiki.git",
             "type": "vcs"
         },
@@ -35,8 +31,8 @@
         "kriswallsmith/buzz": "@stable",
         "sabre/xml": "@stable",
 
-        "pear-pear.php.net/PEAR": "*",
-        "pear-pear.php.net/XML_Util": "*",
+        "pear/pear-core-minimal": "*",
+        "pear/pear_exception": "*",
         "pear/text_wiki": "*@dev",
 
         "burki/zotero-api": "dev-master",
