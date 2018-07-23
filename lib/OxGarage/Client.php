@@ -8,7 +8,7 @@ use \Buzz\Message\Form\FormUpload;
 
 class Client
 {
-    public function __construct($server = 'http://www.tei-c.org')
+    public function __construct($server = 'http://oxgarage.tei-c.org')
     {
         $this->server = $server;
     }
@@ -20,11 +20,11 @@ class Client
     {
         $uri = $this->server
              . '/ege-webservice/Conversions/'
-             . implode('/', array(urlencode($mime_from), urlencode($mime_to)));
+             . implode('/', [ urlencode($mime_from), urlencode($mime_to) ]);
 
         $request = new \Buzz\Message\Form\FormRequest();
         $request->fromUrl($uri);
-        $request->setHeaders(array('Accept' => '*' . '/*'));
+        $request->setHeaders([ 'Accept' => '*' . '/*' ]);
         $request->setMethod('POST');
         // TODO: maybe switch to Guzzle: https://github.com/guzzle/guzzle/issues/768
         // FormUpload is needed since this is the only way that Buzz\FormRequest::isMultipart() sends true
@@ -67,9 +67,9 @@ class Client
                     header('Content-Disposition' . ': ' . $content_disposition);
                 }
             }
+
             header('Content-Type' . ': ' . $content_type);
             echo $response->getContent();
         }
-
     }
 }
