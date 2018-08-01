@@ -6,7 +6,7 @@
  *
  * (c) 2016-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-02-20 dbu
+ * Version: 2018-07-23 dbu
  *
  * TODO:
  *
@@ -83,9 +83,9 @@ extends TableManagerRecord
 
     if ($fetched) {
       foreach ($this->localizedFields as $db_field => $form_field) {
-        $values = json_decode($this->get_value($db_field), TRUE);
+        $values = json_decode($this->get_value($db_field), true);
         foreach ($this->languages as $language) {
-          if (isset($values) && FALSE !== $values && array_key_exists($language, $values)) {
+          if (isset($values) && false !== $values && array_key_exists($language, $values)) {
             $this->set_value($form_field . '_' . $language, $values[$language]);
           }
         }
@@ -110,7 +110,7 @@ extends DisplayBackend
   var $joins_listing = [
   ];
   var $group_by_listing = 'event.id';
-  var $distinct_listing = TRUE;
+  var $distinct_listing = true;
   var $order = [
     'name' => [ 'name, event.id', 'name DESC, event.id DESC' ],
     'created' => [ 'created_at DESC, event.id DESC', 'created_at, event.id' ],
@@ -122,12 +122,12 @@ extends DisplayBackend
     'status' => ''
   ];
   var $page_size = 50;
-  var $search_fulltext = NULL;
-  var $view_after_edit = TRUE;
-  var $show_xls_export = TRUE;
+  var $search_fulltext = null;
+  var $view_after_edit = true;
+  var $show_xls_export = true;
   var $xls_name = 'orte';
 
-  function __construct (&$page, $workflow = NULL) {
+  function __construct (&$page, $workflow = null) {
     $workflow = new EventFlow($page); // deleting may be merging
     parent::__construct($page, $workflow);
 
@@ -167,35 +167,35 @@ extends DisplayBackend
     $record = new EventRecord([ 'tables' => $this->table, 'dbconn' => new DB_Presentation() ]);
 
     $record->add_fields([
-      new Field([ 'name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => TRUE ]),
+      new Field([ 'name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => true ]),
 
-      new Field([ 'name' => 'created_at', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'UTC_TIMESTAMP()', 'noupdate' => TRUE ]),
-      // new Field([ 'name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'noupdate' => TRUE ]),
+      new Field([ 'name' => 'created_at', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'UTC_TIMESTAMP()', 'noupdate' => true ]),
+      // new Field([ 'name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'noupdate' => true ]),
       new Field([ 'name' => 'changed_at', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'UTC_TIMESTAMP()' ]),
       // new Field([ 'name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'] ]),
 
       new Field([ 'name' => 'name', 'id' => 'name', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80 ]),
 
-      new Field([ 'name' => 'alternateName', 'type' => 'hidden', 'datatype' => 'char', 'null' => TRUE ]),
-      new Field([ 'name' => 'name_variant_de', 'type' => 'text', 'datatype' => 'char', 'size' => 40, 'null' => TRUE, 'nodbfield' => true ]),
-      new Field([ 'name' => 'name_variant_en', 'type' => 'text', 'datatype' => 'char', 'size' => 40, 'null' => TRUE, 'nodbfield' => true ]),
+      new Field([ 'name' => 'alternateName', 'type' => 'hidden', 'datatype' => 'char', 'null' => true ]),
+      new Field([ 'name' => 'name_variant_de', 'type' => 'text', 'datatype' => 'char', 'size' => 40, 'null' => true, 'nodbfield' => true ]),
+      new Field([ 'name' => 'name_variant_en', 'type' => 'text', 'datatype' => 'char', 'size' => 40, 'null' => true, 'nodbfield' => true ]),
 
-      new Field([ 'name' => 'startDate', 'id' => 'startDate', 'type' => 'text', /* 'incomplete' => TRUE, */ 'datatype' => 'char', 'null' => TRUE ]),
-      new Field([ 'name' => 'endDate', 'id' => 'endDate', 'type' => 'text', /* 'incomplete' => TRUE, */ 'datatype' => 'char', 'null' => TRUE ]),
+      new Field([ 'name' => 'startDate', 'id' => 'startDate', 'type' => 'text', /* 'incomplete' => true, */ 'datatype' => 'char', 'null' => true ]),
+      new Field([ 'name' => 'endDate', 'id' => 'endDate', 'type' => 'text', /* 'incomplete' => true, */ 'datatype' => 'char', 'null' => true ]),
 
-      new Field([ 'name' => 'description', 'type' => 'hidden', 'datatype' => 'char', 'null' => TRUE ]),
-      new Field([ 'name' => 'description_de', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE, 'nodbfield' => true ]),
-      new Field([ 'name' => 'description_en', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE, 'nodbfield' => true ]),
+      new Field([ 'name' => 'description', 'type' => 'hidden', 'datatype' => 'char', 'null' => true ]),
+      new Field([ 'name' => 'description_de', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => true, 'nodbfield' => true ]),
+      new Field([ 'name' => 'description_en', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => true, 'nodbfield' => true ]),
 
-      new Field([ 'name' => 'gnd', 'id' => 'gnd', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE ]),
+      new Field([ 'name' => 'gnd', 'id' => 'gnd', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => true ]),
 
-      // new Field([ 'name' => 'comment_internal', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE ]),
+      // new Field([ 'name' => 'comment_internal', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => true ]),
     ]);
 
     if ($this->page->isAdminUser()) {
       // admins may publish organization
       $record->add_fields([
-        new Field([ 'name' => 'status', 'type' => 'hidden', 'value' => 0, 'noupdate' => !$this->is_internal, 'null' => TRUE ]),
+        new Field([ 'name' => 'status', 'type' => 'hidden', 'value' => 0, 'noupdate' => !$this->is_internal, 'null' => true ]),
       ]);
     }
 
@@ -209,7 +209,7 @@ extends DisplayBackend
                             "jQuery('#gnd').autocomplete('enable');jQuery('#gnd').autocomplete('search', jQuery('#lastname').val() + ', ' + jQuery('#firstname').val())");
     }
     $rows = [
-      'id' => FALSE, 'status' => FALSE,
+      'id' => false, 'status' => false,
       'name' => [ 'label' => 'Name' ],
       'name_variant_de' => [
         'label' => 'Deutscher Name',
@@ -311,7 +311,7 @@ EOT;
     return $this->formatText($record->get_value('name'));
   }
 
-  function buildViewFooter ($found = TRUE) {
+  function buildViewFooter ($found = true) {
     $gnd = $this->record->get_value('gnd');
     $publications = !empty($gnd)
       ? $this->buildRelatedPublications('http://vocab.getty.edu/gnd/' . $gnd)
@@ -385,23 +385,23 @@ EOT;
     // created is default of type function
     // $record->get_field('created')->set('datatype', 'date');
     if (!$record->fetch($id)) {
-      return FALSE;
+      return false;
     }
-    $action = NULL;
+    $action = null;
     if (array_key_exists('with', $_POST)
         && intval($_POST['with']) > 0)
     {
       $action = 'merge';
       $id_new = intval($_POST['with']);
     }
-    $ret = FALSE;
+    $ret = false;
 
     $dbconn = new DB_Presentation();
     switch ($action) {
       case 'merge':
         $record_new = $this->buildRecord();
         if (!$record_new->fetch($id_new)) {
-          return FALSE;
+          return false;
         }
 
         foreach (EventFlow::$TABLES_RELATED as $table => $key_field) {
@@ -447,8 +447,8 @@ EOT;
     return $ret;
   }
 
-  function buildListingCell (&$row, $col_index, $val = NULL) {
-    $val = NULL;
+  function buildListingCell (&$row, $col_index, $val = null) {
+    $val = null;
     if ($col_index == count($this->fields_listing) - 1) {
       $url_preview = $this->page->buildLink([ 'pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_VIEW) => $row[0] ]);
       $val = sprintf('<div style="text-align:right;">[<a href="%s">%s</a>]</div>',
@@ -489,7 +489,7 @@ EOT;
 }
 
 $display = new DisplayEvent($page);
-if (FALSE === $display->init()) {
+if (false === $display->init()) {
   $page->redirect([ 'pn' => '' ]);
 }
 

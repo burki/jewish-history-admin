@@ -8,12 +8,13 @@
 
 define('K_PATH_MAIN', LIB_PATH . 'tcpdf/');
 
-define('K_TCPDF_EXTERNAL_CONFIG', TRUE); // we don't want default-config taken in
+define('K_TCPDF_EXTERNAL_CONFIG', true); // we don't want default-config taken in
 require_once('./TcpdfConfig.php'); // site-specific config
 require_once(K_PATH_MAIN . 'tcpdf.php');
 */
 
-class PdfExtended extends TCPDF
+class PdfExtended
+extends TCPDF
 {
   protected $print_header_suppress_first = true;
 
@@ -34,7 +35,7 @@ class PdfExtended extends TCPDF
 
   public function Header() {
     if ($this->print_header_suppress_first)
-      $this->print_header_suppress_first = FALSE;
+      $this->print_header_suppress_first = false;
     else {
       // parent::Header();
             $ormargins = $this->getOriginalMargins();
@@ -63,7 +64,7 @@ class PdfExtended extends TCPDF
             $this->SetX($header_x);
             $this->MultiCell(0, $cell_height, $headerdata['string'], 0, '', 0, 1, 0, 0, true, 0);
             // print an ending header line
-            $this->SetLineStyle(array("width" => 0.85 / $this->getScaleFactor(), "cap" => "butt", "join" => "miter", "dash" => 0, "color" => array(0, 0, 0)));
+            $this->SetLineStyle(["width" => 0.85 / $this->getScaleFactor(), "cap" => "butt", "join" => "miter", "dash" => 0, "color" => [0, 0, 0]]);
             $this->SetY(1 + max($imgy, $this->GetY()));
             if ($this->getRTL()) {
                 $this->SetX($ormargins['right']);
@@ -121,7 +122,7 @@ class PdfExtended extends TCPDF
           $prevlinewidth = $this->GetLineWidth();
           $line_width = 0; // hairline 0.85 / $this->k;
           $this->SetLineWidth($line_width);
-          $this->SetDrawColorArray(array(0, 0, 0));
+          $this->SetDrawColorArray([0, 0, 0]);
           $footer_height = round(($this->cell_height_ratio * $this->footer_font[2]) / $this->k, 2); //footer height
           //get footer y position
           $footer_y = $this->h - $this->footer_margin - $footer_height;
@@ -153,5 +154,4 @@ class PdfExtended extends TCPDF
           $this->SetFont($font_family, $font_style, $font_size);
       }
   }
-
 }

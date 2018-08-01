@@ -6,7 +6,7 @@
  *
  * (c) 2006-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-05-22 dbu
+ * Version: 2018-07-23 dbu
  *
  * Changes:
  *
@@ -21,14 +21,14 @@ extends TableManagerFlow
   const MERGE    = 1010;
 
   static $TABLES_RELATED = [
-    'editor' => array('Message'),
-    'referee' => array('Message'),
-    'translator' => array('Message', 'Publication'),
-    'user_id' => array('MessageUser'),
+    'editor' => [ 'Message' ],
+    'referee' => [ 'Message' ],
+    'translator' => [ 'Message', 'Publication' ],
+    'user_id' => [ 'MessageUser' ],
   ];
 
   var $user;
-  var $is_internal = FALSE;
+  var $is_internal = false;
 
   function __construct ($page) {
     global $RIGHTS_EDITOR;
@@ -36,7 +36,7 @@ extends TableManagerFlow
     $this->user = $page->user;
     $this->is_internal = 0 != ($this->user['privs'] & $RIGHTS_EDITOR);
 
-    parent::TableManagerFlow($this->is_internal);
+    parent::__construct($this->is_internal);
   }
 
   function init ($page) {
@@ -57,7 +57,7 @@ extends TableManagerFlow
         return TABLEMANAGER_VIEW;
       }
 
-      return FALSE;
+      return false;
     }
   }
 
@@ -76,7 +76,7 @@ extends TableManagerFlow
     }
 
     // there is no listing for regular users
-    return FALSE;
+    return false;
   }
 }
 
@@ -149,15 +149,15 @@ extends DisplayTable
   ];
   var $joins_listing;
   var $order = [
-    'name' => array('lastname, firstname', 'lastname DESC, firstname DESC'),
-    'created' => array('created DESC, User.id desc', 'created, User.id'),
+    'name' => [ 'lastname, firstname', 'lastname DESC, firstname DESC' ],
+    'created' => [ 'created DESC, User.id desc', 'created, User.id' ],
   ];
   var $cols_listing = [
     'name' => 'Name', 'email' => 'E-Mail', 'status' => '', 'created' => 'Created',
   ];
   var $page_size = 50;
   var $status_deleted;
-  var $search_fulltext = NULL;
+  var $search_fulltext = null;
 
   function __construct (&$page) {
     parent::__construct($page, new AuthorFlow($page));
@@ -180,7 +180,7 @@ extends DisplayTable
     $this->page->setSessionValue('fulltext', $this->search_fulltext);
 
     $review = $this->page->getSessionValue('review');
-    if (NULL === $review && !array_key_exists('review', $_REQUEST)) {
+    if (null === $review && !array_key_exists('review', $_REQUEST)) {
       // default to reviewers only
       $this->page->getSessionValue('review', $_REQUEST['review'] = 'Y');
     }
@@ -194,9 +194,9 @@ extends DisplayTable
 
     $this->condition = [
       "User.status <> " . $this->status_deleted,
-      array('name' => 'status', 'method' => 'buildStatusCondition', 'args' => 'status', 'persist' => 'session'),
+      [ 'name' => 'status', 'method' => 'buildStatusCondition', 'args' => 'status', 'persist' => 'session' ],
       $search_condition,
-      array('name' => 'review', 'method' => 'buildLikeCondition', 'args' => 'review', 'persist' => 'session'),
+      [ 'name' => 'review', 'method' => 'buildLikeCondition', 'args' => 'review', 'persist' => 'session' ],
     ];
   }
 
@@ -216,15 +216,15 @@ extends DisplayTable
   function instantiateRecord ($table = '', $dbconn = '') {
     global $COUNTRIES_FEATURED;
 
-    $record =  new AuthorRecord(array('tables' => $this->table, 'dbconn' => $this->page->dbconn));
+    $record =  new AuthorRecord([ 'tables' => $this->table, 'dbconn' => $this->page->dbconn ]);
 
     $countries = $this->getCountries();
-    $countries_ordered = array('' => tr('-- not available --'));
+    $countries_ordered = ['' => tr('-- not available --')];
     if (isset($COUNTRIES_FEATURED)) {
       for ($i = 0; $i < count($COUNTRIES_FEATURED); $i++) {
         $countries_ordered[$COUNTRIES_FEATURED[$i]] = $countries[$COUNTRIES_FEATURED[$i]];
       }
-      $countries_ordered['&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;'] = FALSE; // separator
+      $countries_ordered['&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;'] = false; // separator
     }
 
     foreach ($countries as $cc => $name) {
@@ -238,68 +238,67 @@ extends DisplayTable
       $status_options[$val] = tr($label);
     }
 
-    $sex_options = array('' => '--', 'F' => tr('Mrs.'), 'M' => tr('Mr.'));
-    $review_options = array('' => tr('outstanding request'), 'Y' => tr('yes'), 'N' => tr('no'));
+    $sex_options = [ '' => '--', 'F' => tr('Mrs.'), 'M' => tr('Mr.') ];
+    $review_options = [ '' => tr('outstanding request'), 'Y' => tr('yes'), 'N' => tr('no') ];
 
     $record->add_fields([
-      new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => TRUE)),
+      new Field([ 'name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => true ]),
 
-//        new Field(array('name' => 'creator', 'type' => 'hidden', 'datatype' => 'int', 'null' => TRUE, 'noupdate' => 1)),
-      new Field(array('name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => 1)),
-/*        new Field(array('name' => 'editor', 'type' => 'hidden', 'datatype' => 'int', 'null' => TRUE)),*/
-      new Field(array('name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()')),
-      new Field(array('name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => TRUE)),
+//        new Field([ 'name' => 'creator', 'type' => 'hidden', 'datatype' => 'int', 'null' => true, 'noupdate' => true ]),
+      new Field([ 'name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => true ]),
+/*        new Field([ 'name' => 'editor', 'type' => 'hidden', 'datatype' => 'int', 'null' => true ]),*/
+      new Field([ 'name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()' ]),
+      new Field([ 'name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => true ]),
 
-      new Field(array('name' => 'email', 'type' => 'email', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE, 'noupdate' => !$this->is_internal)),
-      new Field(array('name' => 'status', 'type' => 'select', 'options' => array_keys($status_options), 'labels' => array_values($status_options), 'datatype' => 'int', 'default' => -10, 'noupdate' => !$this->is_internal, 'null' => !$this->is_internal)),
-//        new Field(array('name' => 'status', 'type' => 'hidden', 'value' => 0, 'noupdate' => !$this->is_internal, 'null' => TRUE)),
-      new Field(array('name' => 'subscribed', 'type' => 'date', 'datatype' => 'date', 'null' => TRUE, 'noupdate' => !$this->is_internal)),
-      new Field(array('name' => 'unsubscribed', 'type' => 'date', 'datatype' => 'date', 'null' => TRUE, 'noupdate' => !$this->is_internal)),
-      /* new Field(array('name' => 'hold', 'type' => 'date', 'datatype' => 'date', 'null' => TRUE, 'noupdate' => !$this->is_internal)), */
+      new Field([ 'name' => 'email', 'type' => 'email', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => true, 'noupdate' => !$this->is_internal ]),
+      new Field([ 'name' => 'status', 'type' => 'select', 'options' => array_keys($status_options), 'labels' => array_values($status_options), 'datatype' => 'int', 'default' => -10, 'noupdate' => !$this->is_internal, 'null' => !$this->is_internal ]),
+//        new Field([ 'name' => 'status', 'type' => 'hidden', 'value' => 0, 'noupdate' => !$this->is_internal, 'null' => true ]),
+      new Field([ 'name' => 'subscribed', 'type' => 'date', 'datatype' => 'date', 'null' => true, 'noupdate' => !$this->is_internal ]),
+      new Field([ 'name' => 'unsubscribed', 'type' => 'date', 'datatype' => 'date', 'null' => true, 'noupdate' => !$this->is_internal ]),
+      /* new Field([ 'name' => 'hold', 'type' => 'date', 'datatype' => 'date', 'null' => true, 'noupdate' => !$this->is_internal ]), */
 
-      new Field(array('name' => 'sex', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($sex_options), 'labels' => array_values($sex_options))),
-      new Field(array('name' => 'title', 'type' => 'text', 'datatype' => 'char', 'size' => 8, 'maxlength' => 20, 'null' => TRUE)),
-      new Field(array('name' => 'lastname', 'id' => 'lastname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80)),
-      new Field(array('name' => 'firstname', 'id' => 'firstname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
-      new Field(array('name' => 'slug', 'type' => 'hidden', 'datatype' => 'char', 'null' => TRUE)),
+      new Field([ 'name' => 'sex', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($sex_options), 'labels' => array_values($sex_options) ]),
+      new Field([ 'name' => 'title', 'type' => 'text', 'datatype' => 'char', 'size' => 8, 'maxlength' => 20, 'null' => true ]),
+      new Field([ 'name' => 'lastname', 'id' => 'lastname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80 ]),
+      new Field([ 'name' => 'firstname', 'id' => 'firstname', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => true ]),
+      new Field([ 'name' => 'slug', 'type' => 'hidden', 'datatype' => 'char', 'null' => true ]),
 
-      new Field(array('name' => 'position', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
-      new Field(array('name' => 'email_work', 'type' => 'email', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
-      new Field(array('name' => 'institution', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+      new Field([ 'name' => 'position', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => true ]),
+      new Field([ 'name' => 'email_work', 'type' => 'email', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => true ]),
+      new Field([ 'name' => 'institution', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => true ]),
 
-      new Field(array('name' => 'address', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 5, 'null' => TRUE)),
-      new Field(array('name' => 'place', 'type' => 'text', 'size' => 30, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
-      new Field(array('name' => 'zip', 'type' => 'text', 'datatype' => 'char', 'size' => 8, 'maxlength' => 8, 'null' => TRUE)),
-      new Field(array('name' => 'country', 'type' => 'select', 'datatype' => 'char', 'null' => TRUE, 'options' => array_keys($countries_ordered), 'labels' => array_values($countries_ordered), 'default' => 'DE', 'null' => TRUE)),
+      new Field([ 'name' => 'address', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 5, 'null' => true ]),
+      new Field([ 'name' => 'place', 'type' => 'text', 'size' => 30, 'datatype' => 'char', 'maxlength' => 80, 'null' => true ]),
+      new Field([ 'name' => 'zip', 'type' => 'text', 'datatype' => 'char', 'size' => 8, 'maxlength' => 8, 'null' => true ]),
+      new Field([ 'name' => 'country', 'type' => 'select', 'datatype' => 'char', 'null' => true, 'options' => array_keys($countries_ordered), 'labels' => array_values($countries_ordered), 'default' => 'DE', 'null' => true ]),
 
-      new Field(array('name' => 'phone', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 40, 'null' => TRUE)),
-      new Field(array('name' => 'fax', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 40, 'null' => TRUE)),
-      new Field(array('name' => 'url', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => TRUE)),
-//        new Field(array('name' => 'supervisor', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => TRUE)),
-      new Field(array('name' => 'gnd', 'id' => 'gnd', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
-      new Field(array('name' => 'description', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
-      new Field(array('name' => 'description_de', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
-      new Field(array('name' => 'areas', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
-      new Field(array('name' => 'ip', 'type' => 'hidden', 'datatype' => 'char', 'null' => TRUE, 'noupdate' => TRUE, 'value' => $_SERVER['REMOTE_ADDR'])),
-
+      new Field([ 'name' => 'phone', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 40, 'null' => true ]),
+      new Field([ 'name' => 'fax', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 40, 'null' => true ]),
+      new Field([ 'name' => 'url', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => true ]),
+//        new Field([ 'name' => 'supervisor', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => true ]),
+      new Field([ 'name' => 'gnd', 'id' => 'gnd', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => true ]),
+      new Field([ 'name' => 'description', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => true ]),
+      new Field([ 'name' => 'description_de', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => true ]),
+      new Field([ 'name' => 'areas', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => true ]),
+      new Field([ 'name' => 'ip', 'type' => 'hidden', 'datatype' => 'char', 'null' => true, 'noupdate' => true, 'value' => $_SERVER['REMOTE_ADDR'] ]),
     ]);
 
     if ($this->is_internal) {
       $record->add_fields([
-        new Field(array('name' => 'knownthrough', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => TRUE)),
-        new Field(array('name' => 'expectations', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
-        new Field(array('name' => 'forum', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => TRUE)),
+        new Field([ 'name' => 'knownthrough', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => true]),
+        new Field([ 'name' => 'expectations', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => true]),
+        new Field([ 'name' => 'forum', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => true]),
 
-        new Field(array('name' => 'review', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($review_options), 'labels' => array_values($review_options), 'null' => TRUE)),
-        new Field(array('name' => 'review_areas', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
-        new Field(array('name' => 'review_suggest', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
+        new Field([ 'name' => 'review', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($review_options), 'labels' => array_values($review_options), 'null' => true]),
+        new Field([ 'name' => 'review_areas', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => true]),
+        new Field([ 'name' => 'review_suggest', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => true]),
 
-        new Field(array('name' => 'comment', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE, 'noupdate' => !$this->is_internal)),
-        new Field(array('name' => 'status_flags', 'type' => 'checkbox', 'datatype' => 'bitmap', 'null' => TRUE, 'default' => 0,
-                            'labels' => array(
-                                              0x01 => tr('CV') . ' ' . tr('finalized'),
-                                              ),
-                           ))
+        new Field([ 'name' => 'comment', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => true, 'noupdate' => !$this->is_internal]),
+        new Field([ 'name' => 'status_flags', 'type' => 'checkbox', 'datatype' => 'bitmap', 'null' => true, 'default' => 0,
+                    'labels' => [
+                      0x01 => tr('CV') . ' ' . tr('finalized'),
+                    ],
+                  ])
        ]);
     }
 
@@ -392,44 +391,56 @@ EOT;
     }
 
     $rows = [
-      'id' => FALSE,
-      'flags' => FALSE,
-      'email' => array('label' => 'E-mail'),
-      'status' => array('label' => 'Newsletter'),
+      'id' => false,
+      'flags' => false,
+      'email' => [ 'label' => 'E-mail' ],
+      'status' => [ 'label' => 'Newsletter' ],
     ];
 
-    if (FALSE && $this->is_internal) {
+    if (false && $this->is_internal) {
       $rows = array_merge($rows, [
-        array('label' => 'Subscribed / Unsubscribed', 'fields' => array('subscribed', 'unsubscribed'), 'show_datetimestyle' => true),
-        'hold' => array('label' => 'Hold until', 'show_datetimestyle' => true),
+        [
+          'label' => 'Subscribed / Unsubscribed',
+          'fields' => ['subscribed', 'unsubscribed'],
+          'show_datetimestyle' => true,
+        ],
+        'hold' => [ 'label' => 'Hold until', 'show_datetimestyle' => true ],
         $this->form->show_submit(tr('Store'))
         . '<hr noshade="noshade" />',
       ]);
     }
 
     $rows = array_merge($rows, [
-        [ 'label' => 'Salutation / Academic Title', 'fields' => array('sex', 'title') ],
-        'lastname' => array('label' => 'Last Name'),
-        'firstname' => array('label' => 'First Name'),
-        'position' => array('label' => 'Position'),
-        'gnd' => array('label' => 'GND-Nr',
-                       'description' => 'Identifikator der Gemeinsamen Normdatei, vgl. http://de.wikipedia.org/wiki/Hilfe:GND',),
-        (isset($this->form) ? $gnd_search . $this->form->show_submit(tr('Store')) : '')
+      [
+        'label' => 'Salutation / Academic Title',
+        'fields' => [ 'sex', 'title' ],
+      ],
+      'lastname' => [ 'label' => 'Last Name' ],
+      'firstname' => [ 'label' => 'First Name' ],
+      'position' => [ 'label' => 'Position' ],
+      'gnd' => [
+        'label' => 'GND-Nr',
+        'description' => 'Identifikator der Gemeinsamen Normdatei, vgl. http://de.wikipedia.org/wiki/Hilfe:GND',
+      ],
+      (isset($this->form) ? $gnd_search . $this->form->show_submit(tr('Store')) : '')
         . '<hr noshade="noshade" />',
-        'email_work' => array('label' => 'Institutional E-Mail'),
-        'institution' => array('label' => 'Institution'),
-        'address' => array('label' => 'Address'),
-        array('label' => 'Postcode / Place', 'fields' => array('zip', 'place')),
-        'country' => array('label' => 'Country'),
-        'phone' => array('label' => 'Telephone'),
-        'fax' => array('label' => 'Fax'),
-        '<hr noshade="noshade" />',
-        'url' => array('label' => 'Homepage'),
-        'description_de' => array('label' => 'Public CV (de)'),
-        'description' => array('label' => 'Public CV (en)'),
-        '<hr noshade="noshade" />',
-        // 'supervisor' => array('label' => 'Supervisor'),
-        'areas' => array('label' => 'Areas of interest'),
+      'email_work' => [ 'label' => 'Institutional E-Mail' ],
+      'institution' => [ 'label' => 'Institution' ],
+      'address' => [ 'label' => 'Address' ],
+      [
+        'label' => 'Postcode / Place',
+        'fields' => ['zip', 'place'],
+      ],
+      'country' => [ 'label' => 'Country' ],
+      'phone' => [ 'label' => 'Telephone' ],
+      'fax' => [ 'label' => 'Fax' ],
+      '<hr noshade="noshade" />',
+      'url' => [ 'label' => 'Homepage' ],
+      'description_de' => [ 'label' => 'Public CV (de)' ],
+      'description' => [ 'label' => 'Public CV (en)' ],
+      '<hr noshade="noshade" />',
+      // 'supervisor' => [ 'label' => 'Supervisor' ],
+      'areas' => [ 'label' => 'Areas of interest' ],
     ]);
 
     if ($this->is_internal) {
@@ -442,7 +453,7 @@ EOT;
       }
 
       foreach ([
-             'cv' => array('label' => 'CV', 'mask' => 0x1),
+             'cv' => ['label' => 'CV', 'mask' => 0x1],
           ] as $key => $options)
       {
         if ('edit' == $mode) {
@@ -462,20 +473,20 @@ EOT;
       }
 
       $rows = array_merge($rows, [
-        /* 'expectations' => array('label' => 'Expectations'),
-        'knownthrough' => array('label' => 'How did you get to know us'),
-        'forum' => array('label' => 'Other lists and fora'),
+        /* 'expectations' => [ 'label' => 'Expectations' ],
+        'knownthrough' => [ 'label' => 'How did you get to know us' ],
+        'forum' => [ 'label' => 'Other lists and fora' ],
         '<hr noshade="noshade" />',  */
-        'review' => array('label' => 'Willing to contribute'),
-        'review_areas' => array('label' => 'Contribution areas'),
-        'review_suggest' => array('label' => 'Article suggestion'),
+        'review' => [ 'label' => 'Willing to contribute' ],
+        'review_areas' => [ 'label' => 'Contribution areas' ],
+        'review_suggest' => [ 'label' => 'Article suggestion' ],
       ]);
 
       $rows = array_merge($rows, $additional);
 
       $rows = array_merge($rows, [
         '<hr noshade="noshade" />',
-        'comment' => array('label' => 'Internal notes and comment'),
+        'comment' => [ 'label' => 'Internal notes and comment' ],
       ]);
     }
     else {
@@ -511,7 +522,7 @@ EOT;
     if ($this->is_internal) {
       global $STATUS_OPTIONS;
 
-      $reviews_found = FALSE; $reviews = '';
+      $reviews_found = false; $reviews = '';
 
       // show all articles related to this person
       $querystr = sprintf("SELECT Message.id AS id, subject, Message.status AS status"
@@ -523,12 +534,12 @@ EOT;
       $dbconn = & $this->page->dbconn;
       $dbconn->query($querystr);
       $reviews = '';
-      $params_view = array('pn' => 'article');
-      $reviews_found = FALSE;
+      $params_view = ['pn' => 'article'];
+      $reviews_found = false;
       while ($dbconn->next_record()) {
         if (!$reviews_found) {
           $reviews = '<ul>';
-          $reviews_found = TRUE;
+          $reviews_found = true;
         }
         $params_view['view'] = $dbconn->Record['id'];
         $reviews .= sprintf('<li id="item_%d">', $dbconn->Record['id'])
@@ -554,7 +565,7 @@ EOT;
 
   function buildSearchBar () {
 /*
-    $select_options = array('<option value="">' . tr('-- all --') . '</option>');
+    $select_options = [ '<option value="">' . tr('-- all --') . '</option>' ];
     foreach (AuthorListing::$status_list as $status => $label)
       if ($this->status_deleted != $status) {
         $selected = $this->search['status'] !== ''
@@ -564,7 +575,7 @@ EOT;
       }
 */
       $ret = sprintf('<form action="%s" method="post" name="search">',
-                     htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, 'page_id' => 0))));
+                     htmlspecialchars($this->page->buildLink(['pn' => $this->page->name, 'page_id' => 0])));
 
       $search = '<input type="text" name="search" value="' . $this->htmlSpecialchars(array_key_exists('search', $this->search) ?  $this->search['search'] : '') . '" size="40" />';
       $search .= '<label><input type="hidden" name="fulltext" value="0" />'
@@ -577,7 +588,7 @@ EOT;
       $search .= '<br />' . tr('Subscription Status') . ': <select name="status">' . implode($select_options) . '</select>';
       */
 
-      foreach (array('' => '-- all --', 'Y' => 'yes', /* 'N' => 'no', */) as $status => $label) {
+      foreach ([ '' => '-- all --', 'Y' => 'yes', /* 'N' => 'no', */ ] as $status => $label) {
         $selected = isset($this->search['review']) && $this->search['review'] !== ''
             && $this->search['review'] == $status
             ? ' selected="selected"' : '';
@@ -626,18 +637,18 @@ EOT;
     return $ret;
   } // buildSearchBar
 
-  function buildListingCell (&$row, $col_index, $val = NULL) {
-    $val = NULL;
+  function buildListingCell (&$row, $col_index, $val = null) {
+    $val = null;
     switch ($col_index) {
       case 1:
-        $val .= '<a href="' . htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, 'view' => $row['id']))) . '">'
+        $val .= '<a href="' . htmlspecialchars($this->page->buildLink(['pn' => $this->page->name, 'view' => $row['id']])) . '">'
               . $this->formatText($row['lastname'] . (isset($row['firstname']) ? ' ' . $row['firstname'] : ''))
               . '</a>';
         break;
 
       case 2:
       case 6:
-        return FALSE;
+        return false;
         break;
 
       case 3:
@@ -652,12 +663,12 @@ EOT;
         break;
 
       case 4:
-          $val = '&nbsp;';
-          if (FALSE && array_key_exists('status', $this->search)
-           && ('' === $this->search['status'] || '0' === $this->search['status']))
-          {
-            $val = tr(AuthorListing::$status_list[$row['status']]) . ' ' . $val;
-          }
+        $val = '&nbsp;';
+        if (false && array_key_exists('status', $this->search)
+         && ('' === $this->search['status'] || '0' === $this->search['status']))
+        {
+          $val = tr(AuthorListing::$status_list[$row['status']]) . ' ' . $val;
+        }
         break;
 
       case 5:
@@ -679,10 +690,10 @@ EOT;
     // created is default of type function
     $record->get_field('created')->set('datatype', 'date');
     if (!$record->fetch($id)) {
-      return FALSE;
+      return false;
     }
 
-    $action = NULL;
+    $action = null;
     if (array_key_exists('with', $this->page->parameters)
         && intval($this->page->parameters['with']) > 0)
     {
@@ -697,42 +708,42 @@ EOT;
       $action = $this->page->parameters['action'];
     }
 
-    $ret = FALSE;
+    $ret = false;
 
     switch ($action) {
       case 'merge':
         $record_new = $this->instantiateRecord();
         $record_new->get_field('created')->set('datatype', 'date');
         if (!$record_new->fetch($id_new)) {
-          return FALSE;
+          return false;
         }
 
-        $store = FALSE;
+        $store = false;
 
         if ($record->get_value('status') > $record_new->get_value('status')) {
           $record_new->set_value('status', $record->get_value('status'));
         }
         // add old fields to new if empty
-        foreach(array('email', 'firstname', 'lastname', 'title',
-                      'email_work', 'institution', 'position',
-                      'address', 'place', 'zip', 'country', 'phone', 'fax',
-                      'supervisor',
-                      'forum', 'sex') as $fieldname) {
+        foreach([ 'email', 'firstname', 'lastname', 'title',
+                  'email_work', 'institution', 'position',
+                  'address', 'place', 'zip', 'country', 'phone', 'fax',
+                  'supervisor',
+                  'forum', 'sex'] as $fieldname) {
           $old = $record->get_value($fieldname);
           if (!empty($old)) {
             $new = $record_new->get_value($fieldname);
             if (empty($new)) {
               $record_new->set_value($fieldname, $old);
-              $store = TRUE;
+              $store = true;
             }
           }
         }
 
         // add old fields to new if empty
-        foreach(array('expectations', 'areas', 'description',
-                      'knownthrough',
-                      'review_areas', 'review_suggest',
-                      'comment') as $fieldname) {
+        foreach([ 'expectations', 'areas', 'description',
+                  'knownthrough',
+                  'review_areas', 'review_suggest',
+                  'comment' ] as $fieldname) {
           $old = $record->get_value($fieldname);
           if (!empty($old)) {
             $new = $record_new->get_value($fieldname);
@@ -744,7 +755,7 @@ EOT;
                                      $new . utf8_encode("\n\n=== aus gelöschtem Eintrag übernommen:\n")
                                      . $old);
             }
-            $store = TRUE;
+            $store = true;
           }
         }
 
@@ -765,34 +776,33 @@ EOT;
         $querystr = sprintf("UPDATE User SET status=%d WHERE id=%d",
                            AuthorListing::$status_deleted, $id);
         $this->page->dbconn->query($querystr);
-        $this->page->redirect(array('pn' => $this->page->name, 'edit' => intval($this->page->parameters['with'])));
+        $this->page->redirect(['pn' => $this->page->name, 'edit' => intval($this->page->parameters['with'])]);
         break;
 
       default:
         $orig = sprintf('%s %s, %s (%s)',
-                  $record->get_value('firstname'),
-                  $record->get_value('lastname'),
-                  $record->get_value('place'),
-                  $record->get_value('email'));
+                        $record->get_value('firstname'),
+                        $record->get_value('lastname'),
+                        $record->get_value('place'),
+                        $record->get_value('email'));
 
         $orig_confirm = sprintf('%s %s (%s) %s',
-                  $record->get_value('firstname'),
-                  $record->get_value('lastname'),
-                  $record->get_value('email'),
-                  $this->formatTimestamp(strtotime($record->get_value('created')))
-                  );
+                                $record->get_value('firstname'),
+                                $record->get_value('lastname'),
+                                $record->get_value('email'),
+                                $this->formatTimestamp(strtotime($record->get_value('created'))));
 
         // find similar entries
         $dbconn = &$this->page->dbconn;
         $querystr = sprintf("SELECT id, firstname, lastname, email, place, status, UNIX_TIMESTAMP(created) AS created_timestamp FROM User WHERE (email = '%s' OR (lastname LIKE '%s' AND firstname LIKE '%s')) AND id<>%d AND status <> %d ORDER BY email='%s' DESC, status DESC, created DESC",
-                    $dbconn->escape_string($record->get_value('email')),
-                    $dbconn->escape_string($record->get_value('lastname')),                    $dbconn->escape_string($record->get_value('firstname')),
-                    $id, AuthorListing::$status_deleted,
-                    $dbconn->escape_string($record->get_value('email'))
-                    );
+                            $dbconn->escape_string($record->get_value('email')),
+                            $dbconn->escape_string($record->get_value('lastname')),
+                            $dbconn->escape_string($record->get_value('firstname')),
+                            $id, AuthorListing::$status_deleted,
+                            $dbconn->escape_string($record->get_value('email')));
         $dbconn->query($querystr);
         $replace = '';
-        $params_replace = array('pn' => $this->page->name, 'merge' => $id);
+        $params_replace = [ 'pn' => $this->page->name, 'merge' => $id ];
         while ($dbconn->next_record()) {
           $params_replace['with'] = $dbconn->Record['id'];
           $replace_confirm = sprintf('%s %s (%s) %s',
@@ -816,6 +826,7 @@ EOT;
                   ))
             .' <input type="button" name="select" value="select" onClick="if (confirm(' . sprintf("'%s'", htmlspecialchars($confirm_msg)) . ')) window.location.href=' . sprintf("'%s'", htmlspecialchars($this->page->buildLink($params_replace))) . ';" />';
         }
+
         if (!empty($replace)) {
           $ret = '<p>'
                . sprintf(tr('Replace %s with'), $this->formatText($orig))
@@ -852,8 +863,8 @@ EOT;
 }
 
 $display = new DisplayAuthor($page);
-if (FALSE === $display->init($page)) {
-  $page->redirect(array('pn' => ''));
+if (false === $display->init($page)) {
+  $page->redirect(['pn' => '']);
 }
 
 $page->setDisplay($display);

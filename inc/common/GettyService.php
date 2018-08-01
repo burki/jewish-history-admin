@@ -4,9 +4,9 @@
  *
  * Try to determine Person GND from Lastname, Firstname
  *
- * (c) 2015 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2015-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-05-10 dbu
+ * Version: 2018-07-23 dbu
  *
  *
  */
@@ -61,7 +61,7 @@ class GettyPlaceData
 
             $count = $resource->countValues($key);
             if ($count > 1) {
-                $collect = array();
+                $collect = [];
                 $properties = $resource->all($key);
                 foreach ($properties as $property) {
                     $value = $property->getValue();
@@ -93,7 +93,7 @@ class GettyPlaceData
         $place = new GettyPlaceData();
 
         \EasyRdf_Namespace::set('gvp', 'http://vocab.getty.edu/ontology#');
-        $graph = $place->executeRdfQuery($url, array('Accept' => 'application/rdf+xml'));
+        $graph = $place->executeRdfQuery($url, ['Accept' => 'application/rdf+xml']);
         if (!isset($graph)) {
             return;
         }
@@ -117,7 +117,7 @@ class GettyPlaceData
             foreach ($prefLabels as $prefLabel) {
                 if ($prefLabel instanceof \EasyRdf_Resource) {
                     $subgraph = $place->executeRdfQuery($prefLabel->getUri(),
-                                                        array('Accept' => 'application/rdf+xml'));
+                                                        ['Accept' => 'application/rdf+xml']);
                     $subresource = $subgraph->resource($prefLabel->getUri());
                     $preferredName = $subresource->get('gvp:term')->getValue();
                     $values['preferredName'] = $preferredName;
@@ -134,8 +134,8 @@ class GettyPlaceData
         }
 
         $place->setValuesFromResource($values, $resource,
-                                     array(
-                                           'parentString' => 'parentPath'),
+                                     [
+                                           'parentString' => 'parentPath'],
                                      'gvp');
         $uri = $resource->get('gvp:broaderPreferred')->getUri();
         if (preg_match('/'
@@ -174,7 +174,7 @@ class GettyPlaceData
         $schemaPlace = $resource->get('foaf:focus');
         if (isset($schemaPlace)) {
             $place->setValuesFromResource($values, $schemaPlace,
-                                         array('lat' => 'latitude', 'long' => 'longitude'),
+                                         ['lat' => 'latitude', 'long' => 'longitude'],
                                          'geo');
 
         }

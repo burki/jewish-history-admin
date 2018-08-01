@@ -6,7 +6,7 @@
  *
  * (c) 2007-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-02-19 dbu
+ * Version: 2018-07-23 dbu
  *
  * Changes:
  *
@@ -104,6 +104,7 @@ extends TablemanagerRecord
             }
         }
       }
+
       if (isset($message_id) && $message_id > 0 && count($users) > 0) {
         $dbconn = $this->params['dbconn'];
 
@@ -118,7 +119,7 @@ extends TablemanagerRecord
             $sql_values = [];
             $sql_values['name'] = 0 == $ord && !empty($_POST['user']) ? sprintf("'%s'", addslashes($_POST['user'])) : 'NULL';
             /* foreach ([ 'email', 'institution' ] as $name) {
-              $value = 0 == $ord ? $this->get_value('user_' . $name) : NULL;
+              $value = 0 == $ord ? $this->get_value('user_' . $name) : null;
               $sql_values[$name] = !empty($value) ? sprintf("'%s'", addslashes($value)) : 'NULL';
             } */
             if (!empty($user_id)) {
@@ -128,7 +129,7 @@ extends TablemanagerRecord
               $dbconn->query($querystr);
             }
           }
-          $stored[$user_id] = TRUE;
+          $stored[$user_id] = true;
         }
       }
     }
@@ -150,7 +151,7 @@ extends TablemanagerRecord
                           . " WHERE message_id=%d ORDER BY MessageUser.ord",
                           $message_id);
       $dbconn->query($querystr);
-      $first = TRUE;
+      $first = true;
       $users_options = [];
       $users_labels = [];
       while ($dbconn->next_record()) {
@@ -166,7 +167,7 @@ extends TablemanagerRecord
                              $dbconn->Record['lastname'] . ' ' . $dbconn->Record['firstname']);
           }
 
-          $first = FALSE;
+          $first = false;
         }
         else {
           $this->users[(string)$dbconn->Record['user_id']]
@@ -217,11 +218,11 @@ extends DisplayBackend
     'status' => 'Status',
     'date' => 'Publication',
   ];
-  var $idcol_listing = TRUE;
+  var $idcol_listing = true;
 
-  var $search_fulltext = NULL;
+  var $search_fulltext = null;
 
-  var $tinymce_fields = NULL; // changed to [] if browser supports
+  var $tinymce_fields = null; // changed to [] if browser supports
 
   var $condition = [];
   var $order = [
@@ -247,7 +248,7 @@ extends DisplayBackend
 
   var $view_options = [];
 
-  function __construct (&$page, $workflow = NULL) {
+  function __construct (&$page, $workflow = null) {
     parent::__construct($page, isset($workflow) ? $workflow : new DisplayMessageFlow($page));
 
     if (isset($this->type)) {
@@ -314,23 +315,23 @@ extends DisplayBackend
     $record->datetime_style = $this->datetime_style;
 
     $record->add_fields([
-      new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => TRUE)),
-      new Field(array('name' => 'type', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->type)),
-      new Field(array('name' => 'status', 'type' => 'select',
-                      'options' => array_keys($this->status_options),
-                      'labels' => array_values($this->status_options),
-                      'datatype' => 'int', 'default' => $this->status_default)),
-      new Field(array('name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => TRUE)),
-      new Field(array('name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => TRUE, 'noupdate' => TRUE)),
-      new Field(array('name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()')),
-      new Field(array('name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => TRUE)),
-      new Field(array('name' => 'published', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE)),
-      new Field(array('name' => 'subject', 'id' => 'subject', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 160)),
-      new Field(array('name' => 'user', 'type' => 'text', 'nodbfield' => TRUE, 'null' => TRUE)),
-      new Field(array('name' => 'user_id', 'type' => 'int', 'nodbfield' => TRUE, 'null' => TRUE)),
-      new Field(array('name' => 'users', 'type' => 'select', 'multiple' => TRUE, 'nodbfield' => TRUE, 'null' => TRUE)),
-      new Field(array('name' => 'body', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 20, 'null' => TRUE)),
-      new Field(array('name' => 'comment', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 15, 'null' => TRUE)),
+      new Field([ 'name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => true ]),
+      new Field([ 'name' => 'type', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->type]),
+      new Field([ 'name' => 'status', 'type' => 'select',
+                  'options' => array_keys($this->status_options),
+                  'labels' => array_values($this->status_options),
+                  'datatype' => 'int', 'default' => $this->status_default ]),
+      new Field([ 'name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => true ]),
+      new Field([ 'name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => true, 'noupdate' => true ]),
+      new Field([ 'name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()' ]),
+      new Field([ 'name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => true ]),
+      new Field([ 'name' => 'published', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => true ]),
+      new Field([ 'name' => 'subject', 'id' => 'subject', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 160 ]),
+      new Field([ 'name' => 'user', 'type' => 'text', 'nodbfield' => true, 'null' => true ]),
+      new Field([ 'name' => 'user_id', 'type' => 'int', 'nodbfield' => true, 'null' => true ]),
+      new Field([ 'name' => 'users', 'type' => 'select', 'multiple' => true, 'nodbfield' => true, 'null' => true ]),
+      new Field([ 'name' => 'body', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 20, 'null' => true ]),
+      new Field([ 'name' => 'comment', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 15, 'null' => true ]),
     ]);
 
     return $record;
@@ -350,8 +351,8 @@ extends DisplayBackend
 
     // reverse specialchars
     // see http://www.alanwood.net/unicode/general_punctuation.html
-    $match = array('/&mdash;/', '/&ndash;/', '/&lsquo;/', '/&rsquo;/', '/&ldquo;/', '/&rdquo;/', '/&bdquo;/'); //  '/&amp;/', '/&lt;/', '/&gt;/', '/&nbsp;/');
-    $replace = array('--', '&#8211;', '&#8216;', '&#8217;', '&#8220;', '&#8221;', '&#8222;'); // , '&', '<', '>', ' ');
+    $match = ['/&mdash;/', '/&ndash;/', '/&lsquo;/', '/&rsquo;/', '/&ldquo;/', '/&rdquo;/', '/&bdquo;/']; //  '/&amp;/', '/&lt;/', '/&gt;/', '/&nbsp;/');
+    $replace = ['--', '&#8211;', '&#8216;', '&#8217;', '&#8220;', '&#8221;', '&#8222;']; // , '&', '<', '>', ' ');
     $ret = preg_replace($match, $replace, $ret, -1);
 
     // replace literal entities
@@ -364,7 +365,7 @@ extends DisplayBackend
     return new MessageQueryConditionBuilder($term);
   }
 
-  function setInput ($values = NULL) {
+  function setInput ($values = null) {
     parent::setInput($values);
     if (isset($this->tinymce_fields) && count($this->tinymce_fields) > 0) {
       foreach ($this->tinymce_fields as $fieldname) {
@@ -504,18 +505,18 @@ EOT;
     }
 
     return [
-      'id' => FALSE, 'type' => FALSE, // hidden fields
+      'id' => false, 'type' => false, // hidden fields
       'user' => [ 'label' => 'Contributor', 'value' => $user_value ],
       'subject' => [ 'label' => 'Title' ],
       'status' => [ 'label' => 'Editing Status' ],
       'published' => [ 'label' => 'Publication Date' ],
-      isset($this->form) ? $this->form->show_submit(ucfirst(tr('save'))) : 'FALSE',
+      isset($this->form) ? $this->form->show_submit(ucfirst(tr('save'))) : false,
 
       'body' => [ 'label' => 'Text' ],
       'users' => [ 'label' => 'Additional Contributors', 'value' => $additional_user_value ],
       'comment' => [ 'label' => 'Internal notes and comments' ],
 
-      isset($this->form) ? $this->form->show_submit(ucfirst(tr('save'))) : 'FALSE',
+      isset($this->form) ? $this->form->show_submit(ucfirst(tr('save'))) : false,
     ];
   }
 
@@ -567,7 +568,7 @@ EOT;
     return $changed . parent::renderEditForm($rows, $name);
   }
 
-  function buildStatusOptions ($options = NULL) {
+  function buildStatusOptions ($options = null) {
     if (!isset($options)) {
       $options = & $this->status_options;
     }
@@ -662,8 +663,8 @@ EOT;
   }
 
   /* attention - only fits admin_article */
-  function buildListingCell (&$row, $col_index, $val = NULL) {
-    $val = NULL;
+  function buildListingCell (&$row, $col_index, $val = null) {
+    $val = null;
 
     if (count($this->cols_listing) - 3 == $col_index && !empty($this->view_options['section'])) {
       $sections = [];

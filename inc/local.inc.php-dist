@@ -29,7 +29,7 @@ define('UPLOAD_PATH2MAGICK', '/usr/bin/'); // '/usr/X11R6/bin/';
 
 $URL_REWRITE = []; // no rewrite rules
 
-define('OUTPUT_COMPRESS', FALSE); // set to TRUE to use output compression
+define('OUTPUT_COMPRESS', false); // set to true to use output compression
 
 // define('SMTP_HOST', 'smtp.host.com');
 // define('SMTP_USERNAME', 'smtp@smtp.host.com');
@@ -37,12 +37,12 @@ define('OUTPUT_COMPRESS', FALSE); // set to TRUE to use output compression
 // define('SMTP_ENCRYPTION', 'ssl');
 // define('SMTP_PORT', 465);
 
-define('MAIL_SEND', TRUE); // only do actual mailings if this is set to true
+define('MAIL_SEND', true); // only do actual mailings if this is set to true
 
 $AUTH_METHODS = [
-  'AUTH_LOCAL' => TRUE,                    // authenticate through form against local db
+  'AUTH_LOCAL' => true,                    // authenticate through form against local db
   // 'AUTH_FORCE' => 'USER'                // force fixed user
-  // 'AUTH_ANONYMOUS' => TRUE,             // browse anonymously
+  // 'AUTH_ANONYMOUS' => true,             // browse anonymously
 ];
 
 // define a database-connection class
@@ -78,15 +78,15 @@ class DB extends DB_Sql
       if (preg_match("/Incorrect key file for table: '([^']+)'. Try to repair it/", $this->Error, $matches)) {
         $table = $matches[1];
         if (!$this->repair[$table]) {
-          $this->repair[$table] = TRUE;
+          $this->repair[$table] = true;
           $ignore_user_abort = ignore_user_abort(1); // no one should stop this
           set_time_limit(300); // give this 5 minutes
           $querystr = "REPAIR TABLE $table EXTENDED";
           $this->query($querystr);
-          $success = FALSE;
+          $success = false;
           while ($this->next_record()) {
             if ($this->Record['Msg_type'] == 'status' && $this->Record['Msg_text'] == 'OK') {
-              $success = TRUE;
+              $success = true;
             }
           }
           if (!$ignore_user_abort) {

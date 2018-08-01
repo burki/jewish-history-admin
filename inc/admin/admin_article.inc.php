@@ -6,7 +6,7 @@
  *
  * (c) 2009-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-02-19 dbu
+ * Version: 2018-07-23 dbu
  *
  * Changes:
  *
@@ -47,6 +47,7 @@ extends MessageQueryConditionBuilder
       else {
         $ret = $fields[0] . '=' . intval($this->term);
       }
+
       // build aggregate states
       /* if (0 == intval($this->term)) {
         // also show expired on holds
@@ -60,7 +61,6 @@ extends MessageQueryConditionBuilder
 
     return  $fields[0] . '<>-1';
   }
-
 }
 
 class MessageWithPublicationRecord
@@ -92,7 +92,7 @@ extends MessageRecord
 class DisplayArticle
 extends DisplayMessage
 {
-  // var $show_xls_export = TRUE;
+  // var $show_xls_export = true;
   var $status_options;
   var $status_default = '-99';
 
@@ -165,7 +165,7 @@ extends DisplayMessage
 
   function init () {
     $ret = parent::init();
-    if (FALSE === $ret) {
+    if (false === $ret) {
       return $ret;
     }
 
@@ -218,8 +218,9 @@ extends DisplayMessage
     return new MessageWithPublicationRecord([ 'tables' => $this->table, 'dbconn' => $this->page->dbconn ]);
   }
 
-  function buildStatusOptions ($options = NULL, $show_all = true) {
+  function buildStatusOptions ($options = null, $show_all = true) {
     $options = [ '100' => '_&#252;berf&#228;llig_' ] + $this->status_options;
+
     return parent::buildStatusOptions($options);
   }
 
@@ -236,7 +237,7 @@ extends DisplayMessage
           for ($i = 0; $i < count($LANGUAGES_FEATURED); $i++) {
             $languages_ordered[$LANGUAGES_FEATURED[$i]] = $languages[$LANGUAGES_FEATURED[$i]];
           }
-          $languages_ordered['&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;'] = FALSE; // separator
+          $languages_ordered['&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;'] = false; // separator
         }
 
         foreach ($languages as $iso639_2 => $name) {
@@ -321,7 +322,7 @@ extends DisplayMessage
     $this->view_options['license'] = $license_options = $this->buildOptions('license');
 
     $record->add_fields([
-      new Field([ 'name' => 'status_flags', 'type' => 'checkbox', 'datatype' => 'bitmap', 'null' => TRUE, 'default' => 0,
+      new Field([ 'name' => 'status_flags', 'type' => 'checkbox', 'datatype' => 'bitmap', 'null' => true, 'default' => 0,
                   'labels' => [
                     0x01 => tr('Peer Review') . ' ' . tr('finalized'),
                     0x02 => tr('Markup') . ' ' . tr('finalized'),
@@ -331,56 +332,56 @@ extends DisplayMessage
                     0x20 => tr('ready for publishing'),
                    ]]),
       new Field([ 'name' => 'publication', 'type' => 'hidden', 'datatype' => 'int',
-                  'nodbfield' => TRUE, 'null' => TRUE ]),
+                  'nodbfield' => true, 'null' => true ]),
       new Field([ 'name' => 'section', 'type' => 'select',
                   'options' => array_merge([ /*''*/ ], array_keys($this->section_options)),
                   'labels' => array_merge([ /*tr('-- please select --')*/ ], array_values($this->section_options)),
-                  /* 'datatype' => 'int', 'multiple' => FALSE, */
-                  'datatype' => 'char', 'multiple' => TRUE, 'class' => 'chosen-select',
-                  'null' => FALSE ]),
+                  /* 'datatype' => 'int', 'multiple' => false, */
+                  'datatype' => 'char', 'multiple' => true, 'class' => 'chosen-select',
+                  'null' => false ]),
       new Field([ 'name' => 'editor', 'type' => 'select',
                   'options' => array_merge([ '' ], array_keys($this->editor_options)),
                   'labels' => array_merge([ tr('-- none --') ], array_values($this->editor_options)),
-                  'datatype' => 'int', 'null' => TRUE ]),
+                  'datatype' => 'int', 'null' => true ]),
       new Field([ 'name' => 'referee', 'type' => 'select',
                   'options' => array_merge([ '' ], array_keys($this->referee_options)),
                   'labels' => array_merge([ tr('-- none --') ], array_values($this->referee_options)),
-                  'datatype' => 'int', 'null' => TRUE ]),
+                  'datatype' => 'int', 'null' => true ]),
       new Field([ 'name' => 'lang', 'type' => 'select', 'datatype' => 'char',
                    'options' => array_keys($languages_ordered),
-                   'labels' => array_values($languages_ordered), 'null' => TRUE ]),
+                   'labels' => array_values($languages_ordered), 'null' => true ]),
       new Field([ 'name' => 'translator', 'type' => 'select',
                       'options' => array_merge([ '' ], array_keys($this->translator_options)),
                       'labels' => array_merge([ tr('-- none --') ], array_values($this->translator_options)),
-                      'datatype' => 'int', 'null' => TRUE ]),
+                      'datatype' => 'int', 'null' => true ]),
       new Field([ 'name' => 'status_translation', 'type' => 'select', 'datatype' => 'char',
                   'options' => array_keys($this->status_translation_options),
-                  'labels' => array_values($this->status_translation_options), 'null' => TRUE ]),
+                  'labels' => array_values($this->status_translation_options), 'null' => true ]),
 
-      new Field([ 'name' => 'modified', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE ]),
-      new Field([ 'name' => 'reviewer_request', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE ]),
-      new Field([ 'name' => 'reviewer_sent', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE ]),
-      new Field([ 'name' => 'reviewer_deadline', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE ]),
-      new Field([ 'name' => 'reviewer_received', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE ]),
-      new Field([ 'name' => 'referee_sent', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE ]),
-      new Field([ 'name' => 'referee_deadline', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE ]),
+      new Field([ 'name' => 'modified', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => true ]),
+      new Field([ 'name' => 'reviewer_request', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => true ]),
+      new Field([ 'name' => 'reviewer_sent', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => true ]),
+      new Field([ 'name' => 'reviewer_deadline', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => true ]),
+      new Field([ 'name' => 'reviewer_received', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => true ]),
+      new Field([ 'name' => 'referee_sent', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => true ]),
+      new Field([ 'name' => 'referee_deadline', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => true ]),
 
-      new Field([ 'name' => 'publisher_request', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE ]),
-      new Field([ 'name' => 'publisher_received', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE ]),
+      new Field([ 'name' => 'publisher_request', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => true ]),
+      new Field([ 'name' => 'publisher_received', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => true ]),
 
-      new Field([ 'name' => 'imprimatur_sent', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => TRUE ]),
+      new Field([ 'name' => 'imprimatur_sent', 'type' => 'datetime', 'datatype' => 'datetime', 'null' => true ]),
 
-      new Field([ 'name' => 'slug_de', 'id' => 'slug_de', 'type' => 'text', 'datatype' => 'char', 'size' => 45, 'maxlength' => 200, 'null' => TRUE ]),
-      new Field([ 'name' => 'slug', 'id' => 'slug', 'type' => 'text', 'datatype' => 'char', 'size' => 45, 'maxlength' => 200, 'null' => TRUE ]),
+      new Field([ 'name' => 'slug_de', 'id' => 'slug_de', 'type' => 'text', 'datatype' => 'char', 'size' => 45, 'maxlength' => 200, 'null' => true ]),
+      new Field([ 'name' => 'slug', 'id' => 'slug', 'type' => 'text', 'datatype' => 'char', 'size' => 45, 'maxlength' => 200, 'null' => true ]),
       new Field([ 'name' => 'license', 'id' => 'license', 'type' => 'select',
                   'options' => array_keys($license_options),
-                  'labels' => array_values($license_options), 'datatype' => 'char', 'null' => TRUE ]),
-      new Field([ 'name' => 'comment_imprimatur', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE ]),
-      new Field([ 'name' => 'comment_review', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE ]),
-      new Field([ 'name' => 'comment_markup', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE ]),
-      new Field([ 'name' => 'comment_bibliography', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE ]),
-      new Field([ 'name' => 'comment_translation', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE ]),
-      new Field([ 'name' => 'comment_translation_markup', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE ]),
+                  'labels' => array_values($license_options), 'datatype' => 'char', 'null' => true ]),
+      new Field([ 'name' => 'comment_imprimatur', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => true ]),
+      new Field([ 'name' => 'comment_review', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => true ]),
+      new Field([ 'name' => 'comment_markup', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => true ]),
+      new Field([ 'name' => 'comment_bibliography', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => true ]),
+      new Field([ 'name' => 'comment_translation', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => true ]),
+      new Field([ 'name' => 'comment_translation_markup', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => true ]),
     ]);
 
     if (!isset($this->workflow->id)) {
@@ -449,8 +450,10 @@ extends DisplayMessage
             params.section = selected.join(', ');
           }
         }
+
         if ('reviewer_sent' == mode || 'reviewer_reminder' == mode) {
           params.reviewer_deadline = form.elements['reviewer_deadline'].value;
+
           if (null == params.reviewer_deadline || "" == params.reviewer_deadline) {
             alert('Bitte setzen Sie erst ein Datum im Feld "Vereinbarte Abgabe"');
             return;
@@ -473,6 +476,7 @@ extends DisplayMessage
       title = subject.value;
       if ("" == title) {
         alert('Bitte tragen Sie erst einen Titel ein');
+
         return;
       }
 
@@ -484,6 +488,7 @@ extends DisplayMessage
         var user_id = form.elements['user_id'].value;
         if ("" != user_id) {
           user_id = + user_id;
+
           if (!isNaN(user_id)) {
             pars += '&user_id=' + user_id;
           }
@@ -500,6 +505,7 @@ extends DisplayMessage
     function setSlug (originalRequest, obj) {
       if (obj.status > 0) {
         var field = \$('slug_de');
+
         if (null != field) {
           field.value = obj.title_slug;
         }
@@ -546,7 +552,7 @@ EOT;
       ], 'status');
 
     $rows = array_merge_at($rows, [
-      'modified' => array('label' => 'Last Modified Date'),
+      'modified' => ['label' => 'Last Modified Date'],
       'reviewer_request' => [
       'label' => 'Author contacted',
       'value' => 'edit' == $mode
@@ -609,6 +615,7 @@ EOT;
       else {
         $finalized = (0 != ($status_flags_value & $options['mask']) ? tr('finalized') . '<br />' : '');
       }
+
       $additional['comment_' . $key] = [
         'label' => $options['label'],
         'value' => $finalized
@@ -624,6 +631,7 @@ EOT;
     else {
       $finalized = (0 != ($status_flags_value & 0x20) ? tr('ready for publishing') . '<br />' : '');
     }
+
     $additional['status_source'] = [
       'label' => 'Source',
       'value' => $finalized,
@@ -662,15 +670,18 @@ EOT;
       if (empty($publications)) {
         $publications = '<ul id="publications" class="sortableList">';
       }
+
       $params_remove['publication_remove'] = $params_view['view'] = $dbconn->Record['id'];
       $publisher_place_year = '';
       if (!empty($dbconn->Record['place'])) {
         $publisher_place_year = $dbconn->Record['place'];
       }
+
       if (!empty($dbconn->Record['publisher'])) {
         $publisher_place_year .= (!empty($publisher_place_year) ? ': ' : '')
           . $dbconn->Record['publisher'];
       }
+
       if (!empty($dbconn->Record['year'])) {
         $publisher_place_year .= (!empty($publisher_place_year) ? ', ' : '')
           . $dbconn->Record['year'];
@@ -689,6 +700,7 @@ EOT;
             : '')
         . '</li>';
     }
+
     if ($this->checkAction(TABLEMANAGER_EDIT) && !empty($publications)) {
       $publications .= '</ul>';
       $msg_submit = tr('Store updated order');
@@ -704,6 +716,7 @@ return true;
 </script>
 EOT;
     }
+
     $ret .= '<hr />'
           . $this->buildContentLine(tr('Covered Source(s)'), $publication_selector . $publications);
 
@@ -743,18 +756,18 @@ EOT;
     $images = [
       'document' => [
         'title' => tr('Dokumente (Texte, Bilder, ...)'),
-        'multiple' => TRUE,
+        'multiple' => true,
         'imgparams' =>[
           'max_width' => 300, 'max_height' => 300,
           'scale' => 'down',
           'keep' => 'large',
-          'keep_orig' => TRUE,
+          'keep_orig' => true,
           'title' => 'File',
-          'pdf' => TRUE,
-          'audio' => TRUE,
-          'video' => TRUE,
-          'office' => TRUE,
-          'xml' => TRUE,
+          'pdf' => true,
+          'audio' => true,
+          'video' => true,
+          'office' => true,
+          'xml' => true,
         ],
         'labels' => [
           'source' => 'Source',
@@ -768,7 +781,7 @@ EOT;
 }
 
 $display = new DisplayArticle($page);
-if (FALSE === $display->init()) {
+if (false === $display->init()) {
   $page->redirect([ 'pn' => '' ]);
 }
 $page->setDisplay($display);

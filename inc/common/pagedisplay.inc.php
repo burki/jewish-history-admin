@@ -22,15 +22,15 @@ class PageDisplayBase
   var $style = '';
   var $image_wrap_div_class = '';
   var $image_caption_class = 'caption';
-  var $image_caption_setwidth = FALSE;
-  var $span_range = NULL; // '[\x{3400}-\x{9faf}]';
+  var $image_caption_setwidth = false;
+  var $span_range = null; // '[\x{3400}-\x{9faf}]';
   var $span_class = ''; // 'cn';
 
   function __construct (&$page) {
     $this->page = $page;
   }
 
-  function buildCountryOptions ($prepend_featured = FALSE) {
+  function buildCountryOptions ($prepend_featured = false) {
     require_once INC_PATH . 'common/classes.inc.php';
 
     $countries = Countries::getAll($this->page->lang());
@@ -48,7 +48,7 @@ class PageDisplayBase
     $line = chr(hexdec('E2')) . chr(hexdec(94)) . chr(hexdec(80));
     $countries_ordered[''] = $line;
     */
-    $countries_ordered['&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;'] = FALSE; // separator
+    $countries_ordered['&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;'] = false; // separator
     foreach ($countries as $cc => $name) {
       if (!isset($countries_ordered[$cc])) {
         $countries_ordered[$cc] = $name;
@@ -82,7 +82,7 @@ class PageDisplayBase
           // var_dump($img_name);
           list($tag, $caption, $copyright) =
             $this->buildImage($this->image['item_id'], $this->image['type'],
-                              $img_name, TRUE, FALSE, TRUE);
+                              $img_name, true, false, true);
 
           if (!isset($tag)) {
             return '';
@@ -109,7 +109,7 @@ class PageDisplayBase
           $ret = $tag;
 
           // build the caption
-          if ($this->image_caption_class !== FALSE && (!empty($caption) || !empty($copyright))) {
+          if ($this->image_caption_class !== false && (!empty($caption) || !empty($copyright))) {
             $caption_style = '';
             if (isset($this->image_caption_setleft)) {
               $caption_style .= 'left:' . $left . 'px;';
@@ -175,7 +175,7 @@ class PageDisplayBase
                    $url, $this->formatText($options['text']));
   }
 
-  function instantiateEncoder ($paragraph_mode = TRUE) {
+  function instantiateEncoder ($paragraph_mode = true) {
     $encoder = @Text_Wiki_CmsCode::factory('CmsCode');
     $encoder->setFormatConf('Xhtml', 'translate', HTML_SPECIALCHARS); // default HTML_ENTITIES messes up &Zcaron
     if ('utf-8' == $this->charset) {
@@ -199,7 +199,7 @@ class PageDisplayBase
   }
 
   function formatText ($txt) {
-    $encoder = $this->instantiateEncoder(FALSE);
+    $encoder = $this->instantiateEncoder(false);
 
     return preg_replace('/\n/', '<br />', trim($this->adjustCharacters(@$encoder->transform($txt))));
   }
@@ -216,9 +216,9 @@ class PageDisplayBase
 
   function formatParagraphs ($txt, $options = '') {
     // $txt = $this->htmlSpecialchars ($txt);
-    $encoder = $this->instantiateEncoder(TRUE);
+    $encoder = $this->instantiateEncoder(true);
 
-    $class = ''; $enable_list = FALSE;
+    $class = ''; $enable_list = false;
     switch (gettype($options)) {
       case 'array':
           if (array_key_exists('class', $options))
@@ -299,7 +299,7 @@ class PageDisplayBase
     return $folder.$name.$MEDIA_EXTENSIONS[$mime];
   }
 
-  function buildImgUrl ($item_id, $type, $name, $mime, $append_uid = FALSE) {
+  function buildImgUrl ($item_id, $type, $name, $mime, $append_uid = false) {
     global $MEDIA_EXTENSIONS, $UPLOAD_TRANSLATE;
     static $uid;
     if (empty($uid))
@@ -341,7 +341,7 @@ class PageDisplayBase
           $attrs['width'] = $size[0]; $attrs['height'] = $size[1];
         }
         $fname_large = preg_replace('/(\_small)?\.([^\.]+)$/', '_large.\2', $fname);
-        if (isset($attrs['enlarge']) && $attrs['enlarge'] !== FALSE) {
+        if (isset($attrs['enlarge']) && $attrs['enlarge'] !== false) {
           // var_dump($fname_large);
 
           if (file_exists($fname_large)) {
@@ -409,7 +409,7 @@ class PageDisplayBase
   }
 
   function buildImage($item_id, $type, $img_name,
-                      $enlarge = FALSE, $append_uid = FALSE, $return_caption = FALSE, $alt = NULL) {
+                      $enlarge = false, $append_uid = false, $return_caption = false, $alt = null) {
     $dbconn = new DB;
 
     $img = $this->fetchImage($dbconn, $item_id, $type, $img_name);
@@ -420,7 +420,7 @@ class PageDisplayBase
       $params = array('width' => $img['width'], 'height' => $img['height'],
                       'enlarge' => $enlarge, 'enlarge_caption' => $this->formatText($caption),
                       'border' => 0);
-      if (NULL !== $alt) {
+      if (null !== $alt) {
         $params['alt'] = $params['title'] = $alt;
       }
 
@@ -441,7 +441,7 @@ class PageDisplayBase
 
     if (file_exists($fname_full)) {
       // check mimetype to determine how to render
-      $unknown = TRUE;
+      $unknown = true;
       list($width, $height, $type, $attr) = @getimagesize($fname_full);
       if (isset($type)) {
         global $MEDIA_EXTENSIONS;
@@ -460,7 +460,7 @@ class PageDisplayBase
                                         $name_append,
                                         $MEDIA_EXTENSIONS[$mime_type]);
                 $fname_scaled_full = UPLOAD_FILEROOT . $fname_scaled;
-                $scale = TRUE;
+                $scale = true;
                 if (file_exists($fname_scaled_full)) {
                   // if scaled file exists, we rescale only if large file was modified after scaled one
                   $scale = filemtime($fname_full) >= filemtime($fname_scaled_full);
@@ -602,7 +602,7 @@ EOT;
   }
 
   function setOutputCompression () {
-    static $compress_set = FALSE;  // only send the header once
+    static $compress_set = false;  // only send the header once
 
     if (headers_sent() || $compress_set) {
       return $compress_set;
@@ -617,10 +617,10 @@ EOT;
 
       // Tell the browser the content is compressed with gzip
       header("Content-Encoding: gzip");
-      return $compress_set = TRUE;
+      return $compress_set = true;
     }
 
-    return FALSE;
+    return false;
   }
 
   function setHttpHeaders () {

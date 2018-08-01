@@ -6,7 +6,7 @@
  *
  * (c) 2008-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-05-22 dbu
+ * Version: 2018-07-23 dbu
  *
  * Changes:
  *
@@ -33,10 +33,10 @@ extends DisplayTable
   var $fields_listing = [ 'id', 'to_email', 'subject', 'IFNULL(sent,changed)' ]; // , 'status' ];
 
   var $condition = [
-    array('name' => 'search', 'method' => 'buildLikeCondition', 'args' => 'to_email'),
+    [ 'name' => 'search', 'method' => 'buildLikeCondition', 'args' => 'to_email' ],
   ];
-  var $order = [ array('sent DESC') ];
-  var $view_after_edit = TRUE;
+  var $order = [ [ 'sent DESC' ] ];
+  var $view_after_edit = true;
   var $listing_default_action = TABLEMANAGER_VIEW;
 
   var $defaults = [];
@@ -101,7 +101,7 @@ extends DisplayTable
       }
       $this->publications = $publications;
 
-      if (in_array($_GET['mode'], array('publisher_request', 'publisher_vouchercopy'))
+      if (in_array($_GET['mode'], [ 'publisher_request', 'publisher_vouchercopy' ])
           && count($this->publications) > 0)
       {
         $dbconn = & $this->page->dbconn;
@@ -144,10 +144,10 @@ extends DisplayTable
             (array_key_exists($_GET['mode'], $SUBJECT) ? $SUBJECT[$_GET['mode']] . ' ' : '')
             . tr($SITE['pagetitle']);
           $fname_template = INC_PATH . 'messages/' . $_GET['mode'] . '.txt';
-          if (FALSE !== ($template = @file_get_contents($fname_template))) {
+          if (false !== ($template = @file_get_contents($fname_template))) {
             // fill in template
             $this->defaults['body'] = preg_replace_callback('|\%([a-z_0-9]+)\%|',
-                                                            array($this, 'replacePlaceholder'),
+                                                            [$this, 'replacePlaceholder'],
                                                             $template);
           }
           break;
@@ -168,11 +168,10 @@ extends DisplayTable
     $parFormat = new ParFormat();
     $parRight = new ParFormat('right');
 
-    //Rtf document
+    // Rtf document
     $rtf = new Rtf();
 
     // headers
-
     $header = $rtf->addHeader('first');
     $header->addImage(INC_PATH . 'messages/rtf_header.png', $parRight);
 
@@ -187,11 +186,11 @@ extends DisplayTable
                        $times10, $parFormat);
 
 
-    //Section
+    // Section
     $sect = $rtf->addSection();
-    $null = NULL;
-    //Write utf-8 encoded text.
-    //Text is from file. But you can use another resouce: db, sockets and other
+    $null = null;
+    // Write utf-8 encoded text.
+    // Text is from file. But you can use another resouce: db, sockets and other
 
     // in office-documents, start with the address
     $to_id = $this->record->get_value('to_id');
@@ -231,7 +230,7 @@ extends DisplayTable
 
     $rtf->sendRtf();
 
-    return TRUE;
+    return true;
   }
 
   private function fetchUser ($id) {
@@ -247,7 +246,8 @@ extends DisplayTable
         $_users[$id] = $dbconn->Record;
       }
     }
-    return isset($_users[$id]) ? $_users[$id] : NULL;
+
+    return isset($_users[$id]) ? $_users[$id] : null;
   }
 
   private function fetchMessage ($id) {
@@ -262,7 +262,7 @@ extends DisplayTable
       }
     }
 
-    return isset($_messages[$id]) ? $_messages[$id] : NULL;
+    return isset($_messages[$id]) ? $_messages[$id] : null;
   }
 
   private function replacePlaceholder ($matches) {
@@ -278,9 +278,11 @@ extends DisplayTable
             case 'email_from':
               $ret = $user['email'];
               break;
+
             case 'phone_from':
               $ret = $user['phone'];
               break;
+
             default:
               $ret = (!empty($user['firstname']) ? $user['firstname'].' ' : '')
                    . $user['lastname'];
@@ -296,6 +298,7 @@ extends DisplayTable
                  . ' ' . $user['lastname'];
           }
         }
+
         if (empty($ret)) {
           $ret = 'Sehr geehrte/r Herr/Frau';
         }
@@ -305,6 +308,7 @@ extends DisplayTable
         if (isset($this->defaults['to_id'])) {
           $user = $this->fetchUser($this->defaults['to_id']);
         }
+
         $ret = isset($user) && 'F' == $user['sex']
           ? ' Autorin' : 'n Autoren';
         break;
@@ -329,6 +333,7 @@ extends DisplayTable
         if (isset($this->defaults['reviewer_id'])) {
           $user = $this->fetchUser($this->defaults['reviewer_id']);
         }
+
         if (isset($user)) {
           $ret = (!empty($user['firstname']) ? $user['firstname'].' ' : '')
                . $user['lastname'];
@@ -367,27 +372,28 @@ extends DisplayTable
     }
 
     $record->add_fields([
-      new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => TRUE)),
-      new Field(array('name' => 'sent', 'type' => 'hidden', 'datatype' => 'function', 'null' => TRUE, 'noupdate' => TRUE)),
-      new Field(array('name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => TRUE)),
-      new Field(array('name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => TRUE, 'noupdate' => TRUE)),
-      new Field(array('name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()')),
-      new Field(array('name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => TRUE)),
-      new Field(array('name' => 'from_email', 'type' => 'email', 'datatype' => 'char', 'default' => array_key_exists('from_email', $this->defaults) ? $this->defaults['from_email'] : '')),
-      new Field(array('name' => 'from_id', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => TRUE)),
-      new Field(array('name' => 'to_email', 'type' => 'email', 'datatype' => 'char', 'default' => array_key_exists('to_email', $this->defaults) ? $this->defaults['to_email'] : '')),
-      new Field(array('name' => 'to_id', 'type' => 'hidden', 'datatype' => 'int', 'default' => array_key_exists('to_id', $this->defaults) ? $this->defaults['to_id'] : '', 'null' => TRUE)),
-      new Field(array('name' => 'message_id', 'type' => 'hidden', 'datatype' => 'int', 'default' => array_key_exists('message_id', $this->defaults) ? $this->defaults['message_id'] : '', 'null' => TRUE)),
-      new Field(array('name' => 'type', 'type' => 'hidden', 'datatype' => 'int', 'default' => array_key_exists('type', $this->defaults) ? $this->defaults['type'] : 0, 'null' => TRUE, 'noupdate' => TRUE)),
-      new Field(array('name' => 'flags', 'type' => 'checkbox', 'datatype' => 'bitmap', 'null' => TRUE,
-                      'default' => array_key_exists('type', $this->defaults)
+      new Field([ 'name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => true ]),
+      new Field([ 'name' => 'sent', 'type' => 'hidden', 'datatype' => 'function', 'null' => true, 'noupdate' => true ]),
+      new Field([ 'name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => true ]),
+      new Field([ 'name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => true, 'noupdate' => true ]),
+      new Field([ 'name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()' ]),
+      new Field([ 'name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => true ]),
+      new Field([ 'name' => 'from_email', 'type' => 'email', 'datatype' => 'char', 'default' => array_key_exists('from_email', $this->defaults) ? $this->defaults['from_email'] : '' ]),
+      new Field([ 'name' => 'from_id', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => true ]),
+      new Field([ 'name' => 'to_email', 'type' => 'email', 'datatype' => 'char', 'default' => array_key_exists('to_email', $this->defaults) ? $this->defaults['to_email'] : '' ]),
+      new Field([ 'name' => 'to_id', 'type' => 'hidden', 'datatype' => 'int', 'default' => array_key_exists('to_id', $this->defaults) ? $this->defaults['to_id'] : '', 'null' => true ]),
+      new Field([ 'name' => 'message_id', 'type' => 'hidden', 'datatype' => 'int', 'default' => array_key_exists('message_id', $this->defaults) ? $this->defaults['message_id'] : '', 'null' => true ]),
+      new Field([ 'name' => 'type', 'type' => 'hidden', 'datatype' => 'int', 'default' => array_key_exists('type', $this->defaults) ? $this->defaults['type'] : 0, 'null' => true, 'noupdate' => true ]),
+      new Field([ 'name' => 'flags', 'type' => 'checkbox', 'datatype' => 'bitmap', 'null' => true,
+                  'default' => array_key_exists('type', $this->defaults)
                       && in_array($this->defaults['type'],
-                                  array(self::$TYPE_MAP['reviewer_request'], self::$TYPE_MAP['reviewer_sent']))
+                                  [self::$TYPE_MAP['reviewer_request'], self::$TYPE_MAP['reviewer_sent']])
                       ? 0x02 : 0,
-                      'labels' => array(tr('Send Bcc to From'), tr('Attach article guidelines')))),
+                  'labels' => [ tr('Send Bcc to From'), tr('Attach article guidelines') ]
+      ]),
 
-      new Field(array('name' => 'subject', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'default' => array_key_exists('subject', $this->defaults) ? $this->defaults['subject'] : '')),
-      new Field(array('name' => 'body', 'type' => 'textarea', 'datatype' => 'char', 'default' => array_key_exists('body', $this->defaults) ? $this->defaults['body'] : '', 'cols' => 65, 'rows' => 20)),
+      new Field([ 'name' => 'subject', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'default' => array_key_exists('subject', $this->defaults) ? $this->defaults['subject'] : '' ]),
+      new Field([ 'name' => 'body', 'type' => 'textarea', 'datatype' => 'char', 'default' => array_key_exists('body', $this->defaults) ? $this->defaults['body'] : '', 'cols' => 65, 'rows' => 20 ]),
     ]);
 
     return $record;
@@ -396,9 +402,9 @@ extends DisplayTable
   function getEditRows () {
     if (isset($this->form)) {
       $show_mask = 0x01;
-      if (in_array($this->form->get_value('type') == NULL
+      if (in_array($this->form->get_value('type') == null
                    ? $this->defaults['type'] : $this->form->get_value('type'),
-                   array(self::$TYPE_MAP['reviewer_request'], self::$TYPE_MAP['reviewer_sent'])))
+                   [self::$TYPE_MAP['reviewer_request'], self::$TYPE_MAP['reviewer_sent']]))
       {
         $show_mask |= 0x02;
       }
@@ -414,10 +420,10 @@ extends DisplayTable
     }
 
     $rows = [
-      'id' => FALSE, 'status' => FALSE, 'message_id' => FALSE, 'type' => FALSE, // hidden fields
+      'id' => false, 'status' => false, 'message_id' => false, 'type' => false, // hidden fields
 
-      'from_id' => FALSE, 'from_email' => array('label' => 'From'),
-      'to_id' => FALSE, 'to_email' => array('label' => 'To'),
+      'from_id' => false, 'from_email' => [ 'label' => 'From' ],
+      'to_id' => false, 'to_email' => [ 'label' => 'To' ],
     ];
 
     if (!empty($flags_value)) {
@@ -425,19 +431,19 @@ extends DisplayTable
     }
 
     $rows = $rows + [
-      'subject' => array('label' => 'Subject'),
-      'body' => array('label' => 'Body'),
+      'subject' => [ 'label' => 'Subject' ],
+      'body' => [ 'label' => 'Body' ],
 
       '<hr noshade="noshade" />',
 
-      isset($this->form) ? $this->form->show_submit(ucfirst(tr('preview'))) : 'FALSE'
+      isset($this->form) ? $this->form->show_submit(ucfirst(tr('preview'))) : false,
     ];
 
     return $rows;
   }
 
   function getViewFormats () {
-    // return array('body' => array('format' => 'p'));
+    // return [ 'body' => [ 'format' => 'p' ] ];
   }
 
   function buildEditButton () {
@@ -456,7 +462,7 @@ extends DisplayTable
     $view_rows = [];
 
     foreach ($rows as $key => $descr)
-      if ($descr !== FALSE && gettype($key) == 'string') {
+      if ($descr !== false && gettype($key) == 'string') {
         if (isset($formats[$key])) {
           $descr = array_merge($descr, $formats[$key]);
         }
@@ -473,7 +479,6 @@ extends DisplayTable
       }
     }
 
-
     $ret = '';
     if (!empty($this->page->msg)) {
       $ret .= '<p class="message">' . $this->page->msg . '</p>';
@@ -483,7 +488,7 @@ extends DisplayTable
     if ('array' == gettype($rows)) {
       foreach ($rows as $key => $row_descr) {
         if ('string' == gettype($row_descr)) {
-          $fields[] = array('&nbsp;', $row_descr);
+          $fields[] = ['&nbsp;', $row_descr];
         }
         else {
           $label = isset($row_descr['label']) ? tr($row_descr['label']).':' : '';
@@ -506,15 +511,16 @@ extends DisplayTable
                 ? $this->formatParagraphs($field_value) : $this->formatText($field_value);
           }
 
-          $fields[] = array($label, $value);
+          $fields[] = [$label, $value];
         }
       }
     }
 
     if (0 != (0x02 & $record->get_value('flags'))) {
-      $fields[] = array('Attachments', sprintf('<a href="%sdata/IGdJ_Schluesseldokumente_Guidelines.pdf">IGdJ_Schluesseldokumente_Guidelines.pdf</a>'
-                                               . '<br /><a href="%sdata/IGdJ_Schluesseldokumente_Redaktionsmodell.pdf">IGdJ_Schluesseldokumente_Redaktionsmodell.pdf</a>',
-                                              BASE_PATH, BASE_PATH));
+      $fields[] = [ 'Attachments',
+                   sprintf('<a href="%sdata/IGdJ_Schluesseldokumente_Guidelines.pdf">IGdJ_Schluesseldokumente_Guidelines.pdf</a>'
+                           . '<br /><a href="%sdata/IGdJ_Schluesseldokumente_Redaktionsmodell.pdf">IGdJ_Schluesseldokumente_Redaktionsmodell.pdf</a>',
+                           BASE_PATH, BASE_PATH)];
     }
 
     if (count($fields) > 0) {
@@ -532,8 +538,8 @@ extends DisplayTable
     $mail->attachPlain($this->record->get_value('body'));
     $mail->attachHtml($this->formatParagraphs($this->record->get_value('body')));
 
-    foreach (array('IGdJ_Schluesseldokumente_Redaktionsmodell.pdf',
-                   'IGdJ_Schluesseldokumente_Guidelines.pdf',) as $fname)
+    foreach ([ 'IGdJ_Schluesseldokumente_Redaktionsmodell.pdf',
+               'IGdJ_Schluesseldokumente_Guidelines.pdf' ] as $fname)
     {
       if (0 != (0x02 & $this->record->get_value('flags'))
           && file_exists($fname_full = BASE_FILEPATH . 'data/' . $fname))
@@ -554,8 +560,10 @@ extends DisplayTable
     $from = $this->record->get_value('from_email');
     $user = $this->fetchUser($this->record->get_value('from_id'));
     if (isset($user)) {
-      $from = array($from => (!empty($user['firstname']) ? $user['firstname'] . ' ' : '')
-                    . $user['lastname']);
+      $from = [
+        $from => (!empty($user['firstname']) ? $user['firstname'] . ' ' : '')
+          . $user['lastname'],
+      ];
     }
     $mail->setFrom($from);
 
@@ -566,6 +574,7 @@ extends DisplayTable
       $dbconn->query($querystr);
       // refetch
       $this->record->fetch($this->id);
+
       return $this->record->get_value('sent');
     }
   }
@@ -595,7 +604,7 @@ extends DisplayTable
       $ret = '<h2>' . $this->formatText($record->get_value('subject')) . ' ' . $edit . '</h2>';
 
       $actions = sprintf('<form action="%s" method="post"><p>',
-                         htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, 'view' => $this->id))));
+                         htmlspecialchars($this->page->buildLink(['pn' => $this->page->name, 'view' => $this->id])));
       if (!isset($sent)) {
         $actions .= sprintf('<input type="submit" name="send_email" value="%s" />',
                             tr('Send E-Mail'));
@@ -603,6 +612,7 @@ extends DisplayTable
       else {
         $actions .= 'Sent on ' . $sent;
       }
+
       $actions .= sprintf(' <input type="submit" name="export" value="%s" /></p></form>',
                           tr('Show Word-file'));
 
@@ -620,7 +630,8 @@ extends DisplayTable
 
   function buildSearchBar () {
     $ret = sprintf('<form action="%s" method="post">',
-                   htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, 'page_id' => 0))));
+                   htmlspecialchars($this->page->buildLink(['pn' => $this->page->name, 'page_id' => 0])));
+
     if ($this->cols_listing_count > 0) {
       $ret .= sprintf('<tr><td colspan="%d" nowrap="nowrap"><input type="text" name="search" value="%s" size="40" /><input class="submit" type="submit" value="%s" /></td></tr>',
                       $this->cols_listing_count,
@@ -635,7 +646,7 @@ extends DisplayTable
 }
 
 $display = new DisplayCommunication($page);
-if (FALSE === $display->init()) {
+if (false === $display->init()) {
   $page->redirect([ 'pn' => '' ]);
 }
 

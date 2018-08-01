@@ -16,7 +16,7 @@ require_once INC_PATH . 'common/tablemanager.inc.php';
 require_once INC_PATH . 'common/image_upload_handler.inc.php';
 
 // small helper function
-function array_merge_at ($array1, $array2, $after_field = NULL) {
+function array_merge_at ($array1, $array2, $after_field = null) {
   if (empty($after_field)) {
     return array_merge($array1, $array2);
   }
@@ -43,7 +43,7 @@ class DisplayBackendFlow
 extends TableManagerFlow
 {
   function __construct ($page) {
-    parent::__construct(TRUE); // view after edit
+    parent::__construct(true); // view after edit
   }
 
   function init ($page) {
@@ -114,7 +114,7 @@ extends ImageUploadHandler
     $img_record = parent::instantiateUploadRecord($dbconn);
 
     $img_record->add_fields([
-      new Field([ 'name' => 'additional', 'type' => 'hidden', 'cols' => 60, 'rows' => 3, 'datatype' => 'char', 'null' => TRUE ]),
+      new Field([ 'name' => 'additional', 'type' => 'hidden', 'cols' => 60, 'rows' => 3, 'datatype' => 'char', 'null' => true ]),
     ]);
 
     return $img_record;
@@ -271,7 +271,7 @@ extends DisplayTable
   function checkAction ($step) {
     if ($this->page->isAdminUser()) {
       // admins have all rights
-      return TRUE;
+      return true;
     }
 
     if (TABLEMANAGER_EDIT == $step) {
@@ -281,11 +281,11 @@ extends DisplayTable
       if (!empty($this->page->user)
           && 0 != ($this->page->user['privs'] & ($RIGHTS_ADMIN | $RIGHTS_EDITOR)))
       {
-        return TRUE;
+        return true;
       }
     }
 
-    return FALSE;
+    return false;
   }
 
   function mayEdit ($row) {
@@ -412,7 +412,7 @@ extends DisplayTable
     $view_rows = [];
 
     foreach ($rows as $key => $descr) {
-      if ($descr !== FALSE && gettype($key) == 'string') {
+      if ($descr !== false && gettype($key) == 'string') {
         if (isset($formats[$key])) {
           $descr = array_merge($descr, $formats[$key]);
         }
@@ -526,7 +526,7 @@ extends DisplayTable
     return $publications;
   }
 
-  function buildViewFooter ($found = TRUE) {
+  function buildViewFooter ($found = true) {
     $ret = ($found ? '<hr />' : '')
          . '[<a href="' . htmlspecialchars($this->page->buildLink([ 'pn' => $this->page->name ])) . '">'
          . tr('back to overview')
@@ -651,7 +651,7 @@ extends DisplayTable
     $params_self = [ 'pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_VIEW) => $this->id ];
     $action = $this->page->buildLink($params_self);
 
-    $first = TRUE;
+    $first = true;
 
     foreach ($this->images as $img_name => $img_descr) {
       $rows = [];
@@ -685,7 +685,7 @@ extends DisplayTable
 
       if ($first) {
         $ret .= $imageUpload->show_start();
-        $first = FALSE;
+        $first = false;
       }
 
       $imageUploadHandler->fetchAll();
@@ -713,7 +713,7 @@ extends DisplayTable
           $url_delete = $this->page->buildLink(array_merge($params_self,
                                                [ 'delete_img' => $img_name ]));
 
-          list($img_tag, $caption, $copyright) = $this->buildImage($imageUploadHandler->item_id, $imageUploadHandler->type, $img_name, TRUE, TRUE, TRUE);
+          list($img_tag, $caption, $copyright) = $this->buildImage($imageUploadHandler->item_id, $imageUploadHandler->type, $img_name, true, true, true);
           // var_dump($img_tag);
           if (!empty($img_tag)) {
             $delete = '';

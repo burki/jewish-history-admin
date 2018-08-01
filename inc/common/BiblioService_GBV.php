@@ -6,7 +6,7 @@
  *
  * (c) 2008-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-05-22 dbu
+ * Version: 2018-07-23 dbu
  *
  * Usage:
  *
@@ -108,6 +108,7 @@ class BiblioService_GBV
         } else {
             $url = self::WS_URL;
         }
+
         return $url . $this->getQueryString($params);
     }
 
@@ -133,10 +134,10 @@ class BiblioService_GBV
         $client->resetParameters();
         $client->setHeaders('x-http-method-override', null);
         $client->setUri($uri);
-        $client->setConfig(array('maxredirects' => self::getMaxRedirects()));
+        $client->setConfig(['maxredirects' => self::getMaxRedirects()]);
         $response = $client->request('GET');
         if ($response->getStatus() !== 200) {
-            return FALSE;
+            return false;
             // TODO: maybe switch to an exception
             /* require_once 'Zend/Gdata/App/HttpException.php';
             $exception = new Zend_Gdata_App_HttpException('Expected response code 200, got ' . $response->getStatus());
@@ -157,7 +158,7 @@ class BiblioService_GBV
                 if (isset($response[$keymap[$code]])) {
                     // append
                     if ('string' == gettype($response[$keymap[$code]])) {
-                        $response[$keymap[$code]] = array($response[$keymap[$code]]);
+                        $response[$keymap[$code]] = [$response[$keymap[$code]]];
                     }
                     $response[$keymap[$code]][] = (string)$subfield;
                 }
@@ -178,46 +179,54 @@ class BiblioService_GBV
                 case '004A':
                 case '004B':
                     $this->setResponseFromSubfields($field, $response,
-                                array('0' => 'isbn', 'A' => 'isbn',
-                                    'g' => 'binding', 'f' => 'listprice'));
+                                ['0' => 'isbn', 'A' => 'isbn',
+                                    'g' => 'binding', 'f' => 'listprice']);
                     break;
+
                 case '011@':
                     $this->setResponseFromSubfields($field, $response,
-                                array('a' => 'publication_date'));
+                                ['a' => 'publication_date']);
                     break;
+
                 case '021A':
                     $this->setResponseFromSubfields($field, $response,
-                                array('a' => 'title', 'd' => 'subtitle'));
+                                ['a' => 'title', 'd' => 'subtitle']);
                     break;
+
                 case '028A':
                     $this->setResponseFromSubfields($field, $response,
-                                array('d' => 'author_given', 'a' => 'author_surname'));
+                                ['d' => 'author_given', 'a' => 'author_surname']);
                     break;
+
                 case '028B':
                     $this->setResponseFromSubfields($field, $response,
-                                array('d' => 'authoradditional_given', 'a' => 'authoradditional_surname'));
+                                ['d' => 'authoradditional_given', 'a' => 'authoradditional_surname']);
                     break;
+
                 case '028C':
                     $this->setResponseFromSubfields($field, $response,
-                                array('d' => 'editor_given', 'a' => 'editor_surname'));
+                                ['d' => 'editor_given', 'a' => 'editor_surname']);
                     break;
+
                 case '033A':
                     $this->setResponseFromSubfields($field, $response,
-                                array('p' => 'place', 'n' => 'publisher'));
+                                ['p' => 'place', 'n' => 'publisher']);
                     break;
+
                 case '034D':
                     $this->setResponseFromSubfields($field, $response,
-                                array('a' => 'pages'));
+                                ['a' => 'pages']);
                     break;
+
                 case '036E':
                     $this->setResponseFromSubfields($field, $response,
-                                array('a' => 'series'));
+                                ['a' => 'series']);
                     break;
             }
         }
 
         // postprocesssing for title and subtitle
-        foreach (array('title', 'subtitle') as $fieldname) {
+        foreach ([ 'title', 'subtitle' ] as $fieldname) {
             if (isset($response[$fieldname])) {
                 // GBV uses @ to alphabetize differently than first word, e.g. "The @most ..."
                 $response[$fieldname] = preg_replace('/@\b/', '', $response[$fieldname]);
@@ -242,13 +251,13 @@ class BiblioService_GBV
             }
             unset($response['authoradditional_given']);
         }
-        foreach (array('author', 'editor') as $prefix) {
-            if (isset($response[$prefix.'_surname'])) {
+        foreach ([ 'author', 'editor' ] as $prefix) {
+            if (isset($response[$prefix . '_surname'])) {
                 if ('array' != gettype($response[$prefix . '_surname'])) {
-                    $response[$prefix . '_surname'] = array($response[$prefix . '_surname']);
+                    $response[$prefix . '_surname'] = [$response[$prefix . '_surname']];
                 }
                 if ('array' != gettype($response[$prefix . '_given'])) {
-                    $response[$prefix . '_given'] = array($response[$prefix . '_given']);
+                    $response[$prefix . '_given'] = [$response[$prefix . '_given']];
                 }
                 $persons = [];
                 for ($i = 0; $i < count($response[$prefix . '_surname']); $i++) {
@@ -273,9 +282,11 @@ class BiblioService_GBV
                 && $response['publication_date'] < 2007
                 ? $isbns[0] : $isbns[count($isbns) - 1];
         }
+
         if (array_key_exists('isbn', $response)) {
             $response['isbn'] = BiblioService::normalizeIsbn($response['isbn']);
         }
+
         if (array_key_exists('binding', $response) && is_array($response['binding'])) {
             $count_before = count($response['binding']);
             $response['binding'] = array_unique($response['binding']);
@@ -285,6 +296,7 @@ class BiblioService_GBV
             }
             $response['binding'] = implode(', ', $response['binding']);
         }
+
         if (array_key_exists('listprice', $response) && is_array($response['listprice'])) {
             $response['listprice'] = implode(', ', $response['listprice']);
         }
@@ -305,19 +317,21 @@ class BiblioService_GBV
             die('Other query-types than isbns not implemented yet');
         }
 
-        $params = array('query' => $query,
-                        'version' => '1.1',
-                        'operation' => 'searchRetrieve',
-                        'recordSchema' => 'picaxml',
-                        'maximumRecords' => 10,
-                        'startRecord' => 1,
-                        'recordPacking' => 'xml');
+        $params = [
+            'query' => $query,
+            'version' => '1.1',
+            'operation' => 'searchRetrieve',
+            'recordSchema' => 'picaxml',
+            'maximumRecords' => 10,
+            'startRecord' => 1,
+            'recordPacking' => 'xml',
+        ];
 
         $uri = $this->getQueryUrl($params);
 
         $xml = self::import($uri, $this->_httpClient);
 
-        if (FALSE !== $xml) {
+        if (false !== $xml) {
             $result = simplexml_load_string($xml);
             $result->registerXPathNamespace('zs', 'http://www.loc.gov/zing/srw/');
             $result->registerXPathNamespace('srw', 'info:srw/schema/5/picaXML-v1.0');
@@ -339,5 +353,4 @@ class BiblioService_GBV
             return $results;
         }
     }
-
 }

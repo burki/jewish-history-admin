@@ -6,7 +6,7 @@
  *
  * (c) 2007-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-05-22 dbu
+ * Version: 2018-07-23 dbu
  *
  * Changes:
  *
@@ -28,18 +28,18 @@ class SearchSimpleParser
   function accept($match, $state) {
     // echo "$state: -$match-<br />";
     if ($state == LEXER_UNMATCHED && strlen($match) < $this->min_length) {
-      return TRUE;
+      return true;
     }
 
     if ($state == LEXER_MATCHED) {
-      return TRUE;
+      return true;
     }
 
     if (preg_match('/\S/', $match)) {
       $this->output[] = $match;
     }
 
-    return TRUE;
+    return true;
   }
 
   function writeQuoted($match, $state) {
@@ -69,7 +69,7 @@ class SearchSimpleParser
         break;
     }
 
-    return TRUE;
+    return true;
   }
 }
 
@@ -116,7 +116,7 @@ class WsHandlerFactory
 
 class WsHandler
 {
-  var $STRIP_SLASHES = FALSE;
+  var $STRIP_SLASHES = false;
 
   function __construct(){
     $this->STRIP_SLASHES = defined('STRIP_SLASHES')
@@ -124,7 +124,7 @@ class WsHandler
   }
 
   function initSession () {
-    static $initialized = FALSE;
+    static $initialized = false;
 
     if ($initialized) {
       return;
@@ -138,10 +138,10 @@ class WsHandler
     // see also http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnpriv/html/ie6privacyfeature.asp
     header('P3P: CP="NOI NID ADMa OUR IND UNI COM NAV"');
 
-    session_start();                      // and start it
     session_cache_limiter('private');
+    session_start();                      // and start it
 
-    $initialized = TRUE;
+    $initialized = true;
   }
 
   function getUser () {
@@ -156,12 +156,12 @@ class WsHandler
     $user = $this->getUser();
 
     if (!isset($user)) {
-      return FALSE;
+      return false;
     }
 
     // check if he has enough privs
     if (-1 == $privs) {
-      return TRUE;
+      return true;
     }
 
     return 0 != ($privs & $user['privs']);
@@ -192,7 +192,7 @@ class WsHandler
       $msg = 'Invalid action ' . $_GET['action'];
     }
 
-    return new JsonResponse(array('status' => $status, 'msg' => $msg));
+    return new JsonResponse(['status' => $status, 'msg' => $msg]);
   }
 }
 
@@ -200,7 +200,7 @@ class JsonResponse
 {
   var $response;
 
-  function __construct ($response = NULL) {
+  function __construct ($response = null) {
     if (isset($response)) {
       $this->response = $response;
     }
@@ -243,8 +243,8 @@ class AutocompleterResponse
   }
 
   function htmlEncode ($txt) {
-    $match   = array('/&(?!\#x?\d+;)/s', '/</s', '/>/s', '/"/s');
-    $replace = array('&amp;', '&lt;', '&gt;', '&quot;');
+    $match   = [ '/&(?!\#x?\d+;)/s', '/</s', '/>/s', '/"/s' ];
+    $replace = [ '&amp;', '&lt;', '&gt;', '&quot;' ];
 
     // return utf8_encode(preg_replace($match, $replace, $txt, -1));
     return preg_replace($match, $replace, $txt, -1); // data already in utf-8

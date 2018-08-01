@@ -6,7 +6,7 @@
  *
  * (c) 2009-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-02-20 dbu
+ * Version: 2018-07-05 dbu
  *
  * Changes:
  *
@@ -14,9 +14,10 @@
 
 require_once INC_PATH . 'common/page.inc.php';
 
-class AdminPage extends Page
+class AdminPage
+extends Page
 {
-    protected $gettext_utf8_encode = FALSE;
+    protected $gettext_utf8_encode = false;
     var $display = 'admin';
 
     function init ($pn) {
@@ -34,6 +35,7 @@ class AdminPage extends Page
         switch ($this->name) {
             case 'pwd': // anonymous pages
                 break;
+
             default:
                 // access to logged in people
                 if (empty($this->user))
@@ -45,7 +47,6 @@ class AdminPage extends Page
         return isset($this->user['privs'])
             && 0 != ($this->user['privs'] & $GLOBALS['RIGHTS_ADMIN']);
     }
-
 }
 
 $URL_REWRITE = []; // don't do rewrites for the backend
@@ -55,68 +56,68 @@ $SITE_DESCRIPTION = [
     'structure' => [
         'root' => [
             'title' => 'Administration',
-            'anonymous' => FALSE,
+            'anonymous' => false,
         ],
         'pwd' => [
             'title' => 'Recover Password',
-            'anonymous' => TRUE,
+            'anonymous' => true,
         ],
         'author' => [
             'title' => 'Authors',
-            'anonymous' => FALSE,
+            'anonymous' => false,
         ],
         'article' => [
             'title' => 'Articles',
-            'anonymous' => FALSE,
+            'anonymous' => false,
         ],
         'publication' => [
             'title' => 'Sources',
-            'anonymous' => FALSE,
+            'anonymous' => false,
         ],
         'communication' => [
             'title' => 'Communication',
-            'anonymous' => FALSE,
+            'anonymous' => false,
         ],
         'publisher' => [
             'title' => 'Holding Institutions',
-            'anonymous' => FALSE,
+            'anonymous' => false,
         ],
         'person' => [
             'title' => 'Normdata: Persons',
-            'anonymous' => FALSE,
+            'anonymous' => false,
         ],
         'place' => [
             'title' => 'Normdata: Places',
-            'anonymous' => FALSE,
+            'anonymous' => false,
         ],
         'organization' => [
             'title' => 'Normdata: Organizations',
-            'anonymous' => FALSE,
+            'anonymous' => false,
         ],
         'event' => [
             'title' => 'Normdata: Event / Period',
-            'anonymous' => FALSE,
+            'anonymous' => false,
         ],
         'term' => [
-            'title' => 'Wertelisten',
-            'anonymous' => FALSE,
+            'title' => 'Term Sets',
+            'anonymous' => false,
         ],
         'convert' => [
-            'title' => 'TEI nach HTML',
-            'anonymous' => FALSE,
+            'title' => 'TEI to HTML',
+            'anonymous' => false,
         ],
         'zotero' => [
             'title' => 'Zotero Sync',
-            'anonymous' => FALSE,
+            'anonymous' => false,
         ],
         'account' => [
             'title' => 'Account',
-            'anonymous' => FALSE,
+            'anonymous' => false,
         ],
         'system_information' => [
             'title' => 'System Information',
-            'anonymous' => FALSE,
-            'display' => FALSE,
+            'anonymous' => false,
+            'display' => false,
         ],
     ],
 ];

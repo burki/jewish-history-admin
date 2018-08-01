@@ -6,7 +6,7 @@
  *
  * (c) 2006-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-05-22 dbu
+ * Version: 2018-07-23 dbu
  *
  * Changes:
  *
@@ -20,11 +20,11 @@ extends PageDisplayBase
   var $page;
   var $charset = 'utf-8';
   var $invalid;
-  var $is_internal = FALSE;
+  var $is_internal = false;
   var $issue;
   var $location;
-  var $stylesheet = array('admin.css');
-  var $span_range = NULL; // '[\x{3400}-\x{9faf}]';
+  var $stylesheet = [ 'admin.css' ];
+  var $span_range = null; // '[\x{3400}-\x{9faf}]';
   var $span_class = ''; // 'cn';
   var $xls_data = [];
 
@@ -55,6 +55,7 @@ extends PageDisplayBase
 
       $ret .= $field->show();
     }
+
     return $ret;
   }
 
@@ -132,7 +133,7 @@ EOT;
     return $folder . $name . $MEDIA_EXTENSIONS[$mime];
   }
 
-  function buildImgUrl ($item_id, $type, $name, $mime, $append_uid = FALSE) {
+  function buildImgUrl ($item_id, $type, $name, $mime, $append_uid = false) {
     global $MEDIA_EXTENSIONS, $UPLOAD_TRANSLATE;
     static $uid;
 
@@ -177,7 +178,7 @@ EOT;
           $attrs['width'] = $size[0]; $attrs['height'] = $size[1];
         }
         $fname_large = preg_replace('/(\_small)?\.([^\.]+)$/', '_large.\2', $fname);
-        if (isset($attrs['enlarge']) && $attrs['enlarge'] !== FALSE) {
+        if (isset($attrs['enlarge']) && $attrs['enlarge'] !== false) {
           // var_dump($fname_large);
 
           if (file_exists($fname_large)) {
@@ -250,7 +251,7 @@ EOT;
   }
 
   function buildImage($item_id, $type, $img_name,
-                      $enlarge = FALSE, $append_uid = FALSE, $return_caption = FALSE, $alt = NULL)
+                      $enlarge = false, $append_uid = false, $return_caption = false, $alt = null)
   {
     $dbconn = new DB;
 
@@ -260,15 +261,17 @@ EOT;
       $copyright = $img['copyright'];
       $img_url = $this->buildImgUrl($item_id, $type, $img_name, $img['mimetype'], $append_uid);
 
-      if (in_array($img['mimetype'], array('text/rtf',
-                                           'application/vnd.oasis.opendocument.text',
-                                           'application/msword',
-                                           'application/vnd.openxmlformats-officedocument.wordprocessingml.document'))) {
+      if (in_array($img['mimetype'], [
+            'text/rtf',
+            'application/vnd.oasis.opendocument.text',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document']))
+      {
         $img_tag = sprintf('<a href="%s" target="_blank">%s</a>',
                            htmlspecialchars($img_url),
                            $this->formatText(empty($caption) ? 'Office-Datei' : $caption));
       }
-      else if (in_array($img['mimetype'], array('application/xml'))) {
+      else if (in_array($img['mimetype'], [ 'application/xml' ])) {
         $img_tag = sprintf('<a class="previewOverlayTrigger" href="%s" target="_blank">%s</a> ',
                            htmlspecialchars(BASE_PATH . "xml.php?media_id=" . $img['media_id']),
                            $this->formatText('HTML-Vorschau'));
@@ -279,9 +282,9 @@ EOT;
                            htmlspecialchars($img_url),
                            $this->formatText(empty($caption) ? 'XML-Datei' : $caption));
       }
-      else if (in_array($img['mimetype'], array(
-                                                'audio/mpeg',
-                                                )))
+      else if (in_array($img['mimetype'], [
+            'audio/mpeg',
+          ]))
       {
         $img_tag = sprintf('<audio src="%s" preload="none" controls></audio>',
                            htmlspecialchars($img_url));
@@ -289,9 +292,9 @@ EOT;
                            htmlspecialchars($img_url),
                            $this->formatText(empty($caption) ? 'Audio' : $caption));
       }
-      else if (in_array($img['mimetype'], array(
-                                                'video/mp4',
-                                                )))
+      else if (in_array($img['mimetype'], [
+            'video/mp4',
+          ]))
       {
         $img_tag = sprintf('<div style="max-width: 800px"><video style="width: 100%%; height: auto;" src="%s" preload="none" controls></video></div>',
                            htmlspecialchars($img_url));
@@ -302,7 +305,7 @@ EOT;
       else if ('application/pdf' == $img['mimetype']) {
         if (!$append_uid) {
           $img_tag = $this->buildPdfViewer($img_url, empty($caption) ? 'PDF' : $caption,
-                                           array('thumbnail' => $this->buildThumbnailUrl($item_id, $type, $img_name, $img['mimetype'])));
+                                           ['thumbnail' => $this->buildThumbnailUrl($item_id, $type, $img_name, $img['mimetype'])]);
         }
         else {
           $img_tag = sprintf('<a href="%s" target="_blank">%s</a>',
@@ -311,8 +314,12 @@ EOT;
         }
       }
       else {
-        $params = array('width' => $img['width'], 'height' => $img['height'], 'enlarge' => $enlarge, 'enlarge_caption' => $this->formatText($caption), 'border' => 0);
-        if (NULL !== $alt) {
+        $params = [
+          'width' => $img['width'], 'height' => $img['height'],
+          'enlarge' => $enlarge,
+          'enlarge_caption' => $this->formatText($caption), 'border' => 0,
+        ];
+        if (null !== $alt) {
           $params['alt'] = $params['title'] = $alt;
         }
 
@@ -320,7 +327,7 @@ EOT;
       }
 
       if ($return_caption) {
-        return array($img_tag, $caption, $copyright);
+        return [$img_tag, $caption, $copyright];
       }
 
       return $img_tag;
@@ -345,8 +352,8 @@ EOT;
       // check if we have to setup an image for body-rendering
       foreach ($this->images as $name => $descr) {
         if (isset($descr['placement']) && 'body' == $descr['placement']) {
-          $this->image = array('item_id' => $this->workflow->primaryKey(),
-                               'type' => $media_type, 'name' => $name);
+          $this->image = ['item_id' => $this->workflow->primaryKey(),
+                               'type' => $media_type, 'name' => $name];
         }
       }
 
@@ -413,10 +420,10 @@ EOT;
   function renderUpload (&$imageUploadHandler, $title = 'Image Upload') {
     $ret = '<h2>' . $this->formatText(tr($title)) . '</h2>';
 
-    $params_self = array('pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_VIEW) => $this->id);
+    $params_self = ['pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_VIEW) => $this->id];
     $action = $this->page->buildLink($params_self);
 
-    $first = TRUE;
+    $first = true;
 
     foreach ($this->images as $img_basename => $img_descr) {
       $rows = [];
@@ -449,7 +456,7 @@ EOT;
 
       if ($first) {
         $ret .= $imageUpload->show_start();
-        $first = FALSE;
+        $first = false;
       }
 
       $imageUploadHandler->fetchAll();
@@ -477,9 +484,9 @@ EOT;
           }
 
           $url_delete = $this->page->buildLink(array_merge($params_self,
-                                               array('delete_img' => $img_name)));
+                                               ['delete_img' => $img_name]));
 
-          list($img_tag, $caption, $copyright) = $this->buildImage($imageUploadHandler->item_id, $imageUploadHandler->type, $img_name, TRUE, TRUE, TRUE);
+          list($img_tag, $caption, $copyright) = $this->buildImage($imageUploadHandler->item_id, $imageUploadHandler->type, $img_name, true, true, true);
           // var_dump($img_tag);
           if (!empty($img_tag)) {
             $img_field .= '<p><div style="margin-right: 2em; margin-bottom: 1em; float: left;">' . $img_tag . '</div>'
@@ -489,11 +496,11 @@ EOT;
 
           $rows[] = $img_field;
 
-          $rows[] = array('File', $img->show_upload_field());
-          $rows[] = array('Image Caption', $this->getUploadFormField($img_form, 'caption', array('prepend' => $img_name . '_')));
-          $rows[] = array('Copyright-Notice', $this->getUploadFormField($img_form, 'copyright', array('prepend' => $img_name . '_')));
+          $rows[] = ['File', $img->show_upload_field()];
+          $rows[] = ['Image Caption', $this->getUploadFormField($img_form, 'caption', ['prepend' => $img_name . '_'])];
+          $rows[] = ['Copyright-Notice', $this->getUploadFormField($img_form, 'copyright', ['prepend' => $img_name . '_'])];
 
-          $rows[] = array('', '<input type="submit" value="' . ucfirst(tr('upload')) . '" />');
+          $rows[] = ['', '<input type="submit" value="' . ucfirst(tr('upload')) . '" />'];
         } // if
       }
 
@@ -517,14 +524,14 @@ EOT;
   function buildMenu () {
     global $SITE_DESCRIPTION;
 
-    $url_main = $this->page->buildLink(array('pn' => '')); // '../';
+    $url_main = $this->page->buildLink(['pn' => '']); // '../';
 
     $ret = '<div id="header">';
 
     if (!empty($this->page->user)) {
       $ret .= '<div id="menuAccount" style="font-size: 9pt; float: right">'
             . $this->formatText($this->page->user['login'])
-            . ' | <a class="inverse" href="' . $this->page->buildLink(array('pn' => 'account', 'edit' => $this->page->user['id'])).'">'.tr('My Account').'</a> | <a class="inverse" href="'.$this->page->buildLink(array('pn' => '', 'do_logout' => 1)).'">'.tr('Sign out').'</a></div>';
+            . ' | <a class="inverse" href="' . $this->page->buildLink(['pn' => 'account', 'edit' => $this->page->user['id']]).'">'.tr('My Account').'</a> | <a class="inverse" href="'.$this->page->buildLink(['pn' => '', 'do_logout' => 1]).'">'.tr('Sign out').'</a></div>';
       if (!$this->is_internal) {
         $this->page->site_description['structure']['root']['title'] = 'Home';
       }
@@ -538,11 +545,10 @@ EOT;
 
     if (isset($this->page->path)) {
       foreach ($this->page->path as $entry) {
-        $url = $this->page->buildLink(array('pn' => $entry));
+        $url = $this->page->buildLink(['pn' => $entry]);
         $entries[] = '<a class="inverse" href="' . $url . '">'
                    . $this->htmlSpecialchars($this->page->buildPageTitle($entry))
                    . '</a>';
-
       }
     }
 

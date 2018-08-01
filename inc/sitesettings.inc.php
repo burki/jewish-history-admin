@@ -5,9 +5,9 @@
  * Sitewide settings
  * (put machine dependent stuff like hardwired paths, logins and passwords in inc/local.inc.php)
  *
- * (c) 2009-2017 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2017-08-02 dbu
+ * Version: 2018-07-23 dbu
  *
  * Changes:
  *
@@ -31,10 +31,10 @@ else {
 define('PWDRECOVER_TIMEOUT', 300);       // wait 5 minutes before sending a new recover-mail
 
 define('LOCALE_DEFAULT', 'en_US'); // so strtoupper works correct - if you don't want to use it, set it to 0;
-define('GETTEXT_AVAILABLE', FALSE); // don't use system-gettext
+define('GETTEXT_AVAILABLE', false); // don't use system-gettext
 
 //
-define('COUNTRIES_FROM_DB', FALSE);
+define('COUNTRIES_FROM_DB', false);
 
 //
 $RIGHTS_EDITOR = 0x02;  // these can see/edit all data
@@ -49,35 +49,30 @@ define('STATUS_USER_DELETED', -100); // -1 stands for rejected
 // should wrap this into a mail/configuration class
 define('MAIL_LINELENGTH', 72);
 
-$SITE = array(
-  'pagetitle' => 'Hamburg Key-Documents of German-Jewish History',
-);
+$SITE = [
+  'pagetitle' => 'Key-Documents of German-Jewish History',
+];
 
-$COUNTRIES_FEATURED = array(
+$COUNTRIES_FEATURED = [
     'DE', 'AT', 'CH', 'UK', 'US', 'CA',
     'FR', 'IT', 'ES', 'NL', 'BE',
     'DK', 'SE', 'NO', 'FI',
     'AU', 'JP',
-);
-$GLOBALS['LANGUAGES_FEATURED'] = array('ger', 'eng', 'fre', 'ita', 'spa', 'heb', 'yid');
+];
+$GLOBALS['LANGUAGES_FEATURED'] = ['ger', 'eng', 'fre', 'ita', 'spa', 'heb', 'yid'];
 
-$GLOBALS['THESAURI'] = array(
+$GLOBALS['THESAURI'] = [
     'section' => 'Section',
     'sourcetype' => 'Source Type',
-);
+];
 
 
-$MAIL_SETTINGS = array(
+$MAIL_SETTINGS = [
   'from'                 => 'burckhardtd@geschichte.hu-berlin.de',
   // 'from_communication'   => 'burckhardtd@geschichte.hu-berlin.de', // don't use users from for communication
   'reply_to'             => 'burckhardtd@geschichte.hu-berlin.de',
   'assistance'           => 'burckhardtd@geschichte.hu-berlin.de',
- // 'return_path'          => 'daniel.burckhardt@sur-gmbh.ch',
-
- /*
-  'from_listserv'        => 'subscription@arthist.net',
-  'listserv'             => 'listserv@h-net.msu.edu', */
-  // 'bcc_listserv'         => 'daniel.burckhardt@sur-gmbh.ch',
+  // 'return_path'          => 'daniel.burckhardt@sur-gmbh.ch',
 
   'bcc_passwordrecover'  => 'burckhardtd@geschichte.hu-berlin.de',
   'technical_assistance' => 'burckhardtd@geschichte.hu-berlin.de',
@@ -88,12 +83,13 @@ $MAIL_SETTINGS = array(
 
   // further stuff
   'subject_prepend'      => 'Hamburg Key-Documents of German-Jewish History - ',
-);
+];
 
 function compute_bytes ($val) {
     if (empty($val)) {
       return 0;
     }
+
     $val = trim($val);
     $last = $val[strlen($val)-1];
     switch (strtolower($last)) {
@@ -117,7 +113,7 @@ if (!defined('UPLOAD_MAX_FILE_SIZE')) {
            compute_bytes(ini_get('upload_max_filesize')));
 }
 
-$MEDIA_EXTENSIONS = array(
+$MEDIA_EXTENSIONS = [
     'image/gif' => '.gif', 'image/jpeg' => '.jpg', 'image/png' => '.png',
 
     'application/pdf' => '.pdf',
@@ -131,13 +127,13 @@ $MEDIA_EXTENSIONS = array(
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => '.docx',
 
     'application/xml' => '.xml',
-);
+];
 
 $STATUS_REMOVED = '-1';
 $STATUS_EDIT = '0';
-$MESSAGE_STATUS = array($STATUS_EDIT => 'draft', '1' => 'publish', $STATUS_REMOVED => 'removed');
+$MESSAGE_STATUS = [$STATUS_EDIT => 'draft', '1' => 'publish', $STATUS_REMOVED => 'removed'];
 
-$STATUS_OPTIONS = array(
+$STATUS_OPTIONS = [
     '-99' => 'angedacht',
     '-76' => 'angefragt Autor',
     '-73' => 'vergeben Autor',
@@ -158,9 +154,9 @@ $STATUS_OPTIONS = array(
     '-103' => 'abgebrochen bewahrende Institution',
     '-106' => 'abgebrochen Autor',
     '-112' => 'abgelehnt Artikel',
-);
+];
 
-$STATUS_TRANSLATION_OPTIONS = array(
+$STATUS_TRANSLATION_OPTIONS = [
     '-29' => 'für Übersetzung bereit',
     '-25' => 'Übersetzung vergeben',
     '-24' => 'Übersetzung eingegangen',
@@ -170,9 +166,9 @@ $STATUS_TRANSLATION_OPTIONS = array(
     '-5' => 'Auszeichnung Übersetzung erstellt',
     '-3' => 'Auszeichnung Übersetzung ok',
     '31' => 'Übersetzung veröffentlicht',
-);
+];
 
-$STATUS_SOURCE_OPTIONS = array(
+$STATUS_SOURCE_OPTIONS = [
     '-99' => 'angedacht',
     '-76' => 'angefragt bewahrende Institution',
     '-59' => 'eingegangen',
@@ -183,9 +179,9 @@ $STATUS_SOURCE_OPTIONS = array(
     '1'   => 'ver&#246;ffentlicht',
     '-100' => 'abgebrochen Redakteur',
     '-103' => 'abgebrochen bewahrende Institution',
-);
+];
 
-$LICENSE_OPTIONS = array(
+$LICENSE_OPTIONS = [
     ''  => '-- unknown --',
     'restricted' => 'restricted (display only)',
     'regular' => 'regular (download for private and educational use)',
@@ -193,14 +189,14 @@ $LICENSE_OPTIONS = array(
     'CC BY-NC-SA' => 'Creative Commons BY-NC-SA',
     'CC BY-SA' => 'Creative Commons BY-SA',
     'PD' => 'Public Domain',
-);
+];
 
-$LICENSE_OPTIONS_ARTICLE = array(
+$LICENSE_OPTIONS_ARTICLE = [
     ''  => '-- unknown --',
     'restricted' => 'restricted (republish only with consent)',
     'CC BY-NC-ND' => 'Creative Commons BY-NC-ND',
     'CC BY-SA' => 'Creative Commons BY-SA',
-);
+];
 
 // $MESSAGE_TYPES
 $MESSAGE_REVIEW_PUBLICATION = 100;
@@ -213,9 +209,9 @@ $TYPE_PERSON = 10;
 $TYPE_PLACE = 20;
 $TYPE_PUBLICATION = 50;
 
-$UPLOAD_TRANSLATE = array(
+$UPLOAD_TRANSLATE = [
     $TYPE_MESSAGE => 'upload', $TYPE_PUBLICATION => 'publication',
-);
+];
 
 $JAVASCRIPT_CONFIRMDELETE = <<<EOT
     function confirmDelete(txt, url) {

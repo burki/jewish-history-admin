@@ -57,15 +57,15 @@ class BiblioService_Amazon
     }
 
     function itemLookup ($isbn) {
-        $success = FALSE;
-        $response = NULL;
+        $success = false;
+        $response = null;
 
         // amazon currently supports only isbn-10 in asin-query
         $isbn_query = $isbn;
         $isbn_version = ISBN::guessVersion($isbn);
         if (isset($isbn_version) && ISBN_VERSION_ISBN_13 == $isbn_version) {
             $isbn_query = ISBN::convert($isbn, $isbn_version, ISBN_VERSION_ISBN_10);
-            if (FALSE === $isbn_query) {
+            if (false === $isbn_query) {
                 $isbn_query = $isbn; // wind back if it failed
             }
         }
@@ -79,7 +79,7 @@ class BiblioService_Amazon
 
             try {
                 $result = $ws->itemLookup($isbn_query, $params);
-                $success = TRUE;
+                $success = true;
 
                 list($title, $subtitle) = self::buildTitleSubtitle($result->Title);
                 $response = [ 'isbn' => $isbn, 'title' => $title, 'subtitle' => $subtitle ];
@@ -172,7 +172,7 @@ class BiblioService_Amazon
 class BiblioService
 {
     // helper function
-    static function validateIsbn ($isbn, $version = NULL) {
+    static function validateIsbn ($isbn, $version = null) {
         return ISBN::validate($isbn, isset($version) ? $version : ISBN_VERSION_UNKNOWN);
     }
 
@@ -226,7 +226,7 @@ class BiblioService
     }
 
     static function isGiven ($name) {
-        static $GIVEN = NULL;
+        static $GIVEN = null;
 
         if (preg_match('/^(of|to|y)$/', $name)
            || preg_match('/^[A-Z]\.?$/', $name)
@@ -234,13 +234,13 @@ class BiblioService
             return 1;
         }
 
-        if (NULL === $GIVEN) {
+        if (null === $GIVEN) {
             // read a list of given-names from a file
             $fname = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'given_names.txt';
             $given_names = @file($fname);
-            if (FALSE !== $given_names) {
+            if (false !== $given_names) {
                 foreach ($given_names as $given_names) {
-                    $GIVEN[strtolower($given_names)] = TRUE;
+                    $GIVEN[strtolower($given_names)] = true;
                 }
             }
             else {
@@ -268,7 +268,7 @@ class BiblioService
     }
 
     private function getDbConn () {
-        static $dbconn = NULL;
+        static $dbconn = null;
         if (!isset($dbconn)) {
             $dbconn = new DB;
         }
@@ -276,7 +276,7 @@ class BiblioService
         return $dbconn;
     }
 
-    function buildCitation ($identifier, $options = NULL) {
+    function buildCitation ($identifier, $options = null) {
         if (preg_match('/^\d+$/', $identifier)) {
             $dbconn = $this->getDbConn();
             $querystr = "SELECT isbn FROM Publication WHERE id=" . $identifier;
@@ -315,11 +315,11 @@ class BiblioService
         }
     }
 
-    function fetchByIsbn ($isbn, $options = NULL) {
+    function fetchByIsbn ($isbn, $options = null) {
         // cache_external: 1 - overwrite, 0 - insert if not exists, -1: don't cache
         static $defaultOptions = [
-            'from_db' => TRUE,
-            'from_external' => TRUE,
+            'from_db' => true,
+            'from_external' => true,
             'cache_external' => 0,
         ];
 
@@ -399,17 +399,17 @@ class BiblioService
 
             if (isset($response)) {
                 // check if we have to store to db
-                if (FALSE && $options['cache_external'] >= 0) {
+                if (false && $options['cache_external'] >= 0) {
                     // TODO: insert/update the $response into the database
                     // TODO: do proper utf8-handling
                     $querystr = sprintf("SELECT id FROM Publication WHERE isbn IN(%s) AND status >= 0 ORDER BY isbn='%s' DESC LIMIT 1",
                                 implode(', ', $isbns_sql), $dbconn->escape_string($isbn));
                     $dbconn->query($querystr);
-                    $update = FALSE;
+                    $update = false;
                     if ($dbconn->next_record()) {
                         $update = $dbconn->Record['id'];
                     }
-                    if (FALSE === $update || $options['cache_external'] > 0) {
+                    if (false === $update || $options['cache_external'] > 0) {
                         // we insert/update the record
                         $fields = $values = [];
                         foreach ($response as $name => $value) {
@@ -426,7 +426,7 @@ class BiblioService
                             $values[] = sprintf("'%s'", $dbconn->escape_string($value));
                         }
 
-                        if (FALSE !== $update) {
+                        if (false !== $update) {
                             $querystr = "UPDATE Publication SET ";
                             for ($i = 0; $i < count($fields); $i++) {
                                 if ($i > 0) {

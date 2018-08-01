@@ -6,7 +6,7 @@
  *
  * (c) 2006-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-05-22 dbu
+ * Version: 2018-07-23 dbu
  *
  * Changes:
  *
@@ -50,15 +50,15 @@ function translit_7bit ($str) {
   $str = preg_replace_callback('/&#([0-9a-fx]+);/mi', 'replace_num_entity', utf8_encode($str));
         // var_dump($str);
 
-  if (TRUE) {
+  if (true) {
     $str = mb_convert_encoding($str, 'HTML-ENTITIES', 'UTF-8');
     // var_dump($str);
     $str = preg_replace(
-       array('/&szlig;/','/&(..)lig;/',
+       ['/&szlig;/','/&(..)lig;/',
              '/&([aou])uml;/i', '/&euml;/i',
              '/&([aeiou])acute;/i',
-             '/&([aeiou])grave;/i'),
-       array('ss',"$1","$1".'e',"$1", "$1", "$1"),
+             '/&([aeiou])grave;/i'],
+       ['ss',"$1","$1".'e',"$1", "$1", "$1"],
        $str);
 
     return $str;
@@ -110,17 +110,17 @@ function replace_num_entity($ord) {
     {
         case 2:
         {
-            $prefix = array(31, 192);
+            $prefix = [31, 192];
             break;
         }
         case 3:
         {
-            $prefix = array(15, 224);
+            $prefix = [15, 224];
             break;
         }
         case 4:
         {
-            $prefix = array(7, 240);
+            $prefix = [7, 240];
         }
     }
 
@@ -180,8 +180,8 @@ function writeMultibyte (&$sheet, $row, $col, $str, $format = 0) {
 }
 
 function strip_specialchars($txt) {
-  $match = array('/’/s', '/[“”]/s', '/—/s');
-  $replace = array("'", '"', '-');
+  $match = ['/’/s', '/[“”]/s', '/—/s'];
+  $replace = ["'", '"', '-'];
 
   return preg_replace($match, $replace, $txt, -1);
 }
@@ -219,7 +219,7 @@ class AuthorListing
 
   function query (&$dbconn) {
     if (!isset($this->id)) {
-      return FALSE;
+      return false;
     }
 
     $tables = 'User';
@@ -259,21 +259,21 @@ class AuthorListing
     if ($dbconn->next_record()) {
       $this->record = $dbconn->Record;
 
-      return TRUE;
+      return true;
     }
 
-    return FALSE;
+    return false;
   }
 
   function initFromRecord ($record) {
     $this->record = $record;
   }
 
-  function buildPlaceWithZip ($record, $append_country = TRUE) {
+  function buildPlaceWithZip ($record, $append_country = true) {
     static $country_shortnames = [ 'UK' => 'UK', 'US' => 'USA' ];
 
     $separator = ', ';
-    $single = TRUE;
+    $single = true;
 
     $zipcode_town = $record['place'];
     if (isset($record['zip'])) {
@@ -300,7 +300,7 @@ class AuthorListing
     return $zipcode_town;
   }
 
-  function formatUrl ($url, $show_protocol = FALSE) {
+  function formatUrl ($url, $show_protocol = false) {
     if (!preg_match('/^http(s)?\:/', $url)) {
       $url = 'http://' . $url;
     }
@@ -329,7 +329,7 @@ class AuthorListing
       . '</span></div>';
   }
 
-  function buildEntry (&$view, $entry, $label = '', $format_entry = TRUE) {
+  function buildEntry (&$view, $entry, $label = '', $format_entry = true) {
     $ret = !empty($label)
            ? '<span class="listingLabel">' . tr($label) . '</span> '
            : '';
@@ -415,8 +415,8 @@ class AuthorListing
 
     if (isset($this->record['email'])) {
       $top[] = $this->buildEntry($view, $this->record['email']
-                                 . (TRUE || 'admin' == $mode
-                                    ? ' ' . $this->buildSubscriptionAction($view, $this->record['status'], 'email') : ''), '<!--Subscription -->E-mail', FALSE);
+                                 . (true || 'admin' == $mode
+                                    ? ' ' . $this->buildSubscriptionAction($view, $this->record['status'], 'email') : ''), '<!--Subscription -->E-mail', false);
     }
 
     if (count($top) > 0) {
@@ -449,7 +449,7 @@ class AuthorListing
     if (isset($this->record['address'])) {
       $address[] = $this->record['address'];
     }
-    $place_with_country = $this->buildPlaceWithZip($this->record, TRUE);
+    $place_with_country = $this->buildPlaceWithZip($this->record, true);
     if (!empty($place_with_country)) {
       $address[] = $place_with_country;
     }

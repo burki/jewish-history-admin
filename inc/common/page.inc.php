@@ -6,7 +6,7 @@
  *
  * (c) 2009-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-05-22 dbu
+ * Version: 2018-07-23 dbu
  *
  * Changes:
  *
@@ -31,10 +31,10 @@ class Page
 {
   static $languages = [ 'de_DE' => 'deutsch', 'en_US' => 'english' ];
   static $lang = 'en_US';
-  static $locale = NULL;
-  private static $init_lang = NULL;
+  static $locale = null;
+  private static $init_lang = null;
 
-  protected $gettext_utf8_encode = FALSE;
+  protected $gettext_utf8_encode = false;
   var $name;
   var $include;
   var $user = [];
@@ -47,10 +47,10 @@ class Page
   var $BASE_PATH = './';
   var $BASE_URL;
   var $STRIP_SLASHES;
-  var $use_session = FALSE;
-  var $use_session_register = FALSE;
+  var $use_session = false;
+  var $use_session_register = false;
   var $dbconn;
-  var $expired = FALSE;
+  var $expired = false;
   var $site_description;
   var $msg = '';
 
@@ -60,9 +60,9 @@ class Page
     return isset($GETTEXT_MESSAGES[$msg]) ? $GETTEXT_MESSAGES[$msg] : $msg;
   }
 
-  static function initGettext ($utf8_encode = FALSE) {
+  static function initGettext ($utf8_encode = false) {
     if (self::$lang == self::$init_lang) {
-      return TRUE;
+      return true;
     }
 
     // init-locale
@@ -122,7 +122,7 @@ class Page
   }
 
   function expire ($when = 0, $cache = 0) {
-    static $expired = FALSE;
+    static $expired = false;
 
     if ($expired || headers_sent()) {
       return;
@@ -146,7 +146,7 @@ class Page
       header('Pragma: cache');                          // HTTP/1.0
     }
 
-    $expired = TRUE;
+    $expired = true;
   }
 
   function identify () {
@@ -155,23 +155,23 @@ class Page
     if (empty($_SESSION['user'])) {
       foreach ($AUTH_METHODS as $method => $value) {
         // echo "Trying $method $value";
-        $done = FALSE;
+        $done = false;
         switch ($method) {
           case 'AUTH_LOCAL':
             $status = $this->processLoginAuthLocal();
             if ($status < 0) {
               $this->msg = tr('Sorry, the e-mail or password you entered is incorrect. Please try again.');
             }
-            $done = TRUE;
+            $done = true;
             break;               // failed - go to next method
 
           case 'AUTH_FORCE':
             $this->setLogin($value);
-            $done = TRUE;
+            $done = true;
             break;
 
           case 'AUTH_ANONYMOUS':
-            $done = TRUE;
+            $done = true;
             break;
         }
 
@@ -203,7 +203,7 @@ class Page
         // default to first available language
         reset(self::$languages); list(self::$lang, $dummy) = each(self::$languages);
 
-        if (FALSE) {
+        if (false) {
           // try to get the language from user settings (cookie oder prefs from database
         }
         else if (array_key_exists('HTTP_ACCEPT_LANGUAGE', $_SERVER)) {
@@ -269,7 +269,7 @@ class Page
     }
     else {
       $this->name = 'root';
-      $this->path = array($this->name);
+      $this->path = [$this->name];
     }
 
     if (!isset($this->include)) {
@@ -311,9 +311,9 @@ class Page
       session_start();                    // and start it
       session_cache_limiter('private');
 
-      $this->use_session = TRUE;
+      $this->use_session = true;
       if (1 == ini_get('register_globals')) {
-        $this->use_session_register = TRUE;
+        $this->use_session_register = true;
       }
     }
 
@@ -381,11 +381,11 @@ class Page
       // user exists -> check password for every matching login
       $pwd = $this->getPostValue('_pwd');
 
-      $success = FALSE;
+      $success = false;
       while (!$success) {
         $login = $dbconn->Record['login'];
         if ($this->passwordCheck($pwd, $dbconn->Record['pwd'])) {
-          $success = TRUE;
+          $success = true;
           $this->setLogin($dbconn->Record['id']);
           return 1;
         }
@@ -402,14 +402,14 @@ class Page
   }
 
   function setLogin ($id) {
-    $success = FALSE;
+    $success = false;
 
     $dbconn = isset($this->dbconn) ? $this->dbconn : new DB();
     $querystr = "SELECT id, email AS login, email AS email, privs FROM User WHERE id=".intval($id);
     $dbconn->query($querystr);
     if ($dbconn->next_record()) {
       $_SESSION['user'] = $dbconn->Record;
-      $success = TRUE;
+      $success = true;
     }
 
     return $success;
@@ -455,7 +455,7 @@ class Page
         $name = $dbconn->Record['name'];
         $flags |= $dbconn->Record['flags']; // TODO: koennte man vermutlich auch über SUM(flags) GROUP BY id_location/issue hinkriegen
       }
-      $locations[] = array('id' => $id_location, 'name' => $name, 'flags' => $flags, 'issue' => $issue);
+      $locations[] = ['id' => $id_location, 'name' => $name, 'flags' => $flags, 'issue' => $issue];
     }
 
     return count($locations) == 1 ? $locations[0] : $locations;
@@ -504,8 +504,8 @@ class Page
     }
 
     return $thispage_only
-      ? (isset($_SESSION[$key][$name]) ? $_SESSION[$key][$name] : NULL)
-      : (isset($_SESSION[$key]) ? $_SESSION[$key]: NULL);
+      ? (isset($_SESSION[$key][$name]) ? $_SESSION[$key][$name] : null)
+      : (isset($_SESSION[$key]) ? $_SESSION[$key]: null);
   }
 
   function setSessionValue ($name, $value, $thispage_only = true) {
@@ -593,7 +593,7 @@ class Page
     }
 
     if (isset($this->path)) {
-      $ignore = count($this->path) > 1 ? $this->path[0] : NULL;
+      $ignore = count($this->path) > 1 ? $this->path[0] : null;
       foreach ($this->path as $entry) {
         if (!isset($ignore) || $ignore != $entry) {
           $titles[] = $this->buildPageTitle($entry);
@@ -611,7 +611,7 @@ class Page
   function display () {
     if (isset($this->renderer)) {
       $res = $this->renderer->show();
-      if (FALSE === $res) {
+      if (false === $res) {
         $this->redirect();
       }
     }
@@ -664,11 +664,11 @@ class Page
                 $base = $URL_REWRITE['host'] . '/';
               }
               if ('array' == gettype($URL_REWRITE[$val])) {
-                foreach (array('prepend', 'append') as $mode) {
+                foreach (['prepend', 'append'] as $mode) {
                   if (isset($URL_REWRITE[$val][$mode])) {
                     $keys = $URL_REWRITE[$val][$mode];
                     if ('array' != gettype($keys)) {
-                      $keys = array($keys);
+                      $keys = [$keys];
                     }
                     foreach ($keys as $name) {
                       if (isset($options[$name])) {
@@ -678,7 +678,7 @@ class Page
                         else {
                           $append[] = rawurlencode($options[$name]);
                         }
-                        $skip[$name] = TRUE;
+                        $skip[$name] = true;
                       }
                     }
                   }

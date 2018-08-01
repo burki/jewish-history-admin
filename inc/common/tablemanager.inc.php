@@ -35,11 +35,11 @@ class TableManagerFlow
   var $id;
   var $view_after_edit;
 
-  function __construct ($view_after_edit = FALSE) {
+  function __construct ($view_after_edit = false) {
     $this->view_after_edit = $view_after_edit;
   }
 
-  function TableManagerFlow ($view_after_edit = FALSE) {
+  function TableManagerFlow ($view_after_edit = false) {
     self::__construct($view_after_edit);
   }
 
@@ -48,16 +48,19 @@ class TableManagerFlow
       if ($id > 0) {
         $this->id = $id;
       }
+
       return TABLEMANAGER_EDIT;
     }
 
     if (isset($page->parameters['view']) && ($id = intval($page->parameters['view'])) > 0) {
       $this->id = $id;
+
       return TABLEMANAGER_VIEW;
     }
 
     if (isset($page->parameters['delete']) && ($id = intval($page->parameters['delete'])) > 0) {
       $this->id = $id;
+
       return TABLEMANAGER_DELETE;
     }
 
@@ -68,6 +71,7 @@ class TableManagerFlow
     if ($this->view_after_edit && TABLEMANAGER_EDIT == $step) {
       return TABLEMANAGER_VIEW;
     }
+
     return TABLEMANAGER_LIST;
   }
 
@@ -75,26 +79,29 @@ class TableManagerFlow
     if (!empty($id)) {
       $this->id = $id;
     }
+
     return $this->id;
   }
 
   function name ($step) {
     switch ($step) {
       case TABLEMANAGER_VIEW:
-          return 'view';
-          break;
+        return 'view';
+        break;
+
       case TABLEMANAGER_EDIT:
-          return 'edit';
-          break;
+        return 'edit';
+        break;
+
       case TABLEMANAGER_DELETE:
-          return 'delete';
-          break;
+        return 'delete';
+        break;
+
       default:
-          return 'list';
-          break;
+        return 'list';
+        break;
     }
   }
-
 }
 
 class TableManagerQueryConditionBuilder
@@ -204,30 +211,30 @@ class DisplayTable extends PageDisplay
 {
   var $step;
   var $modeminor;  // if $mode is TABLEMANAGER_EDIT, we can have several minor modes (edited, validated, ...)
-  var $postback = FALSE; // set to true if we post a form from this screen
-  var $clear_postback = FALSE; // $this->isPostback() -> FALSE if $clear_postback == TRUE
+  var $postback = false; // set to true if we post a form from this screen
+  var $clear_postback = false; // $this->isPostback() -> false if $clear_postback == true
 
   var $active_conn;
 
   var $table;
   var $primary_key = 'id';
   var $datetime_style = 'MM/DD/YYYY';
-  var $sql_calc_found_rows = TRUE;
+  var $sql_calc_found_rows = true;
 
-  var $messages = array('item_new' => 'New Item');
+  var $messages = ['item_new' => 'New Item'];
 
   var $page_size = -1;
-  var $show_xls_export = FALSE;
-  var $show_record_count = FALSE;
+  var $show_xls_export = false;
+  var $show_record_count = false;
 
   var $fields;
-  var $distinct_listing = FALSE;
+  var $distinct_listing = false;
   var $joins_listing;
   var $group_by_listing;
   var $fields_listing;
   var $cols_listing; // e.g. array('name' => 'Name')
   var $cols_listing_count;
-  var $idcol_listing = FALSE;
+  var $idcol_listing = false;
 
   var $record;
   var $form;
@@ -254,7 +261,7 @@ class DisplayTable extends PageDisplay
     $this->step = $this->workflow->init($this->page);
 
     if ($this->step == TABLEMANAGER_NOACCESS) {
-      return FALSE;
+      return false;
     }
 
     if ($this->isPostback()) {
@@ -265,9 +272,9 @@ class DisplayTable extends PageDisplay
     list($advance, $this->modeminor) = $this->process();
     if ($advance) {
 // echo $this->step.'->'.$this->workflow->advance($this->step);
-      $this->clear_postback = TRUE; // force refetch after store
+      $this->clear_postback = true; // force refetch after store
       $this->step = $this->workflow->advance($this->step);
-      if (FALSE !== $this->step) {
+      if (false !== $this->step) {
         $this->record = $this->buildRecord($this->workflow->name($this->step));
       }
     }
@@ -277,11 +284,11 @@ class DisplayTable extends PageDisplay
 
   function isPostback ($name = '') {
     if ($_SERVER['REQUEST_METHOD'] != 'POST' || $this->clear_postback) {
-      return FALSE;
+      return false;
     }
     return isset($_POST['_postback']) && !empty($_POST['_postback'])
-      ? (!empty($name) ? $name == $_POST['_postback'] : TRUE)
-      : FALSE;
+      ? (!empty($name) ? $name == $_POST['_postback'] : true)
+      : false;
   }
 
   function buildRecord ($name = '') {
@@ -294,13 +301,13 @@ class DisplayTable extends PageDisplay
 
   function instantiateRecord ($table = '', $dbconn = '') {
     return new TableManagerRecord(
-      array('tables' => !empty($table) ? $table : $this->table,
-            'dbconn'=> !empty($dbconn) ? $dbconn : $this->page->dbconn)
+      ['tables' => !empty($table) ? $table : $this->table,
+            'dbconn'=> !empty($dbconn) ? $dbconn : $this->page->dbconn]
     );
   }
 
   function instantiateHtmlForm ($name = 'detail', $action = '', $method = 'post') {
-    $params = array('method' => 'post', 'name' => $name);
+    $params = ['method' => 'post', 'name' => $name];
     if (!empty($action)) {
       $params['action'] = $action;
     }
@@ -309,8 +316,8 @@ class DisplayTable extends PageDisplay
     return new FormHTML($params, $this->record);
   }
 
-  function setInput ($values = NULL) {
-    if (NULL === $values) {
+  function setInput ($values = null) {
+    if (null === $values) {
       $values = & $_POST;
     }
     $this->form->set_values($values);
@@ -341,7 +348,7 @@ class DisplayTable extends PageDisplay
   function process () {
     // now check if it was submitted
     if (!$this->isPostback()) {
-      return array(FALSE, 0);
+      return [false, 0];
     }
 
     if (!isset($this->record)) {
@@ -364,11 +371,11 @@ class DisplayTable extends PageDisplay
     }
 
     return $minor == TABLEMANAGER_EDIT_STORED
-      ? array(TRUE, $this->workflow->advance(TABLEMANAGER_EDIT))
-      : array(FALSE, $minor);
+      ? [true, $this->workflow->advance(TABLEMANAGER_EDIT)]
+      : [false, $minor];
   } // process
 
-  function message ($msg_name, $lang = NULL) {
+  function message ($msg_name, $lang = null) {
     $ret = isset($this->messages[$msg_name]) ? $this->messages[$msg_name] : $msg_name;
     return is_array($ret) ? array_map('tr', $ret) : tr($ret);
   }
@@ -395,19 +402,19 @@ class DisplayTable extends PageDisplay
         if ('boolean' == gettype($row_descr)) {
           $value = $this->getFormField($key);
           if ($row_descr) {
-            $fields[] = array('', $value);
+            $fields[] = ['', $value];
           }
           else {
             $ret .= $value;
           }
         }
         else if ('string' == gettype($row_descr)) {
-          $fields[] = array('&nbsp;', $row_descr);
+          $fields[] = ['&nbsp;', $row_descr];
         }
         else {
           $label = isset($row_descr['label']) ? tr($row_descr['label']).':' : '';
           if (!empty($label)) {
-            $required = FALSE;
+            $required = false;
             if (isset($row_descr['required'])) {
               $required = $row_descr['required'];
             }
@@ -438,7 +445,7 @@ class DisplayTable extends PageDisplay
           else {
             $value = $this->getFormField($key);
           }
-          $fields[] = array($label, $value);
+          $fields[] = [$label, $value];
         }
       }
     }
@@ -452,24 +459,24 @@ class DisplayTable extends PageDisplay
   }
 
   function getEditRows () {
-    return array('id' => TRUE, '' => $this->form->show_submit('Store'));
+    return ['id' => true, '' => $this->form->show_submit('Store')];
   }
 
   function buildFormAction () {
-    return $this->page->buildLink(array('pn' => $this->page->name,
-                                        $this->workflow->name(TABLEMANAGER_EDIT) => isset($this->id) ? $this->id : -1));
+    return $this->page->buildLink(['pn' => $this->page->name,
+                                        $this->workflow->name(TABLEMANAGER_EDIT) => isset($this->id) ? $this->id : -1]);
   }
 
   function buildEdit ($name = 'detail') {
     if (!isset($this->record)) {
-      return FALSE;
+      return false;
     }
 
     // check if we need to fetch the data from the DB
     $fetch = $this->workflow->primaryKey() > 0 && !$this->isPostback($name);
 
     if ($fetch && ($res = $this->record->fetch($this->workflow->primaryKey(), $this->datetime_style)) <= 0) {
-      return FALSE;
+      return false;
     }
 
     if ($fetch) {
@@ -515,7 +522,7 @@ class DisplayTable extends PageDisplay
       }
       $this->fields_listing = $fieldnames;
     }
-    else if (FALSE !== $this->fields_listing) {
+    else if (false !== $this->fields_listing) {
       if (isset($this->fields_listing)) {
         $fieldnames = $this->fields_listing;
       }
@@ -540,7 +547,7 @@ class DisplayTable extends PageDisplay
       }
     }
     if (!isset($fieldnames)) {
-      $fieldnames = array('*'); // get all if nothing else is specified
+      $fieldnames = ['*']; // get all if nothing else is specified
     }
 
     return $fieldnames;
@@ -548,12 +555,12 @@ class DisplayTable extends PageDisplay
 
   function buildListingTables () {
     if (!isset($this->record)) {
-      return array($this->table);
+      return [$this->table];
     }
 
     $tables = $this->record->params['tables'];
     if (!is_array($tables)) {
-      return array($tables);
+      return [$tables];
     }
     return $tables;
   }
@@ -596,7 +603,7 @@ class DisplayTable extends PageDisplay
             if (isset($condition['method'])) {
               $conditionBuilder = $this->instantiateQueryConditionBuilder($value);
               if (method_exists($conditionBuilder, $condition['method'])) {
-                $condition = call_user_func_array(array(&$conditionBuilder, $condition['method']),
+                $condition = call_user_func_array([&$conditionBuilder, $condition['method']],
                                                      preg_split('/\\s*\\,\\s*/', $condition['args']));
                 if (isset($condition)) {
                   $conditions[] = $condition;
@@ -608,7 +615,7 @@ class DisplayTable extends PageDisplay
       }
       $where = join(' AND ', $conditions);
     }
-    return array($where, $search_terms);
+    return [$where, $search_terms];
   }
 
   function buildListingGroupBy () {
@@ -665,7 +672,7 @@ class DisplayTable extends PageDisplay
     $this->page->setSessionValue('order', $new_order);
     $this->page->setSessionValue('order_index', $order_index);
 
-    return array($order[$new_order][$order_index], $new_order, $order_index);
+    return [$order[$new_order][$order_index], $new_order, $order_index];
   }
 
   function buildListingQuery () {
@@ -696,14 +703,14 @@ class DisplayTable extends PageDisplay
 
 // var_dump($querystr);
 
-    return array($querystr, $search_terms, $order, $order_index);
+    return [$querystr, $search_terms, $order, $order_index];
   }
 
   function doListingQuery ($page_size = 0, $page_id = 0) {
     list($querystr, $this->search, $this->order_active, $this->order_index) = $this->buildListingQuery();
 
     if ($page_size > 0) {
-      $this->paging = array('page_id' => 0);
+      $this->paging = ['page_id' => 0];
       if ($this->sql_calc_found_rows) {
         // Replace "SELECT" by "SELECT SQL_CALC_FOUND_ROWS"
         if (!preg_match('/\\bSQL_CALC_FOUND_ROWS\\b/', $querystr)) {
@@ -756,7 +763,7 @@ class DisplayTable extends PageDisplay
   // the render functions
 
   function buildSearchBar () {
-    $ret = sprintf('<form action="%s" method="post">', $this->page->buildLink(array('pn' => $this->page->name, 'page_id' => 0)));
+    $ret = sprintf('<form action="%s" method="post">', $this->page->buildLink(['pn' => $this->page->name, 'page_id' => 0]));
     if ($this->cols_listing_count > 0) {
       $ret .= sprintf('<tr><td colspan="%d" nowrap="nowrap"><input type="text" name="search" value="%s" size="40" /><input class="submit" type="submit" value="%s" /></td></tr>',
                       $this->cols_listing_count,
@@ -773,7 +780,7 @@ class DisplayTable extends PageDisplay
     $export = '';
     if ($this->show_xls_export) {
       $export = sprintf('[<a href="%s">%s</a>]',
-                        htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, 'view' => 'xls'))),
+                        htmlspecialchars($this->page->buildLink(['pn' => $this->page->name, 'view' => 'xls'])),
                         $this->htmlSpecialchars(tr('export')));
     }
     return $export;
@@ -781,7 +788,7 @@ class DisplayTable extends PageDisplay
 
   function buildListingAdd () {
     return sprintf('[<a href="%s">%s</a>]',
-                   htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_EDIT) => -1))),
+                   htmlspecialchars($this->page->buildLink(['pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_EDIT) => -1])),
                    tr('add'));
   }
 
@@ -832,7 +839,7 @@ class DisplayTable extends PageDisplay
     }
 
     // var_dump($this->paging);
-    $page_params = array('pn' => $this->page->name);
+    $page_params = ['pn' => $this->page->name];
     if (array_key_exists('search', $this->search)) {
       $page_params['search'] = $this->search['search'];
     }
@@ -850,11 +857,11 @@ class DisplayTable extends PageDisplay
                    htmlspecialchars($this->page->buildLink($page_params)))
          . tr('Result Page') . ': '
          . ($this->paging['page_id'] > 0
-            ? '<a href="' . htmlspecialchars($this->page->buildLink(array_merge($page_params, array('page_id' => $this->paging['page_id'] - 1)))) . '">&lt; ' . tr('Previous') . '</a> '
+            ? '<a href="' . htmlspecialchars($this->page->buildLink(array_merge($page_params, ['page_id' => $this->paging['page_id'] - 1]))) . '">&lt; ' . tr('Previous') . '</a> '
             : '')
          . $page_select
          . ($this->paging['page_id'] < $this->paging['page_count'] - 1
-           ? ' <a href="' . htmlspecialchars($this->page->buildLink(array_merge($page_params, array('page_id' => $this->paging['page_id'] + 1)))) . '">' . tr('Next') . ' &gt;</a>' : '')
+           ? ' <a href="' . htmlspecialchars($this->page->buildLink(array_merge($page_params, ['page_id' => $this->paging['page_id'] + 1]))) . '">' . tr('Next') . ' &gt;</a>' : '')
          . '</form>';
 
     $colspan = $this->cols_listing_count;
@@ -876,7 +883,7 @@ class DisplayTable extends PageDisplay
       $header = $this->formatText(tr($headers[$col_name]));
       if (array_key_exists($col_name, $this->order)) {
         $header = sprintf('<a href="%s">%s</a>',
-                          htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, 'page_id' => 0, 'sort' => $col_name))),
+                          htmlspecialchars($this->page->buildLink(['pn' => $this->page->name, 'page_id' => 0, 'sort' => $col_name])),
                           $header);
       }
       $ret .= '<th>' . $header . '</th>';
@@ -886,7 +893,7 @@ class DisplayTable extends PageDisplay
     return $ret;
   }
 
-  function buildListingTop ($may_add = TRUE) {
+  function buildListingTop ($may_add = true) {
     $ret = '<table class="listing" cellspacing="0">';
 
     if (!isset($this->cols_listing_count)) {
@@ -906,7 +913,7 @@ class DisplayTable extends PageDisplay
     return $ret;
   }
 
-  function buildListingCell (&$row, $col_index, $val = NULL) {
+  function buildListingCell (&$row, $col_index, $val = null) {
     // expect primary-key in first field, "title" in the second and merge those two:
     if (!$this->idcol_listing && 0 == $col_index) {
       return '';
@@ -915,7 +922,7 @@ class DisplayTable extends PageDisplay
     $cell = isset($val) ? $val : $this->htmlSpecialchars($row[$col_index]);
     if (1 == $col_index) {
       $cell = sprintf('<a href="%s">%s</a>',
-                      htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, $this->workflow->name(isset($this->listing_default_action) ? $this->listing_default_action : TABLEMANAGER_EDIT) => $row[0]))), $cell);
+                      htmlspecialchars($this->page->buildLink(['pn' => $this->page->name, $this->workflow->name(isset($this->listing_default_action) ? $this->listing_default_action : TABLEMANAGER_EDIT) => $row[0]])), $cell);
     }
 
     return '<td class="listing">' . $cell . '</td>';
@@ -971,7 +978,7 @@ class DisplayTable extends PageDisplay
 
   function doDelete () {
     if (!isset($this->record)) {
-      return FALSE;
+      return false;
     }
 
     return $this->record->delete($this->workflow->primaryKey());
@@ -985,7 +992,7 @@ class DisplayTable extends PageDisplay
     }
     else if ($this->step == TABLEMANAGER_EDIT) {
       $ret = $this->buildEdit();
-      if (FALSE === $ret) {
+      if (false === $ret) {
         $this->step = TABLEMANAGER_LIST;
         $this->record = $this->buildRecord($this->workflow->name($this->step));
       }
@@ -995,7 +1002,7 @@ class DisplayTable extends PageDisplay
     }
     else if ($this->step == TABLEMANAGER_VIEW) {
       $ret = $this->buildView();
-      if (FALSE === $ret) {
+      if (false === $ret) {
         $this->step = TABLEMANAGER_LIST;
         $this->record = $this->buildRecord($this->workflow->name($this->step));
       }
@@ -1005,7 +1012,7 @@ class DisplayTable extends PageDisplay
     }
 
     if ($this->step != TABLEMANAGER_EDIT && $this->step != TABLEMANAGER_VIEW) {
-      return $this->buildListing($this->page_size, $this->page->getRequestValue('page_id', array('persist' => 'session')));
+      return $this->buildListing($this->page_size, $this->page->getRequestValue('page_id', ['persist' => 'session']));
     }
   } // buildContent
 

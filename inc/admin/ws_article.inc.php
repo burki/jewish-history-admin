@@ -33,7 +33,7 @@ extends WsHandler
     if (isset($title) && !empty($title)) {
       $slugify = new \Cocur\Slugify\Slugify();
       $title_slug = $slugify->slugify($title, '_');
-      if (FALSE === $title_slug) {
+      if (false === $title_slug) {
         $msg = 'slugify failed';
       }
       else {
@@ -46,7 +46,7 @@ extends WsHandler
           $user = $page->findUserById(intval($user_id));
           if (isset($user) && !empty($user['lastname'])) {
             $user_slug = $slugify->slugify($user['lastname'], '_');
-            if (FALSE !== $user_slug) {
+            if (false !== $user_slug) {
               $title_slug = join('-', [ $user_slug, $title_slug ]);
             }
           }

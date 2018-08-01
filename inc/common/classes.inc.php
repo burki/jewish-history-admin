@@ -17,7 +17,7 @@ class Countries
       $querystr = "SELECT cc, name FROM Country ORDER BY name";
       $dbconn = &$this->page->dbconn;
       $dbconn->query($querystr);
-      $countries = array();
+      $countries = [];
       while ($dbconn->next_record()) {
         self::$countries[$dbconn->Record['cc']] = $dbconn->Record['name'];
       }
@@ -35,6 +35,7 @@ class Countries
     if (isset(self::$countries)) {
       self::getAll();
     }
+
     return isset(self::$countries[$cc]) ? self::$countries[$cc] : $cc;
   }
 
@@ -42,6 +43,7 @@ class Countries
     switch ($cc) {
       case 'UK':
         return 2;
+
       case 'AU':
       case 'CA':
       case 'NZ':
@@ -52,26 +54,27 @@ class Countries
     }
     return 0;
   }
-
 }
 
 class Languages
 {
-  static $languages = array();
-  static $from_db = FALSE; // LANGUAGES_FROM_DB;
+  static $languages = [];
+  static $from_db = false; // LANGUAGES_FROM_DB;
 
-  static function getAll ($lang = 'en', $dbconn = NULL) {
-    if (isset(self::$languages[$lang]))
+  static function getAll ($lang = 'en', $dbconn = null) {
+    if (isset(self::$languages[$lang])) {
       return self::$languages[$lang];
+    }
 
     if (self::$from_db) {
       if (!isset($dbconn)) {
         $dbconn = Dbconn::getAdaptor();
       }
+
       $querystr = "SELECT iso639_2, name FROM Languages ORDER BY name";
-      $countries = array();
+      $countries = [];
       $stmt = $dbconn->query($querystr);
-      while ($stmt !== FALSE && $row = $stmt->fetch()) {
+      while ($stmt !== false && $row = $stmt->fetch()) {
         self::$languages[$lang][$row['iso639_2']] = $row['name'];
       }
     }
@@ -82,9 +85,11 @@ class Languages
         case 'de_DE':
           $col_name = 3;
           break;
+
         default: // english
           $col_name = 1;
       }
+
       foreach ($lines as $line) {
         $line = chop($line);
         $parts = preg_split('/\t/', $line);
@@ -92,6 +97,7 @@ class Languages
           self::$languages[$lang][$parts[0]] = $parts[$col_name];
         }
       }
+
       if (1 != $col_name) {
         asort(self::$languages[$lang]);
       }
@@ -104,6 +110,7 @@ class Languages
     if (isset(self::$languages)) {
       self::getAll();
     }
+
     return isset(self::$languages[$iso639_2]) ? self::$languages[$iso639_2] : $iso639_2;
   }
 
@@ -146,11 +153,9 @@ class Languages
           }
           // echo 'TODO: detected ' . $result['language'];
           //         echo "Text_LanguageDetect thinks this text is written in <b>{$result['language']}</b> ({$result['similarity']}, {$result['confidence']})<br /><br />\n";
-
       }
     }
   }
-
 }
 
 class MysqlFulltextSimpleParser
@@ -165,42 +170,47 @@ class MysqlFulltextSimpleParser
   */
   function accept ($match, $state) {
     // echo "$state: -$match-<br />";
-    if ($state == LEXER_UNMATCHED && strlen($match) < $this->min_length && strpos($match, '*') === FALSE)
-      return TRUE;
+    if ($state == LEXER_UNMATCHED && strlen($match) < $this->min_length && strpos($match, '*') === false) {
+      return true;
+    }
 
-    if ($state != LEXER_MATCHED)
+    if ($state != LEXER_MATCHED) {
       $this->output .= '+';
+    }
 
     $this->output .= $match;
-    return TRUE;
+
+    return true;
   }
 
   function writeQuoted ($match, $state) {
     static $words;
 
     switch ($state) {
-    // Entering the variable reference
-    case LEXER_ENTER:
-      $words = array();
-      break;
+      // Entering the variable reference
+      case LEXER_ENTER:
+        $words = [];
+        break;
 
-    // Contents of the variable reference
-    case LEXER_MATCHED:
-      break;
+      // Contents of the variable reference
+      case LEXER_MATCHED:
+        break;
 
-    case LEXER_UNMATCHED:
-      if (strlen($match) >= $this->min_length)
-        $words[] = $match;
-      break;
+      case LEXER_UNMATCHED:
+        if (strlen($match) >= $this->min_length) {
+          $words[] = $match;
+        }
+        break;
 
-    // Exiting the variable reference
-    case LEXER_EXIT:
-      if (count($words) > 0)
-        $this->output .= '+"' . implode(' ', $words) . '"';
-      break;
+      // Exiting the variable reference
+      case LEXER_EXIT:
+        if (count($words) > 0) {
+          $this->output .= '+"' . implode(' ', $words) . '"';
+        }
+        break;
     }
 
-    return TRUE;
+    return true;
   }
 }
 
@@ -225,23 +235,29 @@ class Journal
     }
   }
 
-  static function getIssue (&$dbconn, $nr = NULL) {
-    if (!isset($nr))
+  static function getIssue (&$dbconn, $nr = null) {
+    if (!isset($nr)) {
       $nr = self::getCurrentNr($dbconn);
+    }
+
     if (isset($nr)) {
       $year = intval($nr / 100);
-      $issue_date = new Zend_Date(array(
-                                'year' => $year,
-                                'month' => $nr % 100,
-                                'day' => 1));
-      return array('title' => sprintf('%s, Bd. %d',
-                                      $issue_date->toString('MMMM yyyy', Zend_Registry::get('Zend_Locale')),
-                                      $year - 2008 + 1),
-                   'issue' => $nr);
+      $issue_date = new Zend_Date([
+        'year' => $year,
+        'month' => $nr % 100,
+        'day' => 1,
+      ]);
+
+      return [
+        'title' => sprintf('%s, Bd. %d',
+                           $issue_date->toString('MMMM yyyy', Zend_Registry::get('Zend_Locale')),
+                           $year - 2008 + 1),
+        'issue' => $nr,
+      ];
     }
   }
 
-  static function getTocBySection (&$dbconn, $view, $issue, $preview = FALSE) {
+  static function getTocBySection (&$dbconn, $view, $issue, $preview = false) {
     global $MESSAGE_REVIEW_PUBLICATION;
 
     $querystr = "SELECT Message.id AS id, Message.type AS type, subject, body, DATE_FORMAT(published, '%Y%m') AS yearmonth, DATE(published) AS published,"
@@ -258,11 +274,12 @@ class Journal
       . " ORDER BY IFNULL(Publication.author, Publication.editor), year, User.lastname, Message.id";
 // var_dump($querystr);
     $dbconn->query($querystr);
-    $articles = array();
+    $articles = [];
     while ($dbconn->next_record()) {
       $articles[] = $dbconn->Record;
     }
-    return count($articles) > 0 ? array('REVIEWS' => $articles) : array();
+
+    return count($articles) > 0 ? ['REVIEWS' => $articles] : [];
   }
 
   static function getPublications ($dbconn, $message_id) {
@@ -273,7 +290,7 @@ class Journal
                         . " ORDER BY MessagePublication.ord",
                         $message_id);
     $dbconn->query($querystr);
-    $publications = array();
+    $publications = [];
     while ($dbconn->next_record()) {
       $publications[] = $dbconn->Record;
     }
@@ -293,11 +310,11 @@ class Journal
       . " ORDER BY published DESC, User.lastname, Message.id";
 // var_dump($querystr);
     $dbconn->query($querystr);
-    $articles = array();
+    $articles = [];
     while ($dbconn->next_record()) {
       $articles[] = $dbconn->Record;
     }
+
     return $articles;
   }
-
 }

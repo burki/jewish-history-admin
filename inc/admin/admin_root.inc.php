@@ -49,7 +49,7 @@ extends PageDisplay
       ],
       [
         'name' => 'term',
-        'title' => 'Wertelisten',
+        'title' => 'Term Sets',
         'privs' => $RIGHTS_ADMIN,
       ],
       /*
@@ -87,7 +87,7 @@ extends PageDisplay
         if (empty($ret)) {
           $ret = '<ul>';
         }
-        $url = isset($action['url']) ? $action['url'] : $this->page->buildLink(array('pn' => $action['name']));
+        $url = isset($action['url']) ? $action['url'] : $this->page->buildLink([ 'pn' => $action['name'] ]);
         $ret .= '<li><a href="' . htmlspecialchars($url) . '">'
               . $this->formatText(tr($action['title']))
               . '</a></li>';

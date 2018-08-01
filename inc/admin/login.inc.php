@@ -32,7 +32,7 @@ extends PageDisplay
     }
 
     $ret .= '<form name="login_form" action="'.$this->page->buildLink($params).'" method="post">';
-    /* if ($page['cookie_test'] !== FALSE) {
+    /* if ($page['cookie_test'] !== false) {
       $ret .= '<input type="hidden" name="login_sid" value="'.htmlspecialchars(session_id()).'" />';
     } */
 

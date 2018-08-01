@@ -6,7 +6,7 @@
  *
  * (c) 2015-2017 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2017-01-09 dbu
+ * Version: 2017-07-05 dbu
  *
  * TODO:
  *
@@ -16,12 +16,15 @@
 
 require_once INC_PATH . 'admin/displaybackend.inc.php';
 
-class PlaceFlow extends TableManagerFlow
+class PlaceFlow
+extends TableManagerFlow
 {
   const MERGE = 1010;
   const IMPORT = 1100;
 
-  static $TABLES_RELATED = array("MediaEntity JOIN Place ON CONCAT('http://vocab.getty.edu/tgn/', Place.tgn) = MediaEntity.uri AND Place.id=?");
+  static $TABLES_RELATED = [
+    "MediaEntity JOIN Place ON CONCAT('http://vocab.getty.edu/tgn/', Place.tgn) = MediaEntity.uri AND Place.id=?",
+  ];
 
   function init ($page) {
     $ret = parent::init($page);
@@ -51,9 +54,10 @@ class PlaceFlow extends TableManagerFlow
   }
 }
 
-class PlaceRecord extends TableManagerRecord
+class PlaceRecord
+extends TableManagerRecord
 {
-  var $languages = array('de', 'en');
+  var $languages = [ 'de', 'en' ];
 
   function store ($args = '') {
     $alternateName = [];
@@ -83,16 +87,16 @@ class PlaceRecord extends TableManagerRecord
   function fetch ($args, $datetime_style = '') {
     $fetched = parent::fetch($args, $datetime_style);
     if ($fetched) {
-      $alternateName = json_decode($this->get_value('alternateName'), TRUE);
-      if (isset($alternateName) && FALSE !== $alternateName) {
+      $alternateName = json_decode($this->get_value('alternateName'), true);
+      if (isset($alternateName) && false !== $alternateName) {
         foreach ($this->languages as $language) {
           if (array_key_exists($language, $alternateName)) {
             $this->set_value('name_variant_' . $language, $alternateName[$language]);
           }
         }
       }
-      $additional = json_decode($this->get_value('additional'), TRUE);
-      if (isset($additional) && FALSE !== $additional) {
+      $additional = json_decode($this->get_value('additional'), true);
+      if (isset($additional) && false !== $additional) {
         foreach ([ 'boundaryCode' ] as $key) {
           if (array_key_exists($key, $additional)) {
             $this->set_value($key, $additional[$key]);
@@ -105,48 +109,53 @@ class PlaceRecord extends TableManagerRecord
 
 }
 
-class DisplayPlace extends DisplayBackend
+class DisplayPlace
+extends DisplayBackend
 {
   var $table = 'place';
-  var $fields_listing = array('place.id AS id',
-                              "place.name AS name",
-                              "place.type AS type",
-                              // "parent_path",
-                              'place.tgn AS tgn',
-                              /* 'COUNT(DISTINCT Item.id) AS count',
-                              'COUNT(DISTINCT Media.id) AS how_many_media',
-                              */
-                              'place.created_at AS created',
-                              'place.status AS status',
-                              );
-  var $joins_listing = array(
-                             // ' LEFT OUTER JOIN ItemPlace ON ItemPlace.id_place=Place.id LEFT OUTER JOIN Item ON ItemPlace.id_item=Item.id AND Item.status >= 0' /* AND Item.collection <> 33' */,
-                             // " LEFT OUTER JOIN Media ON Media.item_id=Item.id AND Media.type = 0 AND Media.name='preview00'"
-                             );
+  var $fields_listing = [
+    'place.id AS id',
+    "place.name AS name",
+    "place.type AS type",
+    // "parent_path",
+    'place.tgn AS tgn',
+    /* 'COUNT(DISTINCT Item.id) AS count',
+    'COUNT(DISTINCT Media.id) AS how_many_media',
+    */
+    'place.created_at AS created',
+    'place.status AS status',
+  ];
+  var $joins_listing = [
+    // ' LEFT OUTER JOIN ItemPlace ON ItemPlace.id_place=Place.id LEFT OUTER JOIN Item ON ItemPlace.id_item=Item.id AND Item.status >= 0' /* AND Item.collection <> 33' */,
+    // " LEFT OUTER JOIN Media ON Media.item_id=Item.id AND Media.type = 0 AND Media.name='preview00'"
+  ];
   var $group_by_listing = 'place.id';
-  var $distinct_listing = TRUE;
-  var $order = array('name' => array('name', 'name DESC'),
-                     // 'count' => array('count DESC', 'count'),
-                     // 'how_many_media' => array('how_many_media DESC', 'how_many_media'),
-                     'created' => array('created_at DESC, place.id desc', 'created_at, place.id'),
-                    );
-  var $cols_listing = array('name' => 'Name',
-                            'type' => 'Typ',
-                            // 'parent_path' => 'Uebergeordnet',
-                            'tgn' => 'TGN',
-                            // 'count' => 'Erfasste Werke',
-                            // 'how_many_media' => 'Erfasste Bilder',
-                            'created' => 'Created',
-                            'status' => ''
-                            );
+  var $distinct_listing = true;
+  var $order = [
+    'name' => [ 'name', 'name DESC' ],
+    // 'count' => [ 'count DESC', 'count' ],
+    // 'how_many_media' => [ 'how_many_media DESC', 'how_many_media' ],
+    'created' => [ 'created_at DESC, place.id desc', 'created_at, place.id' ],
+  ];
+  var $cols_listing = [
+    'name' => 'Name',
+    'type' => 'Typ',
+    // 'parent_path' => 'Uebergeordnet',
+    'tgn' => 'TGN',
+    // 'count' => 'Erfasste Werke',
+    // 'how_many_media' => 'Erfasste Bilder',
+    'created' => 'Created',
+    'status' => '',
+  ];
   var $page_size = 50;
-  var $search_fulltext = NULL;
-  var $view_after_edit = TRUE;
-  var $show_xls_export = TRUE;
+  var $search_fulltext = null;
+  var $view_after_edit = true;
+  var $show_xls_export = true;
   var $xls_name = 'orte';
 
-  function __construct (&$page, $workflow = NULL) {
+  function __construct (&$page, $workflow = null) {
     $workflow = new PlaceFlow($page); // deleting may be merging
+
     parent::__construct($page, $workflow);
 
     if ('xls' == $page->display) {
@@ -165,106 +174,104 @@ class DisplayPlace extends DisplayBackend
     $this->page->setSessionValue('fulltext', $this->search_fulltext);
 
     if ($this->search_fulltext) {
-      $search_condition = array('name' => 'search', 'method' => 'buildFulltextCondition', 'args' => 'name,tgn', 'persist' => 'session');
+      $search_condition = [ 'name' => 'search', 'method' => 'buildFulltextCondition', 'args' => 'name,tgn', 'persist' => 'session' ];
     }
     else {
-      $search_condition = array('name' => 'search', 'method' => 'buildLikeCondition', 'args' => 'name,tgn', 'persist' => 'session');
+      $search_condition = [ 'name' => 'search', 'method' => 'buildLikeCondition', 'args' => 'name,tgn', 'persist' => 'session' ];
     }
 
-    $this->condition = array(
+    $this->condition = [
       sprintf('place.status <> %d', $this->status_deleted),
-      array('name' => 'status', 'method' => 'buildStatusCondition', 'args' => 'status', 'persist' => 'session'),
+      [ 'name' => 'status', 'method' => 'buildStatusCondition', 'args' => 'status', 'persist' => 'session' ],
       $search_condition,
-    );
+    ];
   }
 
   function setRecordInternal (&$record) {
   }
 
   function instantiateRecord ($table = '', $dbconn = '') {
-    $record = new PlaceRecord(array('tables' => $this->table, 'dbconn' => new DB_Presentation()));
+    $record = new PlaceRecord([ 'tables' => $this->table, 'dbconn' => new DB_Presentation() ]);
 
-    $type_options = array('' => '--',
-                          'root' => tr('Welt'),
-                          'continent' => tr('Continent'),
-                          'nation' => tr('Nation'),
-                          'country' => tr('Country'),
-                          'autonomous republic' => tr('Autonomous Republic'),
-                          'governorate' => tr('Governorate'),
-                          'state' => tr('State'),
-                          'national district' => tr('National District'),
-                          'province' => tr('Province'),
-                          'region' => tr('Region'),
-                          'canton' => tr('Canton'),
-                          'oblast' => tr('Oblast'),
-                          'voivodeship' => tr('Voivodeship'),
-                          'county' => tr('County'),
-                          'unitary authority' => tr('Unitary authority'),
-                          'municipality' => tr('Municipality'),
-                          'autonomous city' => tr('Autonomous City'),
-                          'autonomous community' => tr('Autonomous Community'),
-                          'special city' => tr('Special City'),
-                          'inhabited place' => tr('Inhabited Place'),
-                          'district' => tr('District'),
-                          'neighborhood' => tr('Neighborhood'),
-                          'general region' => tr('General Region'),
-                          'historical region' => tr('Historical Region'),
-                          'former group of political entitites' => tr('Former group of political entitites'),
-                          'former primary political entity' => tr('Former primary political entity'),
-                          'deserted settlement' => tr('Deserted Settlement'),
-                          'sea' => tr('Sea'),
-                          'peninsula' => tr('Peninsula'),
-                          'island' => tr('Island'),
-                          'association' => tr('Association'),
-                          'miscellaneous' => tr('Miscellaneous'),
-                          );
+    $type_options = [
+      '' => '--',
+      'root' => tr('World'),
+      'continent' => tr('Continent'),
+      'nation' => tr('Nation'),
+      'country' => tr('Country'),
+      'autonomous republic' => tr('Autonomous Republic'),
+      'governorate' => tr('Governorate'),
+      'state' => tr('State'),
+      'national district' => tr('National District'),
+      'province' => tr('Province'),
+      'region' => tr('Region'),
+      'canton' => tr('Canton'),
+      'oblast' => tr('Oblast'),
+      'voivodeship' => tr('Voivodeship'),
+      'county' => tr('County'),
+      'unitary authority' => tr('Unitary authority'),
+      'municipality' => tr('Municipality'),
+      'autonomous city' => tr('Autonomous City'),
+      'autonomous community' => tr('Autonomous Community'),
+      'special city' => tr('Special City'),
+      'inhabited place' => tr('Inhabited Place'),
+      'district' => tr('District'),
+      'neighborhood' => tr('Neighborhood'),
+      'general region' => tr('General Region'),
+      'historical region' => tr('Historical Region'),
+      'former group of political entitites' => tr('Former group of political entitites'),
+      'former primary political entity' => tr('Former primary political entity'),
+      'deserted settlement' => tr('Deserted Settlement'),
+      'sea' => tr('Sea'),
+      'peninsula' => tr('Peninsula'),
+      'island' => tr('Island'),
+      'association' => tr('Association'),
+      'miscellaneous' => tr('Miscellaneous'),
+    ];
 
     $label_select_country = tr('-- please select --');
-    $countries_ordered = array('' => $label_select_country)
-                       + $this->buildCountryOptions(TRUE);
+    $countries_ordered = [ '' => $label_select_country ]
+                       + $this->buildCountryOptions(true);
 
-    $record->add_fields(
-      array(
-        new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => TRUE)),
-        new Field(array('name' => 'type', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($type_options), 'labels' => array_values($type_options), 'null' => TRUE)),
+    $record->add_fields([
+      new Field([ 'name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => true ]),
+      new Field([ 'name' => 'type', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($type_options), 'labels' => array_values($type_options), 'null' => true ]),
 
-        new Field(array('name' => 'created_at', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'UTC_TIMESTAMP()', 'noupdate' => TRUE)),
-        // new Field(array('name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'noupdate' => TRUE)),
-        new Field(array('name' => 'changed_at', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'UTC_TIMESTAMP()')),
-        // new Field(array('name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'])),
+      new Field([ 'name' => 'created_at', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'UTC_TIMESTAMP()', 'noupdate' => true ]),
+      // new Field([ 'name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'noupdate' => true ]),
+      new Field([ 'name' => 'changed_at', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'UTC_TIMESTAMP()' ]),
+      // new Field([ 'name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'] ]),
 
-        new Field(array('name' => 'name', 'id' => 'name', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80)),
+      new Field([ 'name' => 'name', 'id' => 'name', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80 ]),
 
-        new Field(array('name' => 'alternateName', 'type' => 'hidden', 'datatype' => 'char', 'null' => TRUE)),
-        new Field(array('name' => 'name_variant_de', 'type' => 'text', 'datatype' => 'char', 'size' => 40, 'null' => TRUE, 'nodbfield' => true)),
-        new Field(array('name' => 'name_variant_en', 'type' => 'text', 'datatype' => 'char', 'size' => 40, 'null' => TRUE, 'nodbfield' => true)),
+      new Field([ 'name' => 'alternateName', 'type' => 'hidden', 'datatype' => 'char', 'null' => true ]),
+      new Field([ 'name' => 'name_variant_de', 'type' => 'text', 'datatype' => 'char', 'size' => 40, 'null' => true, 'nodbfield' => true ]),
+      new Field([ 'name' => 'name_variant_en', 'type' => 'text', 'datatype' => 'char', 'size' => 40, 'null' => true, 'nodbfield' => true ]),
 
-        new Field(array('name' => 'country_code', 'id' => 'country', 'type' => 'select', 'datatype' => 'char', 'null' => TRUE, 'options' => array_keys($countries_ordered), 'labels' => array_values($countries_ordered),
-                        'data-placeholder' => $label_select_country, 'null' => TRUE)),
+      new Field([ 'name' => 'country_code', 'id' => 'country', 'type' => 'select', 'datatype' => 'char', 'null' => true, 'options' => array_keys($countries_ordered), 'labels' => array_values($countries_ordered),
+                  'data-placeholder' => $label_select_country, 'null' => true ]),
 
-        new Field(array('name' => 'tgn', 'id' => 'tgn', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
-        // new Field(array('name' => 'tgn_parent', 'id' => 'tgn_parent', 'type' => 'hidden', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
-        // new Field(array('name' => 'parent_path', 'id' => 'parent_path', 'type' => 'hidden', 'datatype' => 'char', 'size' => 40, 'null' => TRUE)),
-        new Field(array('name' => 'gnd', 'id' => 'gnd', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
-        new Field(array('name' => 'geonames', 'id' => 'geonames', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
+      new Field([ 'name' => 'tgn', 'id' => 'tgn', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => true ]),
+      // new Field([ 'name' => 'tgn_parent', 'id' => 'tgn_parent', 'type' => 'hidden', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => true ]),
+      // new Field([ 'name' => 'parent_path', 'id' => 'parent_path', 'type' => 'hidden', 'datatype' => 'char', 'size' => 40, 'null' => true ]),
+      new Field([ 'name' => 'gnd', 'id' => 'gnd', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => true ]),
+      new Field([ 'name' => 'geonames', 'id' => 'geonames', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => true ]),
 
-        new Field(array('name' => 'boundaryCode', 'type' => 'text', 'datatype' => 'char', 'size' => 40, 'null' => TRUE, 'nodbfield' => true)),
-        new Field(array('name' => 'additional', 'type' => 'hidden', 'datatype' => 'char', 'null' => TRUE)),
-        /*
-        new Field(array('name' => 'latitude', 'id' => 'latitude', 'type' => 'hidden', 'datatype' => 'char', 'size' => 15, 'null' => TRUE)),
-        new Field(array('name' => 'longitude', 'id' => 'longitude', 'type' => 'hidden', 'datatype' => 'char', 'size' => 15, 'null' => TRUE)),
-        */
+      new Field([ 'name' => 'boundaryCode', 'type' => 'text', 'datatype' => 'char', 'size' => 40, 'null' => true, 'nodbfield' => true ]),
+      new Field([ 'name' => 'additional', 'type' => 'hidden', 'datatype' => 'char', 'null' => true ]),
+      /*
+      new Field([ 'name' => 'latitude', 'id' => 'latitude', 'type' => 'hidden', 'datatype' => 'char', 'size' => 15, 'null' => true ]),
+      new Field([ 'name' => 'longitude', 'id' => 'longitude', 'type' => 'hidden', 'datatype' => 'char', 'size' => 15, 'null' => true ]),
+      */
 
-        // new Field(array('name' => 'comment_internal', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
-    ));
+      // new Field([ 'name' => 'comment_internal', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => true ]),
+    ]);
 
     if ($this->page->isAdminUser()) {
       // admins may publish Place
-      $record->add_fields(
-        array(
-          new Field(array('name' => 'status', 'type' => 'hidden', 'value' => 0, 'noupdate' => !$this->is_internal, 'null' => TRUE)),
-          )
-        );
+      $record->add_fields([
+        new Field([ 'name' => 'status', 'type' => 'hidden', 'value' => 0, 'noupdate' => !$this->is_internal, 'null' => true ]),
+      ]);
     }
 
     return $record;
@@ -276,39 +283,46 @@ class DisplayPlace extends DisplayBackend
       $tgn_search = sprintf('<input value="TGN Anfrage nach Name" type="button" onclick="%s" /><span id="spinner"></span><br />',
                             "jQuery('#tgn').autocomplete('enable');jQuery('#tgn').autocomplete('search', jQuery('#lastname').val() + ', ' + jQuery('#firstname').val())");
     }
-    $rows = array(
-      'id' => FALSE, 'status' => FALSE,
-      'type' => array('label' => 'Place Type'),
-      'name' => array('label' => 'Name'),
-      'name_variant_de' => array('label' => 'Deutscher Name',
-                                 'description' => "Please enter additional names or spellings"),
-      'name_variant_en' => array('label' => 'Englischer Name',
-                                 'description' => "Please enter additional names or spellings"),
-      'tgn' => array('label' => 'Getty Thesaurus of Name',
-                     'description' => 'Identifikator',
-                     ),
-      'tgn_parent' => FALSE,
-      // 'parent_path' => ('edit' == $mode ? FALSE : array('label' => 'Uebergeordnet')),
-      'gnd' => array('label' => 'GND',
-                     'description' => 'Identifikator',
-                     ),
-      'geonames' => array('label' => 'GeoNames',
-                     'description' => 'Identifikator',
-                     ),
+    $rows = [
+      'id' => false, 'status' => false,
+      'type' => [ 'label' => 'Place Type' ],
+      'name' => [ 'label' => 'Name' ],
+      'name_variant_de' => [
+        'label' => 'Deutscher Name',
+        'description' => "Please enter additional names or spellings",
+      ],
+      'name_variant_en' => [
+        'label' => 'Englischer Name',
+        'description' => "Please enter additional names or spellings"
+      ],
+      'tgn' => [
+        'label' => 'Getty Thesaurus of Name',
+        'description' => 'Identifikator',
+      ],
+      'tgn_parent' => false,
+      // 'parent_path' => ('edit' == $mode ? false : [ 'label' => 'Uebergeordnet')),
+      'gnd' => [
+        'label' => 'GND',
+        'description' => 'Identifikator',
+      ],
+      'geonames' => [
+        'label' => 'GeoNames',
+        'description' => 'Identifikator',
+      ],
       (isset($this->form) ? $tgn_search . $this->form->show_submit(tr('Store')) : '')
       . '<hr noshade="noshade" />',
 
-      'country_code' => array('label' => 'Country'),
-      'boundaryCode' => array('label' => 'Boundary Code (ISO 3166-2)'),
-      'additional' => FALSE,
+      'country_code' => [ 'label' => 'Country' ],
+      'boundaryCode' => [ 'label' => 'Boundary Code (ISO 3166-2)' ],
+      'additional' => false,
 
-      'longitude' => FALSE,
-      'latitude' => FALSE,
+      'longitude' => false,
+      'latitude' => false,
 
       '<hr noshade="noshade" />',
-      'comment_internal' => array('label' => 'Internal notes and comments'),
+      'comment_internal' => [ 'label' => 'Internal notes and comments' ],
       (isset($this->form) ? $this->form->show_submit(tr('Store')) : ''),
-    );
+    ];
 
     if ('edit' == $mode) {
       $this->script_url[] = 'script/moment.min.js';
@@ -412,9 +426,9 @@ EOT;
         $this->script_url[] = 'script/seealso.js';
 
 
-        $PND_LINKS = array('http://d-nb.info/tgn/%s' => 'Deutsche Nationalbibliothek',
-                           // 'http://www.kubikat.org/mrbh-cgi/kubikat_de.pl?t_idn=x&tgn=%s' => 'KuBiKat',
-                             );
+        $PND_LINKS = [
+          'http://d-nb.info/tgn/%s' => 'Deutsche Nationalbibliothek',
+        ];
         $rows['tgn']['value'] = '<ul><li>';
 
         $rows['tgn']['value'] .= htmlspecialchars($tgn);
@@ -426,17 +440,18 @@ EOT;
           $url_final = sprintf($url, $tgn);
           $external[] = sprintf('<li><a href="%s" target="_blank">%s</a></li>',
                                 htmlspecialchars($url_final), $this->formatText($title));
-
         }
+
         if (count($external) > 0) {
           $rows['tgn']['value'] .= implode('', $external);
         }
+
         $rows['tgn']['value'] .= '</ul>';
 
         $this->script_code .= <<<EOT
           var service = new SeeAlsoCollection();
           service.services = {
-            'pndaks' : new SeeAlsoService('http://beacon.findbuch.de/seealso/pnd-aks/')
+            'pndaks' : new SeeAlsoService('//beacon.findbuch.de/seealso/pnd-aks/')
           };
           service.views = { 'seealso-ul' : new SeeAlsoUL({ /* preHTML : '<h3>Externe Angebote</h3>', */
                                                             linkTarget: '_blank',
@@ -460,7 +475,7 @@ EOT;
     return $this->formatText($record->get_value('name'));
   }
 
-  function buildViewFooter ($found = TRUE) {
+  function buildViewFooter ($found = true) {
     $tgn = $this->record->get_value('tgn');
     $publications = !empty($tgn)
       ? $this->buildRelatedPublications('http://vocab.getty.edu/tgn/' . $tgn)
@@ -486,8 +501,8 @@ EOT;
               . " ORDER BY earliestdate, displaydate, Item.title, Item.id";
 
     $stmt = $dbconn->query($querystr);
-    if (FALSE !== $stmt) {
-      $params = array('pn' => 'item');
+    if (false !== $stmt) {
+      $params = [ 'pn' => 'item' ];
       while ($row = $stmt->fetch()) {
         if (!empty($works)) {
           $works .= '<br />';
@@ -517,8 +532,8 @@ EOT;
               . " ORDER BY startdate, enddate, Exhibition.title, Exhibition.id";
 
     $stmt = $dbconn->query($querystr);
-    if (FALSE !== $stmt) {
-      $params = array('pn' => 'exhibition');
+    if (false !== $stmt) {
+      $params = [ 'pn' => 'exhibition' ];
       while ($row = $stmt->fetch()) {
         if (!empty($exhibitions)) {
           $exhibitions .= '<br />';
@@ -548,8 +563,8 @@ EOT;
               . " ORDER BY IFNULL(author,editor), YEAR(publication_date)";
 
     $stmt = $dbconn->query($querystr);
-    if (FALSE !== $stmt) {
-      $params = array('pn' => 'publication');
+    if (false !== $stmt) {
+      $params = [ 'pn' => 'publication' ];
       require_once INC_PATH . '/common/biblioservice.inc.php';
       $biblio_client = BiblioService::getInstance();
 
@@ -561,26 +576,28 @@ EOT;
           $publications = '<h3>' . $this->htmlSpecialchars(tr('Publications')) . '</h3>';
         }
         $params['view'] = $row['id'];
-        $citation = $biblio_client->buildCitation($row['id'],
-                                                  array('person_delimiter' => '/',
-                                                        'person_suffix' => ',',
-                                                        'title_suffix' => ',',
-                                                        'publisher_suppress' => TRUE,
-                                                        ));
+        $citation = $biblio_client->buildCitation($row['id'], [
+          'person_delimiter' => '/',
+          'person_suffix' => ',',
+          'title_suffix' => ',',
+          'publisher_suppress' => true,
+        ]);
         $publications .= sprintf('<a href="%s">%s</a>',
                                  htmlspecialchars($this->page->buildLink($params)),
                                  $citation);
       }
     }
-    if (!empty($publications))
+
+    if (!empty($publications)) {
       $ret .= '<br style="clear: both" />' . $publications;
+    }
 
     return $ret . parent::buildViewAdditional($record, $uploadHandler);
   }
 
   function buildSearchBar () {
     $ret = sprintf('<form action="%s" method="post" name="search">',
-                   htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, 'page_id' => 0))));
+                   htmlspecialchars($this->page->buildLink([ 'pn' => $this->page->name, 'page_id' => 0 ])));
 
     $search = sprintf('<input type="text" name="search" value="%s" size="40" />',
                       $this->htmlSpecialchars(array_key_exists('search', $this->search) ?  $this->search['search'] : ''));
@@ -596,18 +613,20 @@ EOT;
         if (null != form) {
           var textfields = ['search'];
           for (var i = 0; i < textfields.length; i++) {
-            if (null != form.elements[textfields[i]])
+            if (null != form.elements[textfields[i]]) {
               form.elements[textfields[i]].value = '';
+            }
           }
           var selectfields = ['status', 'review'];
           for (var i = 0; i < selectfields.length; i++) {
-            if (null != form.elements[selectfields[i]])
+            if (null != form.elements[selectfields[i]]) {
               form.elements[selectfields[i]].selectedIndex = 0;
+            }
           }
           var radiofields = ['fulltext'];
           for (var i = 0; i < radiofields.length; i++) {
             if (null != form.elements[radiofields[i]]) {
-                form.elements[radiofields[i]][1].checked = false;
+              form.elements[radiofields[i]][1].checked = false;
             }
           }
         }
@@ -623,13 +642,14 @@ EOT;
                     $search);
 
     $ret .= '</form>';
+
     return $ret;
   } // buildSearchBar
 
   function getImageDescriptions () {
     global $TYPE_PLACE;
 
-    return array($TYPE_PLACE, []);
+    return [ $TYPE_PLACE, [] ];
   }
 
   function doListingQuery ($page_size = 0, $page_id = 0) {
@@ -637,6 +657,7 @@ EOT;
     $this->page->dbconn = new DB_Presentation();
     $ret = parent::doListingQuery($page_size, $page_id);
     $this->page->dbconn = $dbconn_orig;
+
     return $ret;
   }
 
@@ -648,23 +669,26 @@ EOT;
     $record = $this->buildRecord();
     // created is default of type function
     // $record->get_field('created')->set('datatype', 'date');
-    if (!$record->fetch($id))
-      return FALSE;
-    $action = NULL;
+    if (!$record->fetch($id)) {
+      return false;
+    }
+
+    $action = null;
     if (array_key_exists('with', $_POST)
         && intval($_POST['with']) > 0)
     {
       $action = 'merge';
       $id_new = intval($_POST['with']);
     }
-    $ret = FALSE;
+
+    $ret = false;
 
     $dbconn = new DB_Presentation();
     switch ($action) {
       case 'merge':
         $record_new = $this->buildRecord();
         if (!$record_new->fetch($id_new)) {
-          return FALSE;
+          return false;
         }
 
         foreach (PlaceFlow::$TABLES_RELATED as $table => $key_field) {
@@ -672,7 +696,7 @@ EOT;
                               $table, $key_field, $id_new, $key_field, $id);
           $dbconn->query($querystr);
         }
-        $this->page->redirect(array('pn' => $this->page->name, 'delete' => $id));
+        $this->page->redirect([ 'pn' => $this->page->name, 'delete' => $id ]);
         break;
 
       default:
@@ -681,7 +705,7 @@ EOT;
         return sprintf('%s cannot be deleted since there are entries connected to this place',
                        $orig);
 
-        $params_replace = array('pn' => $this->page->name, 'delete' => $id);
+        $params_replace = [ 'pn' => $this->page->name, 'delete' => $id ];
         // show replacements
         $querystr = sprintf("SELECT id, name, UNIX_TIMESTAMP(created) AS created_timestamp FROM Place WHERE id<>%d AND status >= 0 ORDER BY name, status DESC, created DESC",
                             $id);
@@ -693,6 +717,7 @@ EOT;
                               $this->htmlSpecialchars($dbconn->Record['name'])
                              );
         }
+
         if (!empty($replace)) {
           $ret = sprintf('<form method="post" action="%s">',
                          htmlspecialchars($this->page->buildLink($params_replace)))
@@ -710,10 +735,10 @@ EOT;
     return $ret;
   }
 
-  function buildListingCell (&$row, $col_index, $val = NULL) {
-    $val = NULL;
+  function buildListingCell (&$row, $col_index, $val = null) {
+    $val = null;
     if ($col_index == count($this->fields_listing) - 1) {
-      $url_preview = $this->page->buildLink(array('pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_VIEW) => $row[0]));
+      $url_preview = $this->page->buildLink([ 'pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_VIEW) => $row[0] ]);
       $val = sprintf('<div style="text-align:right;">[<a href="%s">%s</a>]</div>',
                      htmlspecialchars($url_preview),
                      tr('view'));
@@ -752,19 +777,22 @@ EOT;
         if (!isset($place)) {
           $ret .= ' -> failed<br />';
         }
+
         $record = $this->instantiateRecord($this->table);
-        foreach (array('tgn' => 'tgn',
-                       'preferredName' => 'name',
-                       'type' => 'type',
-                       'tgn_parent' => 'tgn_parent',
-                       // 'parentPath' => 'parent_path',
-                       'latitude' => 'latitude',
-                       'longitude' => 'longitude',
-                       ) as $src => $dst)
+        foreach ([
+            'tgn' => 'tgn',
+            'preferredName' => 'name',
+            'type' => 'type',
+            'tgn_parent' => 'tgn_parent',
+            // 'parentPath' => 'parent_path',
+            'latitude' => 'latitude',
+            'longitude' => 'longitude',
+          ] as $src => $dst)
         {
           $value = isset($place->$src) ? $place->$src : null;
           $record->set_value($dst, $value);
         }
+
         $record->store();
         // var_dump($place->preferredName);
         $ret .= ' -> ' . $place->preferredName . '<br />';
@@ -787,6 +815,7 @@ EOT;
         return $res;
       }
     }
+
     if (PlaceFlow::IMPORT == $this->step) {
       $res = $this->buildImport();
       if ('boolean' == gettype($res)) {
@@ -798,14 +827,13 @@ EOT;
         return $res;
       }
     }
+
     return parent::buildContent();
   }
-
 }
 
 $display = new DisplayPlace($page);
-if (FALSE === $display->init()) {
-  $page->redirect(array('pn' => ''));
+if (false === $display->init()) {
+  $page->redirect([ 'pn' => '' ]);
 }
-
 $page->setDisplay($display);

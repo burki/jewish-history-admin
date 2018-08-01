@@ -1,13 +1,12 @@
 <?php
-
 /*
  * Message.php
  *
  * Build multilingual (mail) messages with placeholders
  *
- * (c) 2008-2014 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-06-06 dbu
+ * Version: 2018-07-23 dbu
  *
  * Changes:
  *
@@ -15,18 +14,18 @@
 
 class Message
 {
-    static $SUBJECTS = array(
+    static $SUBJECTS = [
         'pwd_recover' => 'Set new password',
         'register_confirm' => 'Your registration',
-    );
+    ];
 
     var $page;
     var $type;
     var $lang = 'en_US';
     var $id_to;
-    var $options = array();
+    var $options = [];
 
-    function __construct ($page, $type, $id_to = NULL, $options = array(), $lang = NULL) {
+    function __construct ($page, $type, $id_to = null, $options = [], $lang = null) {
         $this->page = $page;
         $this->type = $type;
         $this->id_to = $id_to;
@@ -34,7 +33,7 @@ class Message
         $this->options = $options;
     }
 
-    function buildSubject ($subject = FALSE) {
+    function buildSubject ($subject = false) {
         if (!$subject) {
             if (array_key_exists($this->type, self::$SUBJECTS)) {
                 $subject = self::$SUBJECTS[$this->type];
@@ -48,10 +47,10 @@ class Message
     }
 
     function buildBody () {
-        $body = FALSE;
-        $subject = FALSE;
+        $body = false;
+        $subject = false;
 
-        $languages = array($this->lang);
+        $languages = [$this->lang];
         if ('en_US' != $this->lang) {
             $languages[] = 'en_US'; // add fallback language
         }
@@ -59,13 +58,13 @@ class Message
         foreach ($languages as $lang) {
             $fname_template = INC_PATH . '/messages/' . $this->type . '.' . $lang . '.txt';
             $lines = @file($fname_template);
-            if (FALSE !== $lines) {
+            if (false !== $lines) {
                 break;
             }
         }
 
-        if (FALSE === $lines) {
-            return FALSE;
+        if (false === $lines) {
+            return false;
         }
 
         // The first line may contain the Subject
@@ -79,10 +78,10 @@ class Message
 
         // fill in template
         $body = preg_replace_callback('|\%([a-z_0-9]+)\%|',
-                                    array($this->messagePlaceholder, 'replace'),
+                                    [$this->messagePlaceholder, 'replace'],
                                     $template);
 
-        return array($subject, $body);
+        return [$subject, $body];
     }
 
     function build () {
@@ -95,7 +94,7 @@ class Message
         }
         $subject = $this->buildSubject($subject);
 
-        return array($subject, $body);
+        return [$subject, $body];
     }
 
     function buildFrom () {
@@ -106,14 +105,14 @@ class Message
         global $MAIL_SETTINGS;
         $from = $MAIL_SETTINGS['from'];
         if (isset($MAIL_SETTINGS['from_name'])) {
-            $from = array($from => $MAIL_SETTINGS['from_name']);
+            $from = [$from => $MAIL_SETTINGS['from_name']];
         }
 
         return $from;
     }
 
     function fetchUser ($id) {
-        static $_users = array();
+        static $_users = [];
 
         if (!isset($_users[$id])) {
             $dbconn = new DB();
@@ -127,11 +126,11 @@ class Message
             }
         }
 
-        return isset($_users[$id]) ? $_users[$id] : NULL;
+        return isset($_users[$id]) ? $_users[$id] : null;
     }
 
     function buildRecipients () {
-        $recipients = array();
+        $recipients = [];
 
         if (isset($this->options['recipients'])) {
             $recipients = $this->options['recipients'];
@@ -172,8 +171,8 @@ EOT;
         require_once INC_PATH . 'common/MailMessage.php';
 
         list($subject, $body) = $this->build();
-        if (FALSE === $body) {
-            return FALSE;
+        if (false === $body) {
+            return false;
         }
 
         $recipients = $this->buildRecipients();
@@ -206,21 +205,24 @@ EOT;
                     $mail->attach($attachment);
                 }
             }
+
             return $mail->send();
         }
         catch (Exception $e) {
             // e.g. Swift_RfcComplianceException: Address in mailbox given [zorro1@freesurf.ch> ] does not comply with RFC 2822
             // TODO: somehow log/return the error
         }
-        return FALSE;
+
+        return false;
     }
 }
 
-class StyledMessage extends Message
+class StyledMessage
+extends Message
 {
     var $title;
 
-    function buildMultipartMessage ($subject, $body, $recipients = array()) {
+    function buildMultipartMessage ($subject, $body, $recipients = []) {
         // generate html and plain-text version
 
         $display = new PageDisplayBase($this->page);
@@ -246,7 +248,7 @@ topmargin="4">'
                       ? sprintf('<tr><td align="center"><font face="Verdana,Arial,sans-serif" color="#666" style="font-size:xx-small;">%s</font></td></tr>',
                                 sprintf($footer,
                                         $recipients['to'],
-                                        $this->page->buildLinkFull(array()),
+                                        $this->page->buildLinkFull([]),
                                         $this->page->site_description['title']
                                         ))
                       : '')
@@ -257,7 +259,7 @@ topmargin="4">'
         $mail->attachPlain($body_plain);
 
         $logo = 'media/logo.jpg';
-        $replace = array('%logo%' => $this->page->BASE_URL . $logo);
+        $replace = ['%logo%' => $this->page->BASE_URL . $logo];
 
         /*
         try {
@@ -273,7 +275,6 @@ topmargin="4">'
 
         return $mail;
     }
-
 }
 
 class MessagePlaceholder
@@ -286,6 +287,7 @@ class MessagePlaceholder
             case 'de_CH':
                 return new MessagePlaceholderGerman($message);
                 break;
+
             default:
                 return new MessagePlaceholder ($message);
                 break;
@@ -316,16 +318,20 @@ class MessagePlaceholder
                 /* var_dump($ret);
                 exit; */
                 break;
+
             case 'your_account_linked':
-                $ret = '[' . $this->message->page->buildLinkFull(array('pn' => 'account')) . ' your account]';
+                $ret = '[' . $this->message->page->buildLinkFull(['pn' => 'account']) . ' your account]';
                 break;
+
             case 'site':
                 $ret = $this->message->page->site_description['title'];
                 break;
+
             case 'signature':
                 $ret = Page::gettext('Best regards', $this->message->lang)
                      . "\n\n" . $this->message->page->site_description['title'];
                 break;
+
             default:
                 if (isset($this->message->options['replace'])
                     && array_key_exists($matches[1], $this->message->options['replace'])) {
@@ -337,7 +343,8 @@ class MessagePlaceholder
     }
 }
 
-class MessagePlaceholderGerman extends MessagePlaceholder
+class MessagePlaceholderGerman
+extends MessagePlaceholder
 {
     function replace ($matches) {
         $ret = '';

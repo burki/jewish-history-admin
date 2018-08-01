@@ -4,15 +4,16 @@
  *
  * Show settings and try to check all system-requirements
  *
- * (c) 2012-2014 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2012-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2014-12-15 dbu
+ * Version: 2018-07-23 dbu
  *
  * Changes:
  *
  */
 
-class SystemInformationDisplay extends PageDisplay
+class SystemInformationDisplay
+extends PageDisplay
 {
 
   var $msg = '';
@@ -25,60 +26,12 @@ class SystemInformationDisplay extends PageDisplay
     return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
   }
 
-  static function json_indent ($json) {
-    $result      = '';
-    $pos         = 0;
-    $strLen      = strlen($json);
-    $indentStr   = '  ';
-    $newLine     = "\n";
-    $prevChar    = '';
-    $outOfQuotes = true;
-
-    for ($i = 0; $i <= $strLen; $i++) {
-
-        // Grab the next character in the string.
-        $char = substr($json, $i, 1);
-
-        // Are we inside a quoted string?
-        if ($char == '"' && $prevChar != '\\') {
-            $outOfQuotes = !$outOfQuotes;
-
-        // If this character is the end of an element,
-        // output a new line and indent the next line.
-        } else if (($char == '}' || $char == ']') && $outOfQuotes) {
-            $result .= $newLine;
-            $pos --;
-            for ($j=0; $j<$pos; $j++) {
-                $result .= $indentStr;
-            }
-        }
-
-        // Add the character to the result string.
-        $result .= $char;
-
-        // If the last character was the beginning of an element,
-        // output a new line and indent the next line.
-        if (($char == ',' || $char == '{' || $char == '[') && $outOfQuotes) {
-            $result .= $newLine;
-            if ($char == '{' || $char == '[') {
-                $pos ++;
-            }
-
-            for ($j = 0; $j < $pos; $j++) {
-                $result .= $indentStr;
-            }
-        }
-
-        $prevChar = $char;
-    }
-
-    return $result;
-  }
-
   static function human_filesize ($bytes, $decimals = 2) {
     $sz = 'BKMGTP';
     $factor = floor((strlen($bytes) - 1) / 3);
-    return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . @$sz[$factor];
+
+    return sprintf("%.{$decimals}f",
+                   $bytes / pow(1024, $factor)) . @$sz[$factor];
   }
 
   private static function normalizePath ($path) {
@@ -86,6 +39,7 @@ class SystemInformationDisplay extends PageDisplay
       // replace \ by /
       $path = preg_replace('/\\\\/', '/', $path);
     }
+
     return $path;
   }
 
@@ -102,30 +56,25 @@ class SystemInformationDisplay extends PageDisplay
       foreach ($paths as $path) {
         $cmd_full = $path . '/' . $cmd;
         if (file_exists($cmd_full) && is_executable($cmd_full)) {
-          return TRUE;
+          return true;
         }
       }
     }
 
-    return FALSE;
+    return false;
   }
 
   function buildSuccessFail ($success) {
     if ($success) {
       return '<button class="btn btn-success" type="button">Success</button>';
     }
-    else {
-      return '<button class="btn btn-danger" type="button">Fail</button>';
-    }
+
+    return '<button class="btn btn-danger" type="button">Fail</button>';
   }
 
   function buildVariableDisplay ($config) {
-    if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
-      $parameters_json = json_encode($config, JSON_PRETTY_PRINT);
-    }
-    else {
-      $parameters_json = self::json_indent(json_encode($config));
-    }
+    $parameters_json = json_encode($config, JSON_PRETTY_PRINT);
+
     return '<tt><pre>' . $parameters_json . '</pre></tt>';
   }
 
@@ -166,10 +115,10 @@ class SystemInformationDisplay extends PageDisplay
 
     $ret .= '<h2>Upload Settings</h2>';
     $ret .= $this->buildVariableDisplay(
-                array(
+                [
                       'MAX_FILE_SIZE' => self::human_filesize(UPLOAD_MAX_FILE_SIZE),
                       'UPLOAD_FILEROOT' => UPLOAD_FILEROOT,
-                )
+                ]
             );
 
     if (defined('UPLOAD_PATH2MAGICK')) {
@@ -188,7 +137,7 @@ class SystemInformationDisplay extends PageDisplay
     /*
     $ret .= '<h2>E-Mail Settings</h2>';
     require_once INC_PATH . 'common/MailMessage.php';
-    $mailerFactory = new MailerFactory(array());
+    $mailerFactory = new MailerFactory([]);
     $mailer = $mailerFactory->getInstance();
 
     if (isset($mailer->config)) {
@@ -205,8 +154,8 @@ class SystemInformationDisplay extends PageDisplay
 }
 
 $display = new SystemInformationDisplay($page);
-if (FALSE === $display->init()) {
-  $page->redirect(array('pn' => ''));
+if (false === $display->init()) {
+  $page->redirect(['pn' => '']);
 }
 
 $page->setDisplay($display);

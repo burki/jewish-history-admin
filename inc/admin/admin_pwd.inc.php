@@ -4,9 +4,9 @@
  *
  * mail out a link to the password-change page
  *
- * (c) 2009-2016 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2016-02-22 dbu
+ * Version: 2018-07-23 dbu
  *
  * Changes:
  *
@@ -25,24 +25,28 @@ define('FORWARD_LOGINFIRST', 25);
 
 define('SHOW_LOGIN', 30);
 
-class DisplayPasswordRecover extends PageDisplay
+class DisplayPasswordRecover
+extends PageDisplay
 {
   var $mode = SHOW_RECOVERFORM;
-  var $logins = array();
+  var $logins = [];
   var $msg = '';
 
-  var $data = array(); // to pass data from the init to the display-code
+  var $data = []; // to pass data from the init to the display-code
 
   function init () {
     if ('POST' == $_SERVER['REQUEST_METHOD']) {
       if (!empty($_POST['login'])) {
-        if (!empty($_POST['submitpwd']))
+        if (!empty($_POST['submitpwd'])) {
           list($this->mode, $this->msg) = $this->verifyRecoverCode($_POST['login'], $_POST['r'], $_POST['pwd'], $_POST['pwd_confirm']);
-        else
+        }
+        else {
           list($this->mode, $this->msg) = $this->processRecoverRequest($_POST['login']);
+        }
       }
     }
-    else { // check if we come from a password mail-link
+    else {
+      // check if we come from a password mail-link
       if (!empty($_GET['login'])) {
         list($this->mode, $this->msg) = $this->processRecoverRequest($_GET['login']);
       }
@@ -58,6 +62,7 @@ class DisplayPasswordRecover extends PageDisplay
         }
       }
     }
+
     return $this->mode;
   } // init
 
@@ -66,15 +71,18 @@ class DisplayPasswordRecover extends PageDisplay
 
     require_once INC_PATH . '/common/Message.php';
 
-    $replace = array('url_recover' => $this->page->buildLinkFull(array('pn' => $this->page->name, $magic => $to_id)),
-                     'remote_addr' => $_SERVER['REMOTE_ADDR']);
+    $replace = [
+      'url_recover' => $this->page->buildLinkFull([ 'pn' => $this->page->name, $magic => $to_id ]),
+      'remote_addr' => $_SERVER['REMOTE_ADDR'],
+    ];
 
-    $recipients = array('to' => $to);
-    if (isset($MAIL_SETTINGS['bcc_passwordrecover']))
+    $recipients = [ 'to' => $to ];
+    if (isset($MAIL_SETTINGS['bcc_passwordrecover'])) {
       $recipients['bcc'] = $MAIL_SETTINGS['bcc_passwordrecover'];
+    }
 
     $message = new StyledMessage($this->page, 'pwd_recover', $to_id,
-                                 array('replace' => $replace, 'recipients' => $recipients));
+                                 ['replace' => $replace, 'recipients' => $recipients]);
 
     return $message->send();
   } // sendRecoverMail
@@ -84,7 +92,7 @@ class DisplayPasswordRecover extends PageDisplay
 
     $mode = SHOW_RECOVERFORM;
 
-    $msg = NULL;
+    $msg = null;
     if (_MailValidate($login, 2) != 0) {
       // check if we have a syntactically valid e-mail address
       $msg = tr("You didn't specify a valid e-mail address");
@@ -129,7 +137,7 @@ class DisplayPasswordRecover extends PageDisplay
           else {
             $msg = tr('There was an error sending out the e-mail.') . '<br />'
                  . sprintf(tr('Please <a href="%s">contact us for technical assistance</a>.'),
-                           htmlspecialchars($this->page->buildLink(array('pn' => 'contact', 'email' => $email))));
+                           htmlspecialchars($this->page->buildLink(['pn' => 'contact', 'email' => $email])));
           }
         }
       }
@@ -138,7 +146,7 @@ class DisplayPasswordRecover extends PageDisplay
       }
     }
 
-    return array($mode, $msg);
+    return [ $mode, $msg ];
   }
 
   function verifyRecoverCode ($login, $recover_code, $pwd = '', $pwd_confirm = '') {
@@ -148,7 +156,7 @@ class DisplayPasswordRecover extends PageDisplay
 
     $dbconn = new DB;
 
-    $msg = NULL;
+    $msg = null;
     $valid = is_numeric($login);
 
     if ($valid) {
@@ -156,10 +164,10 @@ class DisplayPasswordRecover extends PageDisplay
       $dbconn->query($querystr);
       if ($dbconn->next_record()) {
         $login_id = $dbconn->Record['id'];
-        $magic     = $dbconn->Record['recover'];
-        $email     = $dbconn->Record['email'];
+        $magic = $dbconn->Record['recover'];
+        $email = $dbconn->Record['email'];
 
-        $params = array('pn' => $page->name);
+        $params = [ 'pn' => $page->name ];
         if (!empty($magic)) {
           // only set this if there is a recover-request to avoid e-mail grabbing
           $params['login'] = $email;
@@ -195,9 +203,11 @@ class DisplayPasswordRecover extends PageDisplay
                 case -1 :
                   $msg = tr('Your password is not long enough (at least six characters)');
                   break;
+
                 case -2 :
                   $msg = tr("The password you entered wasn't correctly confirm. Please try again.");
                   break;
+
                 default :
                   $msg = tr('Invalid password specified.');
               }
@@ -218,12 +228,13 @@ class DisplayPasswordRecover extends PageDisplay
           }
         }
       }
-      else
-        $valid = FALSE;
+      else {
+        $valid = false;
+      }
     }
 
      if (!$valid) {
-      $url_request = $page->buildLink(array('pn' => $page->name)); // we don't have a valid login-info to preset mail
+      $url_request = $page->buildLink([ 'pn' => $page->name ]); // we don't have a valid login-info to preset mail
         $msg = '<p>'
              . tr('The URL you entered contains an invalid or outdated recover-code.')
              . ' ' . tr('Please make sure you entered the URL exactly as specified in your e-mail.')
@@ -231,7 +242,7 @@ class DisplayPasswordRecover extends PageDisplay
              . ' <a href="' . $url_request . '">'
              . tr('request a new code') . '</a>.</p>';
     }
-    return array($mode, $msg);
+    return [ $mode, $msg ];
   }
 
   function buildContent () {
@@ -241,8 +252,9 @@ class DisplayPasswordRecover extends PageDisplay
 
     switch ($this->mode) {
       case SHOW_RECOVERSUCCESS:
-        if (!empty($this->msg))
+        if (!empty($this->msg)) {
           $content = $this->msg;
+        }
         else {
           $email_assistance = $MAIL_SETTINGS['technical_assistance'];
           $email_sent = $this->data['email_sent'];
@@ -260,7 +272,7 @@ class DisplayPasswordRecover extends PageDisplay
         break;
 
       case SHOW_PWDCHANGED:
-        $url_root = $page->buildLink(array('pn' => 'root'));
+        $url_root = $page->buildLink([ 'pn' => 'root' ]);
 
         $content = '<p>' . tr('Your password has been changed. You will use this password when accessing this site in the future.') . '</p>'
                  . '<p>' . tr('You can now delete the instruction e-mail.') . '</p>'
@@ -277,7 +289,7 @@ EOT;
                   . (!empty($this->msg) ? $this->msg : tr('You can now pick a new password'))
                   . '</p>';
 
-        $action = $page->buildLink(array('pn' => $page->name));
+        $action = $page->buildLink(['pn' => $page->name]);
         $recover_code = $this->data['recover_code'];
         $login_id = $this->data['login_id'];
 
@@ -300,7 +312,7 @@ EOT;
       default:
         $email_assistance = $MAIL_SETTINGS['technical_assistance'];
 
-        $action = $page->buildLink(array('pn' => $page->name));
+        $action = $page->buildLink([ 'pn' => $page->name ]);
 
         $content = '<p>' . tr("In case you forgot your password or haven't set one yet, we will immediatly send out e-mail instructions on how to create a new password. Your current (forgotten) password will remain active until you respond to that mail.") . '</p>';
 
@@ -321,6 +333,7 @@ EOT;
       $support_note
 EOT;
     }
+
     return $content;
   } // buildContent
 }
@@ -329,11 +342,11 @@ $display = new DisplayPasswordRecover($page);
 
 switch ($display->init()) {
   case SHOW_LOGIN:
-    $page->redirect(array());
+    $page->redirect([]);
     break;
   /*
   case FORWARD_LOGINFIRST:
-    $page->redirect(array('pn' => 'admin_first'));
+    $page->redirect([ 'pn' => 'admin_first' ]);
     break;
   */
   default:

@@ -5,7 +5,7 @@
   *
   * Author  : Daniel Burckhardt, daniel.burckhardt@sur-gmbh.ch
   *
-  * Version : 2015-01-21 dbu
+  * Version : 2018-07-23 dbu
   *
   * interfaces still not completely finalized,
   * but much better than just plain copy/paste
@@ -25,7 +25,7 @@ class ImageUploadHandler
   }
 
   // helper function
-  static function directory ($item_id, $type, $full_path = FALSE) {
+  static function directory ($item_id, $type, $full_path = false) {
     global $UPLOAD_TRANSLATE;
 
     $folder = ($full_path ? UPLOAD_FILEROOT : '')
@@ -40,14 +40,14 @@ class ImageUploadHandler
   }
 
   // recursively create the directory
-  static function checkDirectory ($dir, $create = TRUE, $mode = 0755) {
+  static function checkDirectory ($dir, $create = true, $mode = 0755) {
     if (file_exists($dir)) {
       return filetype($dir) == 'dir';  // check if it is a directory
     }
 
     if (!$create) {
       // doesn't exist, don't want to create
-      return FALSE;
+      return false;
     }
 
     // recursively try to create that path
@@ -56,7 +56,7 @@ class ImageUploadHandler
       return mkdir($dir, $mode);
     }
 
-    return FALSE;
+    return false;
   }
 
   // methods
@@ -81,6 +81,7 @@ class ImageUploadHandler
           if (!preg_match('/(\d+)$/', $dbconn->Record['name'], $matches)) {
             continue;
           }
+
           $ord = $matches[1];
           if ($ord_orig <= intval($ord)) {
             // rename the entry
@@ -118,22 +119,23 @@ class ImageUploadHandler
       // delete this item
       $querystr = "DELETE FROM Media WHERE id=$media_id";
       $dbconn->query($querystr);
+
       return $media_id;
     }
   }
 
   function buildImages ($img_name, $img_params, $max_images = -1,
-                        $options = array()) {
+                        $options = []) {
     global $UPLOAD_TRANSLATE;
 
-    $images = array();
+    $images = [];
 
     $append_number = array_key_exists('append_number', $options)
       ? $options['append_number'] : $max_images != 1;
     $legacy = array_key_exists('legacy', $options)
-      ? $options['legacy'] : FALSE;
+      ? $options['legacy'] : false;
     $img_title = array_key_exists('title', $options)
-		? $options['title'] : NULL;
+		? $options['title'] : null;
 
 
     if (isset($this->dbconn)) {
@@ -152,11 +154,11 @@ class ImageUploadHandler
     }
 
     for ($i = 0; $i <= $num_imgs && ($max_images <= 0 || $i < $max_images); $i++) {
-      $images[$img_name . sprintf("%02d", $i)] = array(
+      $images[$img_name . sprintf("%02d", $i)] = [
         'title' => sprintf('%s %d', tr(!empty($img_title) ? $img_title : 'Image'), $i + 1),
         'ord' => $i,
         'imgparams' => $img_params,
-      );
+      ];
     }
 
     return $images;
@@ -164,21 +166,21 @@ class ImageUploadHandler
 
   function instantiateUploadRecord ($dbconn) {
     // img-upload
-    $img_record = new RecordSQL(array('tables' => 'Media', 'dbconn' => $dbconn));
-    $img_record->add_fields(
-      array(
-        new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => TRUE)),
-        new Field(array('name' => 'item_id', 'type' => 'hidden', 'datatype' => 'int', 'null' => TRUE)),
-        new Field(array('name' => 'type', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->type)),
-        new Field(array('name' => 'ord', 'type' => 'hidden', 'datatype' => 'int', 'value' => 0)),
-        new Field(array('name' => 'width', 'type' => 'hidden', 'datatype' => 'int', 'null' => TRUE)),
-        new Field(array('name' => 'height', 'type' => 'text', 'datatype' => 'int', 'null' => TRUE)),
-        new Field(array('name' => 'name', 'type' => 'hidden', 'datatype' => 'char', 'null' => TRUE)),
-        new Field(array('name' => 'mimetype', 'type' => 'hidden', 'datatype' => 'char', 'null' => TRUE)),
-        new Field(array('name' => 'caption', 'type' => 'textarea', 'cols' => 60, 'rows' => 3, 'datatype' => 'char', 'null' => TRUE)),
-        new Field(array('name' => 'copyright', 'type' => 'text', 'size' => 60, 'maxlength' => 255, 'datatype' => 'char', 'null' => TRUE)),
-        new Field(array('name' => 'created', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => TRUE))
-      ));
+    $img_record = new RecordSQL([ 'tables' => 'Media', 'dbconn' => $dbconn ]);
+    $img_record->add_fields([
+      new Field([ 'name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => true ]),
+      new Field([ 'name' => 'item_id', 'type' => 'hidden', 'datatype' => 'int', 'null' => true ]),
+      new Field([ 'name' => 'type', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->type ]),
+      new Field([ 'name' => 'ord', 'type' => 'hidden', 'datatype' => 'int', 'value' => 0 ]),
+      new Field([ 'name' => 'width', 'type' => 'hidden', 'datatype' => 'int', 'null' => true ]),
+      new Field([ 'name' => 'height', 'type' => 'text', 'datatype' => 'int', 'null' => true ]),
+      new Field([ 'name' => 'name', 'type' => 'hidden', 'datatype' => 'char', 'null' => true ]),
+      new Field([ 'name' => 'mimetype', 'type' => 'hidden', 'datatype' => 'char', 'null' => true ]),
+      new Field([ 'name' => 'caption', 'type' => 'textarea', 'cols' => 60, 'rows' => 3, 'datatype' => 'char', 'null' => true ]),
+      new Field([ 'name' => 'copyright', 'type' => 'text', 'size' => 60, 'maxlength' => 255, 'datatype' => 'char', 'null' => true ]),
+      new Field([ 'name' => 'created', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => true ])
+    ]);
+
     return $img_record;
   }
 
@@ -210,20 +212,18 @@ class ImageUploadHandler
       $this->img_titles[$key] = $images[$key]['title'];
       $img_form = $this->instantiateUploadRecord($dbconn);
       // $img_form->set_value('ord', $images[$key]['ord']);
-      $this->img_forms[$key] = new FormHTML(array(), $img_form);
-      $this->img_images[] = $this->instantiateImage(array_merge(array('name' => $key), $images[$key]['imgparams']));
+      $this->img_forms[$key] = new FormHTML([], $img_form);
+      $this->img_images[] = $this->instantiateImage(array_merge(['name' => $key], $images[$key]['imgparams']));
     }
     $folder = $this->buildImgFolder();
 
-    $img_upload = $this->instantiateImageUpload(array(
-                                    'action' => $action,
-                                    'upload_fileroot' => UPLOAD_FILEROOT . $folder,
-                                    'upload_urlroot'  => UPLOAD_URLROOT . $folder,
-                                    'imagemagick'     => defined('UPLOAD_PATH2MAGICK') ? UPLOAD_PATH2MAGICK : NULL,
-                                    'max_file_size'   => UPLOAD_MAX_FILE_SIZE,
-                                    )
-                                  );
-
+    $img_upload = $this->instantiateImageUpload([
+      'action' => $action,
+      'upload_fileroot' => UPLOAD_FILEROOT . $folder,
+      'upload_urlroot'  => UPLOAD_URLROOT . $folder,
+      'imagemagick'     => defined('UPLOAD_PATH2MAGICK') ? UPLOAD_PATH2MAGICK : null,
+      'max_file_size'   => UPLOAD_MAX_FILE_SIZE,
+    ]);
 
     $img_upload->add_images($this->img_images);
     // var_dump($img_upload);
@@ -232,7 +232,7 @@ class ImageUploadHandler
   }
 
   function storeImgData ($img, $img_form, $img_name) {
-    $imgdata = isset($img) ? $img->find_imgdata() : array();
+    $imgdata = isset($img) ? $img->find_imgdata() : [];
     if (count($imgdata) > 0) {
       if (isset($this->dbconn)) {
         $dbconn = & $this->dbconn;
@@ -240,10 +240,13 @@ class ImageUploadHandler
       else {
         $dbconn = new DB;
       }
+
       // we have an image
-      $img_form->set_values(array('name' => $img_name, 'width' => isset($imgdata[0]['width']) ? $imgdata[0]['width'] : -1,
-                                  'height' => isset($imgdata[0]['height']) ? $imgdata[0]['height'] : -1,
-                                  'mimetype' => $imgdata[0]['mime']));
+      $img_form->set_values([
+        'name' => $img_name, 'width' => isset($imgdata[0]['width']) ? $imgdata[0]['width'] : -1,
+        'height' => isset($imgdata[0]['height']) ? $imgdata[0]['height'] : -1,
+        'mimetype' => $imgdata[0]['mime'],
+      ]);
 
       // find out if we already have an item
       $querystr = sprintf("SELECT id FROM Media WHERE item_id=%d AND type=%d AND name='%s' ORDER BY ord DESC LIMIT 1",
@@ -253,13 +256,13 @@ class ImageUploadHandler
         $img_form->set_value('id', $dbconn->Record['id']);
       }
 
-      $img_form->set_values(array('item_id' => $this->item_id, 'ord' => 0));
+      $img_form->set_values([ 'item_id' => $this->item_id, 'ord' => 0 ]);
       $img_form->store();
     }
   }
 
   function process (&$img_upload, &$images) {
-    $upload_results = array();
+    $upload_results = [];
     $img_names = array_keys($this->img_forms);
 
     for ($i = 0; $i < count($img_names); $i++) {
@@ -270,11 +273,11 @@ class ImageUploadHandler
       }
 
       $img_form = & $this->img_forms[$img_name];
-      $img_form->set_values($_POST, array('prepend' => $img_name . '_'));
+      $img_form->set_values($_POST, ['prepend' => $img_name . '_']);
 
       if ($img_form->validate()) {
-        $res = $img_upload->process(array_merge(array('img_name' => $img_name), $images[$img_name]['imgparams']));
-        $upload_results[$img_name] = array_key_exists($img_name, $res) ? $res[$img_name] : array();
+        $res = $img_upload->process(array_merge(['img_name' => $img_name], $images[$img_name]['imgparams']));
+        $upload_results[$img_name] = array_key_exists($img_name, $res) ? $res[$img_name] : [];
 
         $img = $img_upload->image($img_name);
         if (isset($images[$img_name]['imgparams']['pdf']) && $images[$img_name]['imgparams']['pdf']) {
@@ -314,12 +317,11 @@ class ImageUploadHandler
     foreach ($this->img_titles as $img_name => $title) {
       $img_form = & $this->img_forms[$img_name];
       $ord = $img_form->get_value('ord');
-      $img_form->fetch(array(
-                             'where' => sprintf("item_id=%d AND type=%d AND name='%s'",
-                                                $this->item_id, $this->type, addslashes($img_name))
-                                      . (isset($ord) ? " AND ord=$ord" : '')
-                                      )
-                       );
+      $img_form->fetch([
+        'where' => sprintf("item_id=%d AND type=%d AND name='%s'",
+                           $this->item_id, $this->type, addslashes($img_name))
+          . (isset($ord) ? " AND ord=$ord" : ''),
+      ]);
     }
   }
 }

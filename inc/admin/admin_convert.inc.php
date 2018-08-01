@@ -16,7 +16,7 @@
 /* Converts any HTML-entities into characters */
 function decode_numericentity($t)
 {
-    $convmap = array(0x0, 0x2FFFF, 0, 0xFFFF);
+    $convmap = [ 0x0, 0x2FFFF, 0, 0xFFFF ];
 
     return mb_decode_numericentity($t, $convmap, 'UTF-8');
 }
@@ -41,28 +41,10 @@ extends PageDisplay
       return $xml;
     }
 
-    /*
-    $nid = arg(1);
-    $book = _teicontent_get_book_for_node($nid);
-    // add js file
-    drupal_add_js("var currentNode = " . $nid . ";", 'inline');
-    drupal_add_js("var currentBook = " . $book . ";", 'inline');
-    drupal_add_js(_teicontent_get_js_texts(), 'inline');
-    drupal_add_js(drupal_get_path('module', 'teicontent') . '/js/drp_main.js');
-    drupal_add_js(drupal_get_path('module', 'teicontent') . '/js/drp_teichi.js');
-
-
-    // add css file
-    $cssPath =  $path_to_css;
-    $options = array( "type" => "file");
-    drupal_add_css($cssPath, $options);
-    */
-
     // Load the XML document
     $dom = new DomDocument('1.0', 'UTF-8');
     @$valid = $dom->loadXML($xml);
     if (!$valid) {
-      //watchdog('TEI Content', "Invalid XML/TEI Content", [], WATCHDOG_WARNING);
       return $xml;
     }
 
@@ -77,12 +59,10 @@ extends PageDisplay
     $proc = new XsltProcessor();
     $xsl = $proc->importStylesheet($xsl);
 
-
      // Currently the empty &quot;&quot; namespace is used.
     if  (!defined('XMLCONTENT_DFLT_NS' )) {
       define('XMLCONTENT_DFLT_NS', '');
     }
-
 
      // initialize the processor with the parameters when defined
     foreach  ($params as $key => $value) {
@@ -95,6 +75,7 @@ extends PageDisplay
     $newdom = $proc->transformToDoc($dom);
 
     $out = $newdom->saveXML();
+
     return $out;
   }
 
@@ -111,7 +92,7 @@ extends PageDisplay
             . $this->teicontent_transform($body, $path_to_xslt);
       // $html = '<pre>' . htmlspecialchars($html, ENT_COMPAT, 'utf-8') . '</pre>';
     }
-    $url_self = htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name)));
+    $url_self = htmlspecialchars($this->page->buildLink(['pn' => $this->page->name]));
     $convert = tr('convert');
 
     $form = <<<EOT

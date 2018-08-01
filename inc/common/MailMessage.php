@@ -16,7 +16,7 @@ require_once VENDOR_PATH . '/swiftmailer/swiftmailer/lib/swift_init.php';
 
 class MailerFactory
 {
-    var $mailer = NULL;
+    var $mailer = null;
 
     function __construct ($config) {
         $this->config = $config;
@@ -42,8 +42,8 @@ class MailerFactory
                 $transport->setEncryption(SMTP_ENCRYPTION);
                 // see https://github.com/swiftmailer/swiftmailer/issues/544
                 $https = [];
-                $https['ssl']['verify_peer'] = FALSE;
-                $https['ssl']['verify_peer_name'] = FALSE;
+                $https['ssl']['verify_peer'] = false;
+                $https['ssl']['verify_peer_name'] = false;
                 $transport->setStreamOptions($https);
             }
         }
@@ -66,7 +66,7 @@ class MailerFactory
 
 class MailMessage
 {
-    private static $swift = NULL;
+    private static $swift = null;
     public static $mailer_config = [];
 
     public $message;
@@ -147,11 +147,11 @@ class MailMessage
         $this->message->addPart($body_html, 'text/html', 'utf-8');
     }
 
-    public function attach ($child, $id = NULL) {
+    public function attach ($child, $id = null) {
         return $this->message->attach($child, $id);
     }
 
-    public function embed ($child, $id = NULL) {
+    public function embed ($child, $id = null) {
         return $this->message->embed($child, $id);
     }
 
@@ -159,8 +159,8 @@ class MailMessage
         return $this->message->setMaxLineLength($len);
     }
 
-    public function printOnly ($recipient_list = NULL, $comment = NULL) {
-        if ($recipient_list == NULL) {
+    public function printOnly ($recipient_list = null, $comment = null) {
+        if ($recipient_list == null) {
             $recipient_list = $this->message->getTo();
         }
 
@@ -236,13 +236,13 @@ class MailMessage
         return $sent;
     }
 
-    static function mail ($to, $subject, $message, $from = NULL) {
+    static function mail ($to, $subject, $message, $from = null) {
         $mail = new MailMessage($subject, $message);
         $mail->addTo($to);
         if (isset($from)) {
             $mail->setFrom($from);
         }
-        
+
         return $mail->send(); // number sent
     }
 }

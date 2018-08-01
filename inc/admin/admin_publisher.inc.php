@@ -4,9 +4,9 @@
  *
  * Class for managing holding institutions
  *
- * (c) 2008-2015 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-02-13 dbu
+ * Version: 2018-07-23 dbu
  *
  * Changes:
  *
@@ -15,7 +15,8 @@
 require_once INC_PATH . 'common/tablemanager.inc.php';
 require_once INC_PATH . 'admin/common.inc.php';
 
-class PublisherFlow extends TableManagerFlow
+class PublisherFlow
+extends TableManagerFlow
 {
   const MERGE = 1010;
 
@@ -35,7 +36,8 @@ class PublisherFlow extends TableManagerFlow
   }
 }
 
-class PublisherRecord extends TableManagerRecord
+class PublisherRecord
+extends TableManagerRecord
 {
 
   function delete ($id) {
@@ -50,25 +52,25 @@ class PublisherRecord extends TableManagerRecord
 
     return $dbconn->affected_rows() > 0;
   }
-
 }
 
-class DisplayPublisher extends DisplayTable
+class DisplayPublisher
+extends DisplayTable
 {
   var $page_size = 30;
-  var $show_xls_export = TRUE;
+  var $show_xls_export = true;
   var $table = 'Publisher';
-  var $fields_listing = array('id', 'name', 'place'); // , 'status');
+  var $fields_listing = [ 'id', 'name', 'place' ]; // , 'status');
   var $listing_default_action = TABLEMANAGER_VIEW;
 
-  var $condition = array(
-      array('name' => 'search', 'method' => 'buildLikeCondition', 'args' => 'name,place'),
-      'Publisher.status>=0',
-      // alternative: buildFulltextCondition
-  );
-  var $order = array(array('name'));
-  var $view_after_edit = TRUE;
-  var $cols_listing = array('name' => 'Name', 'place' => 'Place');
+  var $condition = [
+    [ 'name' => 'search', 'method' => 'buildLikeCondition', 'args' => 'name,place' ],
+    'Publisher.status>=0',
+    // alternative: buildFulltextCondition
+  ];
+  var $order = [ [ 'name' ] ];
+  var $view_after_edit = true;
+  var $cols_listing = [ 'name' => 'Name', 'place' => 'Place' ];
 
   function __construct (&$page, $workflow = '') {
     parent::__construct($page, $workflow);
@@ -86,6 +88,7 @@ class DisplayPublisher extends DisplayTable
     {
       return false;
     }
+
     return parent::init();
   }
 
@@ -94,7 +97,7 @@ class DisplayPublisher extends DisplayTable
   }
 
   function instantiateRecord ($table = '', $dbconn = '') {
-    return new PublisherRecord(array('tables' => $this->table, 'dbconn' => $this->page->dbconn));
+    return new PublisherRecord(['tables' => $this->table, 'dbconn' => $this->page->dbconn]);
   }
 
   function buildRecord ($name = '') {
@@ -107,12 +110,12 @@ class DisplayPublisher extends DisplayTable
     }
 
     $countries = $this->getCountries();
-    $countries_ordered = array('' => tr('-- not available --'));
+    $countries_ordered = ['' => tr('-- not available --')];
     if (isset($COUNTRIES_FEATURED)) {
       for ($i = 0; $i < count($COUNTRIES_FEATURED); $i++) {
         $countries_ordered[$COUNTRIES_FEATURED[$i]] = $countries[$COUNTRIES_FEATURED[$i]];
       }
-      $countries_ordered['&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;'] = FALSE; // separator
+      $countries_ordered['&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;'] = false; // separator
     }
     foreach ($countries as $cc => $name) {
       if (!isset($countries_ordered[$cc])) {
@@ -120,35 +123,35 @@ class DisplayPublisher extends DisplayTable
       }
     }
 
-    $record->add_fields(array(
-      new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => TRUE)),
-      new Field(array('name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => TRUE)),
-      new Field(array('name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => TRUE, 'noupdate' => TRUE)),
-      new Field(array('name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()')),
-      new Field(array('name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => TRUE)),
-      new Field(array('name' => 'name', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 127)),
-      //new Field(array('name' => 'domicile', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 127, 'null' => TRUE)),
-      // new Field(array('name' => 'isbn', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 127, 'null' => TRUE)),
+    $record->add_fields([
+      new Field([ 'name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => true ]),
+      new Field([ 'name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => true ]),
+      new Field([ 'name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => true, 'noupdate' => true ]),
+      new Field([ 'name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()' ]),
+      new Field([ 'name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => true ]),
+      new Field([ 'name' => 'name', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 127 ]),
+      // new Field([ 'name' => 'domicile', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 127, 'null' => true ]),
+      // new Field([ 'name' => 'isbn', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 127, 'null' => true ]),
 
-      new Field(array('name' => 'address', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 2, 'null' => TRUE)),
-      new Field(array('name' => 'place', 'type' => 'text', 'size' => 30, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
-      new Field(array('name' => 'zip', 'type' => 'text', 'datatype' => 'char', 'size' => 8, 'maxlength' => 8, 'null' => TRUE)),
-      new Field(array('name' => 'country', 'type' => 'select', 'datatype' => 'char', 'null' => TRUE,
+      new Field([ 'name' => 'address', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 2, 'null' => true ]),
+      new Field([ 'name' => 'place', 'type' => 'text', 'size' => 30, 'datatype' => 'char', 'maxlength' => 80, 'null' => true ]),
+      new Field([ 'name' => 'zip', 'type' => 'text', 'datatype' => 'char', 'size' => 8, 'maxlength' => 8, 'null' => true ]),
+      new Field([ 'name' => 'country', 'type' => 'select', 'datatype' => 'char', 'null' => true,
                       'options' => array_keys($countries_ordered),
-                      'labels' => array_values($countries_ordered), 'default' => 'DE', 'null' => TRUE)),
+                      'labels' => array_values($countries_ordered), 'default' => 'DE', 'null' => true ]),
 
-      new Field(array('name' => 'phone', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 40, 'null' => TRUE)),
-      new Field(array('name' => 'fax', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 40, 'null' => TRUE)),
-      new Field(array('name' => 'url', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => TRUE)),
-      new Field(array('name' => 'email', 'type' => 'email', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
-      new Field(array('name' => 'url', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => TRUE)),
-      new Field(array('name' => 'gnd', 'id' => 'gnd', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => TRUE)),
-      new Field(array('name' => 'name_contact', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 127, 'null' => TRUE)),
-      new Field(array('name' => 'phone_contact', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
-      new Field(array('name' => 'fax_contact', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 40, 'null' => TRUE)),
-      new Field(array('name' => 'email_contact', 'type' => 'email', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
-      new Field(array('name' => 'comments_internal', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => TRUE)),
-    ));
+      new Field(['name' => 'phone', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 40, 'null' => true ]),
+      new Field(['name' => 'fax', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 40, 'null' => true ]),
+      new Field(['name' => 'url', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => true ]),
+      new Field(['name' => 'email', 'type' => 'email', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => true ]),
+      new Field(['name' => 'url', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => true ]),
+      new Field(['name' => 'gnd', 'id' => 'gnd', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => true ]),
+      new Field(['name' => 'name_contact', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 127, 'null' => true ]),
+      new Field(['name' => 'phone_contact', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => true ]),
+      new Field(['name' => 'fax_contact', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 40, 'null' => true ]),
+      new Field(['name' => 'email_contact', 'type' => 'email', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => true ]),
+      new Field(['name' => 'comments_internal', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => true ]),
+    ]);
 
     return $record;
   }
@@ -160,38 +163,40 @@ class DisplayPublisher extends DisplayTable
   }
 
   function getEditRows ($mode = 'edit') {
-    $rows = array(
-      'id' => FALSE, 'status' => FALSE, // hidden fields
+    $rows = [
+      'id' => false, 'status' => false, // hidden fields
 
-      'name' => array('label' => 'Name'),
-      // 'domicile' => array('label' => 'Domicile of the publisher'),
-      // 'isbn' => array('label' => 'ISBN prefix(es)'),
+      'name' => [ 'label' => 'Name' ],
+      // 'domicile' => [ 'label' => 'Domicile of the publisher' ],
+      // 'isbn' => [ 'label' => 'ISBN prefix(es)' ],
 
       // '<hr noshade="noshade" />',
 
-      'address' => array('label' => 'Address'),
-      array('label' => 'Postcode / Place', 'fields' => array('zip', 'place')),
-      'country' => array('label' => 'Country'),
-      'email' => array('label' => 'E-Mail (general)'),
-      'phone' => array('label' => 'Telephone (general)'),
-      'fax' => array('label' => 'Fax (general)'),
-      'url' => array('label' => 'Homepage'),
-      'gnd' => array('label' => 'GND-Nr',
-                     'description' => 'Identifikator der Gemeinsamen Normdatei, vgl. http://de.wikipedia.org/wiki/Hilfe:GND',),
+      'address' => [ 'label' => 'Address' ],
+      [ 'label' => 'Postcode / Place', 'fields' => [ 'zip', 'place' ] ],
+      'country' => [ 'label' => 'Country' ],
+      'email' => [ 'label' => 'E-Mail (general)' ],
+      'phone' => [ 'label' => 'Telephone (general)' ],
+      'fax' => [ 'label' => 'Fax (general)' ],
+      'url' => [ 'label' => 'Homepage' ],
+      'gnd' => [
+        'label' => 'GND-Nr',
+        'description' => 'Identifikator der Gemeinsamen Normdatei, vgl. http://de.wikipedia.org/wiki/Hilfe:GND',
+      ],
 
       '<hr noshade="noshade" />'
       // . '<b>' . tr('Review department') . '</b>'
       ,
-      'name_contact' => array('label' => 'Contact person(s)'),
-      'email_contact' => array('label' => 'E-Mail'),
-      'phone_contact' => array('label' => 'Telephone'),
-      'fax_contact' => array('label' => 'Fax'),
+      'name_contact' => [ 'label' => 'Contact person(s)' ],
+      'email_contact' => [ 'label' => 'E-Mail' ],
+      'phone_contact' => [ 'label' => 'Telephone' ],
+      'fax_contact' => [ 'label' => 'Fax' ],
 
       '<hr noshade="noshade" />',
-      'comments_internal' => array('label' => 'Internal notes and comments'),
+      'comments_internal' => [ 'label' => 'Internal notes and comments' ],
 
-      isset($this->form) ? $this->form->show_submit(ucfirst(tr('save'))) : 'FALSE'
-    );
+      isset($this->form) ? $this->form->show_submit(ucfirst(tr('save'))) : false
+    ];
 
     if ('view' == $mode) {
       $gnd = $this->record->get_value('gnd');
@@ -205,7 +210,7 @@ class DisplayPublisher extends DisplayTable
   }
 
   function getViewFormats () {
-    // return array('body' => array('format' => 'p'));
+    // return [ 'body' => [ 'format' => 'p' ] ];
   }
 
   function buildViewRows () {
@@ -216,10 +221,10 @@ class DisplayPublisher extends DisplayTable
 
     $formats = $this->getViewFormats();
 
-    $view_rows = array();
+    $view_rows = [];
 
     foreach ($rows as $key => $descr) {
-      if ($descr !== FALSE && gettype($key) == 'string') {
+      if ($descr !== false && gettype($key) == 'string') {
         if (isset($formats[$key])) {
           $descr = array_merge($descr, $formats[$key]);
         }
@@ -236,11 +241,11 @@ class DisplayPublisher extends DisplayTable
       $ret .= '<p class="message">' . $this->page->msg . '</p>';
     }
 
-    $fields = array();
+    $fields = [];
     if ('array' == gettype($rows)) {
       foreach ($rows as $key => $row_descr) {
         if ('string' == gettype($row_descr)) {
-          $fields[] = array('&nbsp;', $row_descr);
+          $fields[] = ['&nbsp;', $row_descr];
         }
         else {
           $label = isset($row_descr['label']) ? tr($row_descr['label']).':' : '';
@@ -263,10 +268,11 @@ class DisplayPublisher extends DisplayTable
                 ? $this->formatParagraphs($field_value) : $this->formatText($field_value);
           }
 
-          $fields[] = array($label, $value);
+          $fields[] = [$label, $value];
         }
       }
     }
+
     if (count($fields) > 0) {
       $ret .= $this->buildContentLineMultiple($fields);
     }
@@ -288,10 +294,10 @@ EOT;
 
     return
       sprintf(' <span class="regular">[<a href="%s">%s</a>]</span>',
-              htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_EDIT) => $this->id))),
+              htmlspecialchars($this->page->buildLink(['pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_EDIT) => $this->id])),
               tr($this->workflow->name(TABLEMANAGER_EDIT)))
       . sprintf(' <span class="regular">[<a href="%s">%s</a>]</span>',
-              htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, 'delete' => $this->id))),
+              htmlspecialchars($this->page->buildLink(['pn' => $this->page->name, 'delete' => $this->id])),
               tr($this->workflow->name(TABLEMANAGER_DELETE)))
       . sprintf('<script>document.write(null != window.opener && null != window.opener.document.detail ? " <span class=\"regular\">[<a href=\"#\" onclick=\"setPublisher(window.opener.document.detail, %d, \'%s\')\">set holding institution</a>]</span>" : "")</script>',
                 $this->record->get_value('id'),
@@ -330,7 +336,7 @@ EOT;
 
   function buildSearchBar () {
     $ret = sprintf('<form action="%s" method="post">',
-                   htmlspecialchars($this->page->buildLink(array('pn' => $this->page->name, 'page_id' => 0))));
+                   htmlspecialchars($this->page->buildLink(['pn' => $this->page->name, 'page_id' => 0])));
     if ($this->cols_listing_count > 0) {
       $ret .= sprintf('<tr><td colspan="%d" nowrap="nowrap"><input type="text" name="search" value="%s" size="40" /><input class="submit" type="submit" value="%s" /></td></tr>',
                       $this->cols_listing_count,
@@ -345,7 +351,7 @@ EOT;
 
   function buildListingRow (&$row) {
     if ('xls' == $this->page->display) {
-      $xls_row = array();
+      $xls_row = [];
       for ($i = 0; $i < $this->cols_listing_count; $i++) {
         $xls_row[] = $row[$i];
       }
@@ -366,28 +372,30 @@ EOT;
     $record = $this->buildRecord();
     // created is default of type function
     // $record->get_field('created')->set('datatype', 'date');
-    if (!$record->fetch($id))
-      return FALSE;
-    $action = NULL;
+    if (!$record->fetch($id)) {
+      return false;
+    }
+
+    $action = null;
     if (array_key_exists('with', $_POST)
         && intval($_POST['with']) > 0)
     {
       $action = 'merge';
       $id_new = intval($_POST['with']);
     }
-    $ret = FALSE;
+    $ret = false;
 
     switch ($action) {
       case 'merge':
         $record_new = $this->buildRecord();
         if (!$record_new->fetch($id_new)) {
-          return FALSE;
+          return false;
         }
 
         $querystr = sprintf("UPDATE Publication SET publisher_id=%d WHERE publisher_id=%d",
                             $id_new, $id);
         $this->page->dbconn->query($querystr);
-        $this->page->redirect(array('pn' => $this->page->name, 'delete' => $id));
+        $this->page->redirect(['pn' => $this->page->name, 'delete' => $id]);
         break;
 
       default:
@@ -403,7 +411,7 @@ EOT;
                             $id, $STATUS_REMOVED);
         $dbconn->query($querystr);
         $replace = '';
-        $params_replace = array('pn' => $this->page->name, 'delete' => $id);
+        $params_replace = ['pn' => $this->page->name, 'delete' => $id];
         while ($dbconn->next_record()) {
           $replace .= sprintf('<option value="%d">%s</option>',
                               $dbconn->Record['id'],
@@ -432,14 +440,14 @@ EOT;
         return $res;
       }
     }
+
     return parent::buildContent();
   }
-
 }
 
 $display = new DisplayPublisher($page, new PublisherFlow($page));
-if (FALSE === $display->init()) {
-  $page->redirect(array('pn' => ''));
+if (false === $display->init()) {
+  $page->redirect(['pn' => '']);
 }
 
 $page->setDisplay($display);

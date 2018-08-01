@@ -48,7 +48,7 @@ extends TableManagerRecord
 
         // create local directory and write it
         $id = $this->get_value('id');
-        $folder = ImageUploadHandler::directory($id, $TYPE_PUBLICATION, TRUE);
+        $folder = ImageUploadHandler::directory($id, $TYPE_PUBLICATION, true);
         $fname = 'cover00';
         // get the extension from the url - TODO: check mime-type
         if (preg_match('/(\.[^\.]+)$/', $image_url, $matches)) {
@@ -57,13 +57,13 @@ extends TableManagerRecord
 
         $fullname = $folder . $fname . '_large' . $ext;
 
-        if (ImageUploadHandler::checkDirectory($folder, TRUE)) {
+        if (ImageUploadHandler::checkDirectory($folder, true)) {
           $handle = fopen($image_url, 'rb');
           $contents = stream_get_contents($handle);
           fclose($handle);
 
           $handle = fopen($fullname, "wb");
-          if (fwrite($handle, $contents) === FALSE) {
+          if (fwrite($handle, $contents) === false) {
             $ret .= "<p>Error writing $fullname.</p>";
           }
           fclose($handle);
@@ -124,13 +124,14 @@ extends TableManagerRecord
   function fetch ($args, $datetime_style = '') {
     $fetched = parent::fetch($args, $datetime_style);
     if ($fetched) {
-      $attribution = json_decode($this->get_value('attribution'), TRUE);
+      $attribution = json_decode($this->get_value('attribution'), true);
       foreach ($this->languages as $language) {
-        if (isset($attribution) && FALSE !== $attribution && array_key_exists($language, $attribution)) {
+        if (isset($attribution) && false !== $attribution && array_key_exists($language, $attribution)) {
           $this->set_value('attribution_' . $language, $attribution[$language]);
         }
       }
     }
+
     return $fetched;
   }
 
@@ -154,11 +155,13 @@ extends TableManagerRecord
       $dbconn->query($querystr);
       return $dbconn->affected_rows() > 0;
     }
-    return FALSE;
+
+    return false;
   }
 }
 
-class DisplayPublication extends DisplayBackend
+class DisplayPublication
+extends DisplayBackend
 {
   var $page_size = 30;
   var $table = 'Publication';
@@ -178,19 +181,22 @@ class DisplayPublication extends DisplayBackend
     // alternative: buildFulltextCondition
   ];
   var $order = [
-    'author' => array('IFNULL(author,editor)', 'IFNULL(author,editor) DESC'),
-    'title' => array('title', 'title DESC'),
-    'year' => array('YEAR(publication_date) DESC', 'YEAR(publication_date)'),
-    'status' => array('Publication.status', 'Publication.status DESC'),
+    'id' => [ 'id DESC', 'id' ],
+    'author' => [ 'IFNULL(author,editor)', 'IFNULL(author,editor) DESC' ],
+    'title' => [ 'title', 'title DESC' ],
+    'year' => [ 'YEAR(publication_date) DESC', 'YEAR(publication_date)' ],
+    'status' => [ 'Publication.status', 'Publication.status DESC' ],
   ];
   var $cols_listing = [
+    'id' => 'ID',
     'author' => 'Author/Editor',
     'title' => 'Title',
     'year' => 'Year',
     'status' => 'Status',
     '' => '',
   ];
-  var $view_after_edit = TRUE;
+  var $idcol_listing = true;
+  var $view_after_edit = true;
 
   function __construct (&$page) {
     global $STATUS_SOURCE_OPTIONS;
@@ -216,7 +222,7 @@ class DisplayPublication extends DisplayBackend
 
   function init () {
     $ret = parent::init();
-    if (FALSE === $ret) {
+    if (false === $ret) {
       return $ret;
     }
 
@@ -231,7 +237,7 @@ class DisplayPublication extends DisplayBackend
     return new PublicationRecord([ 'tables' => $this->table, 'dbconn' => $this->page->dbconn ]);
   }
 
-  function buildStatusOptions ($options = NULL) {
+  function buildStatusOptions ($options = null) {
     if (!isset($options)) {
       $options = & $this->status_options;
     }
@@ -270,13 +276,15 @@ class DisplayPublication extends DisplayBackend
           for ($i = 0; $i < count($LANGUAGES_FEATURED); $i++) {
             $languages_ordered[$LANGUAGES_FEATURED[$i]] = $languages[$LANGUAGES_FEATURED[$i]];
           }
-          $languages_ordered['&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;'] = FALSE; // separator
+          $languages_ordered['&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;'] = false; // separator
         }
+
         foreach ($languages as $iso639_2 => $name) {
           if (!isset($languages_ordered[$iso639_2])) {
             $languages_ordered[$iso639_2] = $name;
           }
         }
+
         return $languages_ordered;
         break;
 
@@ -286,6 +294,7 @@ class DisplayPublication extends DisplayBackend
         foreach ($LICENSE_OPTIONS as $key => $label) {
           $licenses[$key] = tr($label);
         }
+
         return $licenses;
         break;
 
@@ -320,10 +329,9 @@ class DisplayPublication extends DisplayBackend
       $dbconn->query($querystr);
       $options = [];
       while ($dbconn->next_record()) {
-        $options[$dbconn->Record['id']] = in_array($type, [ 'sourcetype', 'publisher' ])
-                ? $dbconn->Record['name']
-                : $dbconn->Record['lastname'] . ', ' . $dbconn->Record['firstname'];
-
+        $options[$dbconn->Record['id']] = in_array( $type, [ 'sourcetype', 'publisher' ])
+          ? $dbconn->Record['name']
+          : $dbconn->Record['lastname'] . ', ' . $dbconn->Record['firstname'];
       }
 
       return $options;
@@ -346,127 +354,130 @@ class DisplayPublication extends DisplayBackend
     $languages_ordered = [ '' => tr('-- please select --') ] + $this->view_options['lang'];
 
     $publisher_options = $this->buildOptions('publisher');
-    $record->add_fields(array(
-        new Field(array('name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => TRUE)),
-//        new Field(array('name' => 'status', 'type' => 'hidden', 'datatype' => 'int', 'default' => 0)),
-        new Field(array('name' => 'status', 'type' => 'select',
-                        'options' => array_keys($this->status_options),
-                        'labels' => array_values($this->status_options),
-                        'datatype' => 'int', 'default' => $this->status_default)),
-        new Field(array('name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => TRUE)),
-        new Field(array('name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => TRUE, 'noupdate' => TRUE)),
-        new Field(array('name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()')),
-        new Field(array('name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => TRUE)),
-        new Field(array('name' => 'type', 'id' => 'type', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($type_options), 'labels' => array_values($type_options))),
+    $record->add_fields([
+      new Field([ 'name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => true ]),
+      new Field([
+        'name' => 'status', 'type' => 'select',
+        'options' => array_keys($this->status_options),
+        'labels' => array_values($this->status_options),
+        'datatype' => 'int', 'default' => $this->status_default,
+      ]),
+      new Field([ 'name' => 'created', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => true ]),
+      new Field([ 'name' => 'created_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => true, 'noupdate' => true ]),
+      new Field([ 'name' => 'changed', 'type' => 'hidden', 'datatype' => 'function', 'value' => 'NOW()' ]),
+      new Field([ 'name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'], 'null' => true ]),
+      new Field([ 'name' => 'type', 'id' => 'type', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($type_options), 'labels' => array_values($type_options) ]),
 
-        new Field(array('name' => 'status_flags', 'type' => 'checkbox', 'datatype' => 'bitmap', 'null' => TRUE, 'default' => 0,
-                              'labels' => array(
-                                                0x01 => tr('Digitization') . ' ' . tr('finalized'),
-                                                0x02 => tr('Transcript and Markup') . ' ' . tr('finalized'),
-                                                0x04 => tr('Bibliography') . ' ' . tr('finalized'),
-                                                0x08 => tr('Translation') . ' ' . tr('finalized'),
-                                                0x10 => tr('Translation Markup') . ' ' . tr('finalized'),
-                                                0x20 => tr('ready for publishing'),
-                                                ),
-                             )
-                       ),
+      new Field([
+        'name' => 'status_flags', 'type' => 'checkbox', 'datatype' => 'bitmap', 'null' => true, 'default' => 0,
+        'labels' => [
+          0x01 => tr('Digitization') . ' ' . tr('finalized'),
+          0x02 => tr('Transcript and Markup') . ' ' . tr('finalized'),
+          0x04 => tr('Bibliography') . ' ' . tr('finalized'),
+          0x08 => tr('Translation') . ' ' . tr('finalized'),
+          0x10 => tr('Translation Markup') . ' ' . tr('finalized'),
+          0x20 => tr('ready for publishing'),
+        ],
+      ]),
 
-       // new Field(array('name' => 'isbn', 'id' => 'isbn', 'type' => 'text', 'size' => 20, 'datatype' => 'char', 'maxlength' => 17, 'null' => TRUE)),
-        new Field(array('name' => 'author', 'id' => 'author', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
-        new Field(array('name' => 'editor', 'id' => 'editor', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
-        new Field(array('name' => 'title', 'id' => 'title', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 127)),
-        new Field(array('name' => 'subtitle', 'id' => 'subtitle', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 127, 'null' => TRUE)),
-        new Field(array('name' => 'series', 'id' => 'series', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 127, 'null' => TRUE)),
-        new Field(array('name' => 'place', 'id' => 'place', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 127, 'null' => TRUE)),
-        new Field(array('name' => 'publisher_id', 'id' => 'publisher_id', 'type' => 'select',
-                        'options' => array_merge(array(''), array_keys($publisher_options)),
-                        'labels' => array_merge(array('-- select a holding institution --'), array_values($publisher_options)), 'datatype' => 'int')),
-        // new Field(array('name' => 'publisher', 'id' => 'publisher', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 127, 'null' => TRUE)),
-        new Field(array('name' => 'archive_location', 'id' => 'archive_location', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 383, 'null' => TRUE)),
-        new Field(array('name' => 'publication_date', 'id' => 'publication_date', 'type' => 'date', 'incomplete' => TRUE, 'datatype' => 'date', 'null' => 1)),
-        new Field(array('name' => 'binding', 'id' => 'binding', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 50, 'null' => TRUE)),
-        new Field(array('name' => 'pages', 'id' => 'pages', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 50, 'null' => TRUE)),
-        new Field(array('name' => 'listprice', 'id' => 'listprice', 'type' => 'text', 'size' =>60, 'datatype' => 'char', 'maxlength' => 50, 'null' => TRUE)),
-        new Field(array('name' => 'image_url', 'id' => 'image', 'type' => 'hidden', 'datatype' => 'char', 'null' => TRUE, 'nodbfield' => TRUE)),
-        new Field(array('name' => 'url', 'id' => 'toc_url', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 255, 'null' => TRUE)),
+      // new Field([ 'name' => 'isbn', 'id' => 'isbn', 'type' => 'text', 'size' => 20, 'datatype' => 'char', 'maxlength' => 17, 'null' => true ]),
+      new Field([ 'name' => 'author', 'id' => 'author', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 80, 'null' => true ]),
+      new Field([ 'name' => 'editor', 'id' => 'editor', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 80, 'null' => true ]),
+      new Field([ 'name' => 'title', 'id' => 'title', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 127 ]),
+      new Field([ 'name' => 'subtitle', 'id' => 'subtitle', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 127, 'null' => true ]),
+      new Field([ 'name' => 'series', 'id' => 'series', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 127, 'null' => true ]),
+      new Field([ 'name' => 'place', 'id' => 'place', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 127, 'null' => true ]),
+      new Field([ 'name' => 'publisher_id', 'id' => 'publisher_id', 'type' => 'select',
+                  'options' => array_merge([ '' ], array_keys($publisher_options)),
+                  'labels' => array_merge([ '-- select a holding institution --' ], array_values($publisher_options)), 'datatype' => 'int' ]),
+      // new Field([ 'name' => 'publisher', 'id' => 'publisher', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 127, 'null' => true ]),
+      new Field([ 'name' => 'archive_location', 'id' => 'archive_location', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 383, 'null' => true ]),
+      new Field([ 'name' => 'publication_date', 'id' => 'publication_date', 'type' => 'date', 'incomplete' => true, 'datatype' => 'date', 'null' => true ]),
+      new Field([ 'name' => 'binding', 'id' => 'binding', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 50, 'null' => true ]),
+      new Field([ 'name' => 'pages', 'id' => 'pages', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 50, 'null' => true ]),
+      new Field([ 'name' => 'listprice', 'id' => 'listprice', 'type' => 'text', 'size' =>60, 'datatype' => 'char', 'maxlength' => 50, 'null' => true ]),
+      new Field([ 'name' => 'image_url', 'id' => 'image', 'type' => 'hidden', 'datatype' => 'char', 'null' => true, 'nodbfield' => true ]),
+      new Field([ 'name' => 'url', 'id' => 'toc_url', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 255, 'null' => true ]),
 
-        new Field(array('name' => 'lang', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($languages_ordered), 'labels' => array_values($languages_ordered), 'null' => TRUE)),
-        new Field(array('name' => 'translator', 'type' => 'select',
-                        'options' => array_merge(array(''), array_keys($this->translator_options)),
-                        'labels' => array_merge(array(tr('-- none --')), array_values($this->translator_options)),
-                        'datatype' => 'int', 'null' => TRUE)),
-        new Field(array('name' => 'status_translation', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($this->status_translation_options), 'labels' => array_values($this->status_translation_options), 'null' => TRUE)),
-        new Field(array('name' => 'place_identifier', 'id' => 'place_identifier', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 255, 'null' => TRUE)),
-        new Field(array('name' => 'place_geo', 'id' => 'place_geo', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 255, 'null' => TRUE)),
-        new Field(array('name' => 'indexingdate', 'type' => 'date', 'incomplete' => TRUE, 'datatype' => 'date', 'null' => TRUE)),
-        new Field(array('name' => 'displaydate', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => TRUE)),
+      new Field([ 'name' => 'lang', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($languages_ordered), 'labels' => array_values($languages_ordered), 'null' => true ]),
+      new Field([ 'name' => 'translator', 'type' => 'select',
+                  'options' => array_merge([ '' ], array_keys($this->translator_options)),
+                  'labels' => array_merge([ tr('-- none --') ], array_values($this->translator_options)),
+                  'datatype' => 'int', 'null' => true ]),
+      new Field([ 'name' => 'status_translation', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($this->status_translation_options), 'labels' => array_values($this->status_translation_options), 'null' => true ]),
+      new Field([ 'name' => 'place_identifier', 'id' => 'place_identifier', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 255, 'null' => true ]),
+      new Field([ 'name' => 'place_geo', 'id' => 'place_geo', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 255, 'null' => true ]),
+      new Field([ 'name' => 'indexingdate', 'type' => 'date', 'incomplete' => true, 'datatype' => 'date', 'null' => true ]),
+      new Field([ 'name' => 'displaydate', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => true ]),
 
-        new Field(array('name' => 'license', 'id' => 'license', 'type' => 'select',
-                        'options' => array_keys($license_options),
-                        'labels' => array_values($license_options), 'datatype' => 'char', 'null' => TRUE)),
-        new Field(array('name' => 'attribution', 'type' => 'hidden', 'datatype' => 'char', 'null' => TRUE)),
-        new Field(array('name' => 'attribution_de', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 3, 'null' => TRUE, 'nodbfield' => TRUE)),
-        new Field(array('name' => 'attribution_en', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 3, 'null' => TRUE, 'nodbfield' => TRUE)),
+      new Field([ 'name' => 'license', 'id' => 'license', 'type' => 'select',
+                  'options' => array_keys($license_options),
+                  'labels' => array_values($license_options), 'datatype' => 'char', 'null' => true ]),
+      new Field([ 'name' => 'attribution', 'type' => 'hidden', 'datatype' => 'char', 'null' => true ]),
+      new Field([ 'name' => 'attribution_de', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 3, 'null' => true, 'nodbfield' => true ]),
+      new Field([ 'name' => 'attribution_en', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 3, 'null' => true, 'nodbfield' => true ]),
 
-        new Field(array('name' => 'comment_digitization', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE)),
-        new Field(array('name' => 'comment_markup', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE)),
-        new Field(array('name' => 'comment_bibliography', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE)),
-        new Field(array('name' => 'comment_translation', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE)),
-        new Field(array('name' => 'comment_translation_markup', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => TRUE)),
+      new Field([ 'name' => 'comment_digitization', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => true ]),
+      new Field([ 'name' => 'comment_markup', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => true ]),
+      new Field([ 'name' => 'comment_bibliography', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => true ]),
+      new Field([ 'name' => 'comment_translation', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => true ]),
+      new Field([ 'name' => 'comment_translation_markup', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 8, 'null' => true ]),
 
-        new Field(array('name' => 'comment', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 15, 'null' => TRUE)),
-      ));
+      new Field([ 'name' => 'comment', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 65, 'rows' => 15, 'null' => true ]),
+    ]);
 
     return $record;
   }
 
   function getEditRows ($mode = 'edit') {
     $add_publisher_button = sprintf('<input type="button" value="%s" onclick="window.open(\'%s\')" />',
-                                    tr('add new Holding Institution'), htmlspecialchars($this->page->buildLink(array('pn' => 'publisher', 'edit' => -1))));
+                                    tr('add new Holding Institution'), htmlspecialchars($this->page->buildLink([ 'pn' => 'publisher', 'edit' => -1 ])));
 
     $rows = [
-      'id' => FALSE, // 'status' => FALSE, // hidden fields
+      'id' => false, // 'status' => false, // hidden fields
 
-      'status' => array('label' => 'Status'),
-      'type' => array('label' => 'Source Type'),
+      'status' => [ 'label' => 'Status' ],
+      'type' => [ 'label' => 'Source Type' ],
 
-      /* 'isbn' => array('label' => 'ISBN'),
+      /* 'isbn' => [ 'label' => 'ISBN' ],
       '<input type="button" value="' . tr('Get Info') . '" onclick="fetchPublicationByIsbn()" />',
       */
-      'author' => array('label' => 'Author(s)'),
-      'editor' => array('label' => 'Editor(s)'),
-      'title' => array('label' => 'Title'),
-      'subtitle' => array('label' => 'Subtitle'),
-      'series' => array('label' => 'Series'),
-      'place' => array('label' => 'Place of publication'),
-      'publisher_id' => array('label' => 'Holding Institution',
-                              'value' => isset($this->form)
-                              ? $this->getFormField('publisher_id') . $add_publisher_button
-                              : ''),
-      'archive_location' => array('label' => 'Archive location'),
-      'publication_date' => array('label' => 'Publication date'),
-      'binding' => array('label' => 'Binding'),
-      'pages' => array('label' => 'Pages/Ills.'),
-      // 'listprice' => array('label' => 'List price'),
-      'url' => array('label' => 'URL'),
-      'image_url' => FALSE, // hidden field
+      'author' => [ 'label' => 'Author(s)' ],
+      'editor' => [ 'label' => 'Editor(s)' ],
+      'title' => [ 'label' => 'Title' ],
+      'subtitle' => [ 'label' => 'Subtitle' ],
+      'series' => [ 'label' => 'Series' ],
+      'place' => [ 'label' => 'Place of publication' ],
+      'publisher_id' => [
+        'label' => 'Holding Institution',
+        'value' => isset($this->form)
+                    ? $this->getFormField('publisher_id') . $add_publisher_button
+                    : '',
+      ],
+      'archive_location' => [ 'label' => 'Archive location' ],
+      'publication_date' => [ 'label' => 'Publication date' ],
+      'binding' => [ 'label' => 'Binding' ],
+      'pages' => [ 'label' => 'Pages/Ills.' ],
+      // 'listprice' => [ 'label' => 'List price' ],
+      'url' => [ 'label' => 'URL' ],
+      'image_url' => false, // hidden field
 
-      'lang' => array('label' => 'Quellsprache'),
-      'translator' => array('label' => 'Translator'),
-      'status_translation' => array('label' => 'Translation Status'),
+      'lang' => [ 'label' => 'Quellsprache' ],
+      'translator' => [ 'label' => 'Translator' ],
+      'status_translation' => [ 'label' => 'Translation Status' ],
 
-      'place_identifier' => array('label' => 'Primary Place (Getty-Identifier)'),
-      'place_geo' => array('label' => 'Primary Place Coordinate Override (Latitude,Longitude, e.g "52.516667,13.4")'),
-      'indexingdate' => array('label' => 'Primary Date (YYYY or DD.MM.YYY)'),
-      'displaydate' => array('label' => 'Primary Date Override (e.g. "around 1600")'),
+      'place_identifier' => [ 'label' => 'Primary Place (Getty-Identifier)' ],
+      'place_geo' => [ 'label' => 'Primary Place Coordinate Override (Latitude,Longitude, e.g "52.516667,13.4")' ],
+      'indexingdate' => [ 'label' => 'Primary Date (YYYY or DD.MM.YYY)' ],
+      'displaydate' => [ 'label' => 'Primary Date Override (e.g. "around 1600")' ],
 
       '<hr noshade="noshade" />',
     ];
 
     $additional = [
-      'license' => array('label' => 'License'),
-      'attribution_de' => array('label' => 'Attribution (German)'),
-      'attribution_en' => array('label' => 'Attribution (English)'),
+      'license' => [ 'label' => 'License' ],
+      'attribution_de' => [ 'label' => 'Attribution (German)' ],
+      'attribution_en' => [ 'label' => 'Attribution (English)' ],
     ];
 
     if ('edit' == $mode) {
@@ -477,11 +488,11 @@ class DisplayPublication extends DisplayBackend
     }
 
     foreach ([
-        'digitization' => array('label' => 'Digitization', 'mask' => 0x1),
-        'markup' => array('label' => 'Transcript and Markup', 'mask' => 0x02),
-        'bibliography' => array('label' => 'Bibliography', 'mask' => 0x04),
-        'translation' => array('label' => 'Translation', 'mask' => 0x08),
-        'translation_markup' => array('label' => 'Translation Markup', 'mask' => 0x10),
+        'digitization' => [ 'label' => 'Digitization', 'mask' => 0x1 ],
+        'markup' => [ 'label' => 'Transcript and Markup', 'mask' => 0x02 ],
+        'bibliography' => [ 'label' => 'Bibliography', 'mask' => 0x04 ],
+        'translation' => [ 'label' => 'Translation', 'mask' => 0x08 ],
+        'translation_markup' => [ 'label' => 'Translation Markup', 'mask' => 0x10 ],
       ] as $key => $options)
     {
       if ('edit' == $mode) {
@@ -495,8 +506,8 @@ class DisplayPublication extends DisplayBackend
         'label' => $options['label'],
         'value' => $finalized
           . ('edit' == $mode
-                                  ? $this->getFormField('comment_' . $key)
-                                  : $this->record->get_value('comment_' . $key))
+              ? $this->getFormField('comment_' . $key)
+              : $this->record->get_value('comment_' . $key))
       ];
     }
 
@@ -507,7 +518,7 @@ class DisplayPublication extends DisplayBackend
 
       'comment' => [ 'label' => 'Internal notes and comments' ],
 
-      isset($this->form) ? $this->form->show_submit(ucfirst(tr('save'))) : 'FALSE',
+      isset($this->form) ? $this->form->show_submit(ucfirst(tr('save'))) : 'false',
     ]);
 
     return $rows;
@@ -590,18 +601,18 @@ EOT;
     $images = [
       'source' => [
         'title' => tr('Digitized Media / Transcript'),
-        'multiple' => TRUE,
+        'multiple' => true,
         'imgparams' => [
           'height' => 164,
           'scale' => 'down',
           'keep' => 'large',
-          'keep_orig' => TRUE,
+          'keep_orig' => true,
           'title' => 'File',
-          'pdf' => TRUE,
-          'audio' => TRUE,
-          'video' => TRUE,
-          'office' => TRUE,
-          'xml' => TRUE,
+          'pdf' => true,
+          'audio' => true,
+          'video' => true,
+          'office' => true,
+          'xml' => true,
         ],
       ],
     ];
@@ -610,7 +621,7 @@ EOT;
   }
 
   function getViewFormats () {
-    // return array('body' => array('format' => 'p'));
+    // return [ 'body' => [ 'format' => 'p'));
   }
 
   function buildViewRows () {
@@ -632,7 +643,7 @@ EOT;
     $view_rows = [];
 
     foreach ($rows as $key => $descr) {
-      if ($descr !== FALSE && gettype($key) == 'string') {
+      if ($descr !== false && gettype($key) == 'string') {
         if (isset($formats[$key])) {
           $descr = array_merge($descr, $formats[$key]);
         }
@@ -726,7 +737,7 @@ EOT;
               ? $this->formatParagraphs($field_value) : $this->formatText($field_value);
           }
 
-          $fields[] = array($label, $value);
+          $fields[] = [ $label, $value ];
         }
       }
     }
@@ -739,11 +750,11 @@ EOT;
   }
 
   function buildReviewSubject (&$record) {
-    $editor = FALSE;
+    $editor = false;
     $authors = $record->get_value('author');
     if (empty($authors)) {
       $authors = $record->get_value('editor');
-      $editor = TRUE;
+      $editor = true;
     }
 
     $author_short = '';
@@ -780,7 +791,7 @@ EOT;
 
       $ret .= $this->renderView($record, $rows);
 
-      $reviews_found = FALSE; $reviews = '';
+      $reviews_found = false; $reviews = '';
 
       // show all articles related to this source
       $querystr = sprintf("SELECT Message.id AS id, subject, status"
@@ -791,12 +802,12 @@ EOT;
       $dbconn = & $this->page->dbconn;
       $dbconn->query($querystr);
       $reviews = '';
-      $params_view = array('pn' => 'article');
-      $reviews_found = FALSE;
+      $params_view = [ 'pn' => 'article' ];
+      $reviews_found = false;
       while ($dbconn->next_record()) {
         if (!$reviews_found) {
           $reviews = '<ul>';
-          $reviews_found = TRUE;
+          $reviews_found = true;
         }
         $params_view['view'] = $dbconn->Record['id'];
         $reviews .= sprintf('<li id="item_%d">', $dbconn->Record['id'])
@@ -818,11 +829,13 @@ EOT;
                         htmlspecialchars($url_delete),
                         tr('delete Source'));
       }
+
       $url_add = $this->page->buildLink([
         'pn' => 'article', 'edit' => -1,
         'subject' => $this->buildReviewSubject($record),
         'publication' => $this->id,
       ]);
+
       $ret .= '<h2>' . tr('Articles')
             . ($this->checkAction(TABLEMANAGER_EDIT)
                 ? ' <span class="regular">[<a href="' . htmlspecialchars($url_add).'">' . tr('add new') . '</a>]</span>'
@@ -835,7 +848,6 @@ EOT;
       if (isset($uploadHandler)) {
         $ret .= $this->renderUpload($uploadHandler, 'File Upload');
       }
-
     }
 
     return $ret;
@@ -912,8 +924,8 @@ EOT;
     return $search;
   }
 
-  function buildListingCell (&$row, $col_index, $val = NULL) {
-    $val = NULL;
+  function buildListingCell (&$row, $col_index, $val = null) {
+    $val = null;
     if ($col_index == count($this->fields_listing) - 2) {
       $val = (isset($row[$col_index]) && array_key_exists($row['status'], $this->status_options))
               ? $this->status_options[$row['status']] . '&nbsp;' : '';
@@ -946,11 +958,10 @@ EOT;
 
     return parent::buildListingCell($row, $col_index, $val);
   }
-
 }
 
 $display = new DisplayPublication($page);
-if (FALSE === $display->init()) {
+if (false === $display->init()) {
   $page->redirect([ 'pn' => '' ]);
 }
 
