@@ -54,12 +54,7 @@ extends PageDisplay
       ],
       [
         'name' => 'person',
-        'title' => 'Normdata: Person',
-        'privs' => $RIGHTS_ADMIN,
-      ],
-      [
-        'name' => 'place',
-        'title' => 'Normdata: Places',
+        'title' => 'Normdata: Persons',
         'privs' => $RIGHTS_ADMIN,
       ],
       [
@@ -68,8 +63,13 @@ extends PageDisplay
         'privs' => $RIGHTS_ADMIN,
       ],
       [
+        'name' => 'place',
+        'title' => 'Normdata: Places',
+        'privs' => $RIGHTS_ADMIN,
+      ],
+      [
         'name' => 'event',
-        'title' => 'Normdata: Event',
+        'title' => 'Normdata: Events',
         'privs' => $RIGHTS_ADMIN,
       ],
       [

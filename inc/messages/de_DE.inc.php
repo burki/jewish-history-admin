@@ -295,5 +295,9 @@ $GETTEXT_MESSAGES = array (
 'Primary Place Coordinate Override (Latitude,Longitude, e.g "52.516667,13.4")' => 'Übersteuerung Primärort Geo-Koord. (Breite, Länge, z.B. "52.516667,13.4")',
 'Primary Date (YYYY or DD.MM.YYY)' => 'Primärdatum (JJJJ oder TT.MM.JJJJ)',
 'Primary Date Override (e.g. "around 1600")' => 'Übersteuerung Primärdatum (z.B. "um 1600")',
+'Normdata: Persons' => 'Normdaten: Personen',
+'Normdata: Organizations' => 'Normdaten: Organisationen',
+'Normdata: Places' => 'Normdaten: Orte',
+'Normdata: Events' => 'Normdaten: Ereignisse',
 );
 
