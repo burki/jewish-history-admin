@@ -6,7 +6,7 @@
  *
  * (c) 2010-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-05-22 dbu
+ * Version: 2018-08-17 dbu
  *
  * Changes:
  *
@@ -52,7 +52,6 @@ extends PageDisplay
         'title' => 'Term Sets',
         'privs' => $RIGHTS_ADMIN,
       ],
-      /*
       [
         'name' => 'person',
         'title' => 'Normdata: Person',
@@ -73,7 +72,6 @@ extends PageDisplay
         'title' => 'Normdata: Event',
         'privs' => $RIGHTS_ADMIN,
       ],
-      */
       [
         'name' => 'account',
         'title' => 'Accounts',
