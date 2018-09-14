@@ -219,6 +219,11 @@ $GETTEXT_MESSAGES = array (
 'New Subscriber' => 'neuer Subskribent',
 'New Reviewer' => 'neuer Rezensent',
 'New Author' => 'neuer Autor',
+'New Person' => 'neue Person',
+'New Organization' => 'neue Organisation',
+'New Place' => 'neuer Ort',
+'New Landmark' => 'neue Landmarke',
+'New Event' => 'neues Ereignis',
 'Author/Editor' => 'Autor/Hrsg.',
 'delete publication' => 'Publikation löschen',
 'Access rights' => 'Zugriffsrechte',
@@ -298,6 +303,7 @@ $GETTEXT_MESSAGES = array (
 'Normdata: Persons' => 'Normdaten: Personen',
 'Normdata: Organizations' => 'Normdaten: Organisationen',
 'Normdata: Places' => 'Normdaten: Orte',
+'Normdata: Landmarks' => 'Normdaten: Landmarken',
 'Normdata: Events' => 'Normdaten: Ereignisse',
 );
 
