@@ -6,7 +6,7 @@
  *
  * (c) 2006-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-07-23 dbu
+ * Version: 2018-09-14 dbu
  *
  * Changes:
  *
@@ -367,7 +367,7 @@ EOT;
     foreach ($this->images as $img_basename => $img_descr) {
       $img_params = $img_descr['imgparams'];
       if (isset($img_descr['multiple'])) {
-        if ('boolean' == gettype($img_descr['multiple'])) {
+        if (is_bool($img_descr['multiple'])) {
           $max_images = $img_descr['multiple'] ? -1 : 1;
         }
         else {
@@ -437,7 +437,7 @@ EOT;
 
       $max_images = 1;
       if (isset($img_descr['multiple'])) {
-        if ('boolean' == gettype($img_descr['multiple'])) {
+        if (is_bool($img_descr['multiple'])) {
           $max_images = $img_descr['multiple'] ? -1 : 1;
         }
         else {
@@ -505,7 +505,7 @@ EOT;
       }
 
       foreach ($rows as $row) {
-        if ('array' == gettype($row)) {
+        if (is_array($row)) {
           $ret .= $this->buildContentLine(tr($row[0]), $row[1]);
         }
         else {

@@ -4,9 +4,9 @@
  *
  * Manage the Place-table
  *
- * (c) 2015-2017 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2015-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2017-07-05 dbu
+ * Version: 2018-09-14 dbu
  *
  * TODO:
  *
@@ -255,6 +255,7 @@ extends DisplayBackend
       // new Field([ 'name' => 'tgn_parent', 'id' => 'tgn_parent', 'type' => 'hidden', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => true ]),
       // new Field([ 'name' => 'parent_path', 'id' => 'parent_path', 'type' => 'hidden', 'datatype' => 'char', 'size' => 40, 'null' => true ]),
       new Field([ 'name' => 'gnd', 'id' => 'gnd', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => true ]),
+      new Field([ 'name' => 'wikidata', 'id' => 'wikidata', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 30, 'null' => true ]),
       new Field([ 'name' => 'geonames', 'id' => 'geonames', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => true ]),
 
       new Field([ 'name' => 'boundaryCode', 'type' => 'text', 'datatype' => 'char', 'size' => 40, 'null' => true, 'nodbfield' => true ]),
@@ -283,6 +284,13 @@ extends DisplayBackend
       $tgn_search = sprintf('<input value="TGN Anfrage nach Name" type="button" onclick="%s" /><span id="spinner"></span><br />',
                             "jQuery('#tgn').autocomplete('enable');jQuery('#tgn').autocomplete('search', jQuery('#lastname').val() + ', ' + jQuery('#firstname').val())");
     }
+
+    $wikidata_lookup = '';
+    if ('edit' == $mode) {
+      $wikidata_lookup = sprintf('<input value="Wikidata Anfrage nach TGN" type="button" onclick="%s" /><span id="spinner"></span><br />',
+                                 "jQuery('#wikidata').autocomplete('enable');jQuery('#wikidata').autocomplete('search', jQuery('#tgn').val())");
+    }
+
     $rows = [
       'id' => false, 'status' => false,
       'type' => [ 'label' => 'Place Type' ],
@@ -301,6 +309,11 @@ extends DisplayBackend
       ],
       'tgn_parent' => false,
       // 'parent_path' => ('edit' == $mode ? false : [ 'label' => 'Uebergeordnet')),
+      'wikidata' => [
+        'label' => 'Wikidata',
+        'description' => 'Identifikator',
+      ],
+      $wikidata_lookup,
       'gnd' => [
         'label' => 'GND',
         'description' => 'Identifikator',
@@ -335,6 +348,7 @@ extends DisplayBackend
         // jQuery('#' + hide[i]).parent().parent().hide();
         jQuery('#' + hide[i]).parents('.container').hide();
       }
+
       for (var i = 0; i < show.length; i++) {
         // jQuery('#' + show[i]).parent().parent().show();
         jQuery('#' + show[i]).parents('.container').show();
@@ -343,31 +357,44 @@ extends DisplayBackend
 
 EOT;
 
-/*
     $this->script_ready[] = <<<EOT
-
-    jQuery('#tgn').autocomplete({
-      // source: availablePnds,
+    jQuery('#wikidata').autocomplete({
       type: 'post',
-      source: './admin_ws.php?pn=place&action=lookupTgn&_debug=1',
+      source: function (request, response) {
+        // request.term is the term searched for.
+        // response is the callback function you must call to update the autocomplete's
+        // suggestion list.
+        jQuery.ajax({
+          url: "./admin_ws.php?pn=place&action=lookupWikidataByTgn&_debug=1",
+          data: { tgn: request.term },
+          dataType: "json",
+          success: response,
+          error: function () {
+            response([]);
+          }
+        });
+      },
       minChars: 2,
       search: function(event, ui) {
-        if (jQuery('#tgn').autocomplete('option', 'disabled'))
+        if (jQuery('#wikidata').autocomplete('option', 'disabled')) {
           return false;
+        }
 
         var output = jQuery('#spinner');
         if (null != output) {
           output.html('<img src="./media/ajax-loader.gif" alt="running" />');
         }
       },
-      response: function(event,ui) { // was open
+      response: function(event,ui) {
+        // was open
         var output = jQuery('#spinner');
         if (null != output) {
           output.html('');
         }
       },
       focus: function(event, ui) {
-        jQuery('#tgn').val(ui.item.value);
+        jQuery('#wikidata').val(ui.item.value);
+
         return false;
       },
       change: function(event, ui) {
@@ -377,92 +404,83 @@ EOT;
         }
       },
       select: function(event, ui) {
-        jQuery('#tgn').val(ui.item.value);
-                // try to fetch more info by tgn
-                jQuery.ajax({ url: './admin_ws.php?pn=place&action=fetchPlaceByTgn&_debug=1',
-                              data: { tgn: ui.item.value },
-                              dataType: 'json',
-                              success: function (data) {
-                                var mapping = {dateOfBirth: 'birthdate',
-                                               placeOfBirth: 'birthplace',
-                                               placeOfResidence: 'actionplace',
-                                               dateOfDeath: 'deathdate',
-                                               placeOfDeath: 'deathplace',
-                                               academicTitle: 'title',
-                                               biographicalInformation: 'occupation'};
-                                for (key in mapping) {
-                                  if (null != data[key]) {
-                                    var field = jQuery('#' + mapping[key]);
-                                    if (null != field) {
-                                      var val = data[key];
-                                      if (val != null && ('dateOfBirth' == key || 'dateOfDeath' == key)) {
-                                        var parts = val.split(/\-/);
-                                        val = val.split(/\-/).reverse().join('.');
-                                      }
-                                      field.val(val);
-                                    }
-                                  }
-                                }
-                              }});
+        jQuery('#wikidata').val(ui.item.value);
 
         return false;
       },
       close: function(event, ui) {
-        jQuery('#tgn').autocomplete('disable');
+        jQuery('#wikidata').autocomplete('disable');
         var output = jQuery('#spinner');
         if (null != output) {
           output.html('');
         }
       }
-
     })
     .autocomplete('disable');
+
 EOT;
-*/
     }
     else {
-      $tgn = $this->record->get_value('tgn');
-      if (false && !empty($tgn)) {
+      $gnd = $this->record->get_value('gnd');
+      if (!empty($gnd)) {
         $this->script_url[] = 'script/seealso.js';
 
 
         $PND_LINKS = [
-          'http://d-nb.info/tgn/%s' => 'Deutsche Nationalbibliothek',
+          'http://d-nb.info/gnd/%s' => 'Deutsche Nationalbibliothek',
         ];
-        $rows['tgn']['value'] = '<ul><li>';
+        $rows['gnd']['value'] = '<ul><li>';
 
-        $rows['tgn']['value'] .= htmlspecialchars($tgn);
+        $rows['gnd']['value'] .= htmlspecialchars($gnd);
 
-        $rows['tgn']['value'] .= '</li>';
+        $rows['gnd']['value'] .= '</li>';
 
         $external = [];
         foreach ($PND_LINKS as $url => $title) {
-          $url_final = sprintf($url, $tgn);
+          $url_final = sprintf($url, $gnd);
           $external[] = sprintf('<li><a href="%s" target="_blank">%s</a></li>',
                                 htmlspecialchars($url_final), $this->formatText($title));
         }
 
         if (count($external) > 0) {
-          $rows['tgn']['value'] .= implode('', $external);
+          $rows['gnd']['value'] .= implode('', $external);
         }
 
-        $rows['tgn']['value'] .= '</ul>';
+        $rows['gnd']['value'] .= '</ul>';
 
         $this->script_code .= <<<EOT
           var service = new SeeAlsoCollection();
           service.services = {
             'pndaks' : new SeeAlsoService('//beacon.findbuch.de/seealso/pnd-aks/')
           };
-          service.views = { 'seealso-ul' : new SeeAlsoUL({ /* preHTML : '<h3>Externe Angebote</h3>', */
-                                                            linkTarget: '_blank',
-                                                            maxItems: 100 }) };
+          service.views = {
+            'seealso-ul' : new SeeAlsoUL({
+              /* preHTML : '<h3>Externe Angebote</h3>', */
+              linkTarget: '_blank',
+              maxItems: 100
+            })
+          };
           service.replaceTagsOnLoad();
 
 EOT;
-          $rows['tgn']['value'] .= $ret = <<<EOT
-  <div title="$tgn" class="pndaks seealso-ul"></div>
+          $rows['gnd']['value'] .= $ret = <<<EOT
+  <div title="$gnd" class="pndaks seealso-ul"></div>
 EOT;
 
+      }
+
+      $tgn = $this->record->get_value('tgn');
+      if (!empty($tgn)) {
+        $rows['tgn']['value'] = sprintf('<a href="http://vocab.getty.edu/page/tgn/%s" target="_blank">%s</a>',
+                                        $this->htmlSpecialchars($tgn),
+                                        $this->htmlSpecialchars($tgn));
+      }
+
+      $wikidata = $this->record->get_value('wikidata');
+      if (!empty($wikidata)) {
+        $rows['wikidata']['value'] = sprintf('<a href="https://www.wikidata.org/wiki/%s" target="_blank">%s</a>',
+                                             $this->htmlSpecialchars($wikidata),
+                                             $this->htmlSpecialchars($wikidata));
       }
     }
 
@@ -806,7 +824,7 @@ EOT;
   function buildContent () {
     if (PlaceFlow::MERGE == $this->step) {
       $res = $this->buildMerge();
-      if ('boolean' == gettype($res)) {
+      if (is_bool($res)) {
         if ($res) {
           $this->step = TABLEMANAGER_VIEW;
         }
@@ -818,7 +836,7 @@ EOT;
 
     if (PlaceFlow::IMPORT == $this->step) {
       $res = $this->buildImport();
-      if ('boolean' == gettype($res)) {
+      if (is_bool($res)) {
         if ($res) {
           $this->step = TABLEMANAGER_VIEW;
         }

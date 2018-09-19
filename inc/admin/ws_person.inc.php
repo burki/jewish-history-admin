@@ -1,8 +1,8 @@
 <?php
 /*
- * ws_user.inc.php
+ * ws_person.inc.php
  *
- * Webservices for managing users
+ * Webservices for managing persons
  *
  * (c) 2007-2018 daniel.burckhardt@sur-gmbh.ch
  *
@@ -15,7 +15,7 @@
 class WsPerson
 extends WsHandler
 {
-  // example-call: http://localhost/juedische-geschichte/admin_ws.php?pn=person&action=fetchBiographyByGnd&_debug=1&gnd=132204991
+  // example-call: http://localhost/juedische-geschichte/admin/admin_ws.php?pn=person&action=fetchBiographyByGnd&_debug=1&gnd=132204991
   function buildResponse () {
     $valid_actions = [ 'lookupGnd', 'fetchBiographyByGnd' ];
 
@@ -55,6 +55,7 @@ extends WsHandler
 
   function fetchBiographyByGndAction () {
     require_once INC_PATH . 'common/GndService.php';
+
     $gnd = $this->getParameter('gnd');
     $bio = BiographicalData::fetchByGnd($gnd);
 

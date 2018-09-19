@@ -68,6 +68,11 @@ extends PageDisplay
         'privs' => $RIGHTS_ADMIN,
       ],
       [
+        'name' => 'landmark',
+        'title' => 'Normdata: Landmarks',
+        'privs' => $RIGHTS_ADMIN,
+      ],
+      [
         'name' => 'event',
         'title' => 'Normdata: Events',
         'privs' => $RIGHTS_ADMIN,

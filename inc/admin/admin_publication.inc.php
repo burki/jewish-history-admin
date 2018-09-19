@@ -6,7 +6,7 @@
  *
  * (c) 2007-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-05-22 dbu
+ * Version: 2018-09-14 dbu
  *
  * Changes:
  *
@@ -702,9 +702,9 @@ EOT;
       $ret .= '<p class="message">' . $this->page->msg . '</p>';
     }
     $fields = [];
-    if ('array' == gettype($rows)) {
+    if (is_array($rows)) {
       foreach ($rows as $key => $row_descr) {
-        if ('string' == gettype($row_descr)) {
+        if (is_string($row_descr)) {
           $fields[] = [ '&nbsp;', $row_descr ];
         }
         else {

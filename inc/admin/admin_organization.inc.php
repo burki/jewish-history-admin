@@ -6,7 +6,7 @@
  *
  * (c) 2016-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-07-23 dbu
+ * Version: 2018-09-14 dbu
  *
  * TODO:
  *
@@ -691,7 +691,7 @@ EOT;
   function buildContent () {
     if (OrganizationFlow::MERGE == $this->step) {
       $res = $this->buildMerge();
-      if ('boolean' == gettype($res)) {
+      if (is_bool($res)) {
         if ($res) {
           $this->step = TABLEMANAGER_VIEW;
         }
@@ -703,7 +703,7 @@ EOT;
 
     if (OrganizationFlow::IMPORT == $this->step) {
       $res = $this->buildImport();
-      if ('boolean' == gettype($res)) {
+      if (is_bool($res)) {
         if ($res) {
           $this->step = TABLEMANAGER_VIEW;
         }

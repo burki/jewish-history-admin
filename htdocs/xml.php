@@ -40,30 +40,28 @@ if (!$dbconn->next_record() || 'application/xml' != $dbconn->Record['mimetype'])
 
 $img = $dbconn->Record;
 $fname = $display->buildImgFname($img['item_id'], $img['type'], $img['name'], $img['mimetype']);
-if (array_key_exists('format', $_GET) && in_array($_GET['format'], array('docx'))) {
-  $client = new \OxGarage\Client();
+if (array_key_exists('format', $_GET) && in_array($_GET['format'], [ 'docx' ])) {
   // preprocess
   $temp = tempnam(sys_get_temp_dir(), 'TMP_');
-  /*
-  header('Content-type: text/xml');
-  echo(tranform(realpath($fname), 'preprocess.xsl'));
-  exit; */
-  file_put_contents($temp, tranform(realpath($fname), 'preprocess.xsl'));
+  file_put_contents($temp, transform(realpath($fname), 'preprocess.xsl'));
 
-  // $client->convert(file_get_contents($fname), 'txt:text:plain');
+  // echo file_get_contents($temp); exit;
+
+  $client = new \OxGarage\Client();
   $client->convert($temp);
   unlink($temp);
   exit;
 }
 
-echo tranform($fname);
+echo transform($fname);
 
-function tranform($fname_xml, $fname_xsl = 'dtabf.xsl') {
+function transform($fname_xml, $fname_xsl = 'dtabf.xsl') {
   $xslt_dir = BASE_FILEPATH . '../inc/xslt/';
-  $cmd = sprintf('java -cp %s net.sf.saxon.Transform -s:%s -xsl:%s',
-                  realpath($xslt_dir . 'saxon9he.jar'),
-                  realpath($fname_xml),
-                  realpath($xslt_dir . $fname_xsl));
+  $cmd = sprintf('%s -cp %s net.sf.saxon.Transform -s:%s -xsl:%s',
+                 defined('JAVA') ? JAVA : 'java',
+                 realpath($xslt_dir . 'saxon9he.jar'),
+                 realpath($fname_xml),
+                 realpath($xslt_dir . $fname_xsl));
   $res = `$cmd`;
 
   return $res;

@@ -6,7 +6,7 @@
  *
  * (c) 2007-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-05-22 dbu
+ * Version: 2018-09-14 dbu
  *
  * Changes:
  *
@@ -20,6 +20,7 @@ function array_merge_at ($array1, $array2, $after_field = null) {
   if (empty($after_field)) {
     return array_merge($array1, $array2);
   }
+
   $ret = [];
   foreach ($array1 as $key => $val) {
     if ('integer' == gettype($key)) {
@@ -28,6 +29,7 @@ function array_merge_at ($array1, $array2, $after_field = null) {
     else {
       $ret[$key] = $val;
     }
+
     if (isset($after_field) && $key === $after_field) {
       //var_dump($after_field);
       $ret = array_merge($ret, $array2);
@@ -433,9 +435,9 @@ extends DisplayTable
     }
 
     $fields = [];
-    if ('array' == gettype($rows)) {
+    if (is_array($rows)) {
       foreach ($rows as $key => $row_descr) {
-        if ('string' == gettype($row_descr)) {
+        if (is_string($row_descr)) {
           $fields[] = [ '&nbsp;', $row_descr ];
         }
         else {
@@ -601,7 +603,7 @@ extends DisplayTable
     foreach ($this->images as $img_name => $img_descr) {
       $img_params = $img_descr['imgparams'];
       if (isset($img_descr['multiple'])) {
-        if ('boolean' == gettype($img_descr['multiple'])) {
+        if (is_bool($img_descr['multiple'])) {
           $max_images = $img_descr['multiple'] ? -1 : 1;
         }
         else {
@@ -665,7 +667,7 @@ extends DisplayTable
 
       $max_images = 1;
       if (isset($img_descr['multiple'])) {
-        if ('boolean' == gettype($img_descr['multiple'])) {
+        if (is_bool($img_descr['multiple'])) {
           $max_images = $img_descr['multiple'] ? -1 : 1;
         }
         else {

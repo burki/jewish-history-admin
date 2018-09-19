@@ -141,6 +141,7 @@ extends DisplayBackend
       if ($dbconn->Record['zoteroVersion'] >= $item['version']) {
         return 0; // no update needed
       }
+
       $update = $dbconn->Record['id']; // update needed
     }
 
@@ -156,6 +157,7 @@ extends DisplayBackend
       'itemType' => $item['data']['itemType'],
       'title' => $item['data']['title'],
     ];
+
     $record['corresp'] = $this->buildCorresp($item);
     $this->insertUpdate($dbconn, $record, $update);
   }

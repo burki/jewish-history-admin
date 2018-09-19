@@ -6,7 +6,7 @@
  *
  * (c) 2009-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-07-22 dbu
+ * Version: 2018-09-14 dbu
  *
  * TODO:
  *
@@ -343,8 +343,9 @@ EOT;
       source: './admin_ws.php?pn=person&action=lookupGnd&_debug=1',
       minChars: 2,
       search: function(event, ui) {
-        if (jQuery('#gnd').autocomplete('option', 'disabled'))
+        if (jQuery('#gnd').autocomplete('option', 'disabled')) {
           return false;
+        }
 
         var output = jQuery('#spinner');
         if (null != output) {
@@ -359,6 +360,7 @@ EOT;
       },
       focus: function(event, ui) {
         jQuery('#gnd').val(ui.item.value);
+
         return false;
       },
       change: function(event, ui) {
@@ -369,32 +371,38 @@ EOT;
       },
       select: function(event, ui) {
         jQuery('#gnd').val(ui.item.value);
-                // try to fetch more info by gnd
-                jQuery.ajax({ url: './admin_ws.php?pn=person&action=fetchBiographyByGnd&_debug=1',
-                              data: { gnd: ui.item.value },
-                              dataType: 'json',
-                              success: function (data) {
-                                var mapping = {dateOfBirth: 'birthdate',
-                                               placeOfBirth: 'birthplace',
-                                               placeOfResidence: 'actionplace',
-                                               dateOfDeath: 'deathdate',
-                                               placeOfDeath: 'deathplace',
-                                               academicTitle: 'title',
-                                               biographicalInformation: 'occupation'};
-                                for (key in mapping) {
-                                  if (null != data[key]) {
-                                    var field = jQuery('#' + mapping[key]);
-                                    if (null != field) {
-                                      var val = data[key];
-                                      if (val != null && ('dateOfBirth' == key || 'dateOfDeath' == key)) {
-                                        var parts = val.split(/\-/);
-                                        val = val.split(/\-/).reverse().join('.');
-                                      }
-                                      field.val(val);
-                                    }
-                                  }
-                                }
-                              }});
+
+        // try to fetch more info by gnd
+        jQuery.ajax({
+          url: './admin_ws.php?pn=person&action=fetchBiographyByGnd&_debug=1',
+          data: { gnd: ui.item.value },
+          dataType: 'json',
+          success: function (data) {
+            var mapping = {
+              dateOfBirth: 'birthdate',
+              placeOfBirth: 'birthplace',
+              placeOfResidence: 'actionplace',
+              dateOfDeath: 'deathdate',
+              placeOfDeath: 'deathplace',
+              academicTitle: 'title',
+              biographicalInformation: 'occupation'
+            };
+
+            for (key in mapping) {
+              if (null != data[key]) {
+                var field = jQuery('#' + mapping[key]);
+                if (null != field) {
+                  var val = data[key];
+                  if (val != null && ('dateOfBirth' == key || 'dateOfDeath' == key)) {
+                    var parts = val.split(/\-/);
+                    val = val.split(/\-/).reverse().join('.');
+                  }
+                  field.val(val);
+                }
+              }
+            }
+          }
+        });
 
         return false;
       },
@@ -702,8 +710,10 @@ EOT;
     $record = $this->buildRecord();
     // created is default of type function
     // $record->get_field('created')->set('datatype', 'date');
-    if (!$record->fetch($id))
+    if (!$record->fetch($id)) {
       return false;
+    }
+
     $action = null;
     if (array_key_exists('with', $_POST)
         && intval($_POST['with']) > 0)
@@ -711,6 +721,7 @@ EOT;
       $action = 'merge';
       $id_new = intval($_POST['with']);
     }
+
     $ret = false;
 
     $dbconn = new DB_Presentation();
@@ -842,7 +853,7 @@ EOT;
   function buildContent () {
     if (PersonFlow::MERGE == $this->step) {
       $res = $this->buildMerge();
-      if ('boolean' == gettype($res)) {
+      if (is_bool($res)) {
         if ($res) {
           $this->step = TABLEMANAGER_VIEW;
         }
@@ -854,7 +865,7 @@ EOT;
 
     if (PersonFlow::IMPORT == $this->step) {
       $res = $this->buildImport();
-      if ('boolean' == gettype($res)) {
+      if (is_bool($res)) {
         if ($res) {
           $this->step = TABLEMANAGER_VIEW;
         }

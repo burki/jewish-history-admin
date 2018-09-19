@@ -6,7 +6,7 @@
  *
  * (c) 2009-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-07-23 dbu
+ * Version: 2018-09-14 dbu
  *
  * Changes:
  *
@@ -200,7 +200,7 @@ extends DisplayMessage
 
     if (array_key_exists('publication_order', $_POST)) {
       parse_str($_POST['publication_order'], $order);
-      if (array_key_exists('publications', $order) && 'array' == gettype($order['publications'])) {
+      if (array_key_exists('publications', $order) && is_array($order['publications'])) {
         $dbconn = &$this->page->dbconn;
         foreach ($order['publications'] as $ord => $id_publication) {
           $querystr = sprintf("UPDATE MessagePublication SET ord=%d WHERE message_id=%d AND publication_id=%d",

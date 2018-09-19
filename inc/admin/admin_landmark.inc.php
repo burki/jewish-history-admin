@@ -225,6 +225,7 @@ extends DisplayBackend
       // new Field([ 'name' => 'gnd', 'id' => 'gnd', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => true ]),
       new Field([ 'name' => 'wikidata', 'id' => 'wikidata', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 30, 'null' => true ]),
       // new Field([ 'name' => 'geonames', 'id' => 'geonames', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => true ]),
+      new Field([ 'name' => 'djh', 'id' => 'djh', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 30, 'null' => true ]),
 
       // new Field([ 'name' => 'boundaryCode', 'type' => 'text', 'datatype' => 'char', 'size' => 40, 'null' => true, 'nodbfield' => true ]),
       new Field([ 'name' => 'additional', 'type' => 'hidden', 'datatype' => 'char', 'null' => true ]),
@@ -286,6 +287,7 @@ extends DisplayBackend
         'description' => 'Identifikator',
       ],
       */
+      'djh' => [ 'label' => 'DJH-ID' ],
       'geo' => [ 'label' => 'Coordinate (Latitude,Longitude, e.g "52.516667,13.4")' ],
       (isset($this->form) ? $tgn_search . $this->form->show_submit(tr('Store')) : '')
       . '<hr noshade="noshade" />',

@@ -2,7 +2,7 @@
     "config": {
        "vendor-dir": "lib/",
         "platform": {
-            "php": "5.4.45"
+            "php": "7.1.3"
         },
         "secure-http" : false
     },
@@ -19,24 +19,27 @@
     ],
 
     "require" : {
-        "php": ">=5.4.0",
-
         "swiftmailer/swiftmailer": "~5.0",
 
         "zendframework/zendframework1": "~1.12",
         "cocur/slugify": "~1.0",
-        "semsol/arc2": "@stable",
+
+        "sabre/xml": "@stable",
+
+        "kriswallsmith/buzz": "0.16.*",
+
+        "semsol/arc2": "2.3.*",
         "easyrdf/easyrdf": "~0.9",
         "ml/json-ld": "~1.0",
-        "kriswallsmith/buzz": "@stable",
-        "sabre/xml": "@stable",
 
         "pear/pear-core-minimal": "*",
         "pear/pear_exception": "*",
         "pear/text_wiki": "*@dev",
 
         "burki/zotero-api": "dev-master",
-        "sabre/dav": "~3.0"
+        "sabre/dav": "~3.0",
+
+        "loilo/fuse": "@stable"
     },
 
     "autoload": {

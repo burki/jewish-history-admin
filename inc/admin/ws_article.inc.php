@@ -6,7 +6,7 @@
  *
  * (c) 2009-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-05-22 dbu
+ * Version: 2018-08-24 dbu
  *
  * Changes:
  *
@@ -15,7 +15,7 @@
 class WsArticle
 extends WsHandler
 {
-  // example-call: http://localhost/juedische-geschichte/admin_ws.php?pn=article&action=generateSlug&_debug=1
+  // example-call: http://localhost/juedische-geschichte/admin/admin_ws.php?pn=article&action=generateSlug&_debug=1
   function buildResponse () {
     $valid_actions = [ 'generateSlug' ];
 

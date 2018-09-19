@@ -297,11 +297,13 @@ extends DisplayTable
         break;
 
       case count($this->fields_listing) - 1:
-        $val = '';
         if (0 == ($val & $GLOBALS['RIGHTS_ADMIN'])) {
           $val = sprintf('[<a href="%s" style="white-space: nowrap">%s</a>]',
                          htmlspecialchars($this->page->buildLink([ 'pn' => $this->page->name, 'action' => 'su', 'id' => $row['id'] ])),
                          $this->htmlSpecialchars(tr('switch to')));
+        }
+        else {
+          $val = '';
         }
 
         break;

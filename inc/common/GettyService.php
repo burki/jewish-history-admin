@@ -30,6 +30,7 @@ class GettyPlaceData
         if (!$response->isSuccessful()) {
             return null;
         }
+
         $content = $response->getBody();
         $graph = new \EasyRdf_Graph($query);
         try {
@@ -93,7 +94,7 @@ class GettyPlaceData
         $place = new GettyPlaceData();
 
         \EasyRdf_Namespace::set('gvp', 'http://vocab.getty.edu/ontology#');
-        $graph = $place->executeRdfQuery($url, ['Accept' => 'application/rdf+xml']);
+        $graph = $place->executeRdfQuery($url, [ 'Accept' => 'application/rdf+xml' ]);
         if (!isset($graph)) {
             return;
         }
@@ -133,9 +134,7 @@ class GettyPlaceData
             }
         }
 
-        $place->setValuesFromResource($values, $resource,
-                                     [
-                                           'parentString' => 'parentPath'],
+        $place->setValuesFromResource($values, $resource, [ 'parentString' => 'parentPath'],
                                      'gvp');
         $uri = $resource->get('gvp:broaderPreferred')->getUri();
         if (preg_match('/'
@@ -171,6 +170,7 @@ class GettyPlaceData
             default:
                 die('TODO: handle place type ' . $placeTypePreferred);
         }
+
         $schemaPlace = $resource->get('foaf:focus');
         if (isset($schemaPlace)) {
             $place->setValuesFromResource($values, $schemaPlace,
@@ -182,6 +182,7 @@ class GettyPlaceData
         foreach ($values as $key => $val) {
             $place->$key = $val;
         }
+
         return $place;
     }
 

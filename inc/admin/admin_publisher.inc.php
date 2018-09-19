@@ -6,7 +6,7 @@
  *
  * (c) 2008-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-07-23 dbu
+ * Version: 2018-09-14 dbu
  *
  * Changes:
  *
@@ -242,7 +242,7 @@ extends DisplayTable
     }
 
     $fields = [];
-    if ('array' == gettype($rows)) {
+    if (is_array($rows)) {
       foreach ($rows as $key => $row_descr) {
         if ('string' == gettype($row_descr)) {
           $fields[] = ['&nbsp;', $row_descr];
@@ -431,7 +431,7 @@ EOT;
   function buildContent () {
     if (PublisherFlow::MERGE == $this->step) {
       $res = $this->buildMerge();
-      if ('boolean' == gettype($res)) {
+      if (is_bool($res)) {
         if ($res) {
           $this->step = TABLEMANAGER_VIEW;
         }

@@ -6,7 +6,7 @@
  *
  * (c) 2008-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-07-23 dbu
+ * Version: 2018-09-14 dbu
  *
  * Changes:
  *
@@ -485,13 +485,13 @@ extends DisplayTable
     }
 
     $fields = [];
-    if ('array' == gettype($rows)) {
+    if (is_array($rows)) {
       foreach ($rows as $key => $row_descr) {
-        if ('string' == gettype($row_descr)) {
-          $fields[] = ['&nbsp;', $row_descr];
+        if (is_string($row_descr)) {
+          $fields[] = [ '&nbsp;', $row_descr ];
         }
         else {
-          $label = isset($row_descr['label']) ? tr($row_descr['label']).':' : '';
+          $label = isset($row_descr['label']) ? tr($row_descr['label']) . ':' : '';
           // var_dump($row_descr);
           if (isset($row_descr['fields'])) {
             $value = '';
