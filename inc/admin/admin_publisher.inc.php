@@ -308,7 +308,7 @@ EOT;
   function buildView () {
     $this->id = $this->workflow->primaryKey();
     $record = $this->buildRecord();
-    if ($found = $record->fetch($this->id)) {
+    if ($found = $record->fetch($this->id, $this->datetime_style)) {
       $this->record = &$record;
       $uploadHandler = $this->instantiateUploadHandler();
       if (isset($uploadHandler)) {

@@ -6,7 +6,7 @@
  *
  * (c) 2007-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-09-14 dbu
+ * Version: 2018-09-27 dbu
  *
  * Changes:
  *
@@ -255,7 +255,7 @@ class DisplayBackend
 extends DisplayTable
 {
   var $listing_default_action = TABLEMANAGER_EDIT;
-  var $datetime_style = 'DD/MM/YYYY';
+  var $datetime_style = 'DD.MM.YYYY';
   var $status_deleted = '-1';
 
   function __construct (&$page, $workflow = '') {
@@ -363,7 +363,7 @@ extends DisplayTable
     $record = $this->buildRecord();
     $ret = '';
 
-    if ($found = $record->fetch($this->id)) {
+    if ($found = $record->fetch($this->id, $this->datetime_style)) {
       $this->record = &$record;
       $uploadHandler = $this->instantiateUploadHandler();
       if (isset($uploadHandler)) {

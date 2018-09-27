@@ -6,7 +6,7 @@
  *
  * (c) 2006-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-05-22 dbu
+ * Version: 2018-09-27 dbu
  *
  * TODO:
  *       the models TableManagerRecord->fetch()-method shouldn't need a style
@@ -178,6 +178,7 @@ class TableManagerQueryConditionBuilder
     for ($j = 0; $j < $num_args; $j++) {
       $or_parts[] = $fields[$j] . " = '" . addslashes($this->term) . "'";
     }
+
     return count($or_parts) > 1
       ? '(' . implode(' OR ', $or_parts) . ')'
       : $or_parts[0];
@@ -300,10 +301,10 @@ class DisplayTable extends PageDisplay
   }
 
   function instantiateRecord ($table = '', $dbconn = '') {
-    return new TableManagerRecord(
-      ['tables' => !empty($table) ? $table : $this->table,
-            'dbconn'=> !empty($dbconn) ? $dbconn : $this->page->dbconn]
-    );
+    return new TableManagerRecord([
+      'tables' => !empty($table) ? $table : $this->table,
+      'dbconn'=> !empty($dbconn) ? $dbconn : $this->page->dbconn,
+    ]);
   }
 
   function instantiateHtmlForm ($name = 'detail', $action = '', $method = 'post') {
@@ -320,6 +321,7 @@ class DisplayTable extends PageDisplay
     if (null === $values) {
       $values = & $_POST;
     }
+
     $this->form->set_values($values);
   }
 
@@ -371,12 +373,13 @@ class DisplayTable extends PageDisplay
     }
 
     return $minor == TABLEMANAGER_EDIT_STORED
-      ? [true, $this->workflow->advance(TABLEMANAGER_EDIT)]
-      : [false, $minor];
+      ? [ true, $this->workflow->advance(TABLEMANAGER_EDIT) ]
+      : [ false, $minor ];
   } // process
 
   function message ($msg_name, $lang = null) {
     $ret = isset($this->messages[$msg_name]) ? $this->messages[$msg_name] : $msg_name;
+
     return is_array($ret) ? array_map('tr', $ret) : tr($ret);
   }
 
@@ -389,6 +392,7 @@ class DisplayTable extends PageDisplay
     if (!empty($this->page->msg)) {
       $ret .= '<p class="message">' . $this->page->msg . '</p>';
     }
+
     $ret .= $this->form->show_start()
           . $this->renderEditFormHiddenFields($name)
           ;
@@ -433,6 +437,7 @@ class DisplayTable extends PageDisplay
               $label .= '<div class="leftSmaller">(' . tr($this->formatText($this->datetime_style)) . ')</div>';
             }
           }
+
           if (isset($row_descr['fields'])) {
             $value = '';
             foreach ($row_descr['fields'] as $field) {
@@ -445,10 +450,12 @@ class DisplayTable extends PageDisplay
           else {
             $value = $this->getFormField($key);
           }
+
           $fields[] = [$label, $value];
         }
       }
     }
+
     if (count($fields) > 0) {
       $ret .= $this->buildContentLineMultiple($fields);
     }
@@ -459,12 +466,17 @@ class DisplayTable extends PageDisplay
   }
 
   function getEditRows () {
-    return ['id' => true, '' => $this->form->show_submit('Store')];
+    return [
+      'id' => true,
+      '' => $this->form->show_submit('Store'),
+    ];
   }
 
   function buildFormAction () {
-    return $this->page->buildLink(['pn' => $this->page->name,
-                                        $this->workflow->name(TABLEMANAGER_EDIT) => isset($this->id) ? $this->id : -1]);
+    return $this->page->buildLink([
+      'pn' => $this->page->name,
+      $this->workflow->name(TABLEMANAGER_EDIT) => isset($this->id) ? $this->id : -1,
+    ]);
   }
 
   function buildEdit ($name = 'detail') {
@@ -539,6 +551,7 @@ class DisplayTable extends PageDisplay
             case 'timestamp':
               $fieldnames[$i] = "DATE_FORMAT($fieldname, '%Y-%m-%d %H:%i:%s') AS $fieldname";
               break;
+
             default:
               $fieldnames[$i] = $fieldname;
           }
@@ -546,8 +559,9 @@ class DisplayTable extends PageDisplay
         $this->fields_listing = $fieldnames;
       }
     }
+
     if (!isset($fieldnames)) {
-      $fieldnames = ['*']; // get all if nothing else is specified
+      $fieldnames = [ '*' ]; // get all if nothing else is specified
     }
 
     return $fieldnames;
@@ -562,6 +576,7 @@ class DisplayTable extends PageDisplay
     if (!is_array($tables)) {
       return [$tables];
     }
+
     return $tables;
   }
 
@@ -615,6 +630,7 @@ class DisplayTable extends PageDisplay
       }
       $where = join(' AND ', $conditions);
     }
+
     return [$where, $search_terms];
   }
 
@@ -672,7 +688,7 @@ class DisplayTable extends PageDisplay
     $this->page->setSessionValue('order', $new_order);
     $this->page->setSessionValue('order_index', $order_index);
 
-    return [$order[$new_order][$order_index], $new_order, $order_index];
+    return [ $order[$new_order][$order_index], $new_order, $order_index ];
   }
 
   function buildListingQuery () {
@@ -687,23 +703,28 @@ class DisplayTable extends PageDisplay
               . ($this->distinct_listing ? 'DISTINCT ' : '')
               . implode(', ', $fields)
               . ' FROM ' . implode(', ', $this->buildListingTables());
+
     $joins = $this->buildListingJoins();
+
     if (isset($joins) && count($joins) > 0) {
       $querystr .= ' ' . implode(' ', $joins);
     }
+
     if (!empty($where)) {
       $querystr .= ' WHERE ' . $where;
     }
+
     if (!empty($group_by)) {
       $querystr .= ' GROUP BY ' . $group_by;
     }
+
     if (!empty($order_by)) {
       $querystr .= ' ORDER BY ' . $order_by;
     }
 
 // var_dump($querystr);
 
-    return [$querystr, $search_terms, $order, $order_index];
+    return [ $querystr, $search_terms, $order, $order_index ];
   }
 
   function doListingQuery ($page_size = 0, $page_id = 0) {
@@ -717,7 +738,9 @@ class DisplayTable extends PageDisplay
           $querystr = preg_replace('/SELECT\\b/i', 'SELECT SQL_CALC_FOUND_ROWS', $querystr);
         }
       }
+
       $querystr .= ' LIMIT ' . ($page_id * $page_size) . ', ' . $page_size;
+
       // fetch those rows
       $rows = [];
       $dbconn = &$this->page->dbconn;
@@ -761,7 +784,6 @@ class DisplayTable extends PageDisplay
   }
 
   // the render functions
-
   function buildSearchBar () {
     $ret = sprintf('<form action="%s" method="post">', $this->page->buildLink(['pn' => $this->page->name, 'page_id' => 0]));
     if ($this->cols_listing_count > 0) {
@@ -783,6 +805,7 @@ class DisplayTable extends PageDisplay
                         htmlspecialchars($this->page->buildLink(['pn' => $this->page->name, 'view' => 'xls'])),
                         $this->htmlSpecialchars(tr('export')));
     }
+
     return $export;
   }
 
@@ -973,6 +996,7 @@ class DisplayTable extends PageDisplay
         unset($this->active_conn);
       }
     }
+
     return $content;
   }
 
@@ -1015,5 +1039,4 @@ class DisplayTable extends PageDisplay
       return $this->buildListing($this->page_size, $this->page->getRequestValue('page_id', ['persist' => 'session']));
     }
   } // buildContent
-
 } // class DisplayTable
