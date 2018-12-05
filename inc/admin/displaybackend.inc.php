@@ -6,7 +6,7 @@
  *
  * (c) 2007-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-09-27 dbu
+ * Version: 2018-12-05 dbu
  *
  * Changes:
  *
@@ -399,7 +399,7 @@ extends DisplayTable
     $status_options = [];
     if (isset($this->status_options)) {
       foreach ($this->status_options as $key => $val) {
-        $status_options[$key] = mb_convert_encoding($val, 'UTF-8', 'HTML-ENTITIES');
+        $status_options[$key] = html_entity_decode($val, ENT_COMPAT, 'utf-8');
       }
       $this->view_options['status'] = $status_options;
     }
