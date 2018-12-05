@@ -201,6 +201,7 @@ CREATE TABLE Publication (
 
   lang          VARCHAR(5) NULL,
   translator    INT NULL,                       #
+  translator_de INT NULL,                       #
   status_translation  INT NULL,                 #
   place_identifier VARCHAR(255) NULL,           #
   place_geo VARCHAR(255) NULL,                  #

@@ -6,7 +6,7 @@
  *
  * (c) 2007-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-09-14 dbu
+ * Version: 2018-12-05 dbu
  *
  * Changes:
  *
@@ -315,10 +315,11 @@ extends DisplayBackend
 
       case 'referee':
       case 'translator':
+      case 'translator_de':
         global $RIGHTS_REFEREE, $RIGHTS_TRANSLATOR;
         $querystr = "SELECT id, lastname, firstname FROM User";
         $querystr .= sprintf(" WHERE 0 <> (privs & %d) AND status <> %d",
-                             'translator' == $type ? $RIGHTS_TRANSLATOR : $RIGHTS_REFEREE,
+                             'referee' == $type ? $RIGHTS_REFEREE : $RIGHTS_TRANSLATOR,
                              STATUS_USER_DELETED);
         $querystr .= " ORDER BY lastname, firstname";
         break;
@@ -345,7 +346,8 @@ extends DisplayBackend
     }
 
     $this->view_options['type'] = $type_options = $this->buildOptions('type');
-    $this->view_options['translator'] = $this->translator_options = $this->buildOptions('translator');
+    $this->view_options['translator'] = $this->view_options['translator_de']
+      = $this->translator_options = $this->buildOptions('translator');
     $this->view_options['lang'] = $this->buildOptions('lang');
     $this->view_options['status_translation'] = $this->status_translation_options
       = [ '' => tr('-- please select --') ] + $this->buildOptions('status_translation');
@@ -400,6 +402,10 @@ extends DisplayBackend
 
       new Field([ 'name' => 'lang', 'type' => 'select', 'datatype' => 'char', 'options' => array_keys($languages_ordered), 'labels' => array_values($languages_ordered), 'null' => true ]),
       new Field([ 'name' => 'translator', 'type' => 'select',
+                  'options' => array_merge([ '' ], array_keys($this->translator_options)),
+                  'labels' => array_merge([ tr('-- none --') ], array_values($this->translator_options)),
+                  'datatype' => 'int', 'null' => true ]),
+      new Field([ 'name' => 'translator_de', 'type' => 'select',
                   'options' => array_merge([ '' ], array_keys($this->translator_options)),
                   'labels' => array_merge([ tr('-- none --') ], array_values($this->translator_options)),
                   'datatype' => 'int', 'null' => true ]),
@@ -461,8 +467,9 @@ extends DisplayBackend
       'url' => [ 'label' => 'URL' ],
       'image_url' => false, // hidden field
 
-      'lang' => [ 'label' => 'Quellsprache' ],
-      'translator' => [ 'label' => 'Translator' ],
+      'lang' => [ 'label' => 'Source Language' ],
+      'translator' => [ 'label' => 'Translator (into English)' ],
+      'translator_de' => [ 'label' => 'Translator (into German)' ],
       'status_translation' => [ 'label' => 'Translation Status' ],
 
       'place_identifier' => [ 'label' => 'Primary Place (Getty-Identifier)' ],
