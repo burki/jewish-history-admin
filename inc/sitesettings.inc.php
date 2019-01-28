@@ -5,16 +5,15 @@
  * Sitewide settings
  * (put machine dependent stuff like hardwired paths, logins and passwords in inc/local.inc.php)
  *
- * (c) 2009-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2019 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-07-23 dbu
+ * Version: 2019-01-28 dbu
  *
  * Changes:
  *
  */
 
 // General Settings
-define('STRIP_SLASHES', get_magic_quotes_gpc());
 define('SESSION_NAME', 'sid');
 
 date_default_timezone_set('Europe/Berlin');

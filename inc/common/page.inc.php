@@ -47,7 +47,6 @@ class Page
   var $SERVER_PORT;
   var $BASE_PATH = './';
   var $BASE_URL;
-  var $STRIP_SLASHES;
   var $use_session = false;
   var $use_session_register = false;
   var $dbconn;
@@ -99,7 +98,6 @@ class Page
 
   function __construct ($dbconn, $site_description = '') {
     $this->dbconn = $dbconn;
-    $this->STRIP_SLASHES = defined('STRIP_SLASHES') ? STRIP_SLASHES : get_magic_quotes_gpc();
     if (!empty($site_description)) {
       $this->site_description = $site_description;
     }
@@ -294,10 +292,6 @@ class Page
       }
     }
 
-    if ($this->STRIP_SLASHES) {
-      $parameters = array_map('stripslashes', $parameters);
-    }
-
     $this->parameters = &$parameters;
   }
 
@@ -469,9 +463,6 @@ class Page
     }
 
     $val = $_POST[$key];
-    if ($this->STRIP_SLASHES) {
-      $val = is_array($val) ? array_map('stripslashes', $val) : stripslashes($val);
-    }
 
     return $val;
   }
@@ -486,9 +477,6 @@ class Page
     }
 
     $val = $_REQUEST[$key];
-    if ($this->STRIP_SLASHES) {
-      $val = is_array($val) ? array_map('stripslashes', $val) : stripslashes($val);
-    }
 
     if ($persist_session) {
       $this->setSessionValue($key, $val);

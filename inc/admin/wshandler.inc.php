@@ -4,9 +4,9 @@
  *
  * Simple base class for Ajax-Web Services
  *
- * (c) 2007-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2019 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-07-23 dbu
+ * Version: 2019-01-28 dbu
  *
  * Changes:
  *
@@ -116,13 +116,6 @@ class WsHandlerFactory
 
 class WsHandler
 {
-  var $STRIP_SLASHES = false;
-
-  function __construct(){
-    $this->STRIP_SLASHES = defined('STRIP_SLASHES')
-      ? STRIP_SLASHES :get_magic_quotes_gpc();
-  }
-
   function initSession () {
     static $initialized = false;
 
@@ -173,11 +166,6 @@ class WsHandler
     }
 
     $val = $_REQUEST[$key];
-    if ($this->STRIP_SLASHES) {
-      $val = is_array($val) ? array_map('stripslashes', $val) : stripslashes($val);
-    }
-
-    // $val = is_array($val) ? array_map('utf8_decode', $val) : utf8_decode($val);
 
     return $val;
   }
