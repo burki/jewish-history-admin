@@ -4,9 +4,9 @@
  *
  * Functions to initialize the page (browser, session, login-stuff, ...)
  *
- * (c) 2009-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2019 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-07-23 dbu
+ * Version: 2019-01-28 dbu
  *
  * Changes:
  *
@@ -15,6 +15,7 @@
 // text translation
 function tr($msg) {
   static $method = -1; // 0: custom, 1: gettext
+
   if ($method == -1) {
     // determine method
     $method = (defined('GETTEXT_AVAILABLE') && !GETTEXT_AVAILABLE) || !function_exists('gettext') ? 0 : 1;
@@ -201,7 +202,8 @@ class Page
       }
       else {
         // default to first available language
-        reset(self::$languages); list(self::$lang, $dummy) = each(self::$languages);
+        reset(self::$languages);
+        self::$lang = key(self::$languages);
 
         if (false) {
           // try to get the language from user settings (cookie oder prefs from database
@@ -308,8 +310,8 @@ class Page
       header('P3P: CP="NOI NID ADMa OUR IND UNI COM NAV"');
 
       session_name(SESSION_NAME);         // set the session name
-      session_start();                    // and start it
       session_cache_limiter('private');
+      session_start();                    // and start it
 
       $this->use_session = true;
       if (1 == ini_get('register_globals')) {
