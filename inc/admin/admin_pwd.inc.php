@@ -56,7 +56,8 @@ extends PageDisplay
       else {
         $keys = array_keys($_GET);
 
-        if (count($keys) >= 2 && !in_array('do_signoff', $keys) && !in_array('do_login', $keys)) {  // check if we are in recovery-mode
+        if (count($keys) >= 2 && !in_array('do_signoff', $keys) && !in_array('do_login', $keys)) {
+          // check if we are in recovery-mode
           $r = $keys[$keys[0] == 'pn' ? 1 : 0]; // url is of the form ?pn=pwd&$magic=$login
           list($this->mode, $this->msg) = $this->verifyRecoverCode(trim($_GET[$r]), $r);
         }
