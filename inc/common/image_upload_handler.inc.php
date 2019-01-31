@@ -5,7 +5,7 @@
   *
   * Author  : Daniel Burckhardt, daniel.burckhardt@sur-gmbh.ch
   *
-  * Version : 2019-01-28 dbu
+  * Version : 2019-01-31 dbu
   *
   * interfaces still not completely finalized,
   * but much better than just plain copy/paste
@@ -234,7 +234,7 @@ class ImageUploadHandler
 
   function storeImgData ($img, $img_form, $img_name, $img_original_name = null) {
     $imgdata = isset($img) ? $img->find_imgdata() : [];
-    if (count($imgdata) > 0) {
+    if (!is_null($imgdata) && count($imgdata) > 0) {
       if (isset($this->dbconn)) {
         $dbconn = & $this->dbconn;
       }
@@ -249,11 +249,12 @@ class ImageUploadHandler
         'height' => isset($imgdata[0]['height']) ? $imgdata[0]['height'] : -1,
         'mimetype' => $imgdata[0]['mime'],
       ];
+
       if (!is_null($img_original_name)) {
         $values['original_name'] = $img_original_name;
       }
 
-      $img_form->set_values($value);
+      $img_form->set_values($values);
 
       // find out if we already have an item
       $querystr = sprintf("SELECT id, original_name FROM Media"
