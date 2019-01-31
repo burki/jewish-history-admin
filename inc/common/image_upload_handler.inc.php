@@ -135,7 +135,7 @@ class ImageUploadHandler
     $legacy = array_key_exists('legacy', $options)
       ? $options['legacy'] : false;
     $img_title = array_key_exists('title', $options)
-		? $options['title'] : null;
+        ? $options['title'] : null;
 
 
     if (isset($this->dbconn)) {
