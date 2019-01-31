@@ -6,11 +6,13 @@
  *
  * (c) 2010-2018 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-07-23 dbu
+ * Version: 2018-10-06 dbu
  *
  * Changes:
  *
- * TODO: Move to http://viaf.org/viaf/search
+ * TODO:
+ *  Maybe integrate
+ *    http://viaf.org/viaf/search
  *  as described on
  *    http://www.oclc.org/developer/documentation/virtual-international-authority-file-viaf/request-types
  *  e.g.
@@ -28,13 +30,29 @@
  *
  */
 
+if (!function_exists('is_is_associative')) {
+    // see https://stackoverflow.com/questions/173400/how-to-check-if-php-array-is-associative-or-sequential
+    // for alternative implementations
+    function is_associative($array) {
+        if (!is_array($array) || empty($array)) {
+            return false;
+        }
+
+        $keys = array_keys($array);
+
+        return array_keys($keys) !== $keys;
+    }
+}
+
 class GndService
 {
-    function lookupByName ($fullname) {
+    /* Lobid 1.x APIs will be shut down on 2018-10-31 */
+    function lookupPersonByNameDeprecated ($fullname) {
         // lobid-service
-        $url = sprintf('http://api.lobid.org/person?name=%s', urlencode($fullname));
+        $url = sprintf('http://api.lobid.org/person?name=%s',
+                       urlencode($fullname));
 
-        $client = new EasyRdf_Http_Client($url);
+        $client = new \EasyRdf_Http_Client($url);
         $client->setHeaders('Accept', 'application/ld+json');
         $response = $client->request();
         if (!$response->isSuccessful()) {
@@ -44,16 +62,21 @@ class GndService
         $persons = [];
 
         $entries = json_decode($response->getBody(), true);
+        if (false === $entries || is_null($entries)) {
+            return $persons;
+        }
+
         foreach ($entries as $entry) {
             if (isset($entry['@graph'])) {
                 $entry = $entry['@graph'][0];
             }
+
             if (!isset($entry['@type'])) {
                 continue;
             }
 
             $types = is_array($entry['@type'])
-                ? $entry['@type'] : [$entry['@type']];
+                ? $entry['@type'] : [ $entry['@type'] ];
 
             if (!in_array('http://d-nb.info/standards/elementset/gnd#DifferentiatedPerson', $types)) {
                 continue;
@@ -61,34 +84,43 @@ class GndService
 
             $gnd = $entry['gndIdentifier'];
             if (self::isGnd($gnd)) {
-                // var_dump($entry);
                 $person = [
                     'gnd' => $gnd,
                     'name' => $entry['preferredNameForThePerson'],
                 ];
 
-                $lifespan = ['', ''];
+                $lifespan = [ '', '' ];
                 $lifespan_set = false;
+
                 if (!empty($entry['dateOfBirth'])) {
+                    if (is_array($entry['dateOfBirth']) && !is_associative($entry['dateOfBirth'])) {
+                        // certain queries give more than one dateOfBirth
+                        $entry['dateOfBirth'] = $entry['dateOfBirth'][0];
+                    }
+
                     $lifespan[0] = is_array($entry['dateOfBirth'])
-                        ? @$entry['dateOfBirth']['@value']
+                        ? $entry['dateOfBirth']['@value']
                         : $entry['dateOfBirth'];
                     $lifespan_set = true;
                 }
+
                 if (!empty($entry['dateOfDeath'])) {
                     $lifespan[1] = is_array($entry['dateOfDeath'])
                         ? $entry['dateOfDeath']['@value']
                         : $entry['dateOfDeath'];
                     $lifespan_set = true;
                 }
+
                 if ($lifespan_set) {
                     $person['lifespan'] = join('-', $lifespan);
                 }
 
                 if (array_key_exists('biographicalOrHistoricalInformation', $entry)) {
-                    if (!empty($entry['biographicalOrHistoricalInformation']['@value']))
+                    if (!empty($entry['biographicalOrHistoricalInformation']['@value'])) {
                         $person['profession'] = $entry['biographicalOrHistoricalInformation']['@value'];
+                    }
                 }
+
                 $persons[] = $person;
             }
         }
@@ -96,74 +128,184 @@ class GndService
         return $persons;
     }
 
-    function lookupByNameLegacy ($fullname) {
-        // http-client
-        require_once 'Zend/Http/Client.php';
+    protected function getLobidResults ($query, $baseUrl = 'https://lobid.org/gnd/search') {
+        $querystring = http_build_query($query);
 
-        $client = new Zend_Http_Client('http://193.30.112.134/F/?func=find-a-0&local_base=hbz10',
-                                       ['maxredirects' => 0, 'timeout' => 30]);
+        $url = $baseUrl . '?' . $querystring;
 
-        try {
-            $response = $client->request();
-
-            if (200 != $response->getStatus()) {
-                throw new Exception($response->getStatus() . ": " . $response->getMessage());
-            }
-            $body = $response->getBody();
-            if (!preg_match('/<form method=get[^>]+name=form1[^>]+action="([^"]*)">/s',
-                           $body, $matches))
-                throw new Exception('form not found in body: ' . $body);
-
-            $client->setUri($matches[1]);
-            $client->setParameterGet([
-                'func'  => 'find-a',
-                'find_code' => 'WPE',
-                'request' => $fullname,
-            ]);
-
-            $response = $client->request();
-            if (200 != $response->getStatus()) {
-                throw new Exception($response->getStatus() . ": " . $response->getMessage());
-            }
-        }
-        catch (Exception $e) {
-            die($e->getMessage());
+        $client = new \EasyRdf_Http_Client($url);
+        $client->setHeaders('Accept', 'application/ld+json');
+        $response = $client->request();
+        if (!$response->isSuccessful()) {
+            return null;
         }
 
-        $body = $response->getBody();
+        return json_decode($response->getBody(), true);
+    }
 
+    protected function processLobidResults ($entries) {
         $persons = [];
-        if (preg_match_all('#<noscript>[\s\n]*<tr valign\=baseline>(.*?)</tr>#s', $body, $matches, PREG_PATTERN_ORDER)) {
-          foreach ($matches[1] as $match) {
-            if (preg_match_all('#<td class=td1[^>]*>(.*?)</td>#', $match, $record, PREG_PATTERN_ORDER)) {
-                $record = $record[1];
-                if (count($record) >= 6) {
-                    $number = self::cleanTd($record[5]);
-                    if (self::isGnd($number)) {
-                        $persons[] = [
-                            'gnd' => $number,
-                            'name' => self::cleanTd($record[2]),
-                            'lifespan' => self::cleanTd($record[3]),
-                            'profession' => self::cleanTd($record['4']),
-                        ];
-                    }
-                    else {
-                        // ignore: var_dump($number . ' is not a PPN');
-                    }
-                }
+
+        foreach ($entries['member'] as $entry) {
+            if (!isset($entry['type'])) {
+                continue;
             }
-          }
+
+            $types = is_array($entry['type'])
+                ? $entry['type'] : [ $entry['type'] ];
+
+            if (!in_array('DifferentiatedPerson', $types)) {
+                continue;
+            }
+
+            $gnd = $entry['gndIdentifier'];
+            if (self::isGnd($gnd)) {
+                $person = [
+                    'gnd' => $gnd,
+                    'name' => $entry['preferredName'],
+                ];
+
+                $lifespan = [ '', '' ];
+                $lifespan_set = false;
+                if (!empty($entry['dateOfBirth'])) {
+                    $lifespan[0] = is_array($entry['dateOfBirth'])
+                        ? $entry['dateOfBirth'][0]
+                        : $entry['dateOfBirth'];
+                    $lifespan_set = true;
+                }
+
+                if (!empty($entry['dateOfDeath'])) {
+                    $lifespan[1] = is_array($entry['dateOfDeath'])
+                        ? $entry['dateOfDeath'][0]
+                        : $entry['dateOfDeath'];
+                    $lifespan_set = true;
+                }
+
+                if ($lifespan_set) {
+                    $person['lifespan'] = join('-', $lifespan);
+                }
+
+                if (array_key_exists('biographicalOrHistoricalInformation', $entry)) {
+                    $person['profession'] = is_array($entry['biographicalOrHistoricalInformation'])
+                        ? $entry['biographicalOrHistoricalInformation'][0]
+                        : $entry['biographicalOrHistoricalInformation'];
+                }
+
+                $persons[$gnd] = $person;
+            }
         }
 
         return $persons;
     }
 
-    /* small helper-function for hbz */
-    private static function cleanTd ($fragment) {
-        $fragment = preg_replace('/<BR>/', ' ', $fragment);
-        $fragment = rtrim($fragment);
-        $fragment = preg_replace('/&nbsp;$/', '', $fragment);
-        return html_entity_decode($fragment, ENT_NOQUOTES, 'utf-8');
+    function lookupPersonByName ($fullname) {
+        $persons = [];
+
+        $nameParts = preg_split('/[,\s]+/', $fullname);
+        if (empty($nameParts)) {
+            return $persons;
+        }
+
+        // run two queries, first only
+        //  '+' . $namePart
+        $queryStrict = [
+            'q' => implode(' ', array_map(function ($namePart) {
+                    return '+' . $namePart;
+                }, $nameParts)),
+            'filter' => '+(type:DifferentiatedPerson)',
+            'size' => 15,
+        ];
+
+        $entries = $this->getLobidResults($queryStrict);
+
+        if (!empty($entries)) {
+            $persons = $this->processLobidResults($entries);
+        }
+
+        if (count($persons) < 10) {
+            $query = [
+                'q' => implode(' ', array_map(function ($namePart) {
+                        return '+' . $namePart . '*';
+                    }, $nameParts)),
+                'filter' => '+(type:DifferentiatedPerson)',
+                'size' => 15,
+            ];
+
+            if (!empty($entries)) {
+                $additionalPersons = $this->processLobidResults($entries);
+
+                foreach ($additionalPersons as $gnd => $person) {
+                    if (!array_key_exists($gnd, $persons)) {
+                        $persons[$gnd] = $person;
+                    }
+                }
+            }
+        }
+
+        return array_values($persons);
+    }
+
+    /*
+     * Legacy
+     */
+    function lookupByName ($fullname) {
+        return $this->lookupPersonByName($fullname);
+    }
+
+    function lookupOrganizationByName ($name, $limit = 20) {
+        $name_escaped = addslashes($name);
+        $phrase_escaped = '"' . $name_escaped . '"'; // TODO: put this at top if matches
+        $query = <<<EOT
+# Text search for corporate bodies (pretty output)
+#
+# Uses diverse literal properties, brings the best match on top
+# of the list
+PREFIX  gndo:   <http://d-nb.info/standards/elementset/gnd#>
+PREFIX  text:   <http://jena.apache.org/text#>
+#
+SELECT DISTINCT
+    ?gndId ?corp (?name as ?corpLabel)
+    (?placeName as ?placeLabel) ?dateOfEstablishment ?dateOfTermination
+WHERE {
+    # limit number of results to $limit
+    (?corp ?score) text:query ('{$name_escaped}' $limit) .
+    ?corp a gndo:CorporateBody ;
+        gndo:preferredNameForTheCorporateBody ?name ;
+        gndo:gndIdentifier ?gndId.
+
+    OPTIONAL {
+        ?corp gndo:placeOfBusiness ?place.
+        ?place gndo:preferredNameForThePlaceOrGeographicName ?placeName
+    }.
+
+    OPTIONAL {
+        ?corp gndo:dateOfEstablishment ?dateOfEstablishment
+    }.
+
+    OPTIONAL {
+        ?corp gndo:dateOfTermination ?dateOfTermination
+    }.
+}
+ORDER BY DESC(?score)
+EOT;
+
+        $sparql = new \EasyRdf_Sparql_Client('http://zbw.eu/beta/sparql/gnd/query');
+
+        $result = $sparql->query($query);
+
+        $matches = [];
+        foreach ($result as $row) {
+            $key = $row->corp->getUri();
+            $match = [
+                'gnd' => $row->gndId->getValue(),
+                'name' => $row->corpLabel->getValue(),
+                'placeLabel' => property_exists($row, 'placeLabel')
+                    ? $row->placeLabel->getValue() : null,
+            ];
+            $matches[$key] = $match;
+        }
+
+        return $matches;
     }
 
     static function isGnd ($number) {
@@ -176,6 +318,7 @@ class GndService
             // we may have one digit less than isbn, prepend a 0
             $normalized = '0' . $normalized;
         }
+
         $checkdigit = self::getCheckdigit($normalized);
         if (false === $checkdigit) {
             // wrong length or wrong character
@@ -205,6 +348,7 @@ class GndService
             case 10:
                 $checkdigit = "X";
                 break;
+
             case 11:
                 $checkdigit = 0;
                 break;
@@ -274,15 +418,17 @@ exit; */
                 case 'http://d-nb.info/standards/elementset/gnd#placeOfBirth':
                 case 'placeOfBirth':
                     $placeOfBirth = self::fetchGeographicLocation($triple['o']);
-                    if (!empty($placeOfBirth))
+                    if (!empty($placeOfBirth)) {
                         $bio->placeOfBirth = $placeOfBirth;
+                    }
                     break;
 
                 case 'http://d-nb.info/standards/elementset/gnd#placeOfActivity':
                 case 'placeOfActivity':
                     $placeOfActivity = self::fetchGeographicLocation($triple['o']);
-                    if (!empty($placeOfActivity))
+                    if (!empty($placeOfActivity)) {
                         $bio->placeOfActivity = $placeOfActivity;
+                    }
                     break;
 
                 case 'http://d-nb.info/standards/elementset/gnd#dateOfDeath':
@@ -293,8 +439,9 @@ exit; */
                 case 'http://d-nb.info/standards/elementset/gnd#placeOfDeath':
                 case 'placeOfDeath':
                     $placeOfDeath = self::fetchGeographicLocation($triple['o']);
-                    if (!empty($placeOfDeath))
+                    if (!empty($placeOfDeath)) {
                         $bio->placeOfDeath = $placeOfDeath;
+                    }
                     break;
 
                 case 'http://d-nb.info/standards/elementset/gnd#forename':
@@ -309,12 +456,15 @@ exit; */
 
                 case 'http://d-nb.info/standards/elementset/gnd#preferredNameForThePerson':
                 case 'preferredNameForThePerson':
-                    if (!isset($bio->preferredName) && 'literal' == $triple['o_type'])
+                    if (!isset($bio->preferredName) && 'literal' == $triple['o_type']) {
                         $bio->preferredName = $triple['o'];
+                    }
                     else if ('bnode' == $triple['o_type']) {
                         $nameRecord = $index[$triple['o']];
-                        $bio->preferredName = [$nameRecord['http://d-nb.info/standards/elementset/gnd#surname'][0]['value'],
-                                                    $nameRecord['http://d-nb.info/standards/elementset/gnd#forename'][0]['value']];
+                        $bio->preferredName = [
+                            $nameRecord['http://d-nb.info/standards/elementset/gnd#surname'][0]['value'],
+                            $nameRecord['http://d-nb.info/standards/elementset/gnd#forename'][0]['value'],
+                        ];
                         // var_dump($index[$triple['o']]);
                     }
                     break;
