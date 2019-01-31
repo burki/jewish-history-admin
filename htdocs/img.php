@@ -39,45 +39,45 @@ $url_large = !isset($_GET['large']) || $_GET['large']
   <script src="./script/jquery-2.2.4.min.js"></script>
   <script src="./script/e-smart-zoom-jquery.min.js"></script>
   <meta http-equiv="content-type" content="text/html;charset=utf-8" />
-		<!--[if lt IE 9]>
-			<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-		<![endif]-->
-		<script>
-			$(document).ready(function() {
+        <!--[if lt IE 9]>
+            <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+        <script>
+            $(document).ready(function() {
               resizeDivs();
 
-				$('#imageFullScreen').smartZoom({'containerClass':'zoomableContainer'});
+                $('#imageFullScreen').smartZoom({'containerClass':'zoomableContainer'});
 
-				$('#topPositionMap,#leftPositionMap,#rightPositionMap,#bottomPositionMap').bind("click", moveButtonClickHandler);
-  				$('#zoomInButton,#zoomOutButton').bind("click", zoomButtonClickHandler);
+                $('#topPositionMap,#leftPositionMap,#rightPositionMap,#bottomPositionMap').bind("click", moveButtonClickHandler);
+                $('#zoomInButton,#zoomOutButton').bind("click", zoomButtonClickHandler);
 
-				function zoomButtonClickHandler(e){
-			    	var scaleToAdd = 0.8;
-					if(e.target.id == 'zoomOutButton')
-						scaleToAdd = -scaleToAdd;
-					$('#imageFullScreen').smartZoom('zoom', scaleToAdd);
-			    }
+                function zoomButtonClickHandler(e){
+                    var scaleToAdd = 0.4;
+                    if(e.target.id == 'zoomOutButton')
+                        scaleToAdd = -scaleToAdd;
+                    $('#imageFullScreen').smartZoom('zoom', scaleToAdd);
+                }
 
-			    function moveButtonClickHandler(e){
-			    	var pixelsToMoveOnX = 0;
-					var pixelsToMoveOnY = 0;
+                function moveButtonClickHandler(e){
+                    var pixelsToMoveOnX = 0;
+                    var pixelsToMoveOnY = 0;
 
-					switch(e.target.id){
-						case "leftPositionMap":
-							pixelsToMoveOnX = 50;
-						break;
-						case "rightPositionMap":
-							pixelsToMoveOnX = -50;
-						break;
-						case "topPositionMap":
-							pixelsToMoveOnY = 50;
-						break;
-						case "bottomPositionMap":
-							pixelsToMoveOnY = -50;
-						break;
-					}
-					$('#imageFullScreen').smartZoom('pan', pixelsToMoveOnX, pixelsToMoveOnY);
-			    }
+                    switch(e.target.id){
+                        case "leftPositionMap":
+                            pixelsToMoveOnX = 50;
+                        break;
+                        case "rightPositionMap":
+                            pixelsToMoveOnX = -50;
+                        break;
+                        case "topPositionMap":
+                            pixelsToMoveOnY = 50;
+                        break;
+                        case "bottomPositionMap":
+                            pixelsToMoveOnY = -50;
+                        break;
+                    }
+                    $('#imageFullScreen').smartZoom('pan', pixelsToMoveOnX, pixelsToMoveOnY);
+                }
 
                 function resizeDivs() {
                   var vpw = $(window).width();
@@ -87,8 +87,8 @@ $url_large = !isset($_GET['large']) || $_GET['large']
                                          'height': vph + 'px'});
                 }
 
-			});
-		</script>
+            });
+        </script>
 </head>
 
 <body>
