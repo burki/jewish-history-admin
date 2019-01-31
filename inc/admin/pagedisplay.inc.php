@@ -4,9 +4,9 @@
  *
  * Base Display class for Admin-pages
  *
- * (c) 2006-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2019 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-09-14 dbu
+ * Version: 2019-01-31 dbu
  *
  * Changes:
  *
@@ -241,7 +241,8 @@ EOT;
   }
 
   function fetchImage (&$dbconn, $item_id, $type, $img_name) {
-    $querystr = sprintf("SELECT id AS media_id, item_id, caption, copyright, width, height, mimetype FROM Media WHERE item_id=%d AND type=%d AND name='%s'",
+    $querystr = sprintf("SELECT id AS media_id, item_id, caption, copyright, width, height, mimetype, original_name"
+                        . " FROM Media WHERE item_id=%d AND type=%d AND name='%s'",
                         $item_id, $type, $dbconn->escape_string($img_name));
 
     $dbconn->query($querystr);
@@ -258,6 +259,7 @@ EOT;
     $img = $this->fetchImage($dbconn, $item_id, $type, $img_name);
     if (isset($img)) {
       $caption = $img['caption'];
+
       $copyright = $img['copyright'];
       $img_url = $this->buildImgUrl($item_id, $type, $img_name, $img['mimetype'], $append_uid);
 
@@ -267,9 +269,10 @@ EOT;
             'application/msword',
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document']))
       {
-        $img_tag = sprintf('<a href="%s" target="_blank">%s</a>',
+        $img_tag = sprintf('<a href="%s" target="_blank">%s</a>%s',
                            htmlspecialchars($img_url),
-                           $this->formatText(empty($caption) ? 'Office-Datei' : $caption));
+                           $this->formatText(true || empty($caption) ? 'Office-Datei' : $caption),
+                           !empty($img['original_name']) ? ' [' . $this->formatText($img['original_name']) . ']' : '');
       }
       else if (in_array($img['mimetype'], [ 'application/xml' ])) {
         $img_tag = sprintf('<a class="previewOverlayTrigger" href="%s" target="_blank">%s</a> ',
@@ -278,9 +281,10 @@ EOT;
         $img_tag .= sprintf(' <a href="%s">%s</a> ',
                            htmlspecialchars(BASE_PATH . "xml.php?format=docx&media_id=" . $img['media_id']),
                            $this->formatText('Word-Export'));
-        $img_tag .= sprintf('<a href="%s" target="_blank">%s</a>',
+        $img_tag .= sprintf('<a href="%s" target="_blank">%s</a>%s',
                            htmlspecialchars($img_url),
-                           $this->formatText(empty($caption) ? 'XML-Datei' : $caption));
+                           $this->formatText(true || empty($caption) ? 'XML-Datei' : $caption),
+                           !empty($img['original_name']) ? ' [' . $this->formatText($img['original_name']) . ']' : '');
       }
       else if (in_array($img['mimetype'], [
             'audio/mpeg',
@@ -288,9 +292,10 @@ EOT;
       {
         $img_tag = sprintf('<audio src="%s" preload="none" controls></audio>',
                            htmlspecialchars($img_url));
-        $img_tag .= sprintf('<br /><a href="%s" target="_blank">%s</a>',
+        $img_tag .= sprintf('<br /><a href="%s" target="_blank">%s</a>%s',
                            htmlspecialchars($img_url),
-                           $this->formatText(empty($caption) ? 'Audio' : $caption));
+                           $this->formatText(true || empty($caption) ? 'Audio' : $caption),
+                           !empty($img['original_name']) ? ' [' . $this->formatText($img['original_name']) . ']' : '');
       }
       else if (in_array($img['mimetype'], [
             'video/mp4',
@@ -298,9 +303,10 @@ EOT;
       {
         $img_tag = sprintf('<div style="max-width: 800px"><video style="width: 100%%; height: auto;" src="%s" preload="none" controls></video></div>',
                            htmlspecialchars($img_url));
-        $img_tag .= sprintf('<br /><a href="%s" target="_blank">%s</a>',
+        $img_tag .= sprintf('<br /><a href="%s" target="_blank">%s</a>%s',
                            htmlspecialchars($img_url),
-                           $this->formatText(empty($caption) ? 'Video' : $caption));
+                           $this->formatText(true || empty($caption) ? 'Video' : $caption),
+                           !empty($img['original_name']) ? ' [' . $this->formatText($img['original_name']) . ']' : '');
       }
       else if ('application/pdf' == $img['mimetype']) {
         if (!$append_uid) {
@@ -308,9 +314,10 @@ EOT;
                                            ['thumbnail' => $this->buildThumbnailUrl($item_id, $type, $img_name, $img['mimetype'])]);
         }
         else {
-          $img_tag = sprintf('<a href="%s" target="_blank">%s</a>',
+          $img_tag = sprintf('<a href="%s" target="_blank">%s</a>%s',
                              htmlspecialchars($img_url),
-                             $this->formatText(empty($caption) ? 'PDF' : $caption));
+                             $this->formatText(true || empty($caption) ? 'PDF' : $caption),
+                             !empty($img['original_name']) ? ' [' . $this->formatText($img['original_name']) . ']' : '');
         }
       }
       else {
@@ -327,7 +334,7 @@ EOT;
       }
 
       if ($return_caption) {
-        return [$img_tag, $caption, $copyright];
+        return [$img_tag, $caption, $copyright, $img['original_name']];
       }
 
       return $img_tag;
@@ -480,18 +487,19 @@ EOT;
 
           $img_form = & $imageUploadHandler->img_forms[$img_name];
           if (isset($upload_results[$img_name]) && isset($upload_results[$img_name]['status']) && $upload_results[$img_name]['status'] < 0) {
-            $img_field .= '<div class="message">'.$upload_results[$img_name]['msg'].'</div>';
+            $img_field .= '<div class="message">' . $upload_results[$img_name]['msg'] . '</div>';
           }
 
           $url_delete = $this->page->buildLink(array_merge($params_self,
                                                ['delete_img' => $img_name]));
 
-          list($img_tag, $caption, $copyright) = $this->buildImage($imageUploadHandler->item_id, $imageUploadHandler->type, $img_name, true, true, true);
+          list($img_tag, $caption, $copyright, $original_name) = $this->buildImage($imageUploadHandler->item_id, $imageUploadHandler->type, $img_name, true, true, true);
           // var_dump($img_tag);
           if (!empty($img_tag)) {
             $img_field .= '<p><div style="margin-right: 2em; margin-bottom: 1em; float: left;">' . $img_tag . '</div>'
-                        . (!empty($caption) ? $this->formatText($caption).'<br />&nbsp;<br />' : '')
-                        . '[<a href="' . htmlspecialchars($url_delete) . '">' . tr('delete') . '</a>]<br clear="left" /></p>';
+                        . '[<a href="' . htmlspecialchars($url_delete) . '">' . tr('delete') . '</a>]<br clear="left" /></p>'
+                        . (!empty($caption) ? '<p>' . $this->formatText($caption) . '</p>' : '')
+                        ;
           }
 
           $rows[] = $img_field;
