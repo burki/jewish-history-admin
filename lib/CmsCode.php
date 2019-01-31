@@ -39,7 +39,7 @@ class Text_Wiki_CmsCode extends Text_Wiki {
      * @access public
      * @var array
      */
-    var $rules = array(
+    var $rules = [
         'Prefilter',
 //      'Delimiter',
 //        'Code',
@@ -84,7 +84,7 @@ class Text_Wiki_CmsCode extends Text_Wiki {
 //        'Revise',
 //        'Interwiki',
 //        'Tighten'
-    );
+    ];
 
     /**
      * Constructor: adds the path to CmsCode rules and adjusts the delimeter

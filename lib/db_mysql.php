@@ -31,7 +31,7 @@ class DB_Sql
   var $Persistent_Connection = TRUE; // set to FALSE to avoid persistent connection
 
   /* public: result array and current row number */
-  var $Record   = array();
+  var $Record   = [];
   var $Row;
 
   /* public: current error number and error text */
@@ -47,7 +47,7 @@ class DB_Sql
   var $Query_ID = 0;
 
   static $Benchmark = false;
-  static $Benchmark_Queries = array();
+  static $Benchmark_Queries = [];
 
   function __construct($query = "") {
     $this->query($query);
@@ -347,7 +347,7 @@ class DB_Sql
   function metadata($table='',$full=false) {
     $count = 0;
     $id    = 0;
-    $res   = array();
+    $res   = [];
 
     /*
      * Due to compatibility problems with Table we changed the behavior

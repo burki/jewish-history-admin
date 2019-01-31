@@ -304,8 +304,8 @@
               $min = intval($timematches[2]);
             }
           }
-          return array('year' => $year, 'month' => $month, 'day' => isset($day) ? $day : NULL,
-                       'hour' => $hour, 'min' => $min);
+          return ['year' => $year, 'month' => $month, 'day' => isset($day) ? $day : NULL,
+                       'hour' => $hour, 'min' => $min];
         }
       }
     }  // parse
@@ -532,7 +532,7 @@
     }
 
     function get_fieldnames () {
-      $names = array();
+      $names = [];
 
       foreach ($this->fields as $name => $thisfield) {
         $names[] = $name;
@@ -550,7 +550,7 @@
 
   class RecordSQL extends Record
   {
-    private static $RESERVED = array('usage', 'condition');
+    private static $RESERVED = ['usage', 'condition'];
 
     var $params;
 
@@ -718,8 +718,8 @@
                     if ($month == 0)
                       $value = preg_replace('/M+[\.\/]*/i', '', $value);
                   }
-                  $value = preg_replace(array('/(M+)/i', '/(D+)/i', '/(Y+)/i'),
-                                        array(sprintf("%02d", $month), sprintf("%02d", $day), sprintf("%02d", $year)), $value);
+                  $value = preg_replace(['/(M+)/i', '/(D+)/i', '/(Y+)/i'],
+                                        [sprintf("%02d", $month), sprintf("%02d", $day), sprintf("%02d", $year)], $value);
                 }
                 else
                   $value = '';
@@ -730,8 +730,8 @@
                 }
 
                 $this->set_fieldvalue($name, 'value_internal',
-                                      array('year' => $year, 'month' => $month, 'day' => $day,
-                                            'hour' => $hour, 'min' => $min));
+                                      ['year' => $year, 'month' => $month, 'day' => $day,
+                                            'hour' => $hour, 'min' => $min]);
               }
           }
           $this->set_value($name, $value);
@@ -758,7 +758,7 @@
         $usefield[$fieldnames[$i]] = 1;
       }
 
-      $fields = $values = array();
+      $fields = $values = [];
       foreach ($this->fields as $name => $thisfield) {
         if (!$usefield[$name]) {
           continue;
@@ -837,7 +837,7 @@
         $update = $dbconn->next_record() && $dbconn->Record['countaffected'] > 0;
       }
 
-      $fields = array(); $values = array();
+      $fields = []; $values = [];
 
       foreach ($this->fields as $name => $thisfield) {
         if (isset($thisfield)) {
@@ -1025,8 +1025,8 @@
       '<' (less than) becomes '&lt;'
       '>' (greater than) becomes '&gt;' */
     function htmlspecialchars ($txt) {
-      $match = array('/&(?!\#x?\d+;)/s', '/</s', '/>/s', '/"/s');
-      $replace = array('&amp;', '&lt;', '&gt;', '&quot;');
+      $match = ['/&(?!\#x?\d+;)/s', '/</s', '/>/s', '/"/s'];
+      $replace = ['&amp;', '&lt;', '&gt;', '&quot;'];
       return preg_replace($match, $replace, $txt, -1);
     }
 
@@ -1119,11 +1119,11 @@
       $prepend  = gettype($params) == 'array' && isset($params['prepend']) ? $params['prepend'] : '';
 
       $datatype = $this->get('datatype');
-      $attrnames = array('id', 'class', 'size', 'maxlength', 'disabled', 'readonly');
-      $attrs = array();
+      $attrnames = ['id', 'class', 'size', 'maxlength', 'disabled', 'readonly'];
+      $attrs = [];
       for ($i = 0; $i < count($attrnames); $i++) {
         $val = $this->get($attrnames[$i]);
-        if (in_array($attrnames[$i], array('disabled', 'readonly')) && isset($val)) {
+        if (in_array($attrnames[$i], ['disabled', 'readonly']) && isset($val)) {
           $val = $val ? $attrnames[$i] : NULL;
         }
         if (!isset($val) && $attrnames[$i] == 'size') {
@@ -1190,10 +1190,10 @@
 
     function show ($params = '') {
       $prepend = gettype($params) == 'array' && isset($params['prepend']) ? $params['prepend'] : '';
-      $defaults = array('rows' => 4, 'cols' => 30, 'wrap' => 'virtual');
-      foreach (array('id', 'disabled', 'readonly') as $name) {
+      $defaults = ['rows' => 4, 'cols' => 30, 'wrap' => 'virtual'];
+      foreach (['id', 'disabled', 'readonly'] as $name) {
         $val = $this->get($name);
-        if (in_array($name, array('disabled', 'readonly')) && isset($val)) {
+        if (in_array($name, ['disabled', 'readonly']) && isset($val)) {
           $val = $val ? $name : NULL;
         }
         if (isset($val))
@@ -1205,12 +1205,12 @@
             $defaults[$attrname] = $value;
         }
       }
-      $attrs = array();
+      $attrs = [];
       foreach ($defaults as $attrname => $default) {
         $val = $this->get($attrname);
         $attrs[] = $attrname . '="' . (isset($val) ? $val : $default) . '"';
       }
-      $attrnames = array('id');
+      $attrnames = ['id'];
       for ($i = 0; $i < count($attrnames); $i++) {
         $val = $this->get($attrnames[$i]);
         if (isset($val))
@@ -1248,8 +1248,8 @@
       $null = isset($null) ? $null : 0;
       if ($this->not_empty($this->value())) {
         if ($this->USE_ZEND_VALIDATOR) {
-          $validator = new Zend_Validate_EmailAddress(array('allow' => Zend_Validate_Hostname::ALLOW_DNS,
-                                                            'mx'    => true));
+          $validator = new Zend_Validate_EmailAddress(['allow' => Zend_Validate_Hostname::ALLOW_DNS,
+                                                            'mx'    => true]);
           if (!$validator->isValid($this->value())) {
             $valid = 0;
             $invalid[$this->name()] = 'email_nonvalid';
@@ -1350,11 +1350,11 @@
     function show ($params = '') {
       $prepend = gettype($params) == 'array' && isset($params['prepend']) ? $params['prepend'] : '';
 
-      $attrnames = array('id', 'size', 'maxlength', 'disabled', 'readonly');
-      $attrs = array();
+      $attrnames = ['id', 'size', 'maxlength', 'disabled', 'readonly'];
+      $attrs = [];
       for ($i = 0; $i < count($attrnames); $i++) {
         $val = $this->get($attrnames[$i]);
-        if (in_array($attrnames[$i], array('disabled', 'readonly')) && isset($val)) {
+        if (in_array($attrnames[$i], ['disabled', 'readonly']) && isset($val)) {
           $val = $val ? $attrnames[$i] : NULL;
         }
         if (!isset($val) && $attrnames[$i] == 'size')
@@ -1535,11 +1535,11 @@
 
       $prepend = gettype($params) == 'array' && isset($params['prepend']) ? $params['prepend'] : '';
 
-      $attrnames = array('id', 'size', 'maxlength', 'disabled', 'readonly');
-      $attrs = array();
+      $attrnames = ['id', 'size', 'maxlength', 'disabled', 'readonly'];
+      $attrs = [];
       for ($i = 0; $i < count($attrnames); $i++) {
         $val = $this->get($attrnames[$i]);
-        if (in_array($attrnames[$i], array('disabled', 'readonly')) && isset($val)) {
+        if (in_array($attrnames[$i], ['disabled', 'readonly']) && isset($val)) {
           $val = $val ? $attrnames[$i] : NULL;
         }
         if (!isset($val) && $attrnames[$i] == 'size')
@@ -1595,7 +1595,7 @@
       $options = $args_isarray && isset($args['options']) ? $args['options'] : $this->get('options');
       $labels = $args_isarray && isset($args['labels']) ? $args['labels'] : $this->get('labels');
 
-      $attrs = array();
+      $attrs = [];
       if (isset($options) && is_array($options)) {
         $val = $this->value();
         if (!isset($val))
@@ -1609,8 +1609,8 @@
         $size = $args_isarray && isset($args['size']) ? $args['size'] : $this->get('size');
         $size = isset($size) ? ' size="' . $this->htmlspecialchars($size) . '"' : '';
 
-        $attrnames = array('id', 'class', 'disabled', 'data-placeholder');
-        $attrs = array();
+        $attrnames = ['id', 'class', 'disabled', 'data-placeholder'];
+        $attrs = [];
         for ($i = 0; $i < count($attrnames); $i++) {
           $attrval = $this->get($attrnames[$i]);
           if ($attrnames[$i] == 'disabled') {
@@ -1708,8 +1708,8 @@
     function show ($params = '') {
       $prepend = gettype($params) == 'array' && isset($params['prepend']) ? $params['prepend'] : '';
 
-      $attrnames = array('id');
-      $attrs     = array();
+      $attrnames = ['id'];
+      $attrs     = [];
       for ($i = 0; $i < count($attrnames); $i++) {
         $val = $this->get($attrnames[$i]);
         if (isset($val))
@@ -1755,8 +1755,8 @@
 
     function show ($params = '') {
       $prepend = gettype($params) == 'array' && isset($params['prepend']) ? $params['prepend'] : '';
-      $attrnames = array('size', 'maxlength');
-      $attrs     = array();
+      $attrnames = ['size', 'maxlength'];
+      $attrs     = [];
       for ($i = 0; $i < count($attrnames); $i++) {
         $val = $this->get($attrnames[$i]);
         if (!isset($val) && $attrnames[$i] == 'size') {
@@ -1828,7 +1828,7 @@
         $this->show_hidden = 0;
         $ret = '<input type="hidden" name="' . $name . '[]" value="0" />';
       }
-      $show = array();
+      $show = [];
       $labels = $this->get('labels');
       if (isset($labels) && is_array($labels)) {
         $current_value = $this->value();
@@ -1891,10 +1891,10 @@
       }
 
       $name = $prepend . $this->name();
-      $show = array();
+      $show = [];
       $labels = $this->get('labels');
       if (isset($labels)) {
-        $values = array();
+        $values = [];
 
         $current_value = $this->value();
         if (!isset($current_value)) {
@@ -1939,7 +1939,7 @@
 
     function __construct ($params, $record = '') {
       $this->params = $params;
-      $this->invalid = array(); // no errors to start with
+      $this->invalid = []; // no errors to start with
       if (!(gettype($record) == 'string' && $record == '')) {
         $this->record = $record;
       }
@@ -1954,8 +1954,8 @@
     }
 
     function error_fulltext ($err_name, $lang = 'en') {
-      $error_msg = array('en' =>
-          array('unknown'                => 'Invalid data',
+      $error_msg = ['en' =>
+          ['unknown'                => 'Invalid data',
                 'nonempty_required'      => 'This field cannot not be empty',
                 'email_nonvalid'         => 'This is not a valid email address',
                 'int_invalid'            => 'This is not a valid number',
@@ -1966,9 +1966,9 @@
                 'datetime_invalid_day'   => 'Invalid day (valid range 1-31 depending on the month)',
                 'datetime_invalid_time'  => 'Invalid time (valid 0:00 to 23:59)',
                 'url_not_allowed'        => 'Because we have problems with fake registrations, you are not allowed to enter Web-Site Addresses into this field',
-           ),
+           ],
           'de' =>
-          array('unknown'                => 'Ungültige Daten',
+          ['unknown'                => 'Ungültige Daten',
                 'nonempty_required'      => 'Dieses Feld darf nicht leer sein',
                 'email_nonvalid'         => 'Dies ist keine gültige E-Mail-Adresse',
                 'int_invalid'            => 'Dies ist keine gültige Zahl',
@@ -1978,8 +1978,8 @@
                 'datetime_invalid_day'   => 'Ungültiger Tag (gültiger Bereich 1-31, je nach Monat)',
                 'datetime_invalid_time'  => 'Ungültige Uhrzeit (gültig 0:00 bis 23:59)',
                 'url_not_allowed'        => "Sie dürfen keine URL in das Adressfeld eintragen. Bitte tragen Sie diese in das Feld 'Homepage (URL)' ein.",
-           ),
-        );
+           ],
+        ];
       if (!isset($error_msg[$lang])) {
         // set default language
         $lang = 'en';
@@ -2000,7 +2000,7 @@
     }
 
     function set_value ($field, $value) {
-      $this->set_values(array($field => $value));
+      $this->set_values([$field => $value]);
     }
 
     function set_property ($fieldname, $property, $value) {
@@ -2122,7 +2122,7 @@
 
     function validate () {
       $success = 1;
-      $this->invalid = array();
+      $this->invalid = [];
       $fieldnames = $this->record->get_fieldnames();
       for ($i = 0; $i < count($fieldnames); $i++) {
         $field = $this->field($fieldnames[$i]);

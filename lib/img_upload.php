@@ -73,7 +73,7 @@
         return;
       }
 
-      $sizes = array();
+      $sizes = [];
 
       $sizes['width_physical'] = $width_physical;
       $sizes['height_physical'] = $height_physical;
@@ -161,7 +161,7 @@
         $img_data = $this->determine_size($upload_fileroot . $fname);
         if (!isset($img_data)) {
           // couldn't determine size
-          $img_data = array();
+          $img_data = [];
         }
         $img_data['mime'] = $mime;
         $img_data['fname'] = $upload_fileroot . $fname;
@@ -182,21 +182,21 @@
 
   class ImageUpload
   {
-    var $MAGICK_MIME = array(
+    var $MAGICK_MIME = [
       'GIF' => 'image/gif',
       'JPEG' => 'image/jpeg',
       'TIFF' => 'image/tiff',
       'PDF' => 'application/pdf',
-    );
-    var $MAGICK_BINARIES = array(
+    ];
+    var $MAGICK_BINARIES = [
       'convert'  => 'convert',
       'mogrify' => 'mogrify',
       'identify' => 'identify',
-    );
+    ];
     var $params;
     var $images;
     var $max_file_size;
-    var $extensions = array(
+    var $extensions = [
       'image/gif' => '.gif', 'image/jpeg' => '.jpg', 'image/png' => '.png',
 
       'application/pdf' => '.pdf',
@@ -210,10 +210,10 @@
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => '.docx',
 
       'application/xml' => '.xml',
-    );
+    ];
 
-    var $translate = array('image/tiff' => 'image/jpeg');
-    var $translate_extensions = array('image/tiff' => '.tif');
+    var $translate = ['image/tiff' => 'image/jpeg'];
+    var $translate_extensions = ['image/tiff' => '.tif'];
 
     function __construct ($params) {
       $this->params = $params;
@@ -309,7 +309,7 @@
         if ($mime == $keep) {
           continue;
         }
-        $remove = array('');
+        $remove = [''];
         if (is_array($args) && isset($args['variants'])) {
           $variants = & $args['variants'];
           if (is_array($variants)) {
@@ -349,7 +349,7 @@
                        ? $args['upload_fileroot'] : $this->params['upload_fileroot'];
       $new_name = $upload_fileroot . $new_name;
       if (!$this->check_directory(dirname($new_name))) {
-        return array('status' => -3, 'msg' => "Directory " . dirname($new_name) . " doesn't exist");
+        return ['status' => -3, 'msg' => "Directory " . dirname($new_name) . " doesn't exist"];
       }
 
       $ret = FALSE;
@@ -467,7 +467,7 @@
         ];
       }
       else {
-        return array('status' => -4, 'msg' => "Couldn't copy file to new location");
+        return ['status' => -4, 'msg' => "Couldn't copy file to new location"];
       }
     }
 
@@ -487,7 +487,7 @@
         if ($retval == 0 && count($lines) > 0) {
           if (preg_match('/^(\w+)\s([0-9]+)x([0-9]+)$/', $lines[0], $matches)) {
             die($lines[0]." w: $matches[2] h: $matches[3] type: $matches[1]");
-            list($width, $height) = array(intval($matches[2]), intval($matches[3]));
+            list($width, $height) = [intval($matches[2]), intval($matches[3])];
             if (isset($this->MAGICK_MIME[$matches[1]])) {
               $type = $this->MAGICK_MIME[$matches[1]];
             }
@@ -495,13 +495,13 @@
               $type = NULL;
             }
 
-            return array($width, $height, $type);
+            return [$width, $height, $type];
           }
         }
       }
       $size = @getimagesize($filename);
       if ($size !== FALSE) {
-        return array($size[0], $size[1], $size['mime']);
+        return [$size[0], $size[1], $size['mime']];
       }
 
       return FALSE;
@@ -584,7 +584,7 @@
         $img_name = $args['img_name'];
       }
 
-      $status = array();
+      $status = [];
       $nonzero_count = 0;
       $upload_info = &$_FILES['_img_upload_files']; // from PHP 4.2 on
 // var_dump($upload_info);
@@ -606,15 +606,15 @@
             $error = !empty($orig_name) ? UPLOAD_ERR_FORM_SIZE : UPLOAD_ERR_NO_FILE;
           }
 
-          $msgs = array(
+          $msgs = [
             UPLOAD_ERR_INI_SIZE => 'The uploaded image exceeds the maximum file size',
             UPLOAD_ERR_FORM_SIZE => 'The uploaded image exceeds the maximum allowed file size',
             UPLOAD_ERR_PARTIAL => 'The image was only partially uploaded. Please try again',
-          );
+          ];
 
           switch ($error) {
             case UPLOAD_ERR_NO_FILE:
-              $status[$name] = array('status' => 0, 'msg' => 'No file specified');
+              $status[$name] = ['status' => 0, 'msg' => 'No file specified'];
               break;
 
             case UPLOAD_ERR_INI_SIZE:
@@ -624,11 +624,11 @@
               if ($error == UPLOAD_ERR_FORM_SIZE && $this->params['max_file_size'] > 0) {
                 $msg .= ' (' . $this->params['max_file_size'] . ' bytes)';
               }
-              $status[$name] = array('status' => -$error, 'msg' => $msg);
+              $status[$name] = ['status' => -$error, 'msg' => $msg];
               break;
 
             default:
-              $status = array('status' => -99, 'msg' => 'An error occurred uploading your image. If this error persists, please contact the administrator'); // unknown error code
+              $status = ['status' => -99, 'msg' => 'An error occurred uploading your image. If this error persists, please contact the administrator']; // unknown error code
           }
         }
         else {
@@ -641,10 +641,10 @@
               $status[$name] = $this->process_image($this->images[$name], $orig_name, $tmp_name, $size, $type, $args);
             }
             else {
-              $status[$name] = array(
+              $status[$name] = [
                 'status' => -1,
                 'msg'  => empty($type) ? "Can't handle this datatype" : "Can't handle datatype $type",
-              );
+              ];
             }
           }
         }

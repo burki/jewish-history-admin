@@ -233,7 +233,7 @@ class DisplayTable extends PageDisplay
   var $joins_listing;
   var $group_by_listing;
   var $fields_listing;
-  var $cols_listing; // e.g. array('name' => 'Name')
+  var $cols_listing; // e.g. ['name' => 'Name']
   var $cols_listing_count;
   var $idcol_listing = false;
 

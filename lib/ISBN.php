@@ -136,7 +136,7 @@ class ISBN
      * @var array ISBN Groups Data acting as cache
      * @see _getISBN10Groups()
      */
-    private static $varISBN10Groups = array();
+    private static $varISBN10Groups = [];
 
     // {{{ __construct
     /**
@@ -330,16 +330,16 @@ class ISBN
         /* extract registraion group
          * boundaries see p.13 2005 handbook
          */
-        $boundaries = array();
+        $boundaries = [];
 
-        $boundaries[] = array(    0, 59999, 1);
-        $boundaries[] = array(60000, 60099, 3); // Iran 2006-12-05
-        $boundaries[] = array(60100, 69999, 0);
-        $boundaries[] = array(70000, 79999, 1);
-        $boundaries[] = array(80000, 94999, 2);
-        $boundaries[] = array(95000, 98999, 3);
-        $boundaries[] = array(99000, 99899, 4);
-        $boundaries[] = array(99900, 99999, 5);
+        $boundaries[] = [    0, 59999, 1];
+        $boundaries[] = [60000, 60099, 3]; // Iran 2006-12-05
+        $boundaries[] = [60100, 69999, 0];
+        $boundaries[] = [70000, 79999, 1];
+        $boundaries[] = [80000, 94999, 2];
+        $boundaries[] = [95000, 98999, 3];
+        $boundaries[] = [99000, 99899, 4];
+        $boundaries[] = [99900, 99999, 5];
         /* segment value */
         $segment      = substr($isbnbody, 0, 5);
         $segmentvalue = intval($segment);
@@ -547,7 +547,7 @@ class ISBN
         }
 
         /* parse external data */
-        $groups = array();
+        $groups = [];
         $tls    = preg_split("/\n/", $t);
         $line   = 0;
         foreach ($tls as $tl) {
@@ -563,7 +563,7 @@ class ISBN
                 }
                 /* edit+ mature: sanitize external
                    data */
-                $groups[$index] = array($tlp[1],$tlp[2]);
+                $groups[$index] = [$tlp[1],$tlp[2]];
             } else {
                 throw new ISBN_Exception(
                     'ISBN Groups Data is malformed on line #' . $line .
@@ -970,7 +970,7 @@ class ISBN
         }
 
         /* remove cosmetic chars and different type of spaces */
-        $isbn = str_replace(array('-', ' ', '\t', '\n'), '', $isbn);
+        $isbn = str_replace(['-', ' ', '\t', '\n'], '', $isbn);
 
         /* take the length to check and differ between versions
          * sothat a syntaxcheck can be made */

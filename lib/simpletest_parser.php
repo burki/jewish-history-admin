@@ -37,8 +37,8 @@
          */
         function ParallelRegex($case) {
             $this->_case = $case;
-            $this->_patterns = array();
-            $this->_labels = array();
+            $this->_patterns = [];
+            $this->_labels = [];
             $this->_regex = null;
         }
 
@@ -95,8 +95,8 @@
             if ($this->_regex == null) {
                 for ($i = 0; $i < count($this->_patterns); $i++) {
                     $this->_patterns[$i] = '(' . str_replace(
-                            array('/', '(', ')'),
-                            array('\/', '\(', '\)'),
+                            ['/', '(', ')'],
+                            ['\/', '\(', '\)'],
                             $this->_patterns[$i]) . ')';
                 }
                 $this->_regex = "/" . implode("|", $this->_patterns) . "/" . $this->_getPerlMatchingFlags();
@@ -128,7 +128,7 @@
          *    @access public
          */
         function SimpleStateStack($start) {
-            $this->_stack = array($start);
+            $this->_stack = [$start];
         }
 
         /**
@@ -193,10 +193,10 @@
          */
         function SimpleLexer(&$parser, $start = "accept", $case = false) {
             $this->_case = $case;
-            $this->_regexes = array();
+            $this->_regexes = [];
             $this->_parser = &$parser;
             $this->_mode = new SimpleStateStack($start);
-            $this->_mode_handlers = array();
+            $this->_mode_handlers = [];
         }
 
         /**
@@ -428,7 +428,7 @@
                 $unparsed_character_count = strpos($raw, $match);
                 $unparsed = substr($raw, 0, $unparsed_character_count);
                 $raw = substr($raw, $unparsed_character_count + strlen($match));
-                return array($unparsed, $match, $action);
+                return [$unparsed, $match, $action];
             }
             return true;
         }
@@ -455,7 +455,7 @@
             $this->_listener = &$listener;
             $this->_lexer = &$this->createLexer($this);
             $this->_tag = '';
-            $this->_attributes = array();
+            $this->_attributes = [];
             $this->_current_attribute = '';
         }
 
@@ -494,8 +494,8 @@
          *    @access private
          */
         function _getParsedTags() {
-            return array('a', 'title', 'form', 'input', 'textarea', 'select',
-                    'option', 'frameset', 'frame');
+            return ['a', 'title', 'form', 'input', 'textarea', 'select',
+                    'option', 'frameset', 'frame'];
         }
 
         /**
@@ -584,7 +584,7 @@
                         $this->_tag,
                         $this->_attributes);
                 $this->_tag = "";
-                $this->_attributes = array();
+                $this->_attributes = [];
                 return $success;
             }
             if ($token != "=") {

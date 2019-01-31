@@ -4,9 +4,9 @@
  *
  * Abstract Base Display class
  *
- * (c) 2007-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2019 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-05-22 dbu
+ * Version: 2019-01-31 dbu
  *
  * Changes:
  *
@@ -65,8 +65,8 @@ class PageDisplayBase
   }
 
   function htmlSpecialchars ($txt) {
-    $match = array('/&(?!\#\d+;)/s', '/</s', '/>/s', '/"/s');
-    $replace = array('&amp;', '&lt;', '&gt;', '&quot;');
+    $match = ['/&(?!\#\d+;)/s', '/</s', '/>/s', '/"/s'];
+    $replace = ['&amp;', '&lt;', '&gt;', '&quot;'];
     return preg_replace($match, $replace, $txt, -1);
   }
 
@@ -146,12 +146,12 @@ class PageDisplayBase
   }
 
   function adjustCharacters ($txt) {
-    $match = array('/\-\-/s'); // , '/—/s', '/’/s', '/[“”]/s', '/&amp;(\#\d+;)/s');
-    $replace = array('&#8212;'); // , '&#8212;', "'", '"', '&\1');
+    $match = ['/\-\-/s']; // , '/—/s', '/’/s', '/[“”]/s', '/&amp;(\#\d+;)/s');
+    $replace = ['&#8212;']; // , '&#8212;', "'", '"', '&\1');
     $ret = preg_replace($match, $replace, $txt, -1);
 
     $ret = preg_replace_callback('/<img\s*([^>]*)\/?>/s',
-                                array(&$this, 'placeImages'), $ret);
+                                [&$this, 'placeImages'], $ret);
 
     if (isset($this->span_range)) {
       $ret = preg_replace('/('.$this->span_range.'+)/us',
@@ -185,7 +185,7 @@ class PageDisplayBase
     $encoder->addPath('render', $encoder->fixPath(LIB_PATH . 'CmsCode'));
 
     $encoder->setRenderConf('Xhtml', 'Wikilink',
-                            array('render_callback' => array(&$this, 'buildWikilink')));
+                            ['render_callback' => [&$this, 'buildWikilink']]);
 
     if ($paragraph_mode) {
       $encoder->enableRule('Newline');
@@ -417,9 +417,9 @@ class PageDisplayBase
       $caption = $img['caption'];
       $copyright = $img['copyright'];
 
-      $params = array('width' => $img['width'], 'height' => $img['height'],
+      $params = ['width' => $img['width'], 'height' => $img['height'],
                       'enlarge' => $enlarge, 'enlarge_caption' => $this->formatText($caption),
-                      'border' => 0);
+                      'border' => 0];
       if (null !== $alt) {
         $params['alt'] = $params['title'] = $alt;
       }
@@ -429,7 +429,7 @@ class PageDisplayBase
                                     $params);
 
       if ($return_caption) {
-        return array($img_tag, $caption, $copyright);
+        return [$img_tag, $caption, $copyright];
       }
 
       return $img_tag;
@@ -480,7 +480,7 @@ class PageDisplayBase
                 if (file_exists($fname_scaled_full)) {
                   list($width, $height, $type, $attr) = @getimagesize($fname_scaled_full);
 
-                  return array($fname_scaled, $width, $height);
+                  return [$fname_scaled, $width, $height];
                 }
           }
       }
@@ -492,7 +492,7 @@ class PageDisplayBase
     if (!empty($this->stylesheet)) {
       // link to stylesheet
       if (!is_array($this->stylesheet)) {
-        $this->stylesheet = array($this->stylesheet);
+        $this->stylesheet = [$this->stylesheet];
       }
 
       foreach ($this->stylesheet as $src) {
