@@ -4,9 +4,9 @@
  *
  * Base-Class for backend
  *
- * (c) 2007-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2019 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-12-05 dbu
+ * Version: 2019-01-31 dbu
  *
  * Changes:
  *
@@ -122,16 +122,17 @@ extends ImageUploadHandler
     return $img_record;
   }
 
-  function storeImgData ($img, $img_form, $img_name) {
+  function storeImgData ($img, $img_form, $img_name, $img_original_name = null) {
     $imgdata = isset($img) ? $img->find_imgdata() : [];
 
-    if (count($imgdata) > 0) {
+    if (is_array($imgdata) && count($imgdata) > 0) {
       if (isset($this->dbconn)) {
         $dbconn = & $this->dbconn;
       }
       else {
         $dbconn = new DB;
       }
+
       $additional = [];
       if ('application/xml' == $imgdata[0]['mime']) {
         $input = file_get_contents($imgdata[0]['fname']);
@@ -196,19 +197,29 @@ extends ImageUploadHandler
       }
 
       // we have an image
-      $img_form->set_values([
-        'name' => $img_name, 'width' => isset($imgdata[0]['width']) ? $imgdata[0]['width'] : -1,
+      $values = [
+        'name' => $img_name,
+        'width' => isset($imgdata[0]['width']) ? $imgdata[0]['width'] : -1,
         'height' => isset($imgdata[0]['height']) ? $imgdata[0]['height'] : -1,
         'mimetype' => $imgdata[0]['mime'],
-        'additional' => json_encode($additional),
-      ]);
+      ];
+      if (!is_null($img_original_name)) {
+        $values['original_name'] = $img_original_name;
+      }
+
+      $img_form->set_values($values);
 
       // find out if we already have an item
-      $querystr = sprintf("SELECT id FROM Media WHERE item_id=%d AND type=%d AND name='%s' ORDER BY ord DESC LIMIT 1",
-                          $this->item_id, $this->type, $img_name);
+      $querystr = sprintf("SELECT id, original_name FROM Media"
+                          . " WHERE item_id=%d AND type=%d AND name='%s'"
+                          . " ORDER BY ord DESC LIMIT 1",
+                          $this->item_id, $this->type, addslashes($img_name));
       $dbconn->query($querystr);
       if ($dbconn->next_record()) {
         $img_form->set_value('id', $dbconn->Record['id']);
+        if (is_null($img_original_name) && !is_null($dbconn->Record['original_name'])) {
+          $img_form->set_value('original_name', $dbconn->Record['original_name']);
+        }
         // remove old entries from MediaEntity
         $querystr = sprintf("DELETE FROM MediaEntity WHERE media_id=%d",
                             $dbconn->Record['id']);
@@ -217,6 +228,7 @@ extends ImageUploadHandler
 
       $img_form->set_values([ 'item_id' => $this->item_id, 'ord' => 0 ]);
       $img_form->store();
+
       if (!empty($additional)) {
         global $TYPE_PERSON, $TYPE_PLACE;
 
@@ -265,7 +277,7 @@ extends DisplayTable
 
     parent::__construct($page, $workflow);
 
-    $this->script_url[] = 'script/jquery-1.9.1.min.js';
+    $this->script_url[] = 'script/jquery-2.2.4.min.js';
     $this->script_url[] = 'script/jquery-noconflict.js';
     $this->script_url[] = 'script/jquery-ui-1.10.3.custom.min.js';
   }
@@ -273,6 +285,7 @@ extends DisplayTable
   function checkAction ($step) {
     if ($this->page->isAdminUser()) {
       // admins have all rights
+
       return true;
     }
 

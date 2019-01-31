@@ -4,9 +4,9 @@
  *
  * Manage the authors
  *
- * (c) 2006-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2019 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-07-23 dbu
+ * Version: 2019-01-31 dbu
  *
  * Changes:
  *
@@ -162,7 +162,7 @@ extends DisplayTable
   function __construct (&$page) {
     parent::__construct($page, new AuthorFlow($page));
 
-    $this->script_url[] = 'script/jquery-1.9.1.min.js';
+    $this->script_url[] = 'script/jquery-2.2.4.min.js';
     $this->script_url[] = 'script/jquery-noconflict.js';
     $this->script_url[] = 'script/jquery-ui-1.10.3.custom.min.js';
 

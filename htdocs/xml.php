@@ -4,16 +4,15 @@
  *
  * show transformed XML
  *
- * (c) 2015-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2015-2019 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-05-22 dbu
+ * Version: 2019-01-30 dbu
  *
  * Changes:
  */
 
 // a bunch of common include-files
 define('INC_PATH', '../inc/');
-
 
 // setup all server specific paths and settings
 require_once INC_PATH . 'local.inc.php';
@@ -22,10 +21,9 @@ require_once INC_PATH . 'local.inc.php';
 require_once INC_PATH . 'sitesettings.inc.php';
 
 require_once INC_PATH . 'admin/adminpage.inc.php';
-
 require_once INC_PATH . 'admin/pagedisplay.inc.php';
 
-$page = new AdminPage($dbconn = new DB(), array());
+$page = new AdminPage($dbconn = new DB(), []);
 $display = new PageDisplay($page);
 if (!array_key_exists('media_id', $_GET)) {
   die('media_id missing');
@@ -50,6 +48,7 @@ if (array_key_exists('format', $_GET) && in_array($_GET['format'], [ 'docx' ])) 
   $client = new \OxGarage\Client();
   $client->convert($temp);
   unlink($temp);
+
   exit;
 }
 

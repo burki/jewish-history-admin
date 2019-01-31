@@ -4,9 +4,9 @@
  *
  * show enlarged image
  *
- * (c) 2009-2015 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2019 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2015-05-02 dbu
+ * Version: 2019-01-31 dbu
  *
  * Changes:
  */
@@ -21,10 +21,8 @@ require_once INC_PATH . 'local.inc.php';
 // include all site-specific settings
 require_once INC_PATH . 'sitesettings.inc.php';
 
-$STRIP_SLASHES = get_magic_quotes_gpc();  // set to 1 in php3 where this function doesn't exist
-
 $url = $width = $height = $caption = '';
-foreach (array('url', 'width', 'height', 'caption') as $key) {
+foreach ([ 'url', 'width', 'height', 'caption' ] as $key) {
   $$key = array_key_exists($key, $_GET) ? $_GET[$key] : '';
 }
 
@@ -38,10 +36,10 @@ $url_large = !isset($_GET['large']) || $_GET['large']
 <head>
   <title><?php echo htmlspecialchars($SITE['pagetitle'], ENT_COMPAT, 'utf-8') ?> / image</title>
   <link rel="stylesheet" href="./css/styles_img.css" type="text/css" />
-  <script src="./script/jquery-1.11.0.min.js"></script>
+  <script src="./script/jquery-2.2.4.min.js"></script>
   <script src="./script/e-smart-zoom-jquery.min.js"></script>
   <meta http-equiv="content-type" content="text/html;charset=utf-8" />
-<!--[if lt IE 9]>
+		<!--[if lt IE 9]>
 			<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 		<![endif]-->
 		<script>
