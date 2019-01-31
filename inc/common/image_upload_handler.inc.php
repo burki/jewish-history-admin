@@ -5,7 +5,7 @@
   *
   * Author  : Daniel Burckhardt, daniel.burckhardt@sur-gmbh.ch
   *
-  * Version : 2018-07-23 dbu
+  * Version : 2019-01-28 dbu
   *
   * interfaces still not completely finalized,
   * but much better than just plain copy/paste
@@ -176,6 +176,7 @@ class ImageUploadHandler
       new Field([ 'name' => 'height', 'type' => 'text', 'datatype' => 'int', 'null' => true ]),
       new Field([ 'name' => 'name', 'type' => 'hidden', 'datatype' => 'char', 'null' => true ]),
       new Field([ 'name' => 'mimetype', 'type' => 'hidden', 'datatype' => 'char', 'null' => true ]),
+      new Field([ 'name' => 'original_name', 'type' => 'hidden', 'datatype' => 'char', 'null' => true ]),
       new Field([ 'name' => 'caption', 'type' => 'textarea', 'cols' => 60, 'rows' => 3, 'datatype' => 'char', 'null' => true ]),
       new Field([ 'name' => 'copyright', 'type' => 'text', 'size' => 60, 'maxlength' => 255, 'datatype' => 'char', 'null' => true ]),
       new Field([ 'name' => 'created', 'datatype' => 'function', 'value' => 'NOW()', 'noupdate' => true ])
@@ -231,7 +232,7 @@ class ImageUploadHandler
     return $img_upload;
   }
 
-  function storeImgData ($img, $img_form, $img_name) {
+  function storeImgData ($img, $img_form, $img_name, $img_original_name = null) {
     $imgdata = isset($img) ? $img->find_imgdata() : [];
     if (count($imgdata) > 0) {
       if (isset($this->dbconn)) {
@@ -242,18 +243,29 @@ class ImageUploadHandler
       }
 
       // we have an image
-      $img_form->set_values([
-        'name' => $img_name, 'width' => isset($imgdata[0]['width']) ? $imgdata[0]['width'] : -1,
+      $values = [
+        'name' => $img_name,
+        'width' => isset($imgdata[0]['width']) ? $imgdata[0]['width'] : -1,
         'height' => isset($imgdata[0]['height']) ? $imgdata[0]['height'] : -1,
         'mimetype' => $imgdata[0]['mime'],
-      ]);
+      ];
+      if (!is_null($img_original_name)) {
+        $values['original_name'] = $img_original_name;
+      }
+
+      $img_form->set_values($value);
 
       // find out if we already have an item
-      $querystr = sprintf("SELECT id FROM Media WHERE item_id=%d AND type=%d AND name='%s' ORDER BY ord DESC LIMIT 1",
-                          $this->item_id, $this->type, $img_name);
+      $querystr = sprintf("SELECT id, original_name FROM Media"
+                          . " WHERE item_id=%d AND type=%d AND name='%s'"
+                          . " ORDER BY ord DESC LIMIT 1",
+                          $this->item_id, $this->type, addslashes($img_name));
       $dbconn->query($querystr);
       if ($dbconn->next_record()) {
         $img_form->set_value('id', $dbconn->Record['id']);
+        if (is_null($img_original_name) && !is_null($dbconn->Record['original_name'])) {
+          $img_form->set_value('original_name', $dbconn->Record['original_name']);
+        }
       }
 
       $img_form->set_values([ 'item_id' => $this->item_id, 'ord' => 0 ]);
@@ -302,7 +314,8 @@ class ImageUploadHandler
           $img->extensions['application/xml'] = '.xml';
         }
 
-        $this->storeImgData($img, $img_form, $img_name);
+        $this->storeImgData($img, $img_form, $img_name, array_key_exists('original_name', $upload_results[$img_name])
+                            ? $upload_results[$img_name]['original_name'] : null);
       }
       else {
         $invalid = $img_form->invalid();

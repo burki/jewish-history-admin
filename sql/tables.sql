@@ -218,7 +218,7 @@ CREATE TABLE Publication (
   comment       TEXT NULL,                      # internal comment
   changed       TIMESTAMP NULL,                 # last changed
   changed_by    INT NULL,                       # ref to User.id: who created the entry
-  created       TIMESTAMP,                      # when it was created
+  created       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, # when it was created
   created_by    INT NULL                        # ref to User.id: who created the entry
 ) ENGINE=MyISAM CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
@@ -240,10 +240,11 @@ CREATE TABLE Media (
   height        INT NOT NULL,                   #
   ord           INT DEFAULT 0,                  # Ordnung innerhalb Kids mit gleichem Parent
   changed       TIMESTAMP NULL,                 # last changed
-  created       TIMESTAMP,                      # when it was created
+  created       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, # when it was created
   caption       VARCHAR(255),                   # img-caption
   descr         TEXT NULL,                      # further stuff
   copyright     VARCHAR(255),                   # copyright
+  original_name VARCHAR(255) NULL,              # the original file name
   additional    TEXT NULL
 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 CREATE Index MediaItemName ON Media(item_id, name);

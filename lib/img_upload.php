@@ -4,9 +4,9 @@
   *
   * Author  : Daniel Burckhardt, daniel.burckhardt@sur-gmbh.ch
   *
-  * (c) 2000-2015
+  * (c) 2000-2019
   *
-  * Version : 2015-06-11 dbu
+  * Version : 2019-01-28 dbu
   *
   * Changes :
   *           2008-05-26 dbu silence warnings
@@ -34,10 +34,10 @@
 
   class Image
   {
-    var $extensions = array(
-                            'image/gif' => '.gif', 'image/jpeg' => '.jpg', 'image/png' => '.png',
-                            'application/pdf' => '.pdf',
-                            );
+    var $extensions = [
+      'image/gif' => '.gif', 'image/jpeg' => '.jpg', 'image/png' => '.png',
+      'application/pdf' => '.pdf',
+    ];
 
     var $params;
 
@@ -67,6 +67,7 @@
           $height_physical = $size[1];
         }
       }
+
       if (!isset($height_physical)) {
         // TODO: make the code run anyway
         return;
@@ -134,6 +135,7 @@
 
     function find_imgdata () {
       $upload_fileroot = $this->params['upload_fileroot'];
+
       if (isset($upload_fileroot)) {
         // find that baby
         $fname = $this->get('filename');
@@ -151,6 +153,7 @@
             break;
           }
         }
+
         if (!$found) {
           return;
         }
@@ -173,39 +176,41 @@
     function show_upload_field ($attrs = '') {
       // can't really be styled except weird hacks: http://www.quirksmode.org/dom/inputfile.html
       return '<input type="hidden" name="_img_upload_names[]" value="' . $this->name() . '" />'
-             . '<input type="file" name="_img_upload_files[]" />';
+           . '<input type="file" name="_img_upload_files[]" />';
     }
   } // Images
 
   class ImageUpload
   {
     var $MAGICK_MIME = array(
-                             'GIF' => 'image/gif',
-                             'JPEG' => 'image/jpeg',
-                             'TIFF' => 'image/tiff',
-                             'PDF' => 'application/pdf',
-                             );
-    var $MAGICK_BINARIES = array('convert'  => 'convert',
-                                 'mogrify' => 'mogrify',
-                                 'identify' => 'identify');
+      'GIF' => 'image/gif',
+      'JPEG' => 'image/jpeg',
+      'TIFF' => 'image/tiff',
+      'PDF' => 'application/pdf',
+    );
+    var $MAGICK_BINARIES = array(
+      'convert'  => 'convert',
+      'mogrify' => 'mogrify',
+      'identify' => 'identify',
+    );
     var $params;
     var $images;
     var $max_file_size;
     var $extensions = array(
-                            'image/gif' => '.gif', 'image/jpeg' => '.jpg', 'image/png' => '.png',
+      'image/gif' => '.gif', 'image/jpeg' => '.jpg', 'image/png' => '.png',
 
-                            'application/pdf' => '.pdf',
+      'application/pdf' => '.pdf',
 
-                            'audio/mpeg' => '.mp3',
-                            'video/mp4' => '.mp4',
+      'audio/mpeg' => '.mp3',
+      'video/mp4' => '.mp4',
 
-                            'text/rtf' => '.rtf',
-                            'application/vnd.oasis.opendocument.text' => '.odt',
-                            'application/msword' => '.doc',
-                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => '.docx',
+      'text/rtf' => '.rtf',
+      'application/vnd.oasis.opendocument.text' => '.odt',
+      'application/msword' => '.doc',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => '.docx',
 
-                            'application/xml' => '.xml',
-                            );
+      'application/xml' => '.xml',
+    );
 
     var $translate = array('image/tiff' => 'image/jpeg');
     var $translate_extensions = array('image/tiff' => '.tif');
@@ -346,6 +351,7 @@
       if (!$this->check_directory(dirname($new_name))) {
         return array('status' => -3, 'msg' => "Directory " . dirname($new_name) . " doesn't exist");
       }
+
       $ret = FALSE;
       if (isset($this->extensions[$type])) {
         $filename = $new_name . $this->extensions[$type];
@@ -370,7 +376,6 @@
         if (is_array($args) && isset($args['keep_orig']) && $args['keep_orig']) {
           move_uploaded_file($tmp_name, $new_name . $this->translate_extensions[$type_orig]);
         }
-
       }
 
       if ($ret) {
@@ -396,6 +401,7 @@
               $extension = 'original';
             }
           }
+
           if (!empty($extension)) {
             $this->delete_image($new_name . '_' . $extension);
           }
@@ -451,7 +457,14 @@
           }
         }
 
-        return array('status' => 1, 'msg' => 'File uploaded', 'mime' => $type, 'width' => $sizes['width'], 'height' => $sizes['height']);
+        return [
+          'status' => 1,
+          'msg' => 'File uploaded',
+          'mime' => $type,
+          'original_name' => $orig_name,
+          'width' => $sizes['width'],
+          'height' => $sizes['height'],
+        ];
       }
       else {
         return array('status' => -4, 'msg' => "Couldn't copy file to new location");
@@ -531,6 +544,11 @@
         }
       }
 
+      if ($type == 'text/xml') {
+        // both are in use
+        $type = 'application/xml';
+      }
+
       if (!$found) {
         $path2magick = $this->params['imagemagick'];
 
@@ -589,15 +607,16 @@
           }
 
           $msgs = array(
-            UPLOAD_ERR_INI_SIZE  => "The uploaded image exceeds the maximum file size",
-            UPLOAD_ERR_FORM_SIZE => "The uploaded image exceeds the maximum allowed file size",
-            UPLOAD_ERR_PARTIAL => "The image was only partially uploaded. Please try again",
+            UPLOAD_ERR_INI_SIZE => 'The uploaded image exceeds the maximum file size',
+            UPLOAD_ERR_FORM_SIZE => 'The uploaded image exceeds the maximum allowed file size',
+            UPLOAD_ERR_PARTIAL => 'The image was only partially uploaded. Please try again',
           );
 
           switch ($error) {
             case UPLOAD_ERR_NO_FILE:
               $status[$name] = array('status' => 0, 'msg' => 'No file specified');
               break;
+
             case UPLOAD_ERR_INI_SIZE:
             case UPLOAD_ERR_FORM_SIZE:
             case UPLOAD_ERR_PARTIAL:
@@ -607,6 +626,7 @@
               }
               $status[$name] = array('status' => -$error, 'msg' => $msg);
               break;
+
             default:
               $status = array('status' => -99, 'msg' => 'An error occurred uploading your image. If this error persists, please contact the administrator'); // unknown error code
           }
@@ -621,12 +641,15 @@
               $status[$name] = $this->process_image($this->images[$name], $orig_name, $tmp_name, $size, $type, $args);
             }
             else {
-              $status[$name] = array('status' => -1,
-                                     'msg'  => empty($type) ? "Can't handle this datatype" : "Can't handle datatype $type");
+              $status[$name] = array(
+                'status' => -1,
+                'msg'  => empty($type) ? "Can't handle this datatype" : "Can't handle datatype $type",
+              );
             }
           }
         }
       }
+
       return $status;
     }
 
@@ -661,5 +684,4 @@
     function image ($name) {
       return $this->images[$name];
     }
-
   } // ImageUpload
