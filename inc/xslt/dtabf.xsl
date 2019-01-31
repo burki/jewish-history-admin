@@ -4,10 +4,6 @@
   exclude-result-prefixes="tei"
   version="2.0">
 
-<!--
-<xsl:output method="html"
-  doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"
-  doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN" indent="yes"/>-->
 <xsl:output method="html" doctype-system="about:legacy-compat"/>
 
 <xsl:template match="tei:TEI">
@@ -18,7 +14,7 @@
       <!-- dbu -->
       <xsl:apply-templates select=".//tei:titleStmt" mode="head" />
       <link rel="stylesheet" type="text/css" href="./vendor/tooltipster-master/css/tooltipster.css" />
-      <script type="text/javascript" src="./script/jquery-1.11.0.min.js"></script>
+      <script type="text/javascript" src="./script/jquery-2.2.4.min.js"></script>
       <script type="text/javascript" src="./vendor/tooltipster-master/js/jquery.tooltipster.min.js"></script>
       <script>
         $(document).ready(function() {
@@ -35,7 +31,7 @@
       <style type="text/css">
         body { font-size:14pt; margin-left:1em; margin-right:1em; max-width:1000px }
         .head  { text-align:center; font-size:1.2em; margin-top:1em }
-        .dta-head  { text-align:center; font-size:1.2em; margin-bottom:.5em }
+        .dta-head  { text-align:center; font-size:1.2em; margin-top:1em; margin-bottom:0em }
 
         .fw-top          { text-align:center; margin-bottom:2em; color:#666 }
         .fw-pageNum      { display:none }
@@ -1214,6 +1210,16 @@
   </span>
 </xsl:template>
 
+<xsl:template match='tei:orgName'>
+  <span title="Organisationsname">
+    <xsl:call-template name="link-ref">
+      <xsl:with-param name="value">
+        <xsl:value-of select="@ref"/>
+      </xsl:with-param>
+    </xsl:call-template>
+  </span>
+</xsl:template>
+
 <xsl:template match='tei:placeName'>
   <span title="Ortsname">
     <xsl:call-template name="link-ref">
@@ -1229,6 +1235,8 @@
   <xsl:choose>
     <xsl:when test="$value and starts-with($value,'http')">
       <xsl:element name="a">
+
+        <xsl:attribute name="target">_blank</xsl:attribute>
         <xsl:attribute name="href">
           <xsl:choose>
             <xsl:when test="contains($value,' ')">
