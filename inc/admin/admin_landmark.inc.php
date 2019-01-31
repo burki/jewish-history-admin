@@ -4,9 +4,9 @@
  *
  * Manage the Landmark-table
  *
- * (c) 2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2018-2019 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-09-14 dbu
+ * Version: 2019-01-31 dbu
  *
  * TODO:
  *
@@ -20,7 +20,6 @@ class LandmarkFlow
 extends TableManagerFlow
 {
   const MERGE = 1010;
-  const IMPORT = 1100;
 
   static $TABLES_RELATED = [
   ];
@@ -617,18 +616,6 @@ EOT;
   function buildContent () {
     if (LandmarkFlow::MERGE == $this->step) {
       $res = $this->buildMerge();
-      if (is_bool($res)) {
-        if ($res) {
-          $this->step = TABLEMANAGER_VIEW;
-        }
-      }
-      else {
-        return $res;
-      }
-    }
-
-    if (LandmarkFlow::IMPORT == $this->step) {
-      $res = $this->buildImport();
       if (is_bool($res)) {
         if ($res) {
           $this->step = TABLEMANAGER_VIEW;

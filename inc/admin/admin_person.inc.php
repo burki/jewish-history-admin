@@ -4,9 +4,9 @@
  *
  * Manage the Person-table
  *
- * (c) 2009-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2019 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-09-14 dbu
+ * Version: 2019-01-31 dbu
  *
  * TODO:
  *
@@ -20,7 +20,6 @@ class PersonFlow
 extends TableManagerFlow
 {
   const MERGE = 1010;
-  const IMPORT = 1100;
 
   static $TABLES_RELATED = [
     "MediaEntity JOIN person ON CONCAT('http://d-nb.info/gnd/', person.gnd) = MediaEntity.uri AND person.id=?",
@@ -42,12 +41,6 @@ extends TableManagerFlow
           return self::MERGE;
         }
       }
-    }
-    else if (TABLEMANAGER_LIST == $ret
-             && isset($page->parameters['view'])
-             && 'import' == $page->parameters['view'])
-    {
-      return self::IMPORT;
     }
 
     return $ret;
@@ -790,81 +783,9 @@ EOT;
     return parent::buildListingCell($row, $col_index, $val);
   }
 
-  function buildImport () {
-    require_once INC_PATH . 'common/GndService.php';
-
-    global $TYPE_PERSON;
-
-    $name = 'import';
-
-    $dbconn = new DB();
-    $querystr = "SELECT uri, Person.id AS person_id, CONCAT('http://d-nb.info/gnd/', Person.gnd) AS test"
-              . " FROM MediaEntity"
-              . " LEFT JOIN Person"
-              . " ON CONCAT('http://d-nb.info/gnd/', Person.gnd) = MediaEntity.uri"
-              . " AND Person.status >= 0"
-              . " WHERE MediaEntity.type=" . $TYPE_PERSON
-              . " HAVING Person.id IS NULL";
-    $dbconn->query($querystr);
-    $ret = '';
-    while ($dbconn->next_record()) {
-      // var_dump($dbconn->Record['test']);
-      if (preg_match('/^'
-                     . preg_quote('http://d-nb.info/gnd/', '/')
-                     . '(\d+[xX]?)$/', $dbconn->Record['uri'], $matches))
-      {
-        $gnd = $matches[1];
-        $ret .= 'Fetch ' . $gnd;
-
-        $bio = BiographicalData::fetchByGnd($gnd);
-        if (!isset($bio)) {
-          $ret .= ' -> failed<br />';
-        }
-        $record = $this->instantiateRecord($this->table);
-        foreach (['gnd' => 'gnd',
-                  'academicDegree' => 'title',
-                  'dateOfBirth' => 'birthdate',
-                  'placeOfBirth' => 'birthplace',
-                  'dateOfDeath' => 'deathdate',
-                  'placeOfDeath' => 'deathplace',
-                  'forename' => 'givenName',
-                  'surname' => 'familyName',
-                  'biographicalInformation' => 'cv'] as $src => $dst)
-        {
-          $value = isset($bio->$src) ? $bio->$src : null;
-          if (isset($value) && in_array($src, [ 'dateOfBirth', 'dateOfDeath' ])) {
-            $parts = preg_split('/\-/', $value);
-            $value = [
-              'year' => $parts[0],
-              'month' => count($parts) > 1 ? $parts[1] : 0,
-              'day' => count($parts) > 2 ? $parts[2] : 0,
-            ];
-          }
-          $record->set_value($dst, $value);
-        }
-        $record->store();
-        $ret .= ' -> ' . $bio->preferredName . '<br />';
-      }
-    }
-
-    return $ret;
-  }
-
   function buildContent () {
     if (PersonFlow::MERGE == $this->step) {
       $res = $this->buildMerge();
-      if (is_bool($res)) {
-        if ($res) {
-          $this->step = TABLEMANAGER_VIEW;
-        }
-      }
-      else {
-        return $res;
-      }
-    }
-
-    if (PersonFlow::IMPORT == $this->step) {
-      $res = $this->buildImport();
       if (is_bool($res)) {
         if ($res) {
           $this->step = TABLEMANAGER_VIEW;

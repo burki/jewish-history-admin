@@ -4,9 +4,9 @@
  *
  * Manage the event-table
  *
- * (c) 2016-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2016-2019 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-09-14 dbu
+ * Version: 2019-01-31 dbu
  *
  * TODO:
  *
@@ -20,7 +20,6 @@ class EventFlow
 extends TableManagerFlow
 {
   const MERGE = 1010;
-  const IMPORT = 1100;
 
   static $TABLES_RELATED = [
     "MediaEntity JOIN event ON CONCAT('http://d-nb.info/gnd/', event.gnd) = MediaEntity.uri AND event.id=?",
@@ -42,12 +41,6 @@ extends TableManagerFlow
           return self::MERGE;
         }
       }
-    }
-    else if (TABLEMANAGER_LIST == $ret
-             && isset($page->parameters['view'])
-             && 'import' == $page->parameters['view'])
-    {
-      return self::IMPORT;
     }
 
     return $ret;
@@ -463,17 +456,6 @@ EOT;
   function buildContent () {
     if (EventFlow::MERGE == $this->step) {
       $res = $this->buildMerge();
-      if (is_bool($res)) {
-        if ($res) {
-          $this->step = TABLEMANAGER_VIEW;
-        }
-      }
-      else {
-        return $res;
-      }
-    }
-    if (EventFlow::IMPORT == $this->step) {
-      $res = $this->buildImport();
       if (is_bool($res)) {
         if ($res) {
           $this->step = TABLEMANAGER_VIEW;

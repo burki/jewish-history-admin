@@ -4,9 +4,9 @@
  *
  * Manage the Place-table
  *
- * (c) 2015-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2015-2019 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-09-14 dbu
+ * Version: 2019-01-31 dbu
  *
  * TODO:
  *
@@ -20,7 +20,6 @@ class PlaceFlow
 extends TableManagerFlow
 {
   const MERGE = 1010;
-  const IMPORT = 1100;
 
   static $TABLES_RELATED = [
     "MediaEntity JOIN Place ON CONCAT('http://vocab.getty.edu/tgn/', Place.tgn) = MediaEntity.uri AND Place.id=?",
@@ -42,12 +41,6 @@ extends TableManagerFlow
           return self::MERGE;
         }
       }
-    }
-    else if (TABLEMANAGER_LIST == $ret
-             && isset($page->parameters['view'])
-             && 'import' == $page->parameters['view'])
-    {
-      return self::IMPORT;
     }
 
     return $ret;
@@ -765,77 +758,9 @@ EOT;
     return parent::buildListingCell($row, $col_index, $val);
   }
 
-  function buildImport () {
-    require_once INC_PATH . 'common/GettyService.php';
-
-    global $TYPE_PLACE;
-
-    $name = 'import';
-
-    $dbconn = new DB();
-    $querystr = "SELECT uri, Place.id AS place_id, CONCAT('http://vocab.getty.edu/tgn/', Place.tgn) AS test"
-              . " FROM MediaEntity"
-              . " LEFT JOIN Place"
-              . " ON CONCAT('http://vocab.getty.edu/tgn/', Place.tgn) = MediaEntity.uri"
-              . " AND Place.status >= 0"
-              . " WHERE MediaEntity.type=" . $TYPE_PLACE
-              . " HAVING Place.id IS NULL";
-    $dbconn->query($querystr);
-    $ret = '';
-    while ($dbconn->next_record()) {
-      // var_dump($dbconn->Record['test']);
-      if (preg_match('/^'
-                     . preg_quote('http://vocab.getty.edu/tgn/', '/')
-                     . '(\d+)$/', $dbconn->Record['uri'], $matches))
-      {
-        $tgn = $matches[1];
-        $ret .= 'Fetch ' . $tgn;
-
-        $place = GettyPlaceData::fetchByIdentifier('tgn:' . $tgn);
-        if (!isset($place)) {
-          $ret .= ' -> failed<br />';
-        }
-
-        $record = $this->instantiateRecord($this->table);
-        foreach ([
-            'tgn' => 'tgn',
-            'preferredName' => 'name',
-            'type' => 'type',
-            'tgn_parent' => 'tgn_parent',
-            // 'parentPath' => 'parent_path',
-            'latitude' => 'latitude',
-            'longitude' => 'longitude',
-          ] as $src => $dst)
-        {
-          $value = isset($place->$src) ? $place->$src : null;
-          $record->set_value($dst, $value);
-        }
-
-        $record->store();
-        // var_dump($place->preferredName);
-        $ret .= ' -> ' . $place->preferredName . '<br />';
-        // exit;
-      }
-
-    }
-    return $ret;
-  }
-
   function buildContent () {
     if (PlaceFlow::MERGE == $this->step) {
       $res = $this->buildMerge();
-      if (is_bool($res)) {
-        if ($res) {
-          $this->step = TABLEMANAGER_VIEW;
-        }
-      }
-      else {
-        return $res;
-      }
-    }
-
-    if (PlaceFlow::IMPORT == $this->step) {
-      $res = $this->buildImport();
       if (is_bool($res)) {
         if ($res) {
           $this->step = TABLEMANAGER_VIEW;
