@@ -6,7 +6,7 @@
  *
  * (c) 2009-2019 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2019-01-31 dbu
+ * Version: 2019-02-05 dbu
  *
  * TODO:
  *
@@ -91,7 +91,7 @@ extends DisplayBackend
   var $table = 'person';
   var $fields_listing = [
     'person.id AS id',
-    "CONCAT(familyName, ', ', IFNULL(givenName, '')) AS name",
+    "CONCAT(IFNULL(CONCAT(familyName, ', '), ''), IFNULL(givenName, '')) AS name",
     "CONCAT(IFNULL(YEAR(birthdate), ''), IF(deathdate IS NOT NULL, CONCAT('-', YEAR(deathdate)), '')) AS lifespan",
     'person.gnd AS gnd',
     /* 'COUNT(DISTINCT Item.id) AS count',
@@ -107,7 +107,7 @@ extends DisplayBackend
   var $group_by_listing = 'person.id';
   var $distinct_listing = true;
   var $order = [
-    'name' => [ 'familyName, givenName', 'familyName DESC, givenName DESC' ],
+    'name' => [ 'name, id', 'name DESC, id DESC' ],
     // 'count' => [ 'count DESC', 'count' ],
     // 'how_many_media' => [ 'how_many_media DESC', 'how_many_media' ],
     'created' => [ 'created_at DESC, person.id desc', 'created_at, person.id' ],
