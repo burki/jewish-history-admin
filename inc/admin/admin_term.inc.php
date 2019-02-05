@@ -48,7 +48,7 @@ extends DisplayTable
     }
     else {
       reset($THESAURI);
-      $categor = key($THESAURI);
+      $category = key($THESAURI);
     }
 
     $record->add_fields([
