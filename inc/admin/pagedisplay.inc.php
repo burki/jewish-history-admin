@@ -362,8 +362,11 @@ EOT;
       // check if we have to setup an image for body-rendering
       foreach ($this->images as $name => $descr) {
         if (isset($descr['placement']) && 'body' == $descr['placement']) {
-          $this->image = ['item_id' => $this->workflow->primaryKey(),
-                               'type' => $media_type, 'name' => $name];
+          $this->image = [
+            'item_id' => $this->workflow->primaryKey(),
+            'type' => $media_type,
+            'name' => $name,
+          ];
         }
       }
 
@@ -427,10 +430,10 @@ EOT;
     return $ret;
   }
 
-  function renderUpload (&$imageUploadHandler, $title = 'Image Upload') {
+  function renderUpload ($imageUploadHandler, $title = 'Image Upload') {
     $ret = '<h2>' . $this->formatText(tr($title)) . '</h2>';
 
-    $params_self = ['pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_VIEW) => $this->id];
+    $params_self = [ 'pn' => $this->page->name, $this->workflow->name(TABLEMANAGER_VIEW) => $this->id ];
     $action = $this->page->buildLink($params_self);
 
     $first = true;
@@ -461,6 +464,7 @@ EOT;
       if (isset($img_params['title'])) {
         $options['title'] = $img_params['title'];
       }
+
       $images = $imageUploadHandler->buildImages($img_basename, $img_params, $max_images, $options);
       $imageUpload = $imageUploadHandler->buildUpload($images, $action);
 
@@ -494,13 +498,16 @@ EOT;
           }
 
           $url_delete = $this->page->buildLink(array_merge($params_self,
-                                               ['delete_img' => $img_name]));
+                                               [ 'delete_img' => $img_name ]));
 
           list($img_tag, $caption, $copyright, $original_name) = $this->buildImage($imageUploadHandler->item_id, $imageUploadHandler->type, $img_name, true, true, true);
           // var_dump($img_tag);
           if (!empty($img_tag)) {
             $img_field .= '<p><div style="margin-right: 2em; margin-bottom: 1em; float: left;">' . $img_tag . '</div>'
-                        . '[<a href="' . htmlspecialchars($url_delete) . '">' . tr('delete') . '</a>]<br clear="left" /></p>'
+                        . sprintf('[<a href="%s">%s</a>]<br clear="left" />',
+                                  htmlspecialchars($url_delete),
+                                  $this->htmlSpecialchars(tr('delete')))
+                        . '</p>'
                         . (!empty($caption) ? '<p>' . $this->formatText($caption) . '</p>' : '')
                         ;
           }
@@ -508,8 +515,8 @@ EOT;
           $rows[] = $img_field;
 
           $rows[] = [ 'File', $img->show_upload_field() ];
-          $rows[] = [ 'Image Caption', $this->getUploadFormField($img_form, 'caption', ['prepend' => $img_name . '_']) ];
-          $rows[] = [ 'Copyright-Notice', $this->getUploadFormField($img_form, 'copyright', ['prepend' => $img_name . '_']) ];
+          $rows[] = [ 'Image Caption', $this->getUploadFormField($img_form, 'caption', [ 'prepend' => $img_name . '_' ]) ];
+          $rows[] = [ 'Copyright-Notice', $this->getUploadFormField($img_form, 'copyright', [ 'prepend' => $img_name . '_' ]) ];
 
           $rows[] = [ '', '<input type="submit" value="' . ucfirst(tr('upload')) . '" />' ];
         } // if

@@ -180,6 +180,7 @@ $GETTEXT_MESSAGES = array (
 'Cover Image' => 'Buchumschlag',
 'File Upload' => 'Datei hochladen',
 'File' => 'Datei',
+'Documents (Texts, Images, ...)' => 'Dokumente (Texte, Bilder, ...)',
 'Image Caption' => 'Bildunterschrift',
 'Preview Image' => 'Vorschaubild',
 'Digitized Media' => 'Digitalisat',

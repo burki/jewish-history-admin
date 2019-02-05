@@ -755,7 +755,7 @@ EOT;
 
     $images = [
       'document' => [
-        'title' => tr('Dokumente (Texte, Bilder, ...)'),
+        'title' => tr('Documents (Texts, Images, ...)'),
         'multiple' => true,
         'imgparams' =>[
           'max_width' => 300, 'max_height' => 300,
