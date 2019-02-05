@@ -60,7 +60,7 @@ extends DisplayTable
   var $page_size = 30;
   var $show_xls_export = true;
   var $table = 'Publisher';
-  var $fields_listing = [ 'id', 'name', 'place' ]; // , 'status');
+  var $fields_listing = [ 'id', 'name', 'place', /* 'status' */ ];
   var $listing_default_action = TABLEMANAGER_VIEW;
 
   var $condition = [
@@ -97,7 +97,7 @@ extends DisplayTable
   }
 
   function instantiateRecord ($table = '', $dbconn = '') {
-    return new PublisherRecord(['tables' => $this->table, 'dbconn' => $this->page->dbconn]);
+    return new PublisherRecord([ 'tables' => $this->table, 'dbconn' => $this->page->dbconn ]);
   }
 
   function buildRecord ($name = '') {
@@ -137,8 +137,8 @@ extends DisplayTable
       new Field([ 'name' => 'place', 'type' => 'text', 'size' => 30, 'datatype' => 'char', 'maxlength' => 80, 'null' => true ]),
       new Field([ 'name' => 'zip', 'type' => 'text', 'datatype' => 'char', 'size' => 8, 'maxlength' => 8, 'null' => true ]),
       new Field([ 'name' => 'country', 'type' => 'select', 'datatype' => 'char', 'null' => true,
-                      'options' => array_keys($countries_ordered),
-                      'labels' => array_values($countries_ordered), 'default' => 'DE', 'null' => true ]),
+                  'options' => array_keys($countries_ordered),
+                  'labels' => array_values($countries_ordered), 'default' => 'DE', 'null' => true ]),
 
       new Field(['name' => 'phone', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 40, 'null' => true ]),
       new Field(['name' => 'fax', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 40, 'null' => true ]),

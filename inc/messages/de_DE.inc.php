@@ -23,6 +23,7 @@ $GETTEXT_MESSAGES = array (
 'Address' => 'Adresse',
 'Postcode' => 'Postleitzahl',
 'Postcode / Place' => 'PLZ / Ort',
+'Place' => 'Ort',
 'Country' => 'Land',
 'Telephone' => 'Telefon',
 'Fax' => 'Fax',
