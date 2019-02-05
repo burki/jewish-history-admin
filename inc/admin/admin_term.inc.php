@@ -4,9 +4,9 @@
  *
  * Class for managing Thesauri-Terms
  *
- * (c) 2013-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2013-2019 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-07-23 dbu
+ * Version: 2019-02-05 dbu
  *
  * Changes:
  *
@@ -48,7 +48,7 @@ extends DisplayTable
     }
     else {
       reset($THESAURI);
-      list($category, $dummy) = each($THESAURI);
+      $categor = key($THESAURI);
     }
 
     $record->add_fields([
