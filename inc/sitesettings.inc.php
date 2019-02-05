@@ -7,7 +7,7 @@
  *
  * (c) 2009-2019 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2019-01-28 dbu
+ * Version: 2019-02-05 dbu
  *
  * Changes:
  *
@@ -81,7 +81,7 @@ $MAIL_SETTINGS = [
   'bcc_change_notify'    => 'burckhardtd@geschichte.hu-berlin.de',
 
   // further stuff
-  'subject_prepend'      => 'Hamburg Key-Documents of German-Jewish History - ',
+  'subject_prepend'      => 'Key-Documents of German-Jewish History - ',
 ];
 
 function compute_bytes ($val) {

@@ -6,7 +6,7 @@
  *
  * (c) 2006-2019 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2019-01-31 dbu
+ * Version: 2019-02-05 dbu
  *
  * Changes:
  *
@@ -64,13 +64,16 @@ extends PageDisplayBase
   }
 
   function buildFormRow ($left, $right = '') {
-    return $this->buildContentLine($left, $right,
-                                   [ 'class_left' => 'form', 'class_right' => 'form' ]);
+    return $this->buildContentLine($left, $right, [
+      'class_left' => 'form',
+      'class_right' => 'form',
+    ]);
   }
 
   function buildContentLine($left, $right, $params = []) {
     $class_left = isset($params['class_left']) ? $params['class_left'] : 'leftFixedWidth';
     $class_right = isset($params['class_right']) ? $params['class_right'] : 'rightFixedWidth';
+
     if (empty($right)) {
       $right = '&nbsp;';
     }
@@ -504,11 +507,11 @@ EOT;
 
           $rows[] = $img_field;
 
-          $rows[] = ['File', $img->show_upload_field()];
-          $rows[] = ['Image Caption', $this->getUploadFormField($img_form, 'caption', ['prepend' => $img_name . '_'])];
-          $rows[] = ['Copyright-Notice', $this->getUploadFormField($img_form, 'copyright', ['prepend' => $img_name . '_'])];
+          $rows[] = [ 'File', $img->show_upload_field() ];
+          $rows[] = [ 'Image Caption', $this->getUploadFormField($img_form, 'caption', ['prepend' => $img_name . '_']) ];
+          $rows[] = [ 'Copyright-Notice', $this->getUploadFormField($img_form, 'copyright', ['prepend' => $img_name . '_']) ];
 
-          $rows[] = ['', '<input type="submit" value="' . ucfirst(tr('upload')) . '" />'];
+          $rows[] = [ '', '<input type="submit" value="' . ucfirst(tr('upload')) . '" />' ];
         } // if
       }
 
@@ -537,17 +540,43 @@ EOT;
     $ret = '<div id="header">';
 
     if (!empty($this->page->user)) {
-      $ret .= '<div id="menuAccount" style="font-size: 9pt; float: right">'
+      $ret .= '<div id="menuAccount">'
             . $this->formatText($this->page->user['login'])
-            . ' | <a class="inverse" href="' . $this->page->buildLink(['pn' => 'account', 'edit' => $this->page->user['id']]).'">'.tr('My Account').'</a> | <a class="inverse" href="'.$this->page->buildLink(['pn' => '', 'do_logout' => 1]).'">'.tr('Sign out').'</a></div>';
+            . sprintf(' | <a class="inverse" href="%s">%s</a>',
+                      htmlspecialchars($this->page->buildLink(['pn' => 'account', 'edit' => $this->page->user['id']])),
+                      $this->htmlSpecialchars(tr('My Account')))
+            . sprintf(' | <a class="inverse" href="%s">%s</a>',
+                      htmlspecialchars($this->page->buildLink(['pn' => '', 'do_logout' => 1])),
+                      $this->htmlSpecialchars(tr('Sign out')))
+            . '</div>'
+            ;
+
       if (!$this->is_internal) {
         $this->page->site_description['structure']['root']['title'] = 'Home';
       }
     }
 
-    $ret .= sprintf('<a href="%s"><img src="%s" style="margin-left: 4px; vertical-align: text-bottom; border: 0;" width="515" height="106" alt="%s" /></a> ',
+    if (count(Page::$languages) > 0) {
+      $languages = [];
+      foreach (Page::$languages as $lang => $label) {
+        if ($lang != $this->page->lang()) {
+          $label = sprintf('<a class="inverse" href="?lang=%s">%s</a>',
+                           $lang, $this->formatText($label));
+        }
+        else {
+          $label = $this->formatText($label);
+        }
+
+        $languages[] = $label;
+      }
+
+      $ret .= '<div id="languages">' . implode(' ', $languages) . '</div>';
+    }
+
+    $ret .= sprintf('<a href="%s"><img src="%s" style="margin-left: 4px; vertical-align: text-bottom; border: 0; height: 106; width: auto" alt="%s" /><h1>%s</h1></a> ',
                     $url_main,
                     $this->page->BASE_PATH . 'media/logo.png',
+                    $this->htmlSpecialchars(tr($SITE_DESCRIPTION['title'])),
                     $this->htmlSpecialchars(tr($SITE_DESCRIPTION['title'])));
     $entries = [];
 
@@ -562,22 +591,6 @@ EOT;
 
     if (isset($this->step) && $this->step > 0) {
       $entries[] = tr($this->workflow->name($this->step));
-    }
-
-    if (count(Page::$languages) > 0) {
-      $languages = [];
-      foreach (Page::$languages as $lang => $label) {
-        if ($lang != $this->page->lang()) {
-          $label = '<a class="inverse" href="?lang=' . $lang . '">' . $this->formatText($label) . '</a>';
-        }
-        else {
-          $label = $this->formatText($label);
-        }
-
-        $languages[] = $label;
-      }
-
-      $ret .= '<div id="languages">' . implode(' ', $languages) . '</div>';
     }
 
     if (count($entries) > 0) {
@@ -612,7 +625,6 @@ EOT;
     echo $this->buildMenu();
     echo '<div id="content">' . $content . "</div>\n";
 
-    // echo '<div id="footer"><div align="right" style="padding:0.5em; font-size: 9pt;">(c) 2008 - daniel burckhardt</div></div>';
     echo '</div><!-- .#holder -->';
 
     echo $this->buildHtmlEnd();

@@ -52,7 +52,7 @@ extends Page
 $URL_REWRITE = []; // don't do rewrites for the backend
 
 $SITE_DESCRIPTION = [
-    'title' => 'Hamburg Key-Documents of German-Jewish History',
+    'title' => 'Key-Documents of German-Jewish History',
     'structure' => [
         'root' => [
             'title' => 'Administration',

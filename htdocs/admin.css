@@ -9,7 +9,10 @@ html, body, #holder { min-height: 100%; width: 100%; height: 100%;}
 html>body, html>body #holder { height: auto;}
 body { margin: 0; padding:0; }
 #holder { /* position: absolute; top: 0; left: 0; */}
-#header { padding: 0px; color: white; background-color: #4D0F77; }
+#header { padding: 0px; color: white; background-color: #2B2738; }
+#menuAccount { font-size: 9pt; float: right; }
+#header > a { display: block; position: relative; max-width: 80%; /* so there is space for #languages */ }
+#header h1 { margin-top: 0; margin-bottom: 0; font-size: 16pt; color: white; position: absolute; top: 40px; left: 140px; }
 #languages { clear: right; font-size: 9pt; color: white; margin-top: 0.3em; padding-top: 0.2em; padding-right: 0.2em; float:right; }
 #languages a:link, #languages a:visited { color: #C1B3D5; }
 #breadcrumbs { background-color: white; padding-left: 1em; font-size: 9pt; color: black; margin-top: 0.3em; border-bottom: 1px solid #909090; padding-top: 0.2em; padding-bottom: 0.2em; }
