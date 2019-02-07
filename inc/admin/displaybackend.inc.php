@@ -441,6 +441,47 @@ extends DisplayTable
     return $view_rows;
   }
 
+  function addPreviewOverlay () {
+    $this->script_ready[] = <<<EOT
+jQuery("#previewOverlay").dialog({
+  autoOpen: false,
+  modal: true,
+  open: function(ev, ui) {
+  },
+  close: function(ev, ui) {
+    jQuery('#previewOverlayFrame').attr('src', '');
+  },
+  width: 860,
+  height: 600,
+  buttons: {
+    'Abbrechen': function() {
+      jQuery(this).dialog('close');
+    }
+  }
+});
+
+function previewOverlayClose() {
+  jQuery('#previewOverlay').dialog('close');
+
+  return false;
+}
+
+jQuery('.previewOverlayTrigger').on('click', function(e) {
+  var browserWindow = jQuery(window);
+  var dWidth = browserWindow.width() * 0.8;
+  var dHeight = browserWindow.height() * 0.8;
+  jQuery('#previewOverlayFrame').attr('src', this.href);
+  // jQuery('#previewOverlay').dialog('option', 'width', dWidth);
+  jQuery('#previewOverlay').dialog('option', 'height', dHeight);
+  jQuery('#previewOverlay').dialog('open');
+
+  return false;
+});
+EOT;
+
+    return '<div id="previewOverlay"><iframe id="previewOverlayFrame" src="" frameBorder="0" width="100%" height="100%"></iframe></div>';
+  }
+
   function renderView ($record, $rows) {
     $ret = '';
     if (!empty($this->page->msg)) {

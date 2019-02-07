@@ -645,7 +645,8 @@ EOT;
   }
 
   function buildView () {
-    $ret = parent::buildView();
+    $ret = $this->addPreviewOverlay()
+      . parent::buildView();
 
     $dbconn = $this->page->dbconn;
 
