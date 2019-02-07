@@ -1,12 +1,12 @@
 <?php
 /*
- * system_information.inc.php
+ * admin_system_information.inc.php
  *
  * Show settings and try to check all system-requirements
  *
- * (c) 2012-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2012-2019 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-07-23 dbu
+ * Version: 2019-02-07 dbu
  *
  * Changes:
  *
@@ -133,21 +133,27 @@ extends PageDisplay
             . ' ' . $this->htmlSpecialchars('UPLOAD_PATH2MAGICK not set') . '</p>';
     }
 
-
-    /*
     $ret .= '<h2>E-Mail Settings</h2>';
     require_once INC_PATH . 'common/MailMessage.php';
     $mailerFactory = new MailerFactory([]);
     $mailer = $mailerFactory->getInstance();
+    $transport = $mailer->getTransport();
 
-    if (isset($mailer->config)) {
-      $config = is_object($mailer->config) ? clone($mailer->config) : $mailer->config; // make sure we manipulate the copy
-      if (isset($config['smtp']) && isset($config['smtp']['password']))
-        $config['smtp']['password'] = '***';
+    if (isset($transport)) {
+      $config = [
+        'class' => get_class($transport),
+      ];
+
+      if ('Swift_SmtpTransport' == $config['class']) {
+        foreach ([ 'username', 'host', 'port', 'encryption', 'streamOptions' ] as $key) {
+          $methodName = 'get' . ucfirst($key);
+          $config[$key] = $transport->$methodName();
+
+        }
+      }
 
       $ret .= $this->buildVariableDisplay($config);
     }
-    */
 
     return $ret;
   } // buildMiddle
