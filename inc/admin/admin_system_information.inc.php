@@ -161,7 +161,7 @@ extends PageDisplay
 
 $display = new SystemInformationDisplay($page);
 if (false === $display->init()) {
-  $page->redirect(['pn' => '']);
+  $page->redirect([ 'pn' => '' ]);
 }
 
 $page->setDisplay($display);
