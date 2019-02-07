@@ -2,11 +2,11 @@
 /*
  * MailMessage.php
  *
- * lightweight wrapper around Swift-Mailer 4.x
+ * lightweight wrapper around Swift-Mailer 5.x
  *
- * (c) 2007-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2019 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-05-22 dbu
+ * Version: 2019-02-07 dbu
  *
  * Changes:
  *
@@ -51,7 +51,7 @@ class MailerFactory
           $transport = Swift_MailTransport::newInstance();
         }
 
-        //Create the Mailer using your created Transport
+        // Create the Mailer using your created Transport
         $this->mailer = Swift_Mailer::newInstance($transport);
     }
 
@@ -77,6 +77,7 @@ class MailMessage
     private static function getSwift () {
         if (!isset(self::$swift)) {
             $mailer_factory = new MailerFactory(self::$mailer_config);
+
             self::$swift = $mailer_factory->getInstance();
         }
 
@@ -193,6 +194,7 @@ class MailMessage
 
     public function send () {
         global $MAIL_WHITELIST;
+
         if (!defined('MAIL_SEND') || !MAIL_SEND) {
             $count = $this->printOnly();
             return $count;
