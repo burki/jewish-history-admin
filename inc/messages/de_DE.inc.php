@@ -180,6 +180,7 @@ $GETTEXT_MESSAGES = array (
 'Cover Image' => 'Buchumschlag',
 'File Upload' => 'Datei hochladen',
 'File' => 'Datei',
+'File Name' => 'Dateiname',
 'Documents (Texts, Images, ...)' => 'Dokumente (Texte, Bilder, ...)',
 'Image Caption' => 'Bildunterschrift',
 'Preview Image' => 'Vorschaubild',
@@ -311,5 +312,8 @@ $GETTEXT_MESSAGES = array (
 'Normdata: Places' => 'Normdaten: Orte',
 'Normdata: Landmarks' => 'Normdaten: Landmarken',
 'Normdata: Events' => 'Normdaten: Ereignisse',
+'Refresh Presentation' => 'Front-End aktualisieren',
+'Presentation copy is already newer than uploaded version' => 'Die Front-End Datei ist bereits aktueller als die hochgeladene',
+'refresh' => 'aktualisieren',
 );
 

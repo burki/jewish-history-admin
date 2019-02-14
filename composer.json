@@ -39,6 +39,7 @@
         "burki/zotero-api": "dev-master",
         "sabre/dav": "~3.0",
 
+        "symfony/process": "3.4.*",
         "loilo/fuse": "@stable"
     },
 

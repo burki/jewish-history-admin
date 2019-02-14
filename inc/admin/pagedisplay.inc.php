@@ -355,7 +355,7 @@ EOT;
     // override for actual images
   }
 
-  function instantiateUploadHandler () {
+  function instantiateUploadHandler ($className = 'ImageUploadHandler') {
     list($media_type, $this->images) = $this->getImageDescriptions();
 
     if (isset($this->images)) {
@@ -370,7 +370,7 @@ EOT;
         }
       }
 
-      return new ImageUploadHandler($this->workflow->primaryKey(), $media_type);
+      return new $className($this->workflow->primaryKey(), $media_type);
     }
   }
 
@@ -497,19 +497,25 @@ EOT;
             $img_field .= '<div class="message">' . $upload_results[$img_name]['msg'] . '</div>';
           }
 
-          $url_delete = $this->page->buildLink(array_merge($params_self,
-                                               [ 'delete_img' => $img_name ]));
+          if (method_exists($imageUploadHandler, 'buildEntry')) {
+            $img_field .= $imageUploadHandler->buildEntry($this, $img_name, $params_self);
+          }
+          else {
+            list($img_tag, $caption, $copyright, $original_name) =
+              $this->buildImage($imageUploadHandler->item_id, $imageUploadHandler->type, $img_name, true, true, true);
+            // var_dump($img_tag);
+            if (!empty($img_tag)) {
+              $url_delete = $this->page->buildLink(array_merge($params_self,
+                                                   [ 'delete_img' => $img_name ]));
 
-          list($img_tag, $caption, $copyright, $original_name) = $this->buildImage($imageUploadHandler->item_id, $imageUploadHandler->type, $img_name, true, true, true);
-          // var_dump($img_tag);
-          if (!empty($img_tag)) {
-            $img_field .= '<p><div style="margin-right: 2em; margin-bottom: 1em; float: left;">' . $img_tag . '</div>'
-                        . sprintf('[<a href="%s">%s</a>]<br clear="left" />',
-                                  htmlspecialchars($url_delete),
-                                  $this->htmlSpecialchars(tr('delete')))
-                        . '</p>'
-                        . (!empty($caption) ? '<p>' . $this->formatText($caption) . '</p>' : '')
-                        ;
+              $img_field .= '<p><div style="margin-right: 2em; margin-bottom: 1em; float: left;">' . $img_tag . '</div>'
+                          . sprintf('[<a href="%s">%s</a>]<br clear="left" />',
+                                    htmlspecialchars($url_delete),
+                                    $this->htmlSpecialchars(tr('delete')))
+                          . '</p>'
+                          . (!empty($caption) ? '<p>' . $this->formatText($caption) . '</p>' : '')
+                          ;
+            }
           }
 
           $rows[] = $img_field;
@@ -622,17 +628,22 @@ EOT;
       $xls = new Excel_XML;
       $xls->addArray($this->xls_data);
       $xls->generateXML('liste');
+
       exit;
     }
 
     echo $this->buildHtmlStart()
+       . $this->buildBodyStart([ 'role' => 'document' ])
        . "\n"
        . '<div id="holder">';
 
-    echo $this->buildMenu();
+    if (!$this->page->embed) {
+      echo $this->buildMenu();
+    }
+
     echo '<div id="content">' . $content . "</div>\n";
 
-    echo '</div><!-- .#holder -->';
+    echo '</div><!-- .#holder -->' . "\n";
 
     echo $this->buildHtmlEnd();
   }

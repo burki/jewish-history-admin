@@ -6,9 +6,9 @@
  *
  * machine dependent stuff like hardwired paths, db-logins and passwords
  *
- * (c) 2008-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2019 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-05-22 dbu
+ * Version: 2019-02-14 dbu
  *
  * Changes:
  */
@@ -17,7 +17,7 @@ define('LIB_PATH', realpath(__DIR__ . '/../lib/') . '/');
 define('VENDOR_PATH', realpath(__DIR__ . '/../lib/') . '/');
 
 // we install through composer.json
-require_once LIB_PATH . 'autoload.php';
+require_once VENDOR_PATH . 'autoload.php';
 
 define('BASE_PATH', '/admin/');
 define('BASE_FILEPATH', dirname($_SERVER['SCRIPT_FILENAME']) . '/');
@@ -25,7 +25,9 @@ define('BASE_FILEPATH', dirname($_SERVER['SCRIPT_FILENAME']) . '/');
 // define('UPLOAD_MAX_FILE_SIZE', 10240000); // go to max
 define('UPLOAD_URLROOT', BASE_PATH . 'uploads/');
 define('UPLOAD_FILEROOT', BASE_FILEPATH . 'uploads/');
-define('UPLOAD_PATH2MAGICK', '/usr/bin/'); // '/usr/X11R6/bin/';
+define('UPLOAD_PATH2MAGICK', '/usr/bin/');
+
+define('JAVA', '/usr/bin/java');
 
 $URL_REWRITE = []; // no rewrite rules
 

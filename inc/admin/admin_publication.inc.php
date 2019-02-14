@@ -4,9 +4,9 @@
  *
  * Class for managing publications (sources)
  *
- * (c) 2007-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2019 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-12-05 dbu
+ * Version: 2019-02-14 dbu
  *
  * Changes:
  *
@@ -668,45 +668,12 @@ EOT;
   }
 
   function renderView ($record, $rows) {
-    $ret = '<div id="previewOverlay"><iframe id="previewOverlayFrame" src="" frameBorder="0" width="100%" height="100%"></iframe></div>';
-    $this->script_ready[] = <<<EOT
-jQuery("#previewOverlay").dialog({
-    autoOpen: false,
-    modal: true,
-    open: function(ev, ui) {
-    },
-    close: function(ev, ui) {
-      jQuery('#previewOverlayFrame').attr('src', '');
-    },
-    width: 860,
-    height: 600,
-    buttons: {
-      "Abbrechen": function() {
-        jQuery(this).dialog("close");
-      }
-    }
-});
-
-function previewOverlayClose() {
-  jQuery('#previewOverlay').dialog('close');
-  return false;
-}
-
-jQuery(".previewOverlayTrigger").on("click", function(e) {
-    var browserWindow = jQuery(window);
-    var dWidth = browserWindow.width() * 0.8;
-    var dHeight = browserWindow.height() * 0.8;
-    jQuery('#previewOverlayFrame').attr('src', this.href);
-    // jQuery('#previewOverlay').dialog( "option", "width", dWidth);
-    jQuery('#previewOverlay').dialog( "option", "height", dHeight);
-    jQuery('#previewOverlay').dialog('open');
-    return false;
-});
-EOT;
+    $ret = $this->addPreviewOverlay();
 
     if (!empty($this->page->msg)) {
       $ret .= '<p class="message">' . $this->page->msg . '</p>';
     }
+
     $fields = [];
     if (is_array($rows)) {
       foreach ($rows as $key => $row_descr) {
@@ -781,11 +748,13 @@ EOT;
   }
 
   function buildView () {
+    require_once INC_PATH . 'admin/xml_upload_handler.inc.php';
+
     $this->id = $this->workflow->primaryKey();
     $record = $this->buildRecord();
     if ($found = $record->fetch($this->id, $this->datetime_style)) {
       $this->record = &$record;
-      $uploadHandler = $this->instantiateUploadHandler();
+      $uploadHandler = $this->instantiateUploadHandler('XmlUploadHandler');
       if (isset($uploadHandler)) {
         $this->processUpload($uploadHandler);
       }

@@ -6,7 +6,7 @@
  *
  * (c) 2007-2019 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2019-01-31 dbu
+ * Version: 2019-02-07 dbu
  *
  * Changes:
  *
@@ -128,7 +128,8 @@ class PageDisplayBase
 
           if (!empty($this->image_wrap_div_class) || !empty($style)) {
             $class = !empty($this->image_wrap_div_class)
-              ? ' class="'.$this->image_wrap_div_class.'"' : '';
+              ? ' class="' . $this->image_wrap_div_class . '"' : '';
+
             if (preg_match('/float\:\s*(left|right)/', $style, $matches)) {
               $padding = 'padding-' . ('left' == $matches[1] ? 'right' : 'left')
                        . ': 10px';
@@ -142,6 +143,7 @@ class PageDisplayBase
         }
       }
     }
+
     return '<img '. $attrs . ' />';
   }
 
@@ -195,6 +197,7 @@ class PageDisplayBase
       $encoder->disableRule('Newline');
       $encoder->disableRule('Paragraph');
     }
+
     return $encoder;
   }
 
@@ -209,6 +212,7 @@ class PageDisplayBase
     if ('utf-8' == $this->charset) {
       $encoder->setFormatConf('Plain', 'charset', 'UTF-8');
     }
+
     $encoder->addPath('render', $encoder->fixPath(LIB_PATH.'CmsCode'));
 
     return $encoder->transform($txt, 'Plain');
@@ -221,15 +225,16 @@ class PageDisplayBase
     $class = ''; $enable_list = false;
     switch (gettype($options)) {
       case 'array':
-          if (array_key_exists('class', $options))
-            $class = $options['class'];
-          if (array_key_exists('list', $options)) {
-            $enable_list = $options['list'];
-          }
-          break;
+        if (array_key_exists('class', $options))
+          $class = $options['class'];
+        if (array_key_exists('list', $options)) {
+          $enable_list = $options['list'];
+        }
+        break;
+
       case 'string':
-          $class = $options;
-          break;
+        $class = $options;
+        break;
     }
 
     if ($enable_list) {
@@ -254,6 +259,7 @@ class PageDisplayBase
   function getDateFromDb ($db_datestr) {
     $ret = new Zend_Date($db_datestr /* . '+00:00' */, // Database set to local time
                          Zend_Date::ISO_8601);
+
     return $ret;
   }
 
@@ -261,6 +267,7 @@ class PageDisplayBase
     if (is_object($date) && $date instanceof Zend_Date) {
       return $date->toString(Zend_Locale_Format::getDateFormat(Zend_Registry::get('Zend_Locale')), Zend_Registry::get('Zend_Locale'));
     }
+
     return date('Y.m.d', $date);
   }
 
@@ -268,14 +275,16 @@ class PageDisplayBase
     if (is_object($datetime) && $datetime instanceof Zend_Date) {
       return $datetime->toString(Zend_Registry::get('Zend_Locale'));
     }
+
     return date('Y.m.d H:i', $datetime);
   }
 
   static function validateEmail ($email) {
-    if (function_exists('_MailValidate'))
-       return 0 == _MailValidate($email, 1);
-    else
-      return preg_match('/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-
+    if (function_exists('_MailValidate')) {
+      return 0 == _MailValidate($email, 1);
+    }
+
+    return preg_match('/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-
 ]+)*(\.[a-z]{2,4})$/', $email);
   }
 
@@ -292,21 +301,23 @@ class PageDisplayBase
   function buildImgFname ($item_id, $type, $name, $mime) {
     global $MEDIA_EXTENSIONS, $UPLOAD_TRANSLATE;
 
-    $folder = UPLOAD_FILEROOT.$UPLOAD_TRANSLATE[$type]
-              .sprintf(".%03d/id%05d/",
-                       intval($item_id / 32768), intval($item_id % 32768));
+    $folder = UPLOAD_FILEROOT . $UPLOAD_TRANSLATE[$type]
+            . sprintf('.%03d/id%05d/',
+                      intval($item_id / 32768), intval($item_id % 32768));
 
-    return $folder.$name.$MEDIA_EXTENSIONS[$mime];
+    return $folder . $name . $MEDIA_EXTENSIONS[$mime];
   }
 
   function buildImgUrl ($item_id, $type, $name, $mime, $append_uid = false) {
     global $MEDIA_EXTENSIONS, $UPLOAD_TRANSLATE;
     static $uid;
-    if (empty($uid))
+
+    if (empty($uid)) {
       $uid = uniqid();
+    }
 
     $folder = UPLOAD_URLROOT.$UPLOAD_TRANSLATE[$type]
-            . sprintf(".%03d/id%05d/",
+            . sprintf('.%03d/id%05d/',
                       intval($item_id / 32768), intval($item_id % 32768));
 
     return $folder . $name . $MEDIA_EXTENSIONS[$mime]
@@ -323,6 +334,7 @@ class PageDisplayBase
     if ($attrs == '') {
       $attrs = [];
     }
+
     if (!isset($attrs['alt'])) {
       $attrs['alt'] = '';
     }
@@ -330,9 +342,9 @@ class PageDisplayBase
     if ((array_key_exists('enlarge', $attrs) && $attrs['enlarge'])
       || (!isset($attrs['width']) && !isset($attrs['height'])))
     {
-      $fname = ereg('^' . UPLOAD_URLROOT, $relurl)
-        ? ereg_replace('^' . UPLOAD_URLROOT, UPLOAD_FILEROOT, $relurl)
-        : ereg_replace('^' . BASE_PATH, './', $relurl);
+      $fname = preg_match('/^' . preg_quote(UPLOAD_URLROOT, '/') . '/', $relurl)
+        ? preg_replace('/^' . preg_quote(UPLOAD_URLROOT, '/') . '/', UPLOAD_FILEROOT, $relurl)
+        : preg_replace('/^' . preg_quote(BASE_PATH, '/') . '/', './', $relurl);
       $fname = preg_replace('/\?.*/', '', $fname);
       // var_dump($fname);
       $size = @getimagesize($fname);
@@ -340,10 +352,11 @@ class PageDisplayBase
         if (!isset($attrs['width']) && !isset($attrs['height'])) {
           $attrs['width'] = $size[0]; $attrs['height'] = $size[1];
         }
+
         $fname_large = preg_replace('/(\_small)?\.([^\.]+)$/', '_large.\2', $fname);
+
         if (isset($attrs['enlarge']) && $attrs['enlarge'] !== false) {
           // var_dump($fname_large);
-
           if (file_exists($fname_large)) {
             $size_large = @getimagesize($fname_large);
             $url_enlarge = "window.open('" . BASE_PATH . "img.php?url=" . urlencode($relurl)
@@ -372,6 +385,7 @@ class PageDisplayBase
         $attrstr .= ($attr . '="' . $value . '" ');
       }
     }
+
     if (isset($attrs['enlarge_only']) && (!empty($url_enlarge))) {
       $img_tag = $attrs['enlarge_only'];
     }
@@ -382,6 +396,7 @@ class PageDisplayBase
     if (isset($attrs['caption']) && !empty($attrs['caption'])) {
       $img_tag .= $attrs['caption'];
     }
+
     if (!empty($url_enlarge)) {
       $img_tag = '<a href="#' . (isset($attrs['anchor']) ? $attrs['anchor'] : '')
                . '" onclick="' . $url_enlarge . '"'
@@ -393,6 +408,7 @@ class PageDisplayBase
     else if (isset($attrs['anchor'])) {
       $img_tag = '<a name="' . $attrs['anchor'] . '">' . $img_tag . '</a>';
     }
+
     return $img_tag;
   }
 
@@ -449,39 +465,39 @@ class PageDisplayBase
         $mime_type = image_type_to_mime_type($type);
 
         switch ($mime_type) {
-            case 'image/gif':
-            case 'image/png':
-            case 'image/jpg':
-                // split
-                $path_parts = pathinfo($fname_rel);
-                $fname_scaled = sprintf('%s/%s_%s%s',
-                                        $path_parts['dirname'],
-                                        $path_parts['filename'],
-                                        $name_append,
-                                        $MEDIA_EXTENSIONS[$mime_type]);
-                $fname_scaled_full = UPLOAD_FILEROOT . $fname_scaled;
-                $scale = true;
-                if (file_exists($fname_scaled_full)) {
-                  // if scaled file exists, we rescale only if large file was modified after scaled one
-                  $scale = filemtime($fname_full) >= filemtime($fname_scaled_full);
-                }
+          case 'image/gif':
+          case 'image/png':
+          case 'image/jpg':
+              // split
+              $path_parts = pathinfo($fname_rel);
+              $fname_scaled = sprintf('%s/%s_%s%s',
+                                      $path_parts['dirname'],
+                                      $path_parts['filename'],
+                                      $name_append,
+                                      $MEDIA_EXTENSIONS[$mime_type]);
+              $fname_scaled_full = UPLOAD_FILEROOT . $fname_scaled;
+              $scale = true;
+              if (file_exists($fname_scaled_full)) {
+                // if scaled file exists, we rescale only if large file was modified after scaled one
+                $scale = filemtime($fname_full) >= filemtime($fname_scaled_full);
+              }
 
-                if ($scale) {
-                  $cmd = UPLOAD_PATH2MAGICK . 'convert '
-                    . '-geometry ' . escapeshellarg($geometry) . ' '
-                    . ('image/jpeg' == $mime_type ? '+profile "*" -colorspace RGB ' : '')
-                    . escapeshellarg($fname_full)
-                    . ' '
-                    . escapeshellarg($fname_scaled_full);
-                  // echo($cmd);
-                  $ret = exec($cmd, $lines, $retval);
-                }
+              if ($scale) {
+                $cmd = UPLOAD_PATH2MAGICK . 'convert '
+                  . '-geometry ' . escapeshellarg($geometry) . ' '
+                  . ('image/jpeg' == $mime_type ? '+profile "*" -colorspace RGB ' : '')
+                  . escapeshellarg($fname_full)
+                  . ' '
+                  . escapeshellarg($fname_scaled_full);
+                // echo($cmd);
+                $ret = exec($cmd, $lines, $retval);
+              }
 
-                if (file_exists($fname_scaled_full)) {
-                  list($width, $height, $type, $attr) = @getimagesize($fname_scaled_full);
+              if (file_exists($fname_scaled_full)) {
+                list($width, $height, $type, $attr) = @getimagesize($fname_scaled_full);
 
-                  return [$fname_scaled, $width, $height];
-                }
+                return [$fname_scaled, $width, $height];
+              }
           }
       }
     }
@@ -501,14 +517,15 @@ class PageDisplayBase
                   htmlspecialchars($this->page->BASE_PATH . $src));
       }
     }
+
     return implode("\n", $tags);
   }
 
   function buildHtmlStartTag ($lang_attr = '') {
     return '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'
+      . "\n"
       . '<html xmlns="http://www.w3.org/1999/xhtml"' . $lang_attr . '>'
       . "\n";
-
   }
 
   function buildHtmlStart () {
@@ -520,19 +537,22 @@ class PageDisplayBase
     }
 
     if (!empty($this->script_url_ie)) {
-      foreach($this->script_url_ie as $url_ie)
+      foreach($this->script_url_ie as $url_ie) {
         $scriptcode .= sprintf('<!--[if lt IE 7]>'
                                . '<script defer type="text/javascript" src="%s"></script>'
                                . '<![endif]-->' . "\n",
                                htmlspecialchars($this->page->BASE_PATH . $url_ie));
+      }
     }
 
     if (!empty($this->script_ready)) {
       $scriptcode .= '<script language="JavaScript" type="text/javascript">'
                    . 'jQuery(document).ready(function(){ ';
+
       foreach ($this->script_ready as $ready) {
         $scriptcode .= $ready . "\n" ;
       }
+
       $scriptcode .= '}); </script>';
     }
 
@@ -580,7 +600,7 @@ EOT;
 
   function buildBodyStart () {
     $attributes = isset($this->script_onload)
-      ? ' onload="'.htmlspecialchars($this->script_onload).'"' : '';
+      ? ' onload="' . htmlspecialchars($this->script_onload) . '"' : '';
 
     return <<<EOT
 <body$attributes>
@@ -596,7 +616,7 @@ EOT;
   }
 
   function buildHtmlEnd () {
-return <<<EOT
+    return <<<EOT
 </html>
 EOT;
   }
@@ -616,7 +636,8 @@ EOT;
       ob_start('ob_gzhandler', 4096);
 
       // Tell the browser the content is compressed with gzip
-      header("Content-Encoding: gzip");
+      header('Content-Encoding: gzip');
+
       return $compress_set = true;
     }
 
@@ -627,6 +648,7 @@ EOT;
     if (headers_sent()) {
       return;
     }
+
     if (defined('OUTPUT_COMPRESS') && OUTPUT_COMPRESS) {
       $this->setOutputCompression();
     }
@@ -649,5 +671,4 @@ EOT;
     echo $this->buildBodyEnd();
     echo $this->buildHtmlEnd();
   }
-
 }

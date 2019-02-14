@@ -4,9 +4,9 @@
  *
  * Page class for admin-section
  *
- * (c) 2009-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2019 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-09-14 dbu
+ * Version: 2019-02-08 dbu
  *
  * Changes:
  *
@@ -19,13 +19,25 @@ extends Page
 {
     protected $gettext_utf8_encode = false;
     var $display = 'admin';
+    var $embed = false;
 
     function init ($pn) {
         $ret = parent::init($pn);
 
         // now get and set the view
-        if (array_key_exists('view', $_GET) && 'xls' == $_GET['view']) {
-          $this->display = 'xls';
+        if (array_key_exists('view', $_GET)) {
+            switch ($_GET['view']) {
+                case 'xls':
+                    $this->display = 'xls';
+                    break;
+            }
+        }
+
+        if (array_key_exists('display', $_GET)) {
+            switch ($_GET['display']) {
+                case 'embed':
+                    $this->embed = true;
+            }
         }
 
         return $ret;
@@ -104,6 +116,10 @@ $SITE_DESCRIPTION = [
         ],
         'term' => [
             'title' => 'Term Sets',
+            'anonymous' => false,
+        ],
+        'presentation' => [
+            'title' => 'TEI to HTML',
             'anonymous' => false,
         ],
         'convert' => [

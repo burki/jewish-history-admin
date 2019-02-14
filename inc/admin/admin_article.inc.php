@@ -4,9 +4,9 @@
  *
  * Manage the articles
  *
- * (c) 2009-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2019 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-09-14 dbu
+ * Version: 2019-02-14 dbu
  *
  * Changes:
  *
@@ -642,6 +642,12 @@ EOT;
     $rows = array_merge_at($rows, $additional, 'users');
 
     return $rows;
+  }
+
+  function instantiateUploadHandler ($className = 'XmlUploadHandler') {
+    require_once INC_PATH . 'admin/xml_upload_handler.inc.php';
+
+    return parent::instantiateUploadHandler($className);
   }
 
   function buildView () {

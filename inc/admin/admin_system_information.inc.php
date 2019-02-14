@@ -6,7 +6,7 @@
  *
  * (c) 2012-2019 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2019-02-07 dbu
+ * Version: 2019-02-13 dbu
  *
  * Changes:
  *
@@ -52,7 +52,7 @@ extends PageDisplay
 
     if (!self::isWindows() && '/' != $cmd[0]) {
       // try to prepend $PATH-component to $cmd
-      $paths = split(PATH_SEPARATOR, getenv('PATH'));
+      $paths = explode(PATH_SEPARATOR, getenv('PATH'));
       foreach ($paths as $path) {
         $cmd_full = $path . '/' . $cmd;
         if (file_exists($cmd_full) && is_executable($cmd_full)) {
@@ -132,6 +132,16 @@ extends PageDisplay
       $ret .= '<p>' . $this->buildSuccessFail(false)
             . ' ' . $this->htmlSpecialchars('UPLOAD_PATH2MAGICK not set') . '</p>';
     }
+
+    $phpBinaryFinder = new \Symfony\Component\Process\PhpExecutableFinder();
+    if (false !== ($phpBinaryPath = $phpBinaryFinder->find())) {
+      $ret .= '<p>' . $this->buildSuccessFail($success) . ' ' . $this->htmlSpecialchars($phpBinaryPath) . '</p>';
+    }
+    else {
+      $ret .= '<p>' . $this->buildSuccessFail(false)
+            . ' ' . $this->htmlSpecialchars('No PHP-binary found (try: SetEnv PHP_PEAR_PHP_BIN "/path/to/php")') . '</p>';
+    }
+
 
     $ret .= '<h2>E-Mail Settings</h2>';
     require_once INC_PATH . 'common/MailMessage.php';

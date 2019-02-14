@@ -270,7 +270,7 @@ extends DisplayTable
   var $datetime_style = 'DD.MM.YYYY';
   var $status_deleted = '-1';
 
-  function __construct (&$page, $workflow = '') {
+  function __construct ($page, $workflow = '') {
     if (!is_object($workflow)) {
       $workflow = new DisplayBackendFlow($page);
     }
