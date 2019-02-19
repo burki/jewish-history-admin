@@ -36,7 +36,7 @@ define('RSYNC_REMOTE_USER', 'jgo-hiwi');
 // define('RSYNC_SSH', 'c:/Run/cygwin/bin/ssh.exe');  // defaults to /usr/bin/ssh
 
 define('RSYNC_REMOTE_PUBLISHED', '/public/jgo/TEI/TEI_veröffentlicht/');
-define('RSYNC_REMOTE_UNPUBLISHED', '/public/jgo/TEI/TEI_finale/');
+define('RSYNC_REMOTE_UNPUBLISHED', '/public/jgo/TEI/TEI_final/');
 */
 
 $URL_REWRITE = []; // no rewrite rules

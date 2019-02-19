@@ -315,6 +315,7 @@ $GETTEXT_MESSAGES = array (
 'Refresh Presentation' => 'Front-End aktualisieren',
 'Presentation copy is already newer than uploaded version' => 'Die Front-End Datei ist bereits aktueller als die hochgeladene',
 'refresh' => 'aktualisieren',
-'Hidrive version is newer (%s) than local version (%s).' => 'Die Version in Hidrive version ist aktueller (%s) als die hochgeladene Version (%s).',
+'Hidrive version is newer (%s) than local version (%s).' => 'Die Version in Hidrive ist aktueller (%s) als die hochgeladene Version (%s).',
+'update from Hidrive' => 'aus Hidrive aktualisieren',
 );
 
