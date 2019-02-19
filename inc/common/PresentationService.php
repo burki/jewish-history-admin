@@ -114,17 +114,16 @@ class PresentationService
         }
 
         $uid = self::buildArticleUid($id, $info['type']);
-        $querystr = sprintf("SELECT COUNT(*) AS how_many"
+        $querystr = sprintf("SELECT status"
                             . " FROM article"
                             . " WHERE uid='%s' AND language='%s' AND status <> -1",
                             $uid, $info['lang']);
         $this->dbconn->query($querystr);
         if ($this->dbconn->next_record()) {
-            if (1 == $this->dbconn->Record['how_many']) {
-                $info['uid'] = $uid;
+            $info['status'] = $this->dbconn->Record['status'];
+            $info['uid'] = $uid;
 
-                return $info;
-            }
+            return $info;
         }
 
         return false;

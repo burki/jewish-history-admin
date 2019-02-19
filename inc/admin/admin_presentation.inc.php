@@ -6,7 +6,7 @@
  *
  * (c) 2019 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2019-02-14 dbu
+ * Version: 2019-02-19 dbu
  *
  * Changes:
  *
@@ -138,14 +138,69 @@ extends DisplayBackend
 
     $ret = '';
 
+    $fnameUpload = $this->buildImgFname($item_id, $this->record->get_value('type'), $name, $mimetype);
+
+    if (defined('RSYNC_REMOTE_HOST')) {
+      // enable updating upload from hidrive
+
+      require_once INC_PATH . 'common/RsyncService.php';
+      $rsyncService = new RsyncService([
+        'ssh_config' => [
+          'executable' => defined('RSYNC_SSH') ? RSYNC_SSH : '/usr/bin/ssh',
+          'host' => RSYNC_REMOTE_HOST,
+          'username' => RSYNC_REMOTE_USER,
+          'private_key' => realpath(INC_PATH . 'ssh/' . RSYNC_REMOTE_USER),
+        ],
+        'rsync_config' => [
+          'executable' => defined('RSYNC_EXECUTABLE') ? RSYNC_EXECUTABLE : '/usr/bin/rsync',
+          'archive' => false,
+          'recursive' => false,
+        ],
+      ]);
+
+      $fileInfo = $rsyncService->listRemote($remotePath = ($info['status'] > 0 ? RSYNC_REMOTE_PUBLISHED : RSYNC_REMOTE_UNPUBLISHED));
+      if (array_key_exists($original_name, $fileInfo)) {
+        if (array_key_exists('action', $_GET) && 'sync' == $_GET['action']) {
+          $res =  $rsyncService->fetchFromRemote($remotePath . $original_name, $fnameUpload);
+          if (0 != $res) {
+            $ret .= 'ERROR: ' . $remotePath . $original_name . ' could not be fetched';
+          }
+        }
+
+        $mtimeUpload = filemtime($fnameUpload);
+        if ($fileInfo[$original_name]['mtime'] >= $mtimeUpload) {
+          $ret .=
+            '<p>'
+            . sprintf('INFO: ' . tr('Hidrive version is newer (%s) than local version (%s).'),
+                      date('d.m.Y H:i:s', $fileInfo[$original_name]['mtime']),
+                      date('d.m.Y H:i:s', $mtimeUpload))
+            . sprintf('<br>[<a href="%s">%s</a>]',
+                      htmlspecialchars($this->page->buildLink([
+                        'pn' => $this->page->name, 'view' => $this->workflow->id,
+                        'display' => 'embed',
+                        'action' => 'sync',
+                      ])),
+                      tr('update from Hidrive'))
+            . '</p>'
+            ;
+        }
+        /*
+        $ret .= 'Remote date: ' . $fileInfo[$original_name]['mtime'] . '<br />';
+        $ret .= 'Remote size: ' . $fileInfo[$original_name]['size'] . '<br />';
+
+
+        $ret .= 'Local date: ' . filemtime($fnameUpload) . '<br />';
+        $ret .= 'Local size: ' . filesize($fnameUpload) . '<br />';
+        */
+      }
+    }
+
     $refresh_button = '';
 
     $cmd = $presentationService->buildRefreshCommand($info['type'], $info['uid'], $info['lang']);
 
     if (false !== $cmd) {
       $fnamePresentation = $presentationService->buildTeiFname($info['type'], $info['uid'], $info['lang']);
-
-      $fnameUpload = $this->buildImgFname($item_id, $this->record->get_value('type'), $name, $mimetype);
 
       $allowRefresh = false;
       if ($fnamePresentation !== false && ($allowRefresh = $presentationService->allowRefresh($fnameUpload, $fnamePresentation))) {

@@ -40,7 +40,8 @@
         "sabre/dav": "~3.0",
 
         "symfony/process": "3.4.*",
-        "loilo/fuse": "@stable"
+        "loilo/fuse": "@stable",
+        "albertofem/rsync-lib": "1.0.0"
     },
 
     "autoload": {
