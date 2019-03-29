@@ -6,7 +6,7 @@
  *
  * (c) 2019 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2019-02-13 dbu
+ * Version: 2019-03-29 dbu
  *
  *
  */
@@ -22,7 +22,7 @@ class PresentationService
         'deu' => [
             'locale' => 'de',
             'source' => 'quelle',
-            'article' => 'article',
+            'article' => 'beitrag',
             'url' => 'https://juedische-geschichte-online.net',
         ],
         'eng' => [
