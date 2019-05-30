@@ -508,16 +508,16 @@
         },
         {
             "name": "loilo/fuse",
-            "version": "3.3.1",
+            "version": "3.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Loilo/Fuse.git",
-                "reference": "2f7a43796a430594199639b0ee2044f6a5047ec8"
+                "reference": "c7d9ba147482f415604c49a4a380e94d30eee066"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Loilo/Fuse/zipball/2f7a43796a430594199639b0ee2044f6a5047ec8",
-                "reference": "2f7a43796a430594199639b0ee2044f6a5047ec8",
+                "url": "https://api.github.com/repos/Loilo/Fuse/zipball/c7d9ba147482f415604c49a4a380e94d30eee066",
+                "reference": "c7d9ba147482f415604c49a4a380e94d30eee066",
                 "shasum": ""
             },
             "require": {
@@ -552,7 +552,7 @@
                 }
             ],
             "description": "Fuzzy search for PHP based on Bitap algorithm",
-            "time": "2019-01-19T14:26:18+00:00"
+            "time": "2019-03-01T14:09:36+00:00"
         },
         {
             "name": "magento/zendframework1",
@@ -746,16 +746,16 @@
         },
         {
             "name": "pear/pear-core-minimal",
-            "version": "v1.10.7",
+            "version": "v1.10.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/pear-core-minimal.git",
-                "reference": "19a3e0fcd50492c4357372f623f55f1b144346da"
+                "reference": "742be8dd68c746a01e4b0a422258e9c9cae1c37f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/pear-core-minimal/zipball/19a3e0fcd50492c4357372f623f55f1b144346da",
-                "reference": "19a3e0fcd50492c4357372f623f55f1b144346da",
+                "url": "https://api.github.com/repos/pear/pear-core-minimal/zipball/742be8dd68c746a01e4b0a422258e9c9cae1c37f",
+                "reference": "742be8dd68c746a01e4b0a422258e9c9cae1c37f",
                 "shasum": ""
             },
             "require": {
@@ -786,7 +786,7 @@
                 }
             ],
             "description": "Minimal set of PEAR core files to be used as composer dependency",
-            "time": "2018-12-05T20:03:52+00:00"
+            "time": "2019-03-13T18:15:44+00:00"
         },
         {
             "name": "pear/pear_exception",
@@ -849,12 +849,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Text_Wiki.git",
-                "reference": "32fd5f483f34645f4efd96d385d8950ea26d4a2a"
+                "reference": "b70d87e7f215381eb3393f3560d27b44172c7260"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Text_Wiki/zipball/32fd5f483f34645f4efd96d385d8950ea26d4a2a",
-                "reference": "32fd5f483f34645f4efd96d385d8950ea26d4a2a",
+                "url": "https://api.github.com/repos/pear/Text_Wiki/zipball/b70d87e7f215381eb3393f3560d27b44172c7260",
+                "reference": "b70d87e7f215381eb3393f3560d27b44172c7260",
                 "shasum": ""
             },
             "require": {
@@ -897,7 +897,7 @@
                 "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=Text_Wiki",
                 "source": "https://github.com/pear/Text_Wiki"
             },
-            "time": "2017-09-04T04:17:21+00:00"
+            "time": "2019-03-13T00:37:51+00:00"
         },
         {
             "name": "psr/http-message",
@@ -1331,16 +1331,16 @@
         },
         {
             "name": "sabre/vobject",
-            "version": "4.1.6",
+            "version": "4.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sabre-io/vobject.git",
-                "reference": "122cacbdea2c6133ac04db86ec05854beef75adf"
+                "reference": "bd500019764e434ff65872d426f523e7882a0739"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sabre-io/vobject/zipball/122cacbdea2c6133ac04db86ec05854beef75adf",
-                "reference": "122cacbdea2c6133ac04db86ec05854beef75adf",
+                "url": "https://api.github.com/repos/sabre-io/vobject/zipball/bd500019764e434ff65872d426f523e7882a0739",
+                "reference": "bd500019764e434ff65872d426f523e7882a0739",
                 "shasum": ""
             },
             "require": {
@@ -1349,8 +1349,7 @@
                 "sabre/xml": ">=1.5 <3.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "> 4.8.35, <6.0.0",
-                "sabre/cs": "^1.0.0"
+                "phpunit/phpunit": "> 4.8.35, <6.0.0"
             },
             "suggest": {
                 "hoa/bench": "If you would like to run the benchmark scripts"
@@ -1424,7 +1423,7 @@
                 "xCal",
                 "xCard"
             ],
-            "time": "2018-04-20T07:22:50+00:00"
+            "time": "2019-02-19T13:05:37+00:00"
         },
         {
             "name": "sabre/xml",
@@ -1591,16 +1590,16 @@
         },
         {
             "name": "symfony/process",
-            "version": "v3.4.22",
+            "version": "v3.4.28",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-                "reference": "009f8dda80930e89e8344a4e310b08f9ff07dd2e"
+                "reference": "afe411c2a6084f25cff55a01d0d4e1474c97ff13"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/009f8dda80930e89e8344a4e310b08f9ff07dd2e",
-                "reference": "009f8dda80930e89e8344a4e310b08f9ff07dd2e",
+                "url": "https://api.github.com/repos/symfony/process/zipball/afe411c2a6084f25cff55a01d0d4e1474c97ff13",
+                "reference": "afe411c2a6084f25cff55a01d0d4e1474c97ff13",
                 "shasum": ""
             },
             "require": {
@@ -1636,7 +1635,7 @@
             ],
             "description": "Symfony Process Component",
             "homepage": "https://symfony.com",
-            "time": "2019-01-16T13:27:11+00:00"
+            "time": "2019-05-22T12:54:11+00:00"
         }
     ],
     "packages-dev": [],
