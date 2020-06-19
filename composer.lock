@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "07a5c10e1b176635b63c3f03dea9b5f5",
+    "content-hash": "3518533e164efd4923d16202690facec",
     "packages": [
         {
             "name": "albertofem/rsync-lib",
@@ -178,12 +178,12 @@
             "version": "0.9.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/njh/easyrdf.git",
+                "url": "https://github.com/easyrdf/easyrdf.git",
                 "reference": "acd09dfe0555fbcfa254291e433c45fdd4652566"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/njh/easyrdf/zipball/acd09dfe0555fbcfa254291e433c45fdd4652566",
+                "url": "https://api.github.com/repos/easyrdf/easyrdf/zipball/acd09dfe0555fbcfa254291e433c45fdd4652566",
                 "reference": "acd09dfe0555fbcfa254291e433c45fdd4652566",
                 "shasum": ""
             },
@@ -237,16 +237,16 @@
         },
         {
             "name": "guzzlehttp/guzzle",
-            "version": "5.3.3",
+            "version": "5.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "93bbdb30d59be6cd9839495306c65f2907370eb9"
+                "reference": "b87eda7a7162f95574032da17e9323c9899cb6b2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/93bbdb30d59be6cd9839495306c65f2907370eb9",
-                "reference": "93bbdb30d59be6cd9839495306c65f2907370eb9",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/b87eda7a7162f95574032da17e9323c9899cb6b2",
+                "reference": "b87eda7a7162f95574032da17e9323c9899cb6b2",
                 "shasum": ""
             },
             "require": {
@@ -286,37 +286,41 @@
                 "rest",
                 "web service"
             ],
-            "time": "2018-07-31T13:33:10+00:00"
+            "time": "2019-10-30T09:32:00+00:00"
         },
         {
             "name": "guzzlehttp/psr7",
-            "version": "1.5.2",
+            "version": "1.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "9f83dded91781a01c63574e387eaa769be769115"
+                "reference": "239400de7a173fe9901b9ac7c06497751f00727a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/9f83dded91781a01c63574e387eaa769be769115",
-                "reference": "9f83dded91781a01c63574e387eaa769be769115",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/239400de7a173fe9901b9ac7c06497751f00727a",
+                "reference": "239400de7a173fe9901b9ac7c06497751f00727a",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4.0",
                 "psr/http-message": "~1.0",
-                "ralouphie/getallheaders": "^2.0.5"
+                "ralouphie/getallheaders": "^2.0.5 || ^3.0.0"
             },
             "provide": {
                 "psr/http-message-implementation": "1.0"
             },
             "require-dev": {
+                "ext-zlib": "*",
                 "phpunit/phpunit": "~4.8.36 || ^5.7.27 || ^6.5.8"
+            },
+            "suggest": {
+                "zendframework/zend-httphandlerrunner": "Emit PSR-7 responses"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.5-dev"
+                    "dev-master": "1.6-dev"
                 }
             },
             "autoload": {
@@ -353,7 +357,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2018-12-04T20:46:45+00:00"
+            "time": "2019-07-01T23:21:34+00:00"
         },
         {
             "name": "guzzlehttp/ringphp",
@@ -404,6 +408,7 @@
                 }
             ],
             "description": "Provides a simple API and specification that abstracts away the details of HTTP into a single PHP function.",
+            "abandoned": true,
             "time": "2018-07-31T13:22:33+00:00"
         },
         {
@@ -454,6 +459,7 @@
                 "Guzzle",
                 "stream"
             ],
+            "abandoned": true,
             "time": "2014-10-12T19:18:40+00:00"
         },
         {
@@ -508,23 +514,23 @@
         },
         {
             "name": "loilo/fuse",
-            "version": "3.4.2",
+            "version": "3.6.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/Loilo/Fuse.git",
-                "reference": "c7d9ba147482f415604c49a4a380e94d30eee066"
+                "url": "https://github.com/loilo/Fuse.git",
+                "reference": "ead0f50addaee3d9bbed3aae1f0b8ed22b0f573f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Loilo/Fuse/zipball/c7d9ba147482f415604c49a4a380e94d30eee066",
-                "reference": "c7d9ba147482f415604c49a4a380e94d30eee066",
+                "url": "https://api.github.com/repos/loilo/Fuse/zipball/ead0f50addaee3d9bbed3aae1f0b8ed22b0f573f",
+                "reference": "ead0f50addaee3d9bbed3aae1f0b8ed22b0f573f",
                 "shasum": ""
             },
             "require": {
-                "php": ">= 5.6"
+                "php": "^5.6 || ^7.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^5.5"
+                "phpunit/phpunit": "^5.0 || ^6.0 || ^7.0"
             },
             "type": "library",
             "autoload": {
@@ -538,6 +544,7 @@
                     "src/Bitap/score.php",
                     "src/Bitap/search.php",
                     "src/Helpers/deep_value.php",
+                    "src/Helpers/get.php",
                     "src/Helpers/is_list.php"
                 ]
             },
@@ -552,54 +559,7 @@
                 }
             ],
             "description": "Fuzzy search for PHP based on Bitap algorithm",
-            "time": "2019-03-01T14:09:36+00:00"
-        },
-        {
-            "name": "magento/zendframework1",
-            "version": "1.14.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/magento/zf1.git",
-                "reference": "4df018254c70b5b998b00a8cb1a30760f831ff0d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/magento/zf1/zipball/4df018254c70b5b998b00a8cb1a30760f831ff0d",
-                "reference": "4df018254c70b5b998b00a8cb1a30760f831ff0d",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.2.11"
-            },
-            "require-dev": {
-                "phpunit/dbunit": "1.3.*",
-                "phpunit/phpunit": "3.7.*"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.12.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "Zend_": "library/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "include-path": [
-                "library/"
-            ],
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "description": "Magento Zend Framework 1",
-            "homepage": "http://framework.zend.com/",
-            "keywords": [
-                "ZF1",
-                "framework"
-            ],
-            "time": "2018-08-09T15:03:40+00:00"
+            "time": "2020-03-10T10:18:12+00:00"
         },
         {
             "name": "ml/iri",
@@ -650,16 +610,16 @@
         },
         {
             "name": "ml/json-ld",
-            "version": "1.1.0",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/lanthaler/JsonLD.git",
-                "reference": "b5f82820c255cb64067b1c7adbb819cad4afa70a"
+                "reference": "c74a1aed5979ed1cfb1be35a55a305fd30e30b93"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/lanthaler/JsonLD/zipball/b5f82820c255cb64067b1c7adbb819cad4afa70a",
-                "reference": "b5f82820c255cb64067b1c7adbb819cad4afa70a",
+                "url": "https://api.github.com/repos/lanthaler/JsonLD/zipball/c74a1aed5979ed1cfb1be35a55a305fd30e30b93",
+                "reference": "c74a1aed5979ed1cfb1be35a55a305fd30e30b93",
                 "shasum": ""
             },
             "require": {
@@ -695,20 +655,20 @@
                 "JSON-LD",
                 "jsonld"
             ],
-            "time": "2018-11-18T20:26:18+00:00"
+            "time": "2020-06-16T17:45:06+00:00"
         },
         {
             "name": "pear/console_getopt",
-            "version": "v1.4.2",
+            "version": "v1.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Console_Getopt.git",
-                "reference": "6c77aeb625b32bd752e89ee17972d103588b90c0"
+                "reference": "a41f8d3e668987609178c7c4a9fe48fecac53fa0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Console_Getopt/zipball/6c77aeb625b32bd752e89ee17972d103588b90c0",
-                "reference": "6c77aeb625b32bd752e89ee17972d103588b90c0",
+                "url": "https://api.github.com/repos/pear/Console_Getopt/zipball/a41f8d3e668987609178c7c4a9fe48fecac53fa0",
+                "reference": "a41f8d3e668987609178c7c4a9fe48fecac53fa0",
                 "shasum": ""
             },
             "type": "library",
@@ -726,11 +686,6 @@
             ],
             "authors": [
                 {
-                    "name": "Greg Beaver",
-                    "email": "cellog@php.net",
-                    "role": "Helper"
-                },
-                {
                     "name": "Andrei Zmievski",
                     "email": "andrei@php.net",
                     "role": "Lead"
@@ -739,23 +694,28 @@
                     "name": "Stig Bakken",
                     "email": "stig@php.net",
                     "role": "Developer"
+                },
+                {
+                    "name": "Greg Beaver",
+                    "email": "cellog@php.net",
+                    "role": "Helper"
                 }
             ],
             "description": "More info available on: http://pear.php.net/package/Console_Getopt",
-            "time": "2019-02-06T16:52:33+00:00"
+            "time": "2019-11-20T18:27:48+00:00"
         },
         {
             "name": "pear/pear-core-minimal",
-            "version": "v1.10.9",
+            "version": "v1.10.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/pear-core-minimal.git",
-                "reference": "742be8dd68c746a01e4b0a422258e9c9cae1c37f"
+                "reference": "625a3c429d9b2c1546438679074cac1b089116a7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/pear-core-minimal/zipball/742be8dd68c746a01e4b0a422258e9c9cae1c37f",
-                "reference": "742be8dd68c746a01e4b0a422258e9c9cae1c37f",
+                "url": "https://api.github.com/repos/pear/pear-core-minimal/zipball/625a3c429d9b2c1546438679074cac1b089116a7",
+                "reference": "625a3c429d9b2c1546438679074cac1b089116a7",
                 "shasum": ""
             },
             "require": {
@@ -786,20 +746,20 @@
                 }
             ],
             "description": "Minimal set of PEAR core files to be used as composer dependency",
-            "time": "2019-03-13T18:15:44+00:00"
+            "time": "2019-11-19T19:00:24+00:00"
         },
         {
             "name": "pear/pear_exception",
-            "version": "v1.0.0",
+            "version": "v1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/PEAR_Exception.git",
-                "reference": "8c18719fdae000b690e3912be401c76e406dd13b"
+                "reference": "dbb42a5a0e45f3adcf99babfb2a1ba77b8ac36a7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/PEAR_Exception/zipball/8c18719fdae000b690e3912be401c76e406dd13b",
-                "reference": "8c18719fdae000b690e3912be401c76e406dd13b",
+                "url": "https://api.github.com/repos/pear/PEAR_Exception/zipball/dbb42a5a0e45f3adcf99babfb2a1ba77b8ac36a7",
+                "reference": "dbb42a5a0e45f3adcf99babfb2a1ba77b8ac36a7",
                 "shasum": ""
             },
             "require": {
@@ -815,9 +775,9 @@
                 }
             },
             "autoload": {
-                "psr-0": {
-                    "PEAR": ""
-                }
+                "classmap": [
+                    "PEAR/"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "include-path": [
@@ -841,7 +801,7 @@
             "keywords": [
                 "exception"
             ],
-            "time": "2015-02-10T20:07:52+00:00"
+            "time": "2019-12-10T10:24:42+00:00"
         },
         {
             "name": "pear/text_wiki",
@@ -849,12 +809,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Text_Wiki.git",
-                "reference": "b70d87e7f215381eb3393f3560d27b44172c7260"
+                "reference": "a045e634a60a1e48b71d626a26b28f23c1893dbc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Text_Wiki/zipball/b70d87e7f215381eb3393f3560d27b44172c7260",
-                "reference": "b70d87e7f215381eb3393f3560d27b44172c7260",
+                "url": "https://api.github.com/repos/pear/Text_Wiki/zipball/a045e634a60a1e48b71d626a26b28f23c1893dbc",
+                "reference": "a045e634a60a1e48b71d626a26b28f23c1893dbc",
                 "shasum": ""
             },
             "require": {
@@ -897,7 +857,7 @@
                 "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=Text_Wiki",
                 "source": "https://github.com/pear/Text_Wiki"
             },
-            "time": "2019-03-13T00:37:51+00:00"
+            "time": "2019-10-18T04:43:31+00:00"
         },
         {
             "name": "psr/http-message",
@@ -951,16 +911,16 @@
         },
         {
             "name": "psr/log",
-            "version": "1.1.0",
+            "version": "1.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/log.git",
-                "reference": "6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd"
+                "reference": "0f73288fd15629204f9d42b7055f72dacbe811fc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd",
-                "reference": "6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/0f73288fd15629204f9d42b7055f72dacbe811fc",
+                "reference": "0f73288fd15629204f9d42b7055f72dacbe811fc",
                 "shasum": ""
             },
             "require": {
@@ -969,7 +929,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.0.x-dev"
+                    "dev-master": "1.1.x-dev"
                 }
             },
             "autoload": {
@@ -994,28 +954,28 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2018-11-20T15:27:04+00:00"
+            "time": "2020-03-23T09:12:05+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
-            "version": "2.0.5",
+            "version": "3.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ralouphie/getallheaders.git",
-                "reference": "5601c8a83fbba7ef674a7369456d12f1e0d0eafa"
+                "reference": "120b605dfeb996808c31b6477290a714d356e822"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ralouphie/getallheaders/zipball/5601c8a83fbba7ef674a7369456d12f1e0d0eafa",
-                "reference": "5601c8a83fbba7ef674a7369456d12f1e0d0eafa",
+                "url": "https://api.github.com/repos/ralouphie/getallheaders/zipball/120b605dfeb996808c31b6477290a714d356e822",
+                "reference": "120b605dfeb996808c31b6477290a714d356e822",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3"
+                "php": ">=5.6"
             },
             "require-dev": {
-                "phpunit/phpunit": "~3.7.0",
-                "satooshi/php-coveralls": ">=1.0"
+                "php-coveralls/php-coveralls": "^2.1",
+                "phpunit/phpunit": "^5 || ^6.5"
             },
             "type": "library",
             "autoload": {
@@ -1034,27 +994,27 @@
                 }
             ],
             "description": "A polyfill for getallheaders.",
-            "time": "2016-02-11T07:05:27+00:00"
+            "time": "2019-03-08T08:55:37+00:00"
         },
         {
             "name": "react/promise",
-            "version": "v2.7.1",
+            "version": "v2.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/promise.git",
-                "reference": "31ffa96f8d2ed0341a57848cbb84d88b89dd664d"
+                "reference": "f3cff96a19736714524ca0dd1d4130de73dbbbc4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/promise/zipball/31ffa96f8d2ed0341a57848cbb84d88b89dd664d",
-                "reference": "31ffa96f8d2ed0341a57848cbb84d88b89dd664d",
+                "url": "https://api.github.com/repos/reactphp/promise/zipball/f3cff96a19736714524ca0dd1d4130de73dbbbc4",
+                "reference": "f3cff96a19736714524ca0dd1d4130de73dbbbc4",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.8"
+                "phpunit/phpunit": "^7.0 || ^6.5 || ^5.7 || ^4.8.36"
             },
             "type": "library",
             "autoload": {
@@ -1080,7 +1040,7 @@
                 "promise",
                 "promises"
             ],
-            "time": "2019-01-07T21:25:54+00:00"
+            "time": "2020-05-12T15:16:56+00:00"
         },
         {
             "name": "sabre/dav",
@@ -1331,16 +1291,16 @@
         },
         {
             "name": "sabre/vobject",
-            "version": "4.2.0",
+            "version": "4.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sabre-io/vobject.git",
-                "reference": "bd500019764e434ff65872d426f523e7882a0739"
+                "reference": "449616b2d45b95c8973975de23f34a3d14f63b4b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sabre-io/vobject/zipball/bd500019764e434ff65872d426f523e7882a0739",
-                "reference": "bd500019764e434ff65872d426f523e7882a0739",
+                "url": "https://api.github.com/repos/sabre-io/vobject/zipball/449616b2d45b95c8973975de23f34a3d14f63b4b",
+                "reference": "449616b2d45b95c8973975de23f34a3d14f63b4b",
                 "shasum": ""
             },
             "require": {
@@ -1423,7 +1383,7 @@
                 "xCal",
                 "xCard"
             ],
-            "time": "2019-02-19T13:05:37+00:00"
+            "time": "2020-01-14T10:18:45+00:00"
         },
         {
             "name": "sabre/xml",
@@ -1535,6 +1495,56 @@
             "time": "2017-06-26T09:46:05+00:00"
         },
         {
+            "name": "shardj/zf1-future",
+            "version": "1.18.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Shardj/zf1-future.git",
+                "reference": "fa96061266c00f5f2bef4ea42180a21bcf4aebc9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Shardj/zf1-future/zipball/fa96061266c00f5f2bef4ea42180a21bcf4aebc9",
+                "reference": "fa96061266c00f5f2bef4ea42180a21bcf4aebc9",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4"
+            },
+            "replace": {
+                "zendframework/zendframework1": ">=1.12.20"
+            },
+            "require-dev": {
+                "phpunit/dbunit": "1.3.*",
+                "phpunit/phpunit": "3.7.*"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.12.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Zend_": "library/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "include-path": [
+                "library/"
+            ],
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "description": "Zend Framework 1. The aim is to keep ZF1 working with the latest PHP versions",
+            "homepage": "http://framework.zend.com/",
+            "keywords": [
+                "ZF1",
+                "framework"
+            ],
+            "time": "2020-06-23T11:12:55+00:00"
+        },
+        {
             "name": "swiftmailer/swiftmailer",
             "version": "v5.4.12",
             "source": {
@@ -1590,16 +1600,16 @@
         },
         {
             "name": "symfony/process",
-            "version": "v3.4.28",
+            "version": "v3.4.42",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-                "reference": "afe411c2a6084f25cff55a01d0d4e1474c97ff13"
+                "reference": "8a895f0c92a7c4b10db95139bcff71bdf66d4d21"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/afe411c2a6084f25cff55a01d0d4e1474c97ff13",
-                "reference": "afe411c2a6084f25cff55a01d0d4e1474c97ff13",
+                "url": "https://api.github.com/repos/symfony/process/zipball/8a895f0c92a7c4b10db95139bcff71bdf66d4d21",
+                "reference": "8a895f0c92a7c4b10db95139bcff71bdf66d4d21",
                 "shasum": ""
             },
             "require": {
@@ -1635,7 +1645,21 @@
             ],
             "description": "Symfony Process Component",
             "homepage": "https://symfony.com",
-            "time": "2019-05-22T12:54:11+00:00"
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-05-23T17:05:51+00:00"
         }
     ],
     "packages-dev": [],
@@ -1653,5 +1677,6 @@
     "platform-dev": [],
     "platform-overrides": {
         "php": "7.1.3"
-    }
+    },
+    "plugin-api-version": "1.1.0"
 }

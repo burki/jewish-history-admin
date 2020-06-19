@@ -21,7 +21,7 @@
     "require" : {
         "swiftmailer/swiftmailer": "^5.4",
 
-        "magento/zendframework1": "^1.14",
+        "shardj/zf1-future": "^1.12",
         "cocur/slugify": "~1.0",
 
         "sabre/xml": "@stable",
