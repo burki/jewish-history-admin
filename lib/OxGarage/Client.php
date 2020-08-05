@@ -8,7 +8,9 @@ use \Buzz\Message\Form\FormUpload;
 
 class Client
 {
-    public function __construct($server = 'http://oxgarage.tei-c.org')
+    // default was https://oxgarage.tei-c.org/
+    // see https://listserv.brown.edu/cgi-bin/wa?A2=ind1904&L=TEI-L&P=91123
+    public function __construct($server = 'https://oxgarage-paderborn.tei-c.org/')
     {
         $this->server = $server;
     }
