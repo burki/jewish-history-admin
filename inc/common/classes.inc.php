@@ -1,8 +1,5 @@
 <?php
 
-require_once 'Zend/Date.php';
-require_once 'Zend/Registry.php';
-
 class Countries
 {
   static $countries;

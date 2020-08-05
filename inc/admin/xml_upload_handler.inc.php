@@ -105,10 +105,11 @@ extends ImageUploadHandler
       else {
         $params = [
           'width' => $img['width'], 'height' => $img['height'],
-          'enlarge' => $enlarge,
-          'enlarge_caption' => $view->formatText($caption), 'border' => 0,
+          'enlarge' => false,
+          // 'enlarge_caption' => $view->formatText($caption),
+          'border' => 0,
         ];
-        if (null !== $alt) {
+        if (!empty($alt)) {
           $params['alt'] = $params['title'] = $alt;
         }
 

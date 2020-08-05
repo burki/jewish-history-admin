@@ -4,9 +4,9 @@
  *
  * Update article and source
  *
- * (c) 2019 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2019-2020 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2019-02-19 dbu
+ * Version: 2020-08-05 dbu
  *
  * Changes:
  *
@@ -17,7 +17,6 @@ class PresentationFlow
 extends TableManagerFlow
 {
   const SYNC = 1010;
-
 
   function init ($page) {
     $res = parent::init($page);
@@ -104,6 +103,7 @@ extends DisplayBackend
 
   function buildViewFooter ($found = true) {
     require_once INC_PATH . 'common/PresentationService.php';
+
     $options = [];
     if (defined('URL_PRESENTATION_DE') || defined('URL_PRESENTATION_EN')) {
       $lang_settings = [];
@@ -236,10 +236,10 @@ extends DisplayBackend
                 $this->htmlSpecialchars(tr('refresh')));
         }
       }
-    }
 
-    if (0 === $allowRefresh) {
-      $ret .= 'Info: Presentation copy is already newer than uploaded version';
+      if (0 === $allowRefresh) {
+        $ret .= 'Info: Presentation copy is already newer than uploaded version';
+      }
     }
 
     $url = $presentationService->buildPresentationUrl($info['type'], $info['uid'], $info['lang']);

@@ -4,9 +4,9 @@
  *
  * Functions to initialize the page (browser, session, login-stuff, ...)
  *
- * (c) 2009-2019 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2020 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2019-01-28 dbu
+ * Version: 2020-06-19 dbu
  *
  * Changes:
  *
@@ -66,12 +66,10 @@ class Page
     }
 
     // init-locale
-    require_once 'Zend/Locale.php';
     self::$locale = new Zend_Locale(self::$lang);
     Zend_Locale::setDefault(self::$lang); // not sure yet if this is also needed
 
     // set it into the registry for date-formatting
-    require_once 'Zend/Registry.php';
     Zend_Registry::set('Zend_Locale', self::$locale);
 
     if ((defined('GETTEXT_AVAILABLE') && !GETTEXT_AVAILABLE) || !function_exists('gettext')) {

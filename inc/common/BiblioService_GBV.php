@@ -4,9 +4,9 @@
  *
  * Class for querying bibliographic information from the GBV
  *
- * (c) 2008-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2020 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-07-23 dbu
+ * Version: 2020-06-19 dbu
  *
  * Usage:
  *
@@ -14,8 +14,6 @@
  * $results = $ws_gbv->searchRetrieve('3909252133');
  *
  */
-
-require_once 'Zend/Http/Client.php';
 
 require_once INC_PATH . 'common/biblioservice.inc.php';
 
@@ -138,11 +136,12 @@ class BiblioService_GBV
         $response = $client->request('GET');
         if ($response->getStatus() !== 200) {
             return false;
+            /*
             // TODO: maybe switch to an exception
-            /* require_once 'Zend/Gdata/App/HttpException.php';
             $exception = new Zend_Gdata_App_HttpException('Expected response code 200, got ' . $response->getStatus());
             $exception->setResponse($response);
-            throw $exception; */
+            throw $exception;
+            */
         }
         $feedContent = $response->getBody();
 
