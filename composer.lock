@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3518533e164efd4923d16202690facec",
+    "content-hash": "acd448e278439cb1e8170331e1b3f166",
     "packages": [
         {
             "name": "albertofem/rsync-lib",
@@ -1496,16 +1496,16 @@
         },
         {
             "name": "shardj/zf1-future",
-            "version": "1.18.2",
+            "version": "1.18.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Shardj/zf1-future.git",
-                "reference": "fa96061266c00f5f2bef4ea42180a21bcf4aebc9"
+                "reference": "e14b5c07dbcd01315c4b2370efbc5cd17a783df4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Shardj/zf1-future/zipball/fa96061266c00f5f2bef4ea42180a21bcf4aebc9",
-                "reference": "fa96061266c00f5f2bef4ea42180a21bcf4aebc9",
+                "url": "https://api.github.com/repos/Shardj/zf1-future/zipball/e14b5c07dbcd01315c4b2370efbc5cd17a783df4",
+                "reference": "e14b5c07dbcd01315c4b2370efbc5cd17a783df4",
                 "shasum": ""
             },
             "require": {
@@ -1542,7 +1542,7 @@
                 "ZF1",
                 "framework"
             ],
-            "time": "2020-06-23T11:12:55+00:00"
+            "time": "2020-07-06T15:13:16+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -1600,16 +1600,16 @@
         },
         {
             "name": "symfony/process",
-            "version": "v3.4.42",
+            "version": "v3.4.43",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-                "reference": "8a895f0c92a7c4b10db95139bcff71bdf66d4d21"
+                "reference": "af8d812d75fcdf2eae30928b42396fe17df137e4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/8a895f0c92a7c4b10db95139bcff71bdf66d4d21",
-                "reference": "8a895f0c92a7c4b10db95139bcff71bdf66d4d21",
+                "url": "https://api.github.com/repos/symfony/process/zipball/af8d812d75fcdf2eae30928b42396fe17df137e4",
+                "reference": "af8d812d75fcdf2eae30928b42396fe17df137e4",
                 "shasum": ""
             },
             "require": {
@@ -1659,7 +1659,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-05-23T17:05:51+00:00"
+            "time": "2020-07-16T09:41:49+00:00"
         }
     ],
     "packages-dev": [],
@@ -1676,7 +1676,7 @@
     "platform": [],
     "platform-dev": [],
     "platform-overrides": {
-        "php": "7.1.3"
+        "php": "7.2.9"
     },
     "plugin-api-version": "1.1.0"
 }
