@@ -1,22 +1,21 @@
-Legacy back-end http://jewish-history-online.net/
-=================================================
+Legacy back-end <https://jewish-history-online.net>
+===================================================
 
 This is the code for the back-end of the site. It is an old code base
 that has been tweaked for various research projects
-(http://docupedia.de, eJournal Kritikon) but isn't recommended for any
+(<https://docupedia.de>, eJournal Kritikon) but isn't recommended for any
 new project due to its age.
 
 You may use it in parts or adjust it to your own needs.
 If you have any questions or find this code helpful, please contact us at
-    http://jewish-history-online.net/contact
-
+    <https://jewish-history-online.net/contact>
 
 License
 -------
     Code for the back-end of the Digital Source Edition
         Key Documents of German-Jewish History
 
-        (C) 2018 Daniel Burckhardt
+        (C) 2018-2020 Daniel Burckhardt
 
 
     This program is free software: you can redistribute it and/or modify
