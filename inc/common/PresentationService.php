@@ -31,7 +31,7 @@ class PresentationService
         ],
     ];
     static $PRESENTATION_ROOT_DIR = null;
-    static $TEI_PATH = 'app/Resources/AppBundle/data/tei';
+    static $TEI_PATH = 'sites/jgo-presentation/data/tei';
 
     var $dbconn;
 
