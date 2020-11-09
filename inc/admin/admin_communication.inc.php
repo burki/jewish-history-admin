@@ -582,8 +582,9 @@ extends DisplayTable
   function buildView () {
     $this->id = $this->workflow->primaryKey();
     $record = $this->buildRecord();
-    if ($found = $record->fetch($this->id, $this->datetime_style)) {
-      $this->record = &$record;
+
+    if ($record->fetch($this->id, $this->datetime_style)) {
+      $this->record = $record;
       $uploadHandler = $this->instantiateUploadHandler();
       if (isset($uploadHandler)) {
         $this->processUpload($uploadHandler);

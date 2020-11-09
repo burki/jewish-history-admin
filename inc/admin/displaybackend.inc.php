@@ -4,9 +4,9 @@
  *
  * Base-Class for backend
  *
- * (c) 2007-2019 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2020 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2019-01-31 dbu
+ * Version: 2020-08-05 dbu
  *
  * Changes:
  *
@@ -358,7 +358,7 @@ extends DisplayTable
       if (!empty($_POST['_changed'])) {
         $id = $this->workflow->primaryKey();
         $record = $this->buildRecord();
-        if ($found = $record->fetch($id)) {
+        if ($record->fetch($id)) {
           if (strcmp($_POST['_changed'], $record->get_value('changed')) < 0) {
             $this->page->msg = 'Dieser Datensatz wurde scheinbar zwischenzeitlich aktualisiert. Um einen Versionskonflikt zu vermeiden, &ouml;ffnen Sie ihn bitte erneut und tragen die &Auml;nderung nochmal ein.';
 

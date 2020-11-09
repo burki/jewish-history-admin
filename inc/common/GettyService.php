@@ -48,12 +48,10 @@ class GettyPlaceData
      */
     protected function setValuesFromResource (&$values, $resource, $propertyMap, $prefix = '') {
         foreach ($propertyMap as $src => $target) {
+            $key = $src;
             if (is_int($src)) {
                 // numerical indexed
                 $key = $target;
-            }
-            else {
-                $key = $src;
             }
 
             if (!empty($prefix) && !preg_match('/\:/', $key)) {

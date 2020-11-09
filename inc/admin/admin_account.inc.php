@@ -4,9 +4,9 @@
  *
  * handle accounts
  *
- * (c) 2006-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2020 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-07-05 dbu
+ * Version: 2020-08-05 dbu
  *
  *
  * Changes:

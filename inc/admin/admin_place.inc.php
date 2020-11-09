@@ -4,9 +4,9 @@
  *
  * Manage the Place-table
  *
- * (c) 2015-2019 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2015-2020 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2019-01-31 dbu
+ * Version: 2020-11-02 dbu
  *
  * TODO:
  *
@@ -215,6 +215,7 @@ extends DisplayBackend
       'former group of political entitites' => tr('Former group of political entitites'),
       'former primary political entity' => tr('Former primary political entity'),
       'deserted settlement' => tr('Deserted Settlement'),
+      'ocean' => tr('Ocean'),
       'sea' => tr('Sea'),
       'peninsula' => tr('Peninsula'),
       'island' => tr('Island'),

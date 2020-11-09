@@ -637,19 +637,24 @@ EOT;
         var form = document.forms['search'];
         if (null != form) {
           var textfields = ['search'];
+
           for (var i = 0; i < textfields.length; i++) {
-            if (null != form.elements[textfields[i]])
+            if (null != form.elements[textfields[i]]) {
               form.elements[textfields[i]].value = '';
+            }
           }
-          var selectfields = ${select_fields_json};
+
+          var selectfields = {$select_fields_json};
           for (var i = 0; i < selectfields.length; i++) {
-            if (null != form.elements[selectfields[i]])
+            if (null != form.elements[selectfields[i]]) {
               form.elements[selectfields[i]].selectedIndex = 0;
+            }
           }
+
           var radiofields = ['fulltext'];
           for (var i = 0; i < radiofields.length; i++) {
             if (null != form.elements[radiofields[i]]) {
-                form.elements[radiofields[i]][1].checked = false;
+              form.elements[radiofields[i]][1].checked = false;
             }
           }
         }

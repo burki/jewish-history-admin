@@ -4,9 +4,9 @@
  *
  * Manage the Person-table
  *
- * (c) 2009-2019 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2020 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2019-02-05 dbu
+ * Version: 2020-08-05 dbu
  *
  * TODO:
  *
@@ -27,6 +27,7 @@ extends TableManagerFlow
 
   function init ($page) {
     $ret = parent::init($page);
+
     if (TABLEMANAGER_DELETE == $ret) {
       $dbconn = new DB_Presentation();
       foreach (self::$TABLES_RELATED as $from_where) {
@@ -163,6 +164,75 @@ extends DisplayBackend
   function setRecordInternal (&$record) {
   }
 
+  function buildOptions ($category) {
+    $dbconn = new DB_Presentation();
+    $querystr = null;
+
+    switch ($category) {
+      case 'places-id':
+        $querystr = "SELECT id, name"
+                  . " FROM place"
+                  . " WHERE status <> -1"
+                  . " AND type IN ('inhabited place', 'suburb', 'neighborhood', 'borough', 'municipality', 'former administrative division', 'historic site')"
+                  . " ORDER BY name";
+        break;
+
+      case 'place':
+        $place_options = $this->buildOptions('places-id'); // default options
+
+        // additional ones from persons
+        $querystr = <<<EOT
+SELECT P.id AS place_id, P.name AS place
+FROM place P
+INNER JOIN
+(
+	SELECT birthplace_id AS place_id FROM person WHERE person.status <> -1
+	UNION DISTINCT
+	SELECT deathplace_id AS place_id FROM person WHERE person.status <> -1
+) AS place_ids
+ON place_ids.place_id=P.id AND P.status >= 0
+ORDER BY P.name
+EOT;
+
+        $place2id = [];
+        $dbconn->query($querystr);
+        while ($dbconn->next_record()) {
+          $row = & $dbconn->Record;
+
+          if (empty($row['place']) || array_key_exists($row['place_id'], $place_options)) {
+            continue;
+          }
+
+          if (array_key_exists($row['place'], $place2id)) {
+            if (!empty($row['place_id'])) {
+              $place2id[$row['place']] = $row['place_id'];
+            }
+          }
+          else {
+            $place2id[$row['place']] = !empty($row['place_id']) ?  $row['place_id'] : $row['place'];
+          }
+        }
+        // var_dump($place2id);
+        $places = $place_options + array_flip($place2id);
+        asort($places);
+
+        return $places;
+        break;
+    }
+
+    if (isset($querystr)) {
+      $options = [];
+      $dbconn->query($querystr);
+      while ($dbconn->next_record()) {
+        $row = & $dbconn->Record;
+        $options[$row['id']] = $row['name'];
+      }
+      return $options;
+    }
+
+    return [];
+  }
+
   function instantiateRecord ($table = '', $dbconn = '') {
     $record = new PersonRecord([ 'tables' => $this->table, 'dbconn' => new DB_Presentation() ]);
 
@@ -171,6 +241,11 @@ extends DisplayBackend
                        + $this->buildCountryOptions(true);
 
     $sex_options = ['' => '--', 'M' => tr('male'), 'F' => tr('female')];
+
+    $this->view_options['birthplace_id']
+      = $this->view_options['deathplace_id']
+      = $this->buildOptions('place');
+    $place_options = [ '' => tr('-- please select --') ] + $this->view_options['birthplace_id'];
 
     $record->add_fields([
       new Field([ 'name' => 'id', 'type' => 'hidden', 'datatype' => 'int', 'primarykey' => true ]),
@@ -189,10 +264,14 @@ extends DisplayBackend
       new Field([ 'name' => 'additionalName', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 40, 'rows' => 2, 'null' => true ]),
 
       new Field([ 'name' => 'birthdate', 'id' => 'birthdate', 'type' => 'date', 'incomplete' => true, 'datatype' => 'date', 'null' => true ]),
-      // new Field([ 'name' => 'birthplace', 'id' => 'birthplace', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => true ]),
+      new Field([ 'name' => 'birthplace_id', 'id' => 'birthplace_id', 'type' => 'select',
+                  'options' => array_keys($place_options), 'labels' => array_values($place_options),
+                  'null' => true ]),
 
       new Field([ 'name' => 'deathdate', 'id' => 'deathdate', 'type' => 'date', 'incomplete' => true, 'datatype' => 'date', 'null' => true]),
-      // new Field([ 'name' => 'deathplace', 'id' => 'deathplace', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => true ]),
+      new Field([ 'name' => 'deathplace_id', 'id' => 'deathplace_id', 'type' => 'select',
+                  'options' => array_keys($place_options), 'labels' => array_values($place_options),
+                  'null' => true ]),
 
       // new Field([ 'name' => 'birthdeath_note', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => true ]),
       // new Field([ 'name' => 'actionplace', 'id' => 'actionplace', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 80, 'null' => true ]),
@@ -243,7 +322,7 @@ extends DisplayBackend
     $rows = [
       'id' => false, 'status' => false,
       'sex_title' => [
-        'label' => 'Sex / (Academic) Title',
+        'label' => 'Gender / (Academic) Title',
         'fields' => [ 'gender', 'title' ],
       ],
       'familyName' => [ 'label' => 'Last Name' ],
@@ -259,13 +338,17 @@ extends DisplayBackend
       (isset($this->form) ? $gnd_search . $this->form->show_submit(tr('Store')) : '')
         . '<hr noshade="noshade" />',
 
-      'birth' => [
-        'label' => 'Birth Date', // 'Birth Date / Place',
-        'fields' => ['birthdate', 'birthplace'],
+      'birthdate' => [
+        'label' => 'Birth Date',
       ],
-      'death' => [
-        'label' => 'Death Date', // 'Death Date / Place',
-        'fields' => [ 'deathdate', 'deathplace' ],
+      'birthplace_id' => [
+        'label' => 'Birth Place',
+      ],
+      'deathdate' => [
+        'label' => 'Death Date',
+      ],
+      'deathplace_id' => [
+        'label' => 'Death Place',
       ],
       /*
       'birthdeath_note' => [
@@ -451,7 +534,7 @@ EOT;
           service.replaceTagsOnLoad();
 
 EOT;
-          $rows['gnd']['value'] .= $ret = <<<EOT
+          $rows['gnd']['value'] .= <<<EOT
   <div title="$gnd" class="pndaks seealso-ul"></div>
 EOT;
 
@@ -478,116 +561,6 @@ EOT;
 
   function buildViewAdditional (&$record, $uploadHandler) {
     return '';
-
-    require_once INC_PATH . '/common/displayhelper.inc.php';
-
-    $ret = '';
-
-    $dbconn = Database::getAdapter();
-
-    $works = '';
-    $querystr = "SELECT Item.id, Item.title, creatordate, earliestdate, latestdate, displaydate, Collection.name AS collection"
-              . " FROM Item"
-              . " LEFT OUTER JOIN Collection ON Collection.id=Item.collection"
-              . " LEFT OUTER JOIN ItemPerson ON ItemPerson.id_item=Item.id"
-              . sprintf(" WHERE ItemPerson.id_person=%d AND Item.status >= 0", $record->get_value('id'))
-              . " ORDER BY earliestdate, displaydate, Item.title, Item.id";
-
-    $stmt = $dbconn->query($querystr);
-    if (false !== $stmt) {
-      $params = ['pn' => 'item'];
-      while ($row = $stmt->fetch()) {
-        if (!empty($works)) {
-          $works .= '<br />';
-        }
-        else {
-          $works = '<h3>' . $this->htmlSpecialchars(tr('Works')) . '</h3>';
-        }
-        $params['view'] = $row['id'];
-        $works .= sprintf('<a href="%s">%s</a> %s (%s)',
-                          htmlspecialchars($this->page->buildLink($params)),
-                          $this->formatText($row['title']),
-                          ItemDisplayHelper::buildDisplayDate($this, $row),
-                          $this->formatText($row['collection']));
-      }
-    }
-
-    if (!empty($works)) {
-      $ret .= '<br style="clear: both" />' . $works;
-    }
-
-    $exhibitions = '';
-    $querystr = "SELECT Exhibition.id, Exhibition.title, startdate, enddate, Location.name AS location"
-              . " FROM Exhibition"
-              . " LEFT OUTER JOIN Location ON Location.id=Exhibition.id_location"
-              . " LEFT OUTER JOIN ExhibitionPerson ON ExhibitionPerson.id_exhibition=Exhibition.id"
-              . sprintf(" WHERE ExhibitionPerson.id_person=%d AND Exhibition.status >= 0",
-                        $record->get_value('id'))
-              . " ORDER BY startdate, enddate, Exhibition.title, Exhibition.id";
-
-    $stmt = $dbconn->query($querystr);
-    if (false !== $stmt) {
-      $params = ['pn' => 'exhibition'];
-      while ($row = $stmt->fetch()) {
-        if (!empty($exhibitions)) {
-          $exhibitions .= '<br />';
-        }
-        else {
-          $exhibitions = '<h3>' . $this->htmlSpecialchars(tr('Exhibitions')) . '</h3>';
-        }
-        $params['view'] = $row['id'];
-        $exhibitions .= sprintf('<a href="%s">%s</a> %s (%s)',
-                                htmlspecialchars($this->page->buildLink($params)),
-                                $this->formatText($row['title']),
-                                $this->formatDateRange($row['startdate'],
-                                                       $row['enddate']),
-                                $this->formatText($row['location']));
-      }
-    }
-
-    if (!empty($exhibitions)) {
-      $ret .= '<br style="clear: both" />' . $exhibitions;
-    }
-
-    $publications = '';
-    $querystr = "SELECT Publication.id"
-              . " FROM Publication"
-              . " LEFT OUTER JOIN PublicationPerson ON PublicationPerson.id_publication=Publication.id"
-              . sprintf(" WHERE PublicationPerson.id_person=%d AND Publication.status >= 0",
-                        $record->get_value('id'))
-              . " ORDER BY IFNULL(author,editor), YEAR(publication_date)";
-
-    $stmt = $dbconn->query($querystr);
-    if (false !== $stmt) {
-      $params = ['pn' => 'publication'];
-      require_once INC_PATH . '/common/biblioservice.inc.php';
-      $biblio_client = BiblioService::getInstance();
-
-      while ($row = $stmt->fetch()) {
-        if (!empty($publications)) {
-          $publications .= '<br />';
-        }
-        else {
-          $publications = '<h3>' . $this->htmlSpecialchars(tr('Publications')) . '</h3>';
-        }
-        $params['view'] = $row['id'];
-        $citation = $biblio_client->buildCitation($row['id'],
-                                                  ['person_delimiter' => '/',
-                                                        'person_suffix' => ',',
-                                                        'title_suffix' => ',',
-                                                        'publisher_suppress' => true,
-                                                        ]);
-        $publications .= sprintf('<a href="%s">%s</a>',
-                                 htmlspecialchars($this->page->buildLink($params)),
-                                 $citation);
-      }
-    }
-
-    if (!empty($publications)) {
-      $ret .= '<br style="clear: both" />' . $publications;
-    }
-
-    return $ret . parent::buildViewAdditional($record, $uploadHandler);
   }
 
   function buildSearchBar () {

@@ -4,9 +4,9 @@
  *
  * Class for managing publications (sources)
  *
- * (c) 2007-2019 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2020 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2019-02-14 dbu
+ * Version: 2020-08-05 dbu
  *
  * Changes:
  *
@@ -752,7 +752,7 @@ EOT;
 
     $this->id = $this->workflow->primaryKey();
     $record = $this->buildRecord();
-    if ($found = $record->fetch($this->id, $this->datetime_style)) {
+    if ($record->fetch($this->id, $this->datetime_style)) {
       $this->record = &$record;
       $uploadHandler = $this->instantiateUploadHandler('XmlUploadHandler');
       if (isset($uploadHandler)) {
