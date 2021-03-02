@@ -11,10 +11,6 @@
         {
             "url": "https://github.com/pear/Text_Wiki.git",
             "type": "vcs"
-        },
-        {
-            "url": "https://github.com/burki/zotero-api",
-            "type": "git"
         }
     ],
 
@@ -36,7 +32,7 @@
         "pear/pear_exception": "*",
         "pear/text_wiki": "*@dev",
 
-        "burki/zotero-api": "dev-master",
+        "hedii/zotero-api": "^1.1",
         "sabre/dav": "~3.0",
 
         "symfony/process": "3.4.*",
