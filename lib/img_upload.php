@@ -407,7 +407,7 @@
           }
         }
 
-        if ($sizes['scaled'] && !empty($scale)) {
+        if (!empty($sizes) && $sizes['scaled'] && !empty($scale)) {
           if (($scale == 'down' && ($sizes['width'] < $sizes['width_physical'] || $sizes['height'] < $sizes['height_physical']))
              || ($scale == 'up' && ($sizes['width'] > $sizes['width_physical'] || $sizes['height'] > $sizes['height_physical']))
              || $scale == 'both')
@@ -462,13 +462,12 @@
           'msg' => 'File uploaded',
           'mime' => $type,
           'original_name' => $orig_name,
-          'width' => $sizes['width'],
-          'height' => $sizes['height'],
+          'width' => !empty($sizes) ? $sizes['width'] : null,
+          'height' => !empty($sizes) ? $sizes['height'] : null,
         ];
       }
-      else {
-        return ['status' => -4, 'msg' => "Couldn't copy file to new location"];
-      }
+
+      return ['status' => -4, 'msg' => "Couldn't copy file to new location"];
     }
 
     // isn't used yet in the library

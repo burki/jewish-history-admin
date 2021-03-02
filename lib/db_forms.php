@@ -5,9 +5,9 @@
   * Requires: phplib-database classes
   * Author  : Daniel Burckhardt, daniel.burckhardt@sur-gmbh.ch
   *
-  * (c) 2000-2016
+  * (c) 2000-2020
   *
-  * Version : 2016-02-22 dbu
+  * Version : 2020-12-07 dbu
   *
   * Changes :
   *
@@ -2018,7 +2018,6 @@
         $datetime_style = NULL;
       }
 
-      $stripslashes = get_magic_quotes_gpc();
       if (!isset($this->record)) {
         return;
       }
@@ -2028,7 +2027,7 @@
       if (is_array($values)) {
         foreach ($values as $name => $val) {
           if (is_string($val)) {
-            $val = rtrim($stripslashes ? stripslashes($val) : $val);
+            $val = rtrim($val);
           }
           if ($prepend != '') {
             if (preg_match("/^$prepend/", $name)) {
