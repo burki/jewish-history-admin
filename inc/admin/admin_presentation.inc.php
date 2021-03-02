@@ -107,14 +107,18 @@ extends DisplayBackend
     $options = [];
     if (defined('URL_PRESENTATION_DE') || defined('URL_PRESENTATION_EN')) {
       $lang_settings = [];
+
       if (defined('URL_PRESENTATION_DE')) {
         $lang_settings['deu'] = [ 'url' => URL_PRESENTATION_DE ];
       }
+
       if (defined('URL_PRESENTATION_EN')) {
         $lang_settings['eng'] = [ 'url' => URL_PRESENTATION_EN ];
       }
+
       $options['lang_settings'] = $lang_settings;
     }
+
     $presentationService = new PresentationService(new DB_Presentation(), $options);
 
     $item_id = $this->record->get_value('item_id');

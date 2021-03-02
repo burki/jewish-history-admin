@@ -4,9 +4,9 @@
  *
  * login-form
  *
- * (c) 2009-2018 daniel burckhardt daniel@thing.net
+ * (c) 2009-2020 daniel burckhardt daniel@thing.net
  *
- * Version: 2018-05-22 dbu
+ * Version: 2020-12-07 dbu
  * Changes:
  *
  */
@@ -15,8 +15,6 @@ class DisplayLogin
 extends PageDisplay
 {
   function buildLogin () {
-    global $MAIL_SETTINGS;
-
     $params = [];
     if (isset($this->page->parameters)) {
       $params = $this->page->parameters;
@@ -57,12 +55,12 @@ extends PageDisplay
           . '.</p>'
           ;
 
-    if (isset($MAIL_SETTINGS['technical_assistance'])) {
+    if (isset($GLOBALS['MAIL_SETTINGS']['technical_assistance'])) {
       $ret .= '<p>'
             . $this->htmlSpecialchars(tr('For further assistance please contact'))
             . sprintf(' <a href="mailto:%s">%s</a>.</p>',
-                      $MAIL_SETTINGS['technical_assistance'],
-                      $MAIL_SETTINGS['technical_assistance'])
+                      $GLOBALS['MAIL_SETTINGS']['technical_assistance'],
+                      $GLOBALS['MAIL_SETTINGS']['technical_assistance'])
             . '</p>';
     }
 

@@ -4,9 +4,9 @@
  *
  * Manage the Place-table
  *
- * (c) 2015-2020 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2015-2021 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2020-11-02 dbu
+ * Version: 2021-01-12 dbu
  *
  * TODO:
  *
@@ -219,6 +219,7 @@ extends DisplayBackend
       'sea' => tr('Sea'),
       'peninsula' => tr('Peninsula'),
       'island' => tr('Island'),
+      'river' => tr('River'),
       'association' => tr('Association'),
       'miscellaneous' => tr('Miscellaneous'),
     ];
