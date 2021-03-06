@@ -298,6 +298,7 @@ $GETTEXT_MESSAGES = array (
 'restricted (display only)' => 'eingeschränkt (nur Anzeige)',
 'restricted (republish only with consent)' => 'eingeschränkt (Weiterverbreitung nur mit Zustimmung)',
 'regular (download for private and educational use)' => 'regulär (Download für Privat- und Unterrichtszwecke)',
+'No Copyright - Non-Commercial Use Only' => 'Kein Urheberrechtsschutz - nur nicht kommerzielle Nutzung erlaubt',
 'Public Domain' => 'Gemeinfrei',
 'License' => 'Lizenz',
 'finalized' => 'abgeschlossen',

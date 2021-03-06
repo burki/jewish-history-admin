@@ -5,9 +5,9 @@
  * Sitewide settings
  * (put machine dependent stuff like hardwired paths, logins and passwords in inc/local.inc.php)
  *
- * (c) 2009-2019 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2021 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2019-02-05 dbu
+ * Version: 2021-03-06 dbu
  *
  * Changes:
  *
@@ -187,6 +187,7 @@ $LICENSE_OPTIONS = [
     'CC BY-NC-ND' => 'Creative Commons BY-NC-ND',
     'CC BY-NC-SA' => 'Creative Commons BY-NC-SA',
     'CC BY-SA' => 'Creative Commons BY-SA',
+    'NoC-NC' => 'No Copyright - Non-Commercial Use Only',
     'PD' => 'Public Domain',
 ];
 
