@@ -4,9 +4,9 @@
  *
  * Functions to initialize the page (browser, session, login-stuff, ...)
  *
- * (c) 2009-2020 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2022 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2020-06-19 dbu
+ * Version: 2022-09-04 dbu
  *
  * Changes:
  *
@@ -742,8 +742,8 @@ EOT;
 
     echo <<<EOT
   <html>
-  <head><meta http-equiv="refresh" content="0; URL=${url}"></head>
-  <body>If your browser doesn't support automatic redirection, please click <a href="${url}">here</a>
+  <head><meta http-equiv="refresh" content="0; URL={$url}"></head>
+  <body>If your browser doesn't support automatic redirection, please click <a href="{$url}">here</a>
   </html>
 EOT;
     exit;

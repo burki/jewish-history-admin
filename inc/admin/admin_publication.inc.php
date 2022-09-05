@@ -4,9 +4,9 @@
  *
  * Class for managing publications (sources)
  *
- * (c) 2007-2020 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2022 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2020-08-05 dbu
+ * Version: 2022-09-00 dbu
  *
  * Changes:
  *
@@ -877,7 +877,7 @@ EOT;
               form.elements[textfields[i]].value = '';
             }
           }
-          var selectfields = ${select_fields_json};
+          var selectfields = {$select_fields_json};
           for (var i = 0; i < selectfields.length; i++) {
             if (null != form.elements[selectfields[i]]) {
               form.elements[selectfields[i]].selectedIndex = 0;
