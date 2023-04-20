@@ -4,9 +4,9 @@
  *
  * Functions to initialize the page (browser, session, login-stuff, ...)
  *
- * (c) 2009-2022 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2023 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2022-09-04 dbu
+ * Version: 2023-04-20 dbu
  *
  * Changes:
  *
@@ -313,8 +313,6 @@ class Page
 
     $this->expire();
 
-    $this->identify();
-
     $this->determineLang();
 
     if (defined('LOCALE_DEFAULT')) {
@@ -322,6 +320,8 @@ class Page
       // $this->lang and $this->user
       setlocale(LC_CTYPE, LOCALE_DEFAULT);
     }
+
+    $this->identify();
 
     $this->determinePage($pn);
 

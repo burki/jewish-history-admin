@@ -4,9 +4,9 @@
  *
  * login-form
  *
- * (c) 2009-2020 daniel burckhardt daniel@thing.net
+ * (c) 2009-2023 daniel burckhardt daniel@thing.net
  *
- * Version: 2020-12-07 dbu
+ * Version: 2023-04-20 dbu
  * Changes:
  *
  */
@@ -20,8 +20,8 @@ extends PageDisplay
       $params = $this->page->parameters;
       unset($params['do_signoff']);
     }
-    $params['pn'] = $this->page->name; // to get back to the page from where we cam
 
+    $params['pn'] = $this->page->name; // to get back to the page from where we cam
 
     $ret = '<h3>' . $this->htmlSpecialchars(tr('Sign-in')) . '</h3>';
 
@@ -44,7 +44,7 @@ extends PageDisplay
     $ret .= $this->buildContentlineMultiple([
       $login_line,
       [ tr('Password') . ':', '<input type="password" name="_pwd" value="" size="35" />' ],
-      [ '&nbsp;', '<input class="submit" type="submit" value="' . $this->htmlSpecialchars('Sign-in') . '" />' ],
+      [ '&nbsp;', '<input class="submit" type="submit" value="' . $this->htmlSpecialchars(tr('Sign-in')) . '" />' ],
     ]);
 
     $ret .= '<p>'
