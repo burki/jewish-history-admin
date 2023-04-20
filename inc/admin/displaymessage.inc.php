@@ -4,9 +4,9 @@
  *
  * Base-Class for managing messages
  *
- * (c) 2007-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2023 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-07-23 dbu
+ * Version: 2023-04-20 dbu
  *
  * Changes:
  *
@@ -66,7 +66,12 @@ extends TableManagerQueryConditionBuilder
     $fields = func_get_args();
 
     if (isset($this->term) && '' !== $this->term) {
-      $ret = $fields[0] . " REGEXP '[[:<:]]" . intval($this->term) . "[[:>:]]'";
+      $ret = $fields[0] . " REGEXP '"
+        . addslashes(MYSQL_REGEX_WORD_BEGIN)
+        . intval($this->term)
+        . addslashes(MYSQL_REGEX_WORD_END)
+        . "'";
+
       return $ret;
     }
 
@@ -381,7 +386,7 @@ extends DisplayBackend
     $user_id = $record->get_value('user_id');
 
     if (!empty($user)) {
-      $user = @FormField::htmlspecialchars($user);
+      $user = $this->htmlSpecialchars($user);
     }
     else {
       $user = '';

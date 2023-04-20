@@ -51,6 +51,8 @@ define('OUTPUT_COMPRESS', false); // set to true to use output compression
 
 define('MAIL_SEND', true); // only do actual mailings if this is set to true
 
+define('ICU_REGEX', false); // set to true for MySQL 8.0
+
 $AUTH_METHODS = [
   'AUTH_LOCAL' => true,                    // authenticate through form against local db
   // 'AUTH_FORCE' => 'USER'                // force fixed user

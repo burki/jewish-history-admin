@@ -4,9 +4,9 @@
  *
  * Webservices for managing users
  *
- * (c) 2007-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2023 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-07-23 dbu
+ * Version: 2023-04-20 dbu
  *
  * Changes:
  *
@@ -32,8 +32,8 @@ extends WsHandler
 
     $search = $this->getParameter('fulltext');
 
-    if (isset($search) && strlen($search) >= 2) {
-      $dbconn = new DB;
+    if (isset($search) && mb_strlen($search, 'UTF-8') >= 2) {
+      $dbconn = new DB();
 
       // build the query
       $words = split_quoted($search);
@@ -44,14 +44,15 @@ extends WsHandler
 
         for ($j = 0; $j < count($fields); $j++) {
           $parts[$j] = $fields[$j]
-                     . sprintf(" REGEXP '[[:<:]]%s'",
-                               $dbconn->escape_string($words[$i]));
+                     . sprintf(" REGEXP '%s'",
+                               $dbconn->escape_string(MYSQL_REGEX_WORD_BEGIN . $words[$i]));
         }
 
         $words[$i] = '('.implode(' OR ', $parts).')';
       }
+
       $querystr = sprintf("SELECT id, lastname, firstname, email FROM User WHERE status <> %d AND %s",
-                          STATUS_DELETED, implode(' AND ', $words))
+                          STATUS_USER_DELETED, implode(' AND ', $words))
                 . " ORDER BY lastname, firstname";
       $dbconn->query($querystr);
 

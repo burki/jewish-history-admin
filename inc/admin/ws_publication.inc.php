@@ -4,9 +4,9 @@
  *
  * Webservices for managing publications (books)
  *
- * (c) 2007-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2023 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-07-23 dbu
+ * Version: 2023-04-20 dbu
  *
  * Changes:
  *
@@ -96,7 +96,8 @@ extends WsHandler
 
         for ($j = 0; $j < count($fields); $j++) {
           $parts[$j] = $fields[$j]
-                     . sprintf(" REGEXP '[[:<:]]%s'", $dbconn->escape_string($words[$i]));
+                     . sprintf(" REGEXP '%s'",
+                               $dbconn->escape_string(MYSQL_REGEX_WORD_BEGIN . $words[$i]));
         }
 
         $words[$i] = '(' . implode(' OR ', $parts) . ')';

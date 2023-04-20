@@ -48,6 +48,16 @@ $RIGHTS_ADMIN = 0x04;   // these can handle restricted system settings
 define('STATUS_DELETED', -1); // reserved value in the database
 define('STATUS_USER_DELETED', -100); // -1 stands for rejected
 
+define('MYSQL_REGEX_WORD_BEGIN',
+       defined('ICU_REGEX') && ICU_REGEX
+       ? '\\b'
+       : '[[:<:]]');
+
+define('MYSQL_REGEX_WORD_END',
+        defined('ICU_REGEX') && ICU_REGEX
+        ? '\\b'
+        : '[[:>:]]');
+
 // settings for mails that are sent through php
 // should wrap this into a mail/configuration class
 define('MAIL_LINELENGTH', 72);
@@ -68,7 +78,6 @@ $GLOBALS['THESAURI'] = [
     'section' => 'Section',
     'sourcetype' => 'Source Type',
 ];
-
 
 $MAIL_SETTINGS = [
   'from'                 => 'burckhardtd@geschichte.hu-berlin.de',
