@@ -73,6 +73,7 @@ CREATE TABLE Message (
   body          LONGTEXT NULL,                  # the entry in plain txt, XML, binary,
   published     DATETIME NULL,                  #
   slug          VARCHAR(255) NULL,              # slug
+  slug_de       VARCHAR(255) NULL,
   url           VARCHAR(255) NULL,              # Permanent-Link
   urn           VARCHAR(255) NULL,              # URL
   tags          VARCHAR(255) NULL,              #
@@ -82,6 +83,7 @@ CREATE TABLE Message (
   # review fields
   referee       INT NULL,                       #
   translator    INT NULL,                       #
+  status_translation  INT NULL,                 #
 
   modified     DATETIME NULL,                   #
   publisher_request DATETIME NULL,
