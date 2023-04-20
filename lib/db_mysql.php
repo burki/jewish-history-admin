@@ -11,7 +11,7 @@
 
 if (!function_exists('\mysql_connect')) {
   // include php7-mysql-shim
-  require_once __DIR__ . '/mysql.php';
+  require_once 'mysql.php';
 };
 
 class DB_Sql

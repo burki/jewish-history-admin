@@ -2,22 +2,21 @@
     "config": {
        "vendor-dir": "lib/",
         "platform": {
-            "php": "7.2.9"
-        },
-        "secure-http" : false
+            "php": "7.3.0"
+        }
     },
 
     "repositories": [
         {
-            "url": "https://github.com/pear/Text_Wiki.git",
-            "type": "vcs"
+            "type": "vcs",
+            "url": "https://github.com/burki/Text_Wiki.git"
         }
     ],
 
     "require" : {
         "swiftmailer/swiftmailer": "^5.4",
 
-        "shardj/zf1-future": "^1.12",
+        "shardj/zf1-future": "^1.22",
         "cocur/slugify": "~1.0",
 
         "sabre/xml": "@stable",
@@ -37,7 +36,8 @@
 
         "symfony/process": "3.4.*",
         "loilo/fuse": "@stable",
-        "albertofem/rsync-lib": "1.0.0"
+        "albertofem/rsync-lib": "1.0.0",
+        "dshafik/php7-mysql-shim": "dev-master"
     },
 
     "autoload": {

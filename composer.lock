@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4f5f6bd74be7cc908ca0822739bd458c",
+    "content-hash": "859a386248d86dab69ed2f75464722b9",
     "packages": [
         {
             "name": "albertofem/rsync-lib",
@@ -124,6 +124,54 @@
                 "source": "https://github.com/cocur/slugify/tree/1.4"
             },
             "time": "2016-02-11T09:53:46+00:00"
+        },
+        {
+            "name": "dshafik/php7-mysql-shim",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dshafik/php7-mysql-shim.git",
+                "reference": "98f835008ed931df507e86424a770e32d6b18ecb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dshafik/php7-mysql-shim/zipball/98f835008ed931df507e86424a770e32d6b18ecb",
+                "reference": "98f835008ed931df507e86424a770e32d6b18ecb",
+                "shasum": ""
+            },
+            "require": {
+                "ext-mysqli": "*",
+                "php": ">=5.3.6"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.16",
+                "squizlabs/php_codesniffer": "^3.5",
+                "yoast/phpunit-polyfills": "^1.0.1"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "lib/mysql.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Davey Shafik",
+                    "email": "me@daveyshafik.com",
+                    "homepage": "https://daveyshafik.com"
+                }
+            ],
+            "description": "A PHP 7 shim for ext/mysql",
+            "support": {
+                "issues": "https://github.com/dshafik/php7-mysql-shim/issues",
+                "source": "https://github.com/dshafik/php7-mysql-shim/tree/master"
+            },
+            "time": "2021-08-26T04:33:02+00:00"
         },
         {
             "name": "easyrdf/easyrdf",
@@ -606,23 +654,23 @@
         },
         {
             "name": "loilo/fuse",
-            "version": "3.6.1",
+            "version": "4.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/loilo/Fuse.git",
-                "reference": "ead0f50addaee3d9bbed3aae1f0b8ed22b0f573f"
+                "reference": "ba87037107e1a21d13a23679714ec95f97be5ae3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/loilo/Fuse/zipball/ead0f50addaee3d9bbed3aae1f0b8ed22b0f573f",
-                "reference": "ead0f50addaee3d9bbed3aae1f0b8ed22b0f573f",
+                "url": "https://api.github.com/repos/loilo/Fuse/zipball/ba87037107e1a21d13a23679714ec95f97be5ae3",
+                "reference": "ba87037107e1a21d13a23679714ec95f97be5ae3",
                 "shasum": ""
             },
             "require": {
-                "php": "^5.6 || ^7.0"
+                "php": "^7.3 || ^8.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^5.0 || ^6.0 || ^7.0"
+                "phpunit/phpunit": "^8.0 || ^9.0"
             },
             "type": "library",
             "autoload": {
@@ -653,9 +701,9 @@
             "description": "Fuzzy search for PHP based on Bitap algorithm",
             "support": {
                 "issues": "https://github.com/loilo/Fuse/issues",
-                "source": "https://github.com/loilo/Fuse/tree/v3.6.1"
+                "source": "https://github.com/loilo/Fuse/tree/v4.0.2"
             },
-            "time": "2020-03-10T10:18:12+00:00"
+            "time": "2021-06-21T15:34:15+00:00"
         },
         {
             "name": "ml/iri",
@@ -924,13 +972,13 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/pear/Text_Wiki.git",
-                "reference": "b618033b4e0297b894d0cfa53043dea1939e1974"
+                "url": "https://github.com/burki/Text_Wiki.git",
+                "reference": "e509183a2783bbea2c2fe98efcde965d4427329c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Text_Wiki/zipball/b618033b4e0297b894d0cfa53043dea1939e1974",
-                "reference": "b618033b4e0297b894d0cfa53043dea1939e1974",
+                "url": "https://api.github.com/repos/burki/Text_Wiki/zipball/e509183a2783bbea2c2fe98efcde965d4427329c",
+                "reference": "e509183a2783bbea2c2fe98efcde965d4427329c",
                 "shasum": ""
             },
             "require": {
@@ -974,7 +1022,7 @@
                 "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=Text_Wiki",
                 "source": "https://github.com/pear/Text_Wiki"
             },
-            "time": "2022-03-27T11:24:09+00:00"
+            "time": "2023-03-27T12:20:53+00:00"
         },
         {
             "name": "psr/http-message",
@@ -2205,14 +2253,15 @@
     "stability-flags": {
         "sabre/xml": 0,
         "pear/text_wiki": 20,
-        "loilo/fuse": 0
+        "loilo/fuse": 0,
+        "dshafik/php7-mysql-shim": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
     "platform-overrides": {
-        "php": "7.2.9"
+        "php": "7.3.0"
     },
     "plugin-api-version": "2.3.0"
 }
