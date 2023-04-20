@@ -15,7 +15,7 @@ License
     Code for the back-end of the Digital Source Edition
         Key Documents of German-Jewish History
 
-        (C) 2018-2020 Daniel Burckhardt
+        (C) 2018-2023 Daniel Burckhardt
 
 
     This program is free software: you can redistribute it and/or modify
@@ -35,3 +35,29 @@ Third Party Code
 ----------------
 This projects builds on numerous third-party projects under a variety of
 Open Source Licenses. Please check `composer.json` for these dependencies.
+
+Installation
+------------
+
+    git clone git@github.com:burki/jewish-history-admin.git
+
+    cd jewish-history-admin
+    composer install
+
+    cp inc/local.inc.php-dist inc/local.inc.php
+    # adjust settings as needed
+
+### Create and populate the database
+
+Create a proper database and create the table-structure
+
+    mysqladmin -u root create jgo_admin
+    # create user/password
+    # then insert table-structure
+    mysql -u jgo_admin -p jgo_admin < sql/tables.sql
+
+    Insert an initial user with administrator privs into the empty table
+
+Insert an initial user with administrator privs into the empty table
+
+    INSERT INTO User (email, privs) VALUES ('my@example.com', 0x02 | 0x04);
