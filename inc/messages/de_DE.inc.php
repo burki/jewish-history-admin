@@ -44,6 +44,7 @@ $GETTEXT_MESSAGES = [
 	'Willing to review' => 'Rezensionsinteresse',
 	'-- please select --' => '-- bitte auswählen --',
 	'-- none --' => '-- keiner --',
+	'No results match' => 'Keine passenden Ergebnisse zu',
 	'yes' => 'ja',
 	'no' => 'nein',
 	'Review areas' => 'Rezensionsbereiche',

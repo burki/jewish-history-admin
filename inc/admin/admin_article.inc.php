@@ -4,9 +4,9 @@
  *
  * Manage the articles
  *
- * (c) 2009-2019 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2023 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2019-02-14 dbu
+ * Version: 2023-04-20 dbu
  *
  * Changes:
  *
@@ -403,10 +403,22 @@ extends DisplayMessage
 
       $this->stylesheet[] = 'css/chosen.css';
       $this->script_url[] = 'script/chosen.jquery.min.js';
+
+      $messages = [
+        'no_results_text' => json_encode(tr('No results match')),
+        'placeholder_text_single' => json_encode(tr('-- please select --')),
+        'placeholder_text_multiple' => json_encode(tr('-- please select --')),
+      ];
+
       $this->script_code .= <<<EOT
     // for chosen
     jQuery(document).ready(function() {
-      jQuery('.chosen-select').chosen({ width: "95%" });
+      jQuery('.chosen-select').chosen({
+        width: "95%",
+        no_results_text: {$messages['no_results_text']},
+        placeholder_text_single: {$messages['placeholder_text_single']},
+        placeholder_text_multiple: {$messages['placeholder_text_multiple']}
+      });
     }); //
 
 
@@ -427,14 +439,17 @@ extends DisplayMessage
         }
         else {
           params.id_to = form.elements['user_id'].value;
+
           if ('' == params.id_to) {
             alert('Please set a Contributor first');
             return;
           }
+
           if ('' == params.title) {
             alert('Please set a Title first');
             return;
           }
+
           if ('' == form.elements['section[]'].value) {
             alert('Please select a Section first');
             return;
@@ -749,6 +764,7 @@ EOT;
 
         $xls_row[] = $val;
       }
+
       $this->xls_data[] = $xls_row;
 
       return;
@@ -758,8 +774,6 @@ EOT;
   }
 
   function getImageDescriptions () {
-    global $TYPE_MESSAGE;
-
     $images = [
       'document' => [
         'title' => tr('Documents (Texts, Images, ...)'),
@@ -783,7 +797,7 @@ EOT;
       ],
     ];
 
-    return [ $TYPE_MESSAGE, $images ];
+    return [ $GLOBALS['TYPE_MESSAGE'], $images ];
   }
 }
 
@@ -791,4 +805,5 @@ $display = new DisplayArticle($page);
 if (false === $display->init()) {
   $page->redirect([ 'pn' => '' ]);
 }
+
 $page->setDisplay($display);
