@@ -669,7 +669,7 @@
                      && preg_match('/[^0-9]/', $value)) // Warning Mysql 4.1.0: Incompatible change! TIMESTAMP is now returned as a string of type 'YYYY-MM-DD HH:MM:SS'
 
               ) {
-                if (preg_match(
+                if (isset($value) && preg_match(
                  '/^([0-9]{4})\-?([0-9]{2})\-?([0-9]{2})/',
                  $value, $matches))
                 {

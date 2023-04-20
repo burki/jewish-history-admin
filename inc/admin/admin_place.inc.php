@@ -4,9 +4,9 @@
  *
  * Manage the Place-table
  *
- * (c) 2015-2021 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2015-2023 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2021-01-12 dbu
+ * Version: 2023-04-20 dbu
  *
  * TODO:
  *
@@ -88,7 +88,12 @@ extends TableManagerRecord
           }
         }
       }
-      $additional = json_decode($this->get_value('additional'), true);
+
+      $additional = $this->get_value('additional');
+      if (!is_null($additional)) {
+        $additional = json_decode($additional, true);
+      }
+
       if (isset($additional) && false !== $additional) {
         foreach ([ 'boundaryCode' ] as $key) {
           if (array_key_exists($key, $additional)) {
