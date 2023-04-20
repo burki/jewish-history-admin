@@ -1008,6 +1008,7 @@
       if (is_object($form)) {
         $this->form = $form;
       }
+
       $this->name = $name;
     }
 
@@ -1078,8 +1079,10 @@
       $non_empty = $this->not_empty($this->value());
 
       if ($this->get('datatype') == 'int') {
-        if (!preg_match('/^\s*(-\s*\d+|\d*)\s*$/', $this->value())) {
+        $val = $this->value();
+        if (!is_null($val) && !preg_match('/^\s*(-\s*\d+|\d*)\s*$/', $val)) {
           $invalid[$this->name] = 'int_invalid';
+
           return 0;
         }
       }
