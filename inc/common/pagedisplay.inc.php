@@ -4,9 +4,9 @@
  *
  * Abstract Base Display class
  *
- * (c) 2007-2019 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2023 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2019-02-07 dbu
+ * Version: 2023-04-20 dbu
  *
  * Changes:
  *
@@ -65,8 +65,13 @@ class PageDisplayBase
   }
 
   function htmlSpecialchars ($txt) {
+    if (is_null($txt)) {
+      return $txt;
+    }
+
     $match = ['/&(?!\#\d+;)/s', '/</s', '/>/s', '/"/s'];
     $replace = ['&amp;', '&lt;', '&gt;', '&quot;'];
+
     return preg_replace($match, $replace, $txt, -1);
   }
 

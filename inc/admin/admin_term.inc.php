@@ -4,9 +4,9 @@
  *
  * Class for managing Thesauri-Terms
  *
- * (c) 2013-2019 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2013-2023 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2019-02-05 dbu
+ * Version: 2023-04-20 dbu
  *
  * Changes:
  *
@@ -95,8 +95,8 @@ extends DisplayTable
       else {
         // preset the first one
         global $THESAURI;
-        reset($THESAURI);
-        list($_REQUEST['category'], $dummy) = each($THESAURI);
+
+        $_REQUEST['category'] = array_key_first($THESAURI);
       }
     }
 

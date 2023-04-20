@@ -5,9 +5,9 @@
   * Requires: phplib-database classes
   * Author  : Daniel Burckhardt, daniel.burckhardt@sur-gmbh.ch
   *
-  * (c) 2000-2020
+  * (c) 2000-2023
   *
-  * Version : 2020-12-07 dbu
+  * Version : 2023-04-20 dbu
   *
   * Changes :
   *
@@ -1025,8 +1025,13 @@
       '<' (less than) becomes '&lt;'
       '>' (greater than) becomes '&gt;' */
     function htmlspecialchars ($txt) {
+      if (is_null($txt)) {
+        return $txt;
+      }
+
       $match = ['/&(?!\#x?\d+;)/s', '/</s', '/>/s', '/"/s'];
       $replace = ['&amp;', '&lt;', '&gt;', '&quot;'];
+
       return preg_replace($match, $replace, $txt, -1);
     }
 
