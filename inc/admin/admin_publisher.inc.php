@@ -299,9 +299,10 @@ EOT;
       . sprintf(' <span class="regular">[<a href="%s">%s</a>]</span>',
               htmlspecialchars($this->page->buildLink(['pn' => $this->page->name, 'delete' => $this->id])),
               tr($this->workflow->name(TABLEMANAGER_DELETE)))
-      . sprintf('<script>document.write(null != window.opener && null != window.opener.document.detail ? " <span class=\"regular\">[<a href=\"#\" onclick=\"setPublisher(window.opener.document.detail, %d, \'%s\')\">set holding institution</a>]</span>" : "")</script>',
+      . sprintf('<script>document.write(null != window.opener && null != window.opener.document.detail ? " <span class=\"regular\">[<a href=\"#\" onclick=\"setPublisher(window.opener.document.detail, %d, \'%s\')\">%s</a>]</span>" : "")</script>',
                 $this->record->get_value('id'),
-                htmlspecialchars(preg_replace('/\\\\/', "\\\\\\\\", addslashes($this->record->get_value('name')))));
+                htmlspecialchars(preg_replace('/\\\\/', "\\\\\\\\", addslashes($this->record->get_value('name')))),
+                tr('set holding institution'));
 
   }
 

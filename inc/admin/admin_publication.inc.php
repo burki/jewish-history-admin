@@ -390,7 +390,7 @@ extends DisplayBackend
       new Field([ 'name' => 'place', 'id' => 'place', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 127, 'null' => true ]),
       new Field([ 'name' => 'publisher_id', 'id' => 'publisher_id', 'type' => 'select',
                   'options' => array_merge([ '' ], array_keys($publisher_options)),
-                  'labels' => array_merge([ '-- select a holding institution --' ], array_values($publisher_options)), 'datatype' => 'int' ]),
+                  'labels' => array_merge([ tr('-- select a holding institution --') ], array_values($publisher_options)), 'datatype' => 'int' ]),
       // new Field([ 'name' => 'publisher', 'id' => 'publisher', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 127, 'null' => true ]),
       new Field([ 'name' => 'archive_location', 'id' => 'archive_location', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 383, 'null' => true ]),
       new Field([ 'name' => 'publication_date', 'id' => 'publication_date', 'type' => 'date', 'incomplete' => true, 'datatype' => 'date', 'null' => true ]),
