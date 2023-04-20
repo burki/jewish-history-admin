@@ -4,9 +4,9 @@
  *
  * Page class for admin-section
  *
- * (c) 2009-2019 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2023 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2019-02-08 dbu
+ * Version: 2023-04-20 dbu
  *
  * Changes:
  *
@@ -64,7 +64,7 @@ extends Page
 $URL_REWRITE = []; // don't do rewrites for the backend
 
 $SITE_DESCRIPTION = [
-    'title' => 'Key-Documents of German-Jewish History',
+    'title' => SITE_TITLE,
     'structure' => [
         'root' => [
             'title' => 'Administration',

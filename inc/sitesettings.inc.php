@@ -5,9 +5,9 @@
  * Sitewide settings
  * (put machine dependent stuff like hardwired paths, logins and passwords in inc/local.inc.php)
  *
- * (c) 2009-2021 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2023 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2021-03-06 dbu
+ * Version: 2023-04-20 dbu
  *
  * Changes:
  *
@@ -35,6 +35,10 @@ define('GETTEXT_AVAILABLE', false); // don't use system-gettext
 //
 define('COUNTRIES_FROM_DB', false);
 
+if (!defined('SITE_TITLE')) {
+    define('SITE_TITLE', 'Key-Documents of German-Jewish History');
+};
+
 //
 $RIGHTS_EDITOR = 0x02;  // these can see/edit all data
 $RIGHTS_REFEREE = 0x10; // these can see but not edit
@@ -49,7 +53,7 @@ define('STATUS_USER_DELETED', -100); // -1 stands for rejected
 define('MAIL_LINELENGTH', 72);
 
 $SITE = [
-  'pagetitle' => 'Key-Documents of German-Jewish History',
+  'pagetitle' => SITE_TITLE,
 ];
 
 $COUNTRIES_FEATURED = [
@@ -81,7 +85,7 @@ $MAIL_SETTINGS = [
   'bcc_change_notify'    => 'burckhardtd@geschichte.hu-berlin.de',
 
   // further stuff
-  'subject_prepend'      => 'Key-Documents of German-Jewish History - ',
+  'subject_prepend'      => SITE_TITLE . ' - ',
 ];
 
 function compute_bytes ($val) {
