@@ -34,7 +34,7 @@ extends WsHandler
 
     $tgn = $this->getParameter('tgn');
     if (empty($tgn)) {
-      // jquery ui autocomplete passes term, could be changed: 
+      // jquery ui autocomplete passes term, could be changed:
     }
 
     if (!empty($tgn)) {
@@ -77,7 +77,7 @@ SELECT DISTINCT ?place ?placeLabel ?placeType ?placeTypeLabel ?geonamesId ?locat
 } ORDER BY ASC(?dist)
 EOT;
 
-        $sparqlClient =  new \EasyRdf_Sparql_Client('https://query.wikidata.org/sparql');
+        $sparqlClient =  new \EasyRdf\Sparql\Client('https://query.wikidata.org/sparql');
 
         $result = $sparqlClient->query($query);
         $candidates = [];

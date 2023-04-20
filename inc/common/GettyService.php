@@ -4,9 +4,9 @@
  *
  * Try to determine Person GND from Lastname, Firstname
  *
- * (c) 2015-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2015-2023 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-07-23 dbu
+ * Version: 2023-04-20 dbu
  *
  *
  */
@@ -20,11 +20,11 @@ class GettyPlaceData
      *
      * @throws NoResultException
      *
-     * @return \EasyRdf_Graph graph object representing the query result
+     * @return \EasyRdf\Graph graph object representing the query result
      */
     protected function executeRdfQuery($query)
     {
-        $client = new \EasyRdf_Http_Client($query);
+        $client = new \EasyRdf\Http\Client($query);
         $client->setHeaders('Accept', 'application/rdf+xml');
         $response = $client->request();
         if (!$response->isSuccessful()) {
@@ -32,11 +32,11 @@ class GettyPlaceData
         }
 
         $content = $response->getBody();
-        $graph = new \EasyRdf_Graph($query);
+        $graph = new \EasyRdf\Graph($query);
         try {
             $num_triples = $graph->parse($content);
         }
-        catch (\EasyRdf_Exception $e) {
+        catch (\EasyRdf\Exception $e) {
             throw new \Exception(sprintf('Problem executing query %s: %s', $query, $e->getMessage()));
         }
 
@@ -74,7 +74,7 @@ class GettyPlaceData
             else if ($count == 1) {
                 $property = $resource->get($key);
 
-                if (isset($property) && !($property instanceof \EasyRdf_Resource)) {
+                if (isset($property) && !($property instanceof \EasyRdf\Resource)) {
                     $value = $property->getValue();
                     if (!empty($value)) {
                         $values[$target] = $value;
@@ -91,7 +91,7 @@ class GettyPlaceData
 
         $place = new GettyPlaceData();
 
-        \EasyRdf_Namespace::set('gvp', 'http://vocab.getty.edu/ontology#');
+        \EasyRdf\RdfNamespace::set('gvp', 'http://vocab.getty.edu/ontology#');
         $graph = $place->executeRdfQuery($url, [ 'Accept' => 'application/rdf+xml' ]);
         if (!isset($graph)) {
             return;
@@ -114,7 +114,7 @@ class GettyPlaceData
                 exit;
             }
             foreach ($prefLabels as $prefLabel) {
-                if ($prefLabel instanceof \EasyRdf_Resource) {
+                if ($prefLabel instanceof \EasyRdf\Resource) {
                     $subgraph = $place->executeRdfQuery($prefLabel->getUri(),
                                                         ['Accept' => 'application/rdf+xml']);
                     $subresource = $subgraph->resource($prefLabel->getUri());

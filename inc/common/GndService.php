@@ -2,11 +2,12 @@
 /*
  * GndService.php
  *
- * Try to determine Person GND from Lastname, Firstname
+ * Lookup Person by Name
+ * Fetch Information by GND
  *
- * (c) 2010-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2010-2023 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-10-06 dbu
+ * Version: 2023-04-20 dbu
  *
  * Changes:
  *
@@ -46,94 +47,12 @@ if (!function_exists('is_is_associative')) {
 
 class GndService
 {
-    /* Lobid 1.x APIs will be shut down on 2018-10-31 */
-    function lookupPersonByNameDeprecated ($fullname) {
-        // lobid-service
-        $url = sprintf('http://api.lobid.org/person?name=%s',
-                       urlencode($fullname));
-
-        $client = new \EasyRdf_Http_Client($url);
-        $client->setHeaders('Accept', 'application/ld+json');
-        $response = $client->request();
-        if (!$response->isSuccessful()) {
-            return null;
-        }
-
-        $persons = [];
-
-        $entries = json_decode($response->getBody(), true);
-        if (false === $entries || is_null($entries)) {
-            return $persons;
-        }
-
-        foreach ($entries as $entry) {
-            if (isset($entry['@graph'])) {
-                $entry = $entry['@graph'][0];
-            }
-
-            if (!isset($entry['@type'])) {
-                continue;
-            }
-
-            $types = is_array($entry['@type'])
-                ? $entry['@type'] : [ $entry['@type'] ];
-
-            if (!in_array('http://d-nb.info/standards/elementset/gnd#DifferentiatedPerson', $types)) {
-                continue;
-            }
-
-            $gnd = $entry['gndIdentifier'];
-            if (self::isGnd($gnd)) {
-                $person = [
-                    'gnd' => $gnd,
-                    'name' => $entry['preferredNameForThePerson'],
-                ];
-
-                $lifespan = [ '', '' ];
-                $lifespan_set = false;
-
-                if (!empty($entry['dateOfBirth'])) {
-                    if (is_array($entry['dateOfBirth']) && !is_associative($entry['dateOfBirth'])) {
-                        // certain queries give more than one dateOfBirth
-                        $entry['dateOfBirth'] = $entry['dateOfBirth'][0];
-                    }
-
-                    $lifespan[0] = is_array($entry['dateOfBirth'])
-                        ? $entry['dateOfBirth']['@value']
-                        : $entry['dateOfBirth'];
-                    $lifespan_set = true;
-                }
-
-                if (!empty($entry['dateOfDeath'])) {
-                    $lifespan[1] = is_array($entry['dateOfDeath'])
-                        ? $entry['dateOfDeath']['@value']
-                        : $entry['dateOfDeath'];
-                    $lifespan_set = true;
-                }
-
-                if ($lifespan_set) {
-                    $person['lifespan'] = join('-', $lifespan);
-                }
-
-                if (array_key_exists('biographicalOrHistoricalInformation', $entry)) {
-                    if (!empty($entry['biographicalOrHistoricalInformation']['@value'])) {
-                        $person['profession'] = $entry['biographicalOrHistoricalInformation']['@value'];
-                    }
-                }
-
-                $persons[] = $person;
-            }
-        }
-
-        return $persons;
-    }
-
     protected function getLobidResults ($query, $baseUrl = 'https://lobid.org/gnd/search') {
         $querystring = http_build_query($query);
 
         $url = $baseUrl . '?' . $querystring;
 
-        $client = new \EasyRdf_Http_Client($url);
+        $client = new \EasyRdf\Http\Client($url);
         $client->setHeaders('Accept', 'application/ld+json');
         $response = $client->request();
         if (!$response->isSuccessful()) {
@@ -143,8 +62,8 @@ class GndService
         return json_decode($response->getBody(), true);
     }
 
-    protected function processLobidResults ($entries) {
-        $persons = [];
+    protected function processLobidResults ($entries, $expectedType = 'DifferentiatedPerson') {
+        $results = [];
 
         foreach ($entries['member'] as $entry) {
             if (!isset($entry['type'])) {
@@ -154,48 +73,72 @@ class GndService
             $types = is_array($entry['type'])
                 ? $entry['type'] : [ $entry['type'] ];
 
-            if (!in_array('DifferentiatedPerson', $types)) {
+            if (!in_array($expectedType, $types)) {
                 continue;
             }
 
             $gnd = $entry['gndIdentifier'];
-            if (self::isGnd($gnd)) {
-                $person = [
-                    'gnd' => $gnd,
-                    'name' => $entry['preferredName'],
-                ];
+            if ($expectedType != 'DifferentiatedPerson' || self::isGnd($gnd)) {
+                switch ($expectedType) {
+                    case 'DifferentiatedPerson':
+                        $person = [
+                            'gnd' => $gnd,
+                            'name' => $entry['preferredName'],
+                        ];
 
-                $lifespan = [ '', '' ];
-                $lifespan_set = false;
-                if (!empty($entry['dateOfBirth'])) {
-                    $lifespan[0] = is_array($entry['dateOfBirth'])
-                        ? $entry['dateOfBirth'][0]
-                        : $entry['dateOfBirth'];
-                    $lifespan_set = true;
+                        $lifespan = [ '', '' ];
+                        $lifespan_set = false;
+                        if (!empty($entry['dateOfBirth'])) {
+                            $lifespan[0] = is_array($entry['dateOfBirth'])
+                                ? $entry['dateOfBirth'][0]
+                                : $entry['dateOfBirth'];
+                            $lifespan_set = true;
+                        }
+
+                        if (!empty($entry['dateOfDeath'])) {
+                            $lifespan[1] = is_array($entry['dateOfDeath'])
+                                ? $entry['dateOfDeath'][0]
+                                : $entry['dateOfDeath'];
+                            $lifespan_set = true;
+                        }
+
+                        if ($lifespan_set) {
+                            $person['lifespan'] = join('-', $lifespan);
+                        }
+
+                        if (array_key_exists('biographicalOrHistoricalInformation', $entry)) {
+                            $person['profession'] = is_array($entry['biographicalOrHistoricalInformation'])
+                                ? $entry['biographicalOrHistoricalInformation'][0]
+                                : $entry['biographicalOrHistoricalInformation'];
+                        }
+
+                        $results[$gnd] = $person;
+
+                        break;
+
+                    case 'CorporateBody':
+                        $result = [
+                            'gnd' => $gnd,
+                            'name' => $entry['preferredName'],
+                            'placeLabel' => null, // TODO
+                        ];
+
+                        if (!empty($entry['placeOfBusiness'])) {
+                            $result['placeLabel'] = $entry['placeOfBusiness'][0]['label'];
+                        }
+
+                        $results[$gnd] = $result;
+
+                        break;
+
+                    default:
+                        var_dump($entry);
+                        die('TODO: handle ' . $expectedType);
                 }
-
-                if (!empty($entry['dateOfDeath'])) {
-                    $lifespan[1] = is_array($entry['dateOfDeath'])
-                        ? $entry['dateOfDeath'][0]
-                        : $entry['dateOfDeath'];
-                    $lifespan_set = true;
-                }
-
-                if ($lifespan_set) {
-                    $person['lifespan'] = join('-', $lifespan);
-                }
-
-                if (array_key_exists('biographicalOrHistoricalInformation', $entry)) {
-                    $person['profession'] = is_array($entry['biographicalOrHistoricalInformation'])
-                        ? $entry['biographicalOrHistoricalInformation'][0]
-                        : $entry['biographicalOrHistoricalInformation'];
-                }
-
-                $persons[$gnd] = $person;
             }
         }
 
-        return $persons;
+        return $results;
     }
 
     function lookupPersonByName ($fullname) {
@@ -219,7 +162,7 @@ class GndService
         $entries = $this->getLobidResults($queryStrict);
 
         if (!empty($entries)) {
-            $persons = $this->processLobidResults($entries);
+            $persons = $this->processLobidResults($entries, 'DifferentiatedPerson');
         }
 
         if (count($persons) < 10) {
@@ -253,6 +196,29 @@ class GndService
     }
 
     function lookupOrganizationByName ($name, $limit = 20) {
+        // try exact match first
+        $query = [
+            'q' => '"' . $name . '"',
+            'filter' => '+(type:CorporateBody)',
+            'size' => 15,
+        ];
+
+        $entries = $this->getLobidResults($query);
+
+        if (empty($entries) || 0 == $entries['totalItems']) {
+            $query['q'] = $name; // try with non-exact query next
+            $entries = $this->getLobidResults($query);
+        }
+
+        if (!empty($entries)) {
+            $corporateBodies = $this->processLobidResults($entries, 'CorporateBody');
+
+            if (!empty($corporateBodies)) {
+                return $corporateBodies;
+            }
+        }
+
+        // alternative
         $name_escaped = addslashes($name);
         $phrase_escaped = '"' . $name_escaped . '"'; // TODO: put this at top if matches
         $query = <<<EOT
@@ -289,7 +255,7 @@ WHERE {
 ORDER BY DESC(?score)
 EOT;
 
-        $sparql = new \EasyRdf_Sparql_Client('http://zbw.eu/beta/sparql/gnd/query');
+        $sparql = new \EasyRdf\Sparql\Client('http://zbw.eu/beta/sparql/gnd/query');
 
         $result = $sparql->query($query);
 
@@ -370,33 +336,19 @@ class BiographicalData
         return self::$RDFParser;
     }
 
-    /*
-     * TODO: Fix!
-     */
     static function fetchGeographicLocation ($url) {
         $parser = self::getRDFParser();
         $parser->parse($url . '/about/lds');
         $triples = $parser->getTriples();
         $index = ARC2::getSimpleIndex($triples, true) ; /* true -> flat version */
-        if (isset($index[$url]['http://d-nb.info/standards/elementset/gnd#preferredNameForThePlaceOrGeographicName'])) {
-            return $index[$url]['http://d-nb.info/standards/elementset/gnd#preferredNameForThePlaceOrGeographicName'][0];
-        }
-        if (isset($index[$url]['preferredNameForThePlaceOrGeographicName'])) {
-            return $index[$url]['preferredNameForThePlaceOrGeographicName'][0];
-        }
-
-        foreach ($triples as $triple) {
-            if ('sameAs' == $triple['p']) {
-                if (preg_match('/d\-nb\.info/', $triple['o']) && $triple['o'] != $url) {
-                    return self::fetchGeographicLocation($triple['o']);
-                }
-            }
+        if (isset($index[$url]['https://d-nb.info/standards/elementset/gnd#preferredNameForThePlaceOrGeographicName'])) {
+            return $index[$url]['https://d-nb.info/standards/elementset/gnd#preferredNameForThePlaceOrGeographicName'][0];
         }
     }
 
     static function fetchByGnd ($gnd) {
         $parser = self::getRDFParser();
-        $url = sprintf('http://d-nb.info/gnd/%s/about/lds', $gnd);
+        $url = sprintf('https://d-nb.info/gnd/%s/about/lds', $gnd);
         $parser->parse($url);
         $triples = $parser->getTriples();
         if (empty($triples)) {
@@ -410,12 +362,11 @@ exit; */
         $bio->gnd = $gnd;
         foreach ($triples as $triple) {
             switch ($triple['p']) {
-                case 'http://d-nb.info/standards/elementset/gnd#dateOfBirth':
-                case 'dateOfBirth':
+                case 'https://d-nb.info/standards/elementset/gnd#dateOfBirth':
                     $bio->dateOfBirth = $triple['o'];
                     break;
 
-                case 'http://d-nb.info/standards/elementset/gnd#placeOfBirth':
+                case 'https://d-nb.info/standards/elementset/gnd#placeOfBirth':
                 case 'placeOfBirth':
                     $placeOfBirth = self::fetchGeographicLocation($triple['o']);
                     if (!empty($placeOfBirth)) {
@@ -423,7 +374,7 @@ exit; */
                     }
                     break;
 
-                case 'http://d-nb.info/standards/elementset/gnd#placeOfActivity':
+                case 'https://d-nb.info/standards/elementset/gnd#placeOfActivity':
                 case 'placeOfActivity':
                     $placeOfActivity = self::fetchGeographicLocation($triple['o']);
                     if (!empty($placeOfActivity)) {
@@ -431,12 +382,12 @@ exit; */
                     }
                     break;
 
-                case 'http://d-nb.info/standards/elementset/gnd#dateOfDeath':
+                case 'https://d-nb.info/standards/elementset/gnd#dateOfDeath':
                 case 'dateOfDeath':
                     $bio->dateOfDeath = $triple['o'];
                     break;
 
-                case 'http://d-nb.info/standards/elementset/gnd#placeOfDeath':
+                case 'https://d-nb.info/standards/elementset/gnd#placeOfDeath':
                 case 'placeOfDeath':
                     $placeOfDeath = self::fetchGeographicLocation($triple['o']);
                     if (!empty($placeOfDeath)) {
@@ -444,17 +395,17 @@ exit; */
                     }
                     break;
 
-                case 'http://d-nb.info/standards/elementset/gnd#forename':
+                case 'https://d-nb.info/standards/elementset/gnd#forename':
                 case 'forename':
                     $bio->forename = $triple['o'];
                     break;
 
-                case 'http://d-nb.info/standards/elementset/gnd#surname':
+                case 'https://d-nb.info/standards/elementset/gnd#surname':
                 case 'surname':
                     $bio->surname = $triple['o'];
                     break;
 
-                case 'http://d-nb.info/standards/elementset/gnd#preferredNameForThePerson':
+                case 'https://d-nb.info/standards/elementset/gnd#preferredNameForThePerson':
                 case 'preferredNameForThePerson':
                     if (!isset($bio->preferredName) && 'literal' == $triple['o_type']) {
                         $bio->preferredName = $triple['o'];
@@ -462,29 +413,29 @@ exit; */
                     else if ('bnode' == $triple['o_type']) {
                         $nameRecord = $index[$triple['o']];
                         $bio->preferredName = [
-                            $nameRecord['http://d-nb.info/standards/elementset/gnd#surname'][0]['value'],
-                            $nameRecord['http://d-nb.info/standards/elementset/gnd#forename'][0]['value'],
+                            $nameRecord['https://d-nb.info/standards/elementset/gnd#surname'][0]['value'],
+                            $nameRecord['https://d-nb.info/standards/elementset/gnd#forename'][0]['value'],
                         ];
                         // var_dump($index[$triple['o']]);
                     }
                     break;
 
-                case 'http://d-nb.info/standards/elementset/gnd#academicDegree':
+                case 'https://d-nb.info/standards/elementset/gnd#academicDegree':
                 case 'academicDegree':
                     $bio->academicDegree = $triple['o'];
                     break;
 
-                case 'http://d-nb.info/standards/elementset/gnd#biographicalOrHistoricalInformation':
+                case 'https://d-nb.info/standards/elementset/gnd#biographicalOrHistoricalInformation':
                 case 'biographicalOrHistoricalInformation':
                     $bio->biographicalInformation = $triple['o'];
                     break;
 
-                case 'http://d-nb.info/standards/elementset/gnd#professionOrOccupation':
+                case 'https://d-nb.info/standards/elementset/gnd#professionOrOccupation':
                 case 'professionOrOccupation':
                     // TODO: links to external resource
                     break;
 
-                case 'http://d-nb.info/standards/elementset/gnd#variantNameForThePerson':
+                case 'https://d-nb.info/standards/elementset/gnd#variantNameForThePerson':
                 case 'variantNameForThePerson':
                     // var_dump($triple);
                     break;

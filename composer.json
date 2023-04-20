@@ -23,9 +23,9 @@
 
         "kriswallsmith/buzz": "0.16.*",
 
-        "semsol/arc2": "2.3.*",
-        "easyrdf/easyrdf": "~0.9",
-        "ml/json-ld": "~1.0",
+        "semsol/arc2": "^2.5",
+        "sweetrdf/easyrdf": "^1.8",
+        "ml/json-ld": "^1.0",
 
         "pear/pear-core-minimal": "*",
         "pear/pear_exception": "*",
