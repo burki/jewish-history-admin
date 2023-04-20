@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c0a9955ae827ee9e75087af6e74d209d",
+    "content-hash": "0830e05306a2e5b898fa96e3cbf8a0d4",
     "packages": [
         {
             "name": "albertofem/rsync-lib",
@@ -3053,7 +3053,9 @@
     },
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "php": ">= 7.3"
+    },
     "platform-dev": [],
     "platform-overrides": {
         "php": "7.3.0"
