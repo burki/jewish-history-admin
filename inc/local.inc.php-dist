@@ -6,9 +6,9 @@
  *
  * machine dependent stuff like hardwired paths, db-logins and passwords
  *
- * (c) 2008-2019 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2023 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2019-02-14 dbu
+ * Version: 2023-05-15 dbu
  *
  * Changes:
  */
@@ -29,6 +29,7 @@ define('UPLOAD_PATH2MAGICK', '/usr/bin/');
 
 define('JAVA', '/usr/bin/java');
 
+// define('SITE_TITLE', 'Online-Anthologie zur jüdischen Architektur und jüdischem Raum'); // non-default site title
 /*
 define('RSYNC_REMOTE_HOST', 'rsync.hidrive.strato.com');
 define('RSYNC_REMOTE_USER', 'jgo-hiwi');

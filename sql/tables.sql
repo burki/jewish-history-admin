@@ -107,7 +107,7 @@ CREATE TABLE Message (
   comment       TEXT NULL,                      # internal comment
   changed       TIMESTAMP NULL,                 # last changed
   changed_by    INT NULL,                       # ref to User.id: who created the entry
-  created       TIMESTAMP,                      # when it was created
+  created       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, # when it was created
   created_by    INT NULL                        # ref to User.id: who created the entry
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE INDEX MessageTypePublish ON Message (type, published);
@@ -149,7 +149,7 @@ CREATE TABLE Publisher (
 
   changed       TIMESTAMP NULL,                 # last changed
   changed_by    INT NULL,                       # ref to User.id: who created the entry
-  created       TIMESTAMP,                      # when it was created
+  created       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, # when it was created
   created_by    INT NULL                        # ref to User.id: who created the entry
 ) ENGINE=MyISAM CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -173,7 +173,7 @@ CREATE TABLE Communication (
   comment       TEXT NULL,                      # internal comment
   changed       TIMESTAMP NULL,                 # last changed
   changed_by    INT NULL,                       # ref to User.id: who created the entry
-  created       TIMESTAMP,                      # when it was created
+  created       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, # when it was created
   created_by    INT NULL                        # ref to User.id: who created the entry
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -378,6 +378,6 @@ CREATE TABLE Zotero (
   comment       TEXT NULL,                      # internal comment
   changed       TIMESTAMP NULL,                 # last changed
   changed_by    INT NULL,                       # ref to User.id: who created the entry
-  created       TIMESTAMP,                      # when it was created
+  created       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, # when it was created
   created_by    INT NULL                        # ref to User.id: who created the entry
 ) ENGINE=MyISAM CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
