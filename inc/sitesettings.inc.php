@@ -7,14 +7,16 @@
  *
  * (c) 2009-2023 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2023-04-20 dbu
+ * Version: 2023-05-15 dbu
  *
  * Changes:
  *
  */
 
 // General Settings
-define('SESSION_NAME', 'sid');
+if (!defined('SESSION_NAME')) {
+    define('SESSION_NAME', 'sid');
+}
 
 date_default_timezone_set('Europe/Berlin');
 
