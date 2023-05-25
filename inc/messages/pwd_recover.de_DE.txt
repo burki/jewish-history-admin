@@ -1,6 +1,6 @@
 %salutation_name%
 
-Jemand, wahrscheinlich Sie selbst, hat ein neues Passwort für die Anmeldung bei "Schlüsseldokumente zur deutsch-jüdischen Geschichte" angefordert.
+Jemand, wahrscheinlich Sie selbst, hat ein neues Passwort für die Anmeldung bei "%site%" angefordert.
 
 Um ein neues Passwort zu setzen, öffnen Sie die folgende Adresse in Ihrem Web-Browser:
     %url_recover%
