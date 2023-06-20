@@ -6,7 +6,7 @@
  *
  * (c) 2007-2023 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2023-04-20 dbu
+ * Version: 2023-06-06 dbu
  *
  * Changes:
  *
@@ -83,7 +83,7 @@ class PageDisplayBase
       if (preg_match('/^http:\/\/(\d+)$/', $url, $matches)) {
         // we have to build a local image
         if (isset($this->image)) {
-          $img_name = $this->image['name'].sprintf('%02d', $matches[1] - 1);
+          $img_name = $this->image['name'] . sprintf('%02d', $matches[1] - 1);
           // var_dump($img_name);
           list($tag, $caption, $copyright) =
             $this->buildImage($this->image['item_id'], $this->image['type'],
@@ -438,9 +438,13 @@ class PageDisplayBase
       $caption = $img['caption'];
       $copyright = $img['copyright'];
 
-      $params = ['width' => $img['width'], 'height' => $img['height'],
-                      'enlarge' => $enlarge, 'enlarge_caption' => $this->formatText($caption),
-                      'border' => 0];
+      $params = [
+        'width' => $img['width'], 'height' => $img['height'],
+        'enlarge' => $enlarge,
+        'enlarge_caption' => $this->formatText($caption),
+        'border' => 0,
+      ];
+
       if (null !== $alt) {
         $params['alt'] = $params['title'] = $alt;
       }
