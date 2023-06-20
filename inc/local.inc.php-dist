@@ -30,7 +30,16 @@ define('UPLOAD_PATH2MAGICK', '/usr/bin/');
 define('JAVA', '/usr/bin/java');
 
 // define('SITE_TITLE', 'Online-Anthologie zur jüdischen Architektur und jüdischem Raum'); // non-default site title
-// define('SESSION_NAME', 'sid'); // non-default session name
+// define('SITE_KEY', 'aur'); // will be appended for custom messages
+// define('SESSION_NAME', 'sid-aur'); // non-default session name
+
+/*
+// override attachments
+$GLOBALS['COMMUNICATION_ATTACHMENTS'] = [
+  'IGdJ_Schluesseldokumente_Guidelines.pdf',
+  'IGdJ_Schluesseldokumente_Redaktionsmodell.pdf',
+];
+*/
 
 /*
 define('RSYNC_REMOTE_HOST', 'rsync.hidrive.strato.com');

@@ -4,9 +4,9 @@
  *
  * Class for managing communication
  *
- * (c) 2008-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2023 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-09-14 dbu
+ * Version: 2023-06-20 dbu
  *
  * Changes:
  *
@@ -140,10 +140,25 @@ extends DisplayTable
         case 'publisher_vouchercopy':
         case 'imprimatur_sent':
           global $SITE;
+
           $this->defaults['subject'] =
             (array_key_exists($_GET['mode'], $SUBJECT) ? $SUBJECT[$_GET['mode']] . ' ' : '')
             . tr($SITE['pagetitle']);
-          $fname_template = INC_PATH . 'messages/' . $_GET['mode'] . '.txt';
+
+          $fname_base = INC_PATH . 'messages/' . $_GET['mode'];
+          $fname_template = null;
+          if (!empty($SITE['key'])) {
+            // check if there is a site-specific version
+            $fname_template = $fname_base . '_' . $SITE['key'] . '.txt';
+            if (!file_exists($fname_template)) {
+              $fname_template = null;
+            }
+          }
+
+          if (is_null($fname_template)) {
+            $fname_template = $fname_base . '.txt';
+          }
+
           if (false !== ($template = @file_get_contents($fname_template))) {
             // fill in template
             $this->defaults['body'] = preg_replace_callback('|\%([a-z_0-9]+)\%|',
@@ -516,11 +531,15 @@ extends DisplayTable
       }
     }
 
-    if (0 != (0x02 & $record->get_value('flags'))) {
-      $fields[] = [ 'Attachments',
-                   sprintf('<a href="%sdata/IGdJ_Schluesseldokumente_Guidelines.pdf">IGdJ_Schluesseldokumente_Guidelines.pdf</a>'
-                           . '<br /><a href="%sdata/IGdJ_Schluesseldokumente_Redaktionsmodell.pdf">IGdJ_Schluesseldokumente_Redaktionsmodell.pdf</a>',
-                           BASE_PATH, BASE_PATH)];
+    if (0 != (0x02 & $record->get_value('flags')) && !empty($GLOBALS['COMMUNICATION_ATTACHMENTS'])) {
+      $links = [];
+
+      foreach ($GLOBALS['COMMUNICATION_ATTACHMENTS'] as $fname) {
+        $links[] = sprintf('<a href="%sdata/%s">%s</a>',
+                             BASE_PATH, $fname, $fname);
+      }
+
+      $fields[] = [ 'Attachments', join('<br />', $links) ];
     }
 
     if (count($fields) > 0) {
@@ -538,9 +557,7 @@ extends DisplayTable
     $mail->attachPlain($this->record->get_value('body'));
     $mail->attachHtml($this->formatParagraphs($this->record->get_value('body')));
 
-    foreach ([ 'IGdJ_Schluesseldokumente_Redaktionsmodell.pdf',
-               'IGdJ_Schluesseldokumente_Guidelines.pdf' ] as $fname)
-    {
+    foreach ($GLOBALS['COMMUNICATION_ATTACHMENTS'] as $fname) {
       if (0 != (0x02 & $this->record->get_value('flags'))
           && file_exists($fname_full = BASE_FILEPATH . 'data/' . $fname))
       {

@@ -7,7 +7,7 @@
  *
  * (c) 2009-2023 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2023-05-15 dbu
+ * Version: 2023-06-20 dbu
  *
  * Changes:
  *
@@ -67,6 +67,9 @@ define('MAIL_LINELENGTH', 72);
 $SITE = [
   'pagetitle' => SITE_TITLE,
 ];
+if (defined('SITE_KEY')) {
+    $SITE['key'] = SITE_KEY;
+}
 
 $COUNTRIES_FEATURED = [
     'DE', 'AT', 'CH', 'UK', 'US', 'CA',
@@ -80,6 +83,13 @@ $GLOBALS['THESAURI'] = [
     'section' => 'Section',
     'sourcetype' => 'Source Type',
 ];
+
+if (!isset($GLOBALS['COMMUNICATION_ATTACHMENTS'])) {
+    $GLOBALS['COMMUNICATION_ATTACHMENTS'] = [
+      'IGdJ_Schluesseldokumente_Guidelines.pdf',
+      'IGdJ_Schluesseldokumente_Redaktionsmodell.pdf',
+    ];
+}
 
 $MAIL_SETTINGS = [
   'from'                 => 'burckhardtd@geschichte.hu-berlin.de',
