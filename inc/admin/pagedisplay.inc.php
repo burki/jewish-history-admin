@@ -4,9 +4,9 @@
  *
  * Base Display class for Admin-pages
  *
- * (c) 2006-2019 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2023 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2019-02-05 dbu
+ * Version: 2023-06-06 dbu
  *
  * Changes:
  *
@@ -174,12 +174,15 @@ EOT;
       $fname = preg_match('/^' . preg_quote(UPLOAD_URLROOT, '/') . '/', $relurl)
         ? preg_replace('/^' . preg_quote(UPLOAD_URLROOT, '/') . '/', UPLOAD_FILEROOT, $relurl)
         : preg_replace('/^' . preg_quote(BASE_PATH, '/') . '/', './', $relurl);
+
       $fname = preg_replace('/\?.*/', '', $fname);
       $size = @getimagesize($fname);
+
       if (isset($size)) {
         if (!isset($attrs['width']) && !isset($attrs['height'])) {
           $attrs['width'] = $size[0]; $attrs['height'] = $size[1];
         }
+
         $fname_large = preg_replace('/(\_small)?\.([^\.]+)$/', '_large.\2', $fname);
         if (isset($attrs['enlarge']) && $attrs['enlarge'] !== false) {
           // var_dump($fname_large);
@@ -189,7 +192,7 @@ EOT;
             $url_enlarge = "window.open('"
                          . BASE_PATH . "img.php?url=" . urlencode($relurl)
                          . "&width=" . $size_large[0] . "&height=" . $size_large[1]
-                         . "&caption=" . urlencode($attrs['enlarge_caption'])
+                         . "&caption=" . urlencode(array_key_exists('enlarge_caption', $attrs) ? $attrs['enlarge_caption'] : '')
                          . "', '_blank', 'width=" . ($size_large[0] + $IMG_ENLARGE_ADDWIDTH) . ",height=" . ($size_large[1] + $IMG_ENLARGE_ADDHEIGHT) . ",resizable=yes');";
             $url_enlarge .= 'return false;';
             $attrs['alt'] = 'Click to enlarge';
@@ -329,6 +332,7 @@ EOT;
           'enlarge' => $enlarge,
           'enlarge_caption' => $this->formatText($caption), 'border' => 0,
         ];
+
         if (null !== $alt) {
           $params['alt'] = $params['title'] = $alt;
         }
