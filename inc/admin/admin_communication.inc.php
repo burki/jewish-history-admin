@@ -590,7 +590,7 @@ extends DisplayTable
       $querystr = "UPDATE Communication SET sent=NOW() WHERE id=" . $this->id;
       $dbconn->query($querystr);
       // refetch
-      $this->record->fetch($this->id, $this->datetimestyle);
+      $this->record->fetch($this->id, $this->datetime_style);
 
       return $this->record->get_value('sent');
     }
