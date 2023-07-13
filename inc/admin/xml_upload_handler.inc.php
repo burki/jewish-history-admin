@@ -5,7 +5,7 @@
   *
   * Author  : Daniel Burckhardt, daniel.burckhardt@sur-gmbh.ch
   *
-  * Version : 2019-02-14 dbu
+  * Version : 2023-06-06 dbu
   *
   *
   */
@@ -105,10 +105,11 @@ extends ImageUploadHandler
       else {
         $params = [
           'width' => $img['width'], 'height' => $img['height'],
-          'enlarge' => false,
+          'enlarge' => true,
           // 'enlarge_caption' => $view->formatText($caption),
           'border' => 0,
         ];
+
         if (!empty($alt)) {
           $params['alt'] = $params['title'] = $alt;
         }
