@@ -7,7 +7,7 @@
  *
  * (c) 2009-2023 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2023-06-20 dbu
+ * Version: 2023-08-06 dbu
  *
  * Changes:
  *
@@ -39,6 +39,9 @@ define('COUNTRIES_FROM_DB', false);
 
 if (!defined('SITE_TITLE')) {
     define('SITE_TITLE', 'Key-Documents of German-Jewish History');
+};
+if (!defined('SITE_LOGO')) {
+    define('SITE_LOGO', 'media/logo.png');
 };
 
 //
