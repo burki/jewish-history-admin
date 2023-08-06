@@ -6,7 +6,7 @@
  *
  * (c) 2006-2023 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2023-06-06 dbu
+ * Version: 2023-08-06 dbu
  *
  * Changes:
  *
@@ -590,9 +590,9 @@ EOT;
       $ret .= '<div id="languages">' . implode(' ', $languages) . '</div>';
     }
 
-    $ret .= sprintf('<a href="%s"><img src="%s" style="margin-left: 4px; vertical-align: text-bottom; border: 0; height: 106; width: auto" alt="%s" /><h1>%s</h1></a> ',
+    $ret .= sprintf('<a href="%s"><img src="%s" style="margin-left: 4px; vertical-align: text-bottom; border: 0; height: 106px; width: auto" alt="%s" /><h1>%s</h1></a> ',
                     $url_main,
-                    $this->page->BASE_PATH . 'media/logo.png',
+                    htmlspecialchars($this->page->BASE_PATH . SITE_LOGO),
                     $this->htmlSpecialchars(tr($SITE_DESCRIPTION['title'])),
                     $this->htmlSpecialchars(tr($SITE_DESCRIPTION['title'])));
     $entries = [];
