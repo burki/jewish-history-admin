@@ -2374,20 +2374,21 @@
         },
         {
             "name": "shardj/zf1-future",
-            "version": "1.22.0",
+            "version": "1.23.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Shardj/zf1-future.git",
-                "reference": "5446af3466d1fc3faa32a708af2cdc9baf9fc11a"
+                "reference": "aa077dde19ee94c308ca6a4f6ee6522029ba5c92"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Shardj/zf1-future/zipball/5446af3466d1fc3faa32a708af2cdc9baf9fc11a",
-                "reference": "5446af3466d1fc3faa32a708af2cdc9baf9fc11a",
+                "url": "https://api.github.com/repos/Shardj/zf1-future/zipball/aa077dde19ee94c308ca6a4f6ee6522029ba5c92",
+                "reference": "aa077dde19ee94c308ca6a4f6ee6522029ba5c92",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.1",
+                "symfony/polyfill-ctype": "^1.27",
                 "symfony/polyfill-mbstring": "^1.26",
                 "symfony/polyfill-php81": "^1.24"
             },
@@ -2396,8 +2397,9 @@
             },
             "require-dev": {
                 "php-parallel-lint/php-parallel-lint": "^1.3",
-                "phpunit/phpunit": "^9",
-                "rector/rector": "^0.14.8"
+                "phpunit/phpunit": "^7|^8|^9",
+                "rector/rector": "^0.12.19",
+                "yoast/phpunit-polyfills": "2.0"
             },
             "suggest": {
                 "ext-mbstring": "Multibyte strings handling"
@@ -2428,9 +2430,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Shardj/zf1-future/issues",
-                "source": "https://github.com/Shardj/zf1-future/tree/release-1.22.0"
+                "source": "https://github.com/Shardj/zf1-future/tree/release-1.23.0"
             },
-            "time": "2023-01-16T12:07:29+00:00"
+            "time": "2023-08-10T19:08:01+00:00"
         },
         {
             "name": "spatie/simple-excel",
@@ -2871,6 +2873,88 @@
                 }
             ],
             "time": "2022-01-02T09:53:40+00:00"
+        },
+        {
+            "name": "symfony/polyfill-ctype",
+            "version": "v1.27.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/polyfill-ctype.git",
+                "reference": "5bbc823adecdae860bb64756d639ecfec17b050a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/5bbc823adecdae860bb64756d639ecfec17b050a",
+                "reference": "5bbc823adecdae860bb64756d639ecfec17b050a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1"
+            },
+            "provide": {
+                "ext-ctype": "*"
+            },
+            "suggest": {
+                "ext-ctype": "For best performance"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "1.27-dev"
+                },
+                "thanks": {
+                    "name": "symfony/polyfill",
+                    "url": "https://github.com/symfony/polyfill"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "bootstrap.php"
+                ],
+                "psr-4": {
+                    "Symfony\\Polyfill\\Ctype\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Gert de Pagter",
+                    "email": "BackEndTea@gmail.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony polyfill for ctype functions",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "compatibility",
+                "ctype",
+                "polyfill",
+                "portable"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/polyfill-ctype/tree/v1.27.0"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2022-11-03T14:55:06+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
