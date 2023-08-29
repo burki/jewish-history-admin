@@ -4,25 +4,30 @@
  *
  * Class for querying bibliographic information from the GBV
  *
- * (c) 2008-2020 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2023 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2020-06-19 dbu
+ * Version: 2023-08-29 dbu
  *
  * Usage:
  *
- * $ws_gbv = new BiblioService_GBV();
- * $results = $ws_gbv->searchRetrieve('3909252133');
+ *  $ws_gbv = new BiblioService_GBV();
+ *  $results = $ws_gbv->searchRetrieve('3909252133');
+ *
+ * TODO:
+ *  Maybe switch to https://github.com/scriptotek/php-sru-client
+ *  Maybe use recordSchema=mods instead of recordSchema=picaxml
+ *
  *
  */
 
 require_once INC_PATH . 'common/biblioservice.inc.php';
-
 
 // see http://de3.php.net/ucfirst
 if (!function_exists('mb_ucfirst') && function_exists('mb_substr')) {
     function mb_ucfirst($string) {
         mb_internal_encoding('UTF-8');
         $string = mb_strtoupper(mb_substr($string, 0, 1)) . mb_substr($string, 1);
+
         return $string;
     }
 }
@@ -31,13 +36,14 @@ if (!function_exists('mb_lcfirst') && function_exists('mb_substr')) {
     function mb_lcfirst($string) {
         mb_internal_encoding('UTF-8');
         $string = mb_strtolower(mb_substr($string, 0, 1)) . mb_substr($string, 1);
+
         return $string;
     }
 }
 
 class BiblioService_GBV
 {
-    const WS_URL = 'http://sru.gbv.de/gvk';
+    const WS_URL = 'https://sru.k10plus.de/gvk';
 
     /**
      * Maximum number of redirects to follow during HTTP operations
@@ -65,13 +71,14 @@ class BiblioService_GBV
      * Create BiblioService_GBV object
      *
      * @param Zend_Http_Client $client (optional) The HTTP client to use when
-     *          when communicating with the Google servers.
+     *          when communicating with the GBV server.
      */
     public function __construct($client = null)
     {
         if ($client === null) {
             $client = new Zend_Http_Client();
         }
+
         $this->_httpClient = $client;
     }
 
@@ -85,13 +92,15 @@ class BiblioService_GBV
             if (substr($name, 0, 1) == '_') {
                 continue;
             }
+
             $queryArray[] = urlencode($name) . '=' . urlencode($value);
         }
+
         if (count($queryArray) > 0) {
             return '?' . implode('&', $queryArray);
-        } else {
-            return '';
         }
+
+        return '';
     }
 
     /**
@@ -103,7 +112,8 @@ class BiblioService_GBV
     {
         if (isset($this->_url)) {
             $url = $this->_url;
-        } else {
+        }
+        else {
             $url = self::WS_URL;
         }
 
@@ -132,7 +142,7 @@ class BiblioService_GBV
         $client->resetParameters();
         $client->setHeaders('x-http-method-override', null);
         $client->setUri($uri);
-        $client->setConfig(['maxredirects' => self::getMaxRedirects()]);
+        $client->setConfig([ 'maxredirects' => self::getMaxRedirects() ]);
         $response = $client->request('GET');
         if ($response->getStatus() !== 200) {
             return false;
@@ -143,6 +153,7 @@ class BiblioService_GBV
             throw $exception;
             */
         }
+
         $feedContent = $response->getBody();
 
         return $feedContent;
@@ -156,9 +167,10 @@ class BiblioService_GBV
             if ('' !== (string)$subfield && array_key_exists($code, $keymap)) {
                 if (isset($response[$keymap[$code]])) {
                     // append
-                    if ('string' == gettype($response[$keymap[$code]])) {
-                        $response[$keymap[$code]] = [$response[$keymap[$code]]];
+                    if (is_string($response[$keymap[$code]])) {
+                        $response[$keymap[$code]] = [ $response[$keymap[$code]] ];
                     }
+
                     $response[$keymap[$code]][] = (string)$subfield;
                 }
                 else {
@@ -177,49 +189,58 @@ class BiblioService_GBV
             switch ($field->attributes()->tag) {
                 case '004A':
                 case '004B':
-                    $this->setResponseFromSubfields($field, $response,
-                                ['0' => 'isbn', 'A' => 'isbn',
-                                    'g' => 'binding', 'f' => 'listprice']);
+                    $this->setResponseFromSubfields($field, $response, [
+                        '0' => 'isbn', 'A' => 'isbn',
+                        'g' => 'binding', 'f' => 'listprice',
+                    ]);
                     break;
 
                 case '011@':
-                    $this->setResponseFromSubfields($field, $response,
-                                ['a' => 'publication_date']);
+                    $this->setResponseFromSubfields($field, $response, [
+                        'a' => 'publication_date',
+                    ]);
                     break;
 
                 case '021A':
-                    $this->setResponseFromSubfields($field, $response,
-                                ['a' => 'title', 'd' => 'subtitle']);
+                    $this->setResponseFromSubfields($field, $response, [
+                        'a' => 'title', 'd' => 'subtitle',
+                    ]);
                     break;
 
                 case '028A':
-                    $this->setResponseFromSubfields($field, $response,
-                                ['d' => 'author_given', 'a' => 'author_surname']);
+                    $this->setResponseFromSubfields($field, $response, [
+                        'd' => 'author_given', 'a' => 'author_surname',
+                    ]);
                     break;
 
                 case '028B':
-                    $this->setResponseFromSubfields($field, $response,
-                                ['d' => 'authoradditional_given', 'a' => 'authoradditional_surname']);
+                    $this->setResponseFromSubfields($field, $response, [
+                        'd' => 'authoradditional_given', 'a' => 'authoradditional_surname',
+                    ]);
                     break;
 
                 case '028C':
-                    $this->setResponseFromSubfields($field, $response,
-                                ['d' => 'editor_given', 'a' => 'editor_surname']);
+                    $this->setResponseFromSubfields($field, $response, [
+                        'd' => 'editor_given', 'a' => 'editor_surname',
+                    ]);
                     break;
 
                 case '033A':
-                    $this->setResponseFromSubfields($field, $response,
-                                ['p' => 'place', 'n' => 'publisher']);
+                    $this->setResponseFromSubfields($field, $response, [
+                        'p' => 'place', 'n' => 'publisher',
+                    ]);
                     break;
 
                 case '034D':
-                    $this->setResponseFromSubfields($field, $response,
-                                ['a' => 'pages']);
+                    $this->setResponseFromSubfields($field, $response, [
+                        'a' => 'number_of_pages',
+                    ]);
                     break;
 
                 case '036E':
-                    $this->setResponseFromSubfields($field, $response,
-                                ['a' => 'series']);
+                    $this->setResponseFromSubfields($field, $response, [
+                        'a' => 'series', 'l' => 'series_number',
+                    ]);
                     break;
             }
         }
@@ -244,36 +265,43 @@ class BiblioService_GBV
             }
             unset($response['authoradditional_surname']);
         }
+
         if (isset($response['authoradditional_given'])) {
             if (!isset($response['author_given'])) {
                 $response['author_given'] = $response['authoradditional_given'];
             }
             unset($response['authoradditional_given']);
         }
+
         foreach ([ 'author', 'editor' ] as $prefix) {
             if (isset($response[$prefix . '_surname'])) {
-                if ('array' != gettype($response[$prefix . '_surname'])) {
-                    $response[$prefix . '_surname'] = [$response[$prefix . '_surname']];
+                if (!is_array($response[$prefix . '_surname'])) {
+                    $response[$prefix . '_surname'] = [ $response[$prefix . '_surname'] ];
                 }
-                if ('array' != gettype($response[$prefix . '_given'])) {
-                    $response[$prefix . '_given'] = [$response[$prefix . '_given']];
+                if (!is_array($response[$prefix . '_given'])) {
+                    $response[$prefix . '_given'] = [ $response[$prefix . '_given'] ];
                 }
+
                 $persons = [];
                 for ($i = 0; $i < count($response[$prefix . '_surname']); $i++) {
                     $fullname = trim($response[$prefix . '_surname'][$i]);
                     if (!empty($response[$prefix . '_given'][$i])) {
                         $fullname .= ', ' . trim($response[$prefix . '_given'][$i]);
                     }
-                    $persons[] = $fullname;
+
+                    if (!in_array($fullname, $persons)) {
+                        $persons[] = $fullname;
+                    }
                 }
                 $response[$prefix] = implode('; ', $persons);
                 unset($response[$prefix . '_surname']);
             }
+
             unset($response[$prefix . '_given']);
         }
 
         // isbn post-processing
-        if (array_key_exists('isbn', $response) && 'array' == gettype($response['isbn'])) {
+        if (array_key_exists('isbn', $response) && is_array($response['isbn'])) {
             $isbns = array_unique($response['isbn']); // throw away duplicates
             sort($isbns);
             // take lowest for older books, highest (hopefully isbn-13) for newer
@@ -289,10 +317,12 @@ class BiblioService_GBV
         if (array_key_exists('binding', $response) && is_array($response['binding'])) {
             $count_before = count($response['binding']);
             $response['binding'] = array_unique($response['binding']);
+
             if (count($response['binding']) != $count_before
                 && array_key_exists('listprice', $response) && is_array($response['listprice'])) {
                 $response['listprice'] = array_unique($response['listprice']);
             }
+
             $response['binding'] = implode(', ', $response['binding']);
         }
 
@@ -302,6 +332,12 @@ class BiblioService_GBV
 
         if (array_key_exists('listprice', $response)) {
             $response['listprice'] = preg_replace('/Eur\b/', 'EUR', $response['listprice']);
+        }
+
+        if (array_key_exists('series_number', $response)) {
+            $response['series'] = (!empty($response['series']) ? $response['series'] . '; ' : '')
+                                . $response['series_number'];
+            unset($response['series_number']);
         }
 
         return $response;
