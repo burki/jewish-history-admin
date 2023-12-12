@@ -4,9 +4,9 @@
  *
  * Methods to check/update sources and articles in the frontend
  *
- * (c) 2019 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2019-2023 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2019-03-29 dbu
+ * Version: 2023-08-03 dbu
  *
  *
  */
@@ -23,10 +23,10 @@ class PresentationService
             'locale' => 'de',
             'source' => 'quelle',
             'article' => 'beitrag',
-            'url' => 'https://juedische-geschichte-online.net',
+            'url' => 'https://schluesseldokumente.net',
         ],
         'eng' => [
-            'url' => 'https://jewish-history-online.net',
+            'url' => 'https://keydocuments.net',
             'locale' => 'en',
         ],
     ];
