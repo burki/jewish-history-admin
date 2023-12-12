@@ -6,7 +6,7 @@
  *
  * (c) 2015-2023 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2023-04-20 dbu
+ * Version: 2023-12-12 dbu
  *
  * TODO:
  *
@@ -225,6 +225,8 @@ extends DisplayBackend
       'peninsula' => tr('Peninsula'),
       'island' => tr('Island'),
       'river' => tr('River'),
+      'stream' => tr('Stream'),
+      'channel' => tr('Channel'),
       'association' => tr('Association'),
       'miscellaneous' => tr('Miscellaneous'),
     ];
