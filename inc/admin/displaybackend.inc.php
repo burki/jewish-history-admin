@@ -69,7 +69,7 @@ extends TableManagerFlow
 class CollectingReader
 extends Sabre\Xml\Reader
 {
-  function xml($source, $encoding = null, $options = 0)
+  /* static */ function xml($source, $encoding = null, $options = 0)
   {
     // hack for <?xml-model href="http://www.deutschestextarchiv.de/basisformat_ohne_header.rng"
     // type="application/xml"

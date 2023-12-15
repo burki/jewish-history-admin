@@ -5,16 +5,18 @@
  * Sitewide settings
  * (put machine dependent stuff like hardwired paths, logins and passwords in inc/local.inc.php)
  *
- * (c) 2009-2021 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2023 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2021-03-06 dbu
+ * Version: 2023-08-06 dbu
  *
  * Changes:
  *
  */
 
 // General Settings
-define('SESSION_NAME', 'sid');
+if (!defined('SESSION_NAME')) {
+    define('SESSION_NAME', 'sid');
+}
 
 date_default_timezone_set('Europe/Berlin');
 
@@ -43,6 +45,16 @@ $RIGHTS_ADMIN = 0x04;   // these can handle restricted system settings
 
 define('STATUS_DELETED', -1); // reserved value in the database
 define('STATUS_USER_DELETED', -100); // -1 stands for rejected
+
+define('MYSQL_REGEX_WORD_BEGIN',
+       defined('ICU_REGEX') && ICU_REGEX
+       ? '\\b'
+       : '[[:<:]]');
+
+define('MYSQL_REGEX_WORD_END',
+        defined('ICU_REGEX') && ICU_REGEX
+        ? '\\b'
+        : '[[:>:]]');
 
 // settings for mails that are sent through php
 // should wrap this into a mail/configuration class
