@@ -13,7 +13,7 @@ CREATE TABLE User (
   firstname varchar(255) NULL,
   lastname varchar(255) NULL,
   slug VARCHAR(255) NULL,
-  sex enum('F','M') NULL,
+  sex enum('F', 'M', 'N') NULL,
   title varchar(50) NULL,
   position varchar(255) NULL,
   email_work varchar(255) NULL,
@@ -267,7 +267,7 @@ CREATE TABLE Person (
   firstname     VARCHAR(255) NULL,              # Firstname(s)
 
   title         VARCHAR(255) NULL,
-  sex           ENUM('M', 'F') NULL,
+  sex           ENUM('M', 'F', 'N') NULL,
 
   name_variant  TEXT NULL,
 

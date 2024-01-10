@@ -4,9 +4,9 @@
  *
  * Manage the Person-table
  *
- * (c) 2009-2020 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2024 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2020-08-05 dbu
+ * Version: 2024-01-10 dbu
  *
  * TODO:
  *
@@ -240,7 +240,12 @@ EOT;
     $countries_ordered = ['' => $label_select_country]
                        + $this->buildCountryOptions(true);
 
-    $sex_options = ['' => '--', 'M' => tr('male'), 'F' => tr('female')];
+    $sex_options = [
+      '' => '--',
+      'M' => tr('male'),
+      'F' => tr('female'),
+      'N' => tr('non-binary'),
+    ];
 
     $this->view_options['birthplace_id']
       = $this->view_options['deathplace_id']
@@ -323,7 +328,7 @@ EOT;
       'id' => false, 'status' => false,
       'sex_title' => [
         'label' => 'Gender / (Academic) Title',
-        'fields' => [ 'gender', 'title' ],
+        'fields' => [ 'gender', 'honoricPrefix' ],
       ],
       'familyName' => [ 'label' => 'Last Name' ],
       'givenName' => [ 'label' => 'First Name(s)' ],
@@ -501,7 +506,7 @@ EOT;
 
 
         $GND_LINKS = [
-          'http://d-nb.info/gnd/%s' => 'Deutsche Nationalbibliothek',
+          'https://d-nb.info/gnd/%s' => 'Deutsche Nationalbibliothek',
         ];
         $rows['gnd']['value'] = '<ul><li>';
 
@@ -514,7 +519,6 @@ EOT;
           $url_final = sprintf($url, $gnd);
           $external[] = sprintf('<li><a href="%s" target="_blank">%s</a></li>',
                                 htmlspecialchars($url_final), $this->formatText($title));
-
         }
 
         if (count($external) > 0) {
@@ -528,9 +532,13 @@ EOT;
           service.services = {
             'pndaks' : new SeeAlsoService('http://beacon.findbuch.de/seealso/pnd-aks/')
           };
-          service.views = { 'seealso-ul' : new SeeAlsoUL({ /* preHTML : '<h3>Externe Angebote</h3>', */
-                                                            linkTarget: '_blank',
-                                                            maxItems: 100 }) };
+          service.views = {
+            'seealso-ul' : new SeeAlsoUL({
+              /* preHTML : '<h3>Externe Angebote</h3>', */
+              linkTarget: '_blank',
+              maxItems: 100
+            })
+          };
           service.replaceTagsOnLoad();
 
 EOT;

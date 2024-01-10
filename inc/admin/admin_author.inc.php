@@ -4,9 +4,9 @@
  *
  * Manage the authors
  *
- * (c) 2006-2019 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2024 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2019-01-31 dbu
+ * Version: 2024-01-10 dbu
  *
  * Changes:
  *
@@ -31,10 +31,8 @@ extends TableManagerFlow
   var $is_internal = false;
 
   function __construct ($page) {
-    global $RIGHTS_EDITOR;
-
     $this->user = $page->user;
-    $this->is_internal = 0 != ($this->user['privs'] & $RIGHTS_EDITOR);
+    $this->is_internal = 0 != ($this->user['privs'] & $GLOBALS['RIGHTS_EDITOR']);
 
     parent::__construct($this->is_internal);
   }
@@ -50,15 +48,14 @@ extends TableManagerFlow
 
       return parent::init($page);
     }
-    else {
-      // only view
-      if (isset($page->parameters['view']) && ($id = intval($page->parameters['view'])) > 0) {
-        $this->id = $id;
-        return TABLEMANAGER_VIEW;
-      }
 
-      return false;
+    // only view
+    if (isset($page->parameters['view']) && ($id = intval($page->parameters['view'])) > 0) {
+      $this->id = $id;
+      return TABLEMANAGER_VIEW;
     }
+
+    return false;
   }
 
   function primaryKey ($id = '') {
@@ -90,6 +87,7 @@ extends TableManagerRecord
     if (!empty($lastname)) {
       $name_parts[] = $lastname;
     }
+
     $firstname = $this->get_value('firstname');
     if (!empty($firstname)) {
       $name_parts[] = $firstname;
@@ -150,6 +148,7 @@ extends DisplayTable
   var $joins_listing;
   var $order = [
     'name' => [ 'lastname, firstname', 'lastname DESC, firstname DESC' ],
+    'email' => [ 'email, User.id', 'email DESC, User.id DESC' ],
     'created' => [ 'created DESC, User.id desc', 'created, User.id' ],
   ];
   var $cols_listing = [
@@ -177,12 +176,13 @@ extends DisplayTable
     if (!isset($this->search_fulltext)) {
       $this->search_fulltext = $this->page->getSessionValue('fulltext');
     }
+
     $this->page->setSessionValue('fulltext', $this->search_fulltext);
 
     $review = $this->page->getSessionValue('review');
     if (null === $review && !array_key_exists('review', $_REQUEST)) {
       // default to reviewers only
-      $this->page->getSessionValue('review', $_REQUEST['review'] = 'Y');
+      // $this->page->getSessionValue('review', $_REQUEST['review'] = 'Y');
     }
 
     if ($this->search_fulltext) {
@@ -238,7 +238,12 @@ extends DisplayTable
       $status_options[$val] = tr($label);
     }
 
-    $sex_options = [ '' => '--', 'F' => tr('Mrs.'), 'M' => tr('Mr.') ];
+    $sex_options = [
+      '' => '--',
+      'F' => tr('Mrs.'),
+      'M' => tr('Mr.'),
+      'N' => tr('Non-binary'),
+    ];
     $review_options = [ '' => tr('outstanding request'), 'Y' => tr('yes'), 'N' => tr('no') ];
 
     $record->add_fields([
