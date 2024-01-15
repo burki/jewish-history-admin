@@ -4,9 +4,9 @@
  *
  * Class for managing communication
  *
- * (c) 2008-2023 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2024 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2023-06-20 dbu
+ * Version: 2024-01-15 dbu
  *
  * Changes:
  *
@@ -400,7 +400,7 @@ extends DisplayTable
       new Field([ 'name' => 'message_id', 'type' => 'hidden', 'datatype' => 'int', 'default' => array_key_exists('message_id', $this->defaults) ? $this->defaults['message_id'] : '', 'null' => true ]),
       new Field([ 'name' => 'type', 'type' => 'hidden', 'datatype' => 'int', 'default' => array_key_exists('type', $this->defaults) ? $this->defaults['type'] : 0, 'null' => true, 'noupdate' => true ]),
       new Field([ 'name' => 'flags', 'type' => 'checkbox', 'datatype' => 'bitmap', 'null' => true,
-                  'default' => array_key_exists('type', $this->defaults)
+                  'default' => !empty($GLOBALS['COMMUNICATION_ATTACHMENTS']) && array_key_exists('type', $this->defaults)
                       && in_array($this->defaults['type'],
                                   [self::$TYPE_MAP['reviewer_request'], self::$TYPE_MAP['reviewer_sent']])
                       ? 0x02 : 0,
