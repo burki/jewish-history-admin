@@ -229,6 +229,7 @@ $GETTEXT_MESSAGES = [
 	'Referee deadline' => 'Termin Herausgeber',
 	'Voucher copy sent' => 'Belegexemplar verschickt',
 	'Reviewed Publication(s)' => 'Besprochene Publikation(en)',
+	'Article for' => 'Artikel für',
 	'remove' => 'entfernen',
 	'back to overview' => 'zurück zur Übersicht',
 	'Store updated order' => 'geänderte Reihenfolge speichern',

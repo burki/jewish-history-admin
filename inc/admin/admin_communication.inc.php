@@ -6,7 +6,7 @@
  *
  * (c) 2008-2024 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2024-01-15 dbu
+ * Version: 2024-01-18 dbu
  *
  * Changes:
  *
@@ -99,6 +99,7 @@ extends DisplayTable
           $publications[] = $dbconn->Record['publication_id'];
         }
       }
+
       $this->publications = $publications;
 
       if (in_array($_GET['mode'], [ 'publisher_request', 'publisher_vouchercopy' ])
@@ -123,7 +124,7 @@ extends DisplayTable
 
       $SUBJECT = [
         'publisher_request' => 'Anfrage Quelle f&#252;r',
-        'reviewer_request' => 'Artikel f&#252;r',
+        'reviewer_request' => 'Article for',
         'reviewer_sent' => 'Artikel f&#252;r',
         'reviewer_reminder' => 'Erinnerung Artikel f&#252;r',
         'referee_request' => 'Gutachteranfrage',
@@ -142,7 +143,8 @@ extends DisplayTable
           global $SITE;
 
           $this->defaults['subject'] =
-            (array_key_exists($_GET['mode'], $SUBJECT) ? $SUBJECT[$_GET['mode']] . ' ' : '')
+            (array_key_exists($_GET['mode'], $SUBJECT)
+              ? tr($SUBJECT[$_GET['mode']], 'de_DE') . ' ' : '')
             . tr($SITE['pagetitle']);
 
           $fname_base = INC_PATH . 'messages/' . $_GET['mode'];
@@ -150,6 +152,22 @@ extends DisplayTable
           if (!empty($SITE['key'])) {
             // check if there is a site-specific version
             $fname_template = $fname_base . '_' . $SITE['key'] . '.txt';
+
+            // check if there is a locale-specific
+            $locale = preg_replace('/_.*/', '', $this->page->lang());
+
+            if (!empty($locale)) {
+              $fname_template_localized = $fname_base . '_' . $SITE['key'] . '.' . $locale . '.txt';
+              if (file_exists($fname_template_localized)) {
+                $this->defaults['subject'] =
+                  (array_key_exists($_GET['mode'], $SUBJECT)
+                    ? tr($SUBJECT[$_GET['mode']]) . ' ' : '')
+                  . tr($SITE['pagetitle']);
+
+                $fname_template = $fname_template_localized;
+              }
+            }
+
             if (!file_exists($fname_template)) {
               $fname_template = null;
             }
@@ -165,6 +183,7 @@ extends DisplayTable
                                                             [$this, 'replacePlaceholder'],
                                                             $template);
           }
+
           break;
       }
     }
@@ -315,7 +334,21 @@ extends DisplayTable
         }
 
         if (empty($ret)) {
-          $ret = 'Sehr geehrte/r Herr/Frau';
+          $ret = 'Sehr geehrte/r Frau/Herr';
+        }
+        break;
+
+      case 'salutation_name_en':
+        if (isset($this->defaults['to_id'])) {
+          $user = $this->fetchUser($this->defaults['to_id']);
+          if (isset($user)) {
+            $ret = ('F' == $user['sex'] ? 'Dear Ms.' : 'Dear Mr.')
+                 . ' ' . $user['lastname'];
+          }
+        }
+
+        if (empty($ret)) {
+          $ret = 'Dear Madam/Sir';
         }
         break;
 
