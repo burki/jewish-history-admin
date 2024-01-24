@@ -6,7 +6,7 @@
  *
  * (c) 2008-2024 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2024-01-18 dbu
+ * Version: 2024-01-24 dbu
  *
  * Changes:
  *
@@ -568,6 +568,19 @@ extends DisplayTable
       $links = [];
 
       foreach ($GLOBALS['COMMUNICATION_ATTACHMENTS'] as $fname) {
+        if (file_exists($fname_full = BASE_FILEPATH . 'data/' . $fname)) {
+          // check for localized attachment
+          $locale = preg_replace('/_.*/', '', $this->page->lang());
+          $parts = pathinfo($fname);
+          $fname_localized = sprintf('%s.%s.%s',
+                                     $parts['filename'],
+                                     $locale,
+                                     $parts['extension']);
+          if (file_exists(BASE_FILEPATH . 'data/' . $fname_localized)) {
+            $fname = $fname_localized;
+          }
+        }
+
         $links[] = sprintf('<a href="%sdata/%s">%s</a>',
                              BASE_PATH, $fname, $fname);
       }
@@ -594,6 +607,18 @@ extends DisplayTable
       if (0 != (0x02 & $this->record->get_value('flags'))
           && file_exists($fname_full = BASE_FILEPATH . 'data/' . $fname))
       {
+        // check for localized attachment
+        $locale = preg_replace('/_.*/', '', $this->page->lang());
+        $parts = pathinfo($fname);
+        $fname_localized = sprintf('%s.%s.%s',
+                                    $parts['filename'],
+                                    $locale,
+                                    $parts['extension']);
+        if (file_exists(BASE_FILEPATH . 'data/' . $fname_localized)) {
+          $fname = $fname_localized;
+          $fname_full = BASE_FILEPATH . 'data/' . $fname;
+        }
+
         $attachment = Swift_Attachment::newInstance(file_get_contents($fname_full),
                                                     $fname, 'application/pdf');
         $mail->attach($attachment);
