@@ -27,6 +27,7 @@ extends PageDisplayBase
   var $span_range = null; // '[\x{3400}-\x{9faf}]';
   var $span_class = ''; // 'cn';
   var $xls_data = [];
+  var $images;
 
   function __construct (&$page) {
     global $RIGHTS_REFEREE, $RIGHTS_EDITOR;

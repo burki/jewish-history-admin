@@ -6,7 +6,7 @@
  *
  * (c) 2009-2023 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2023-04-20 dbu
+ * Version: 2023-11-19 dbu
  *
  * Changes:
  *
@@ -47,8 +47,9 @@ class Page
   var $SERVER_PORT;
   var $BASE_PATH = './';
   var $BASE_URL;
+  var $PHP_SELF;
+  var $URL_SELF;
   var $use_session = false;
-  var $use_session_register = false;
   var $dbconn;
   var $expired = false;
   var $site_description;
@@ -149,7 +150,7 @@ class Page
   function identify () {
     global $AUTH_METHODS;
 
-    if (empty($_SESSION['user'])) {
+    if (isset($AUTH_METHODS) && !isset($_SESSION['user'])) {
       foreach ($AUTH_METHODS as $method => $value) {
         // echo "Trying $method $value";
         $done = false;
@@ -159,6 +160,7 @@ class Page
             if ($status < 0) {
               $this->msg = tr('Sorry, the e-mail or password you entered is incorrect. Please try again.');
             }
+
             $done = true;
             break;               // failed - go to next method
 
@@ -202,7 +204,7 @@ class Page
         self::$lang = key(self::$languages);
 
         if (false) {
-          // try to get the language from user settings (cookie oder prefs from database
+          ; // TODO: try to get the language from user settings (cookie oder prefs from database
         }
         else if (array_key_exists('HTTP_ACCEPT_LANGUAGE', $_SERVER)) {
           // TODO: get default language either from browser settings
@@ -246,7 +248,6 @@ class Page
   function determinePage ($pn) {
     if (isset($this->site_description) && isset($this->site_description['structure'])) {
       $path = [];
-
       foreach ($this->site_description['structure'] as $name => $descr) {
         if (count($path) == 0) {
           $path[] = $name;
@@ -267,7 +268,7 @@ class Page
     }
     else {
       $this->name = 'root';
-      $this->path = [$this->name];
+      $this->path = [ $this->name ];
     }
 
     if (!isset($this->include)) {
@@ -306,12 +307,11 @@ class Page
       session_start();                    // and start it
 
       $this->use_session = true;
-      if (1 == ini_get('register_globals')) {
-        $this->use_session_register = true;
-      }
     }
 
     $this->expire();
+
+    $this->identify();
 
     $this->determineLang();
 
@@ -320,8 +320,6 @@ class Page
       // $this->lang and $this->user
       setlocale(LC_CTYPE, LOCALE_DEFAULT);
     }
-
-    $this->identify();
 
     $this->determinePage($pn);
 
@@ -491,19 +489,17 @@ class Page
       return;
     }
 
-    return $thispage_only
-      ? (isset($_SESSION[$key][$name]) ? $_SESSION[$key][$name] : null)
-      : (isset($_SESSION[$key]) ? $_SESSION[$key]: null);
+    if (!isset($_SESSION[$key][$name])) {
+      return;
+    }
+
+    return $thispage_only ? $_SESSION[$key][$name] : $_SESSION[$key];
   }
 
   function setSessionValue ($name, $value, $thispage_only = true) {
     static $PREPEND = '_';
 
     $key = $thispage_only ? $PREPEND . $this->name : $PREPEND . $name;
-
-    if ($this->use_session_register && !session_is_registered($key)) {
-      session_register($key);
-    }
 
     if ($thispage_only) {
       $_SESSION[$key][$name] = $value;
@@ -516,7 +512,7 @@ class Page
   }
 
   function passwordValid ($pwd, $pwd_confirm) {
-    if (strlen($pwd) < 6) {
+    if (mb_strlen($pwd, 'UTF-8') < 6) {
       return -1;
     }
 
@@ -618,29 +614,31 @@ class Page
     $base = $this->BASE_PATH; // may be overridden through $URL_REWRITE['host'];
 
     if (isset($options)) {
-      if (gettype($options) == 'string' && $options != '') { // split get-options into ass. array
+      if (is_string($options) && $options != '') {
+        // split get-options into ass. array
         // TODO: ignore a possible leading ?
-        $args = split('&', $options);
+        $args = explode('&', $options);
         $options = [];
-        for ($i=0; $i < count($args); $i++) {
+        for ($i = 0; $i < count($args); $i++) {
           $keyval = split('=', $args[$i], 2);
           $options[$keyval[0]] = count($keyval) == 2 ? $keyval[1] : '';
         }
       }
 
-      if (gettype($options) == 'array') {
+      if (is_array($options)) {
         if (isset($options['pn']) && '' === $options['pn']) // 'pn' => '' shortcut for homepage
           $options['pn'] = 'root';
 
         foreach ($options as $key => $val) {
-          if (gettype($val) == 'string' && empty($val)) {
+          if (is_string($val) && empty($val)) {
             continue;
           }
+
           if ('anchor' == $key) {
             $anchor = '#' . $val;
           }
           else if ('pn' == $key && isset($URL_REWRITE[$val])) {
-            if (gettype($URL_REWRITE[$val]) == 'string') {
+            if (is_string($URL_REWRITE[$val])) {
               $rewrite = $URL_REWRITE[$val];
               if (preg_match('/^http(s?)\:/', $rewrite)) {
                 $base = '';
@@ -648,15 +646,16 @@ class Page
             }
             else {
               $rewrite = $val;
-              if (isset($URL_REWRITE['host'])){
+              if (isset($URL_REWRITE['host'])) {
                 $base = $URL_REWRITE['host'] . '/';
               }
-              if ('array' == gettype($URL_REWRITE[$val])) {
-                foreach (['prepend', 'append'] as $mode) {
+
+              if (is_array($URL_REWRITE[$val])) {
+                foreach ([ 'prepend', 'append' ] as $mode) {
                   if (isset($URL_REWRITE[$val][$mode])) {
                     $keys = $URL_REWRITE[$val][$mode];
-                    if ('array' != gettype($keys)) {
-                      $keys = [$keys];
+                    if (!is_array($keys)) {
+                      $keys = [ $keys ];
                     }
                     foreach ($keys as $name) {
                       if (isset($options[$name])) {
@@ -676,7 +675,7 @@ class Page
           }
           else if (!isset($skip[$key])) {
             $optstring = ($optstring == '' ? '' : $optstring . '&')
-                       . $key . '=' . rawurlencode($val);
+                       . $key . '=' . (!is_null($val) ? rawurlencode($val) : '');
           }
         }
       }
@@ -718,7 +717,7 @@ class Page
   // sends HTTP-Redirect-Header to another page in the site
   //------------------------------------------------------------
   function redirect ($options = '', $delay = 0, $base_url = '') {
-    if (gettype($options) == 'string' && preg_match('/^(http|https|ftp)\\:\\/\\//', $options)) {
+    if (is_string($options) && preg_match('/^(http|https|ftp)\\:\\/\\//', $options)) {
       $url = $options;
     }
     else {

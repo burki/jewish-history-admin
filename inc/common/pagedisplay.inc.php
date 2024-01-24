@@ -19,6 +19,7 @@ class PageDisplayBase
   var $charset;
   var $script_url = [];
   var $script_code = '';
+  var $script_ready = [];
   var $style = '';
   var $image_wrap_div_class = '';
   var $image_caption_class = 'caption';
@@ -26,7 +27,7 @@ class PageDisplayBase
   var $span_range = null; // '[\x{3400}-\x{9faf}]';
   var $span_class = ''; // 'cn';
 
-  function __construct (&$page) {
+  function __construct ($page) {
     $this->page = $page;
   }
 
@@ -69,8 +70,8 @@ class PageDisplayBase
       return $txt;
     }
 
-    $match = ['/&(?!\#\d+;)/s', '/</s', '/>/s', '/"/s'];
-    $replace = ['&amp;', '&lt;', '&gt;', '&quot;'];
+    $match = [ '/&(?!\#\d+;)/s', '/</s', '/>/s', '/"/s' ];
+    $replace = [ '&amp;', '&lt;', '&gt;', '&quot;' ];
 
     return preg_replace($match, $replace, $txt, -1);
   }
@@ -80,6 +81,7 @@ class PageDisplayBase
 
     if (preg_match('/\bsrc\=\"([^\"]*)\"/', $attrs, $matches)) {
       $url = $matches[1];
+
       if (preg_match('/^http:\/\/(\d+)$/', $url, $matches)) {
         // we have to build a local image
         if (isset($this->image)) {
@@ -108,7 +110,7 @@ class PageDisplayBase
 
           $style = '';
           if (preg_match('/\bstyle\=\"([^\"]*)\"/', $attrs, $matches)) {
-            $style = ' '.$matches[0];
+            $style = ' ' . $matches[0];
           }
 
           $ret = $tag;
@@ -119,6 +121,7 @@ class PageDisplayBase
             if (isset($this->image_caption_setleft)) {
               $caption_style .= 'left:' . $left . 'px;';
             }
+
             if ($this->image_caption_setwidth) {
               $caption_style .= 'width:' . $img_width . 'px;';
             }
@@ -149,20 +152,20 @@ class PageDisplayBase
       }
     }
 
-    return '<img '. $attrs . ' />';
+    return '<img ' . $attrs . ' />';
   }
 
   function adjustCharacters ($txt) {
-    $match = ['/\-\-/s']; // , '/—/s', '/’/s', '/[“”]/s', '/&amp;(\#\d+;)/s');
-    $replace = ['&#8212;']; // , '&#8212;', "'", '"', '&\1');
+    $match = [ '/\-\-/s' ]; // , '/ï¿½/s', '/ï¿½/s', '/[ï¿½ï¿½]/s', '/&amp;(\#\d+;)/s');
+    $replace = [ '&#8212;' ]; // , '&#8212;', "'", '"', '&\1');
     $ret = preg_replace($match, $replace, $txt, -1);
 
     $ret = preg_replace_callback('/<img\s*([^>]*)\/?>/s',
-                                [&$this, 'placeImages'], $ret);
+                                [ $this, 'placeImages' ], $ret);
 
     if (isset($this->span_range)) {
-      $ret = preg_replace('/('.$this->span_range.'+)/us',
-                          '<span class="'.$this->span_class.'">\1</span>', $ret);
+      $ret = preg_replace('/(' . $this->span_range . '+)/us',
+                          '<span class="' . $this->span_class . '">\1</span>', $ret);
     }
 
     return $ret;
@@ -184,7 +187,8 @@ class PageDisplayBase
 
   function instantiateEncoder ($paragraph_mode = true) {
     $encoder = @Text_Wiki_CmsCode::factory('CmsCode');
-    $encoder->setFormatConf('Xhtml', 'translate', HTML_SPECIALCHARS); // default HTML_ENTITIES messes up &Zcaron
+    // default HTML_ENTITIES messes up &Zcaron;
+    $encoder->setFormatConf('Xhtml', 'translate', HTML_SPECIALCHARS);
     if ('utf-8' == $this->charset) {
       $encoder->setFormatConf('Xhtml', 'charset', 'UTF-8');
     }
@@ -192,7 +196,7 @@ class PageDisplayBase
     $encoder->addPath('render', $encoder->fixPath(LIB_PATH . 'CmsCode'));
 
     $encoder->setRenderConf('Xhtml', 'Wikilink',
-                            ['render_callback' => [&$this, 'buildWikilink']]);
+                            [ 'render_callback' => [ $this, 'buildWikilink' ]]);
 
     if ($paragraph_mode) {
       $encoder->enableRule('Newline');
@@ -209,7 +213,8 @@ class PageDisplayBase
   function formatText ($txt) {
     $encoder = $this->instantiateEncoder(false);
 
-    return preg_replace('/\n/', '<br />', trim($this->adjustCharacters(@$encoder->transform($txt))));
+    return preg_replace('/\n/', '<br />',
+                        trim($this->adjustCharacters(@$encoder->transform($txt))));
   }
 
   function convertToPlain ($txt) {
@@ -218,7 +223,7 @@ class PageDisplayBase
       $encoder->setFormatConf('Plain', 'charset', 'UTF-8');
     }
 
-    $encoder->addPath('render', $encoder->fixPath(LIB_PATH.'CmsCode'));
+    $encoder->addPath('render', $encoder->fixPath(LIB_PATH . 'CmsCode'));
 
     return $encoder->transform($txt, 'Plain');
   }
@@ -227,7 +232,8 @@ class PageDisplayBase
     // $txt = $this->htmlSpecialchars ($txt);
     $encoder = $this->instantiateEncoder(true);
 
-    $class = ''; $enable_list = false;
+    $class = '';
+    $enable_list = false;
     switch (gettype($options)) {
       case 'array':
         if (array_key_exists('class', $options))
@@ -295,12 +301,14 @@ class PageDisplayBase
 
   function addMailto ($email) {
     return self::validateEmail($email)
-      ? '<a href="mailto:'.$email.'">'.$email.'</a>' : $email;
+      ? '<a href="mailto:' . $email . '">' . $email . '</a>' : $email;
   }
 
   function linkEmails ($txt) {
-    return preg_replace('/([_a-z0-9-][_a-z0-9-\.]*\@[_a-z0-9-\.]*[_a-z0-9-])/se',
-                        '$this->addMailto'."('\\1')", $txt, -1);
+    return preg_replace_callback('/([_a-z0-9-][_a-z0-9-\.]*\@[_a-z0-9-\.]*[_a-z0-9-])/s',
+                                 function ($matches) {
+                                    return $this->addMailto($matches[1]);
+                                 }, $txt, -1);
   }
 
   function buildImgFname ($item_id, $type, $name, $mime) {
@@ -329,7 +337,6 @@ class PageDisplayBase
          . ($append_uid ? '?uid=' . $uid : '');
   }
 
-
   function buildImgTag ($relurl, $attrs = '') {
     // global $IMG_ENLARGE_ADDWIDTH, $IMG_ENLARGE_ADDHEIGHT;
     $IMG_ENLARGE_ADDWIDTH = $IMG_ENLARGE_ADDHEIGHT = 200;
@@ -351,6 +358,7 @@ class PageDisplayBase
         ? preg_replace('/^' . preg_quote(UPLOAD_URLROOT, '/') . '/', UPLOAD_FILEROOT, $relurl)
         : preg_replace('/^' . preg_quote(BASE_PATH, '/') . '/', './', $relurl);
       $fname = preg_replace('/\?.*/', '', $fname);
+
       // var_dump($fname);
       $size = @getimagesize($fname);
       if (isset($size)) {
@@ -454,7 +462,7 @@ class PageDisplayBase
                                     $params);
 
       if ($return_caption) {
-        return [$img_tag, $caption, $copyright];
+        return [ $img_tag, $caption, $copyright ];
       }
 
       return $img_tag;
@@ -540,19 +548,20 @@ class PageDisplayBase
   function buildHtmlStart () {
     // javascript
     $scriptcode = '';
-    foreach($this->script_url as $url) {
+
+    foreach ($this->script_url as $url) {
       $scriptcode .= sprintf('<script language="JavaScript" type="text/javascript" src="%s"></script>'."\n",
                              htmlspecialchars($this->page->BASE_PATH . $url));
     }
 
     if (!empty($this->script_url_ie)) {
-      foreach($this->script_url_ie as $url_ie) {
+      foreach ($this->script_url_ie as $url_ie) {
         $scriptcode .= sprintf('<!--[if lt IE 7]>'
                                . '<script defer type="text/javascript" src="%s"></script>'
                                . '<![endif]-->' . "\n",
                                htmlspecialchars($this->page->BASE_PATH . $url_ie));
       }
-    }
+   }
 
     if (!empty($this->script_ready)) {
       $scriptcode .= '<script language="JavaScript" type="text/javascript">'
