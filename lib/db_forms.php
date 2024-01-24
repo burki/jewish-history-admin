@@ -214,7 +214,7 @@
       }
     }
 
-    function parse ($datetimestring, $century_window = 50, $incomplete = FALSE) {
+    function parse ($datetimestring, $century_window = 50, $incomplete = false) {
       $datetimestring = trim($datetimestring); // get rid of spaces first
       // TODO: add support for time only
 
@@ -231,8 +231,10 @@
           $day = intval($matches[$daypos]);
           $month = intval($matches[$monthpos]);
           $year = $matches[3];
-          if ('0000' === $year)
-            $year_handle_short = FALSE;
+          if ('0000' === $year) {
+            $year_handle_short = false;
+          }
+
           $year = intval($year);
 
           $timestr = $matches[4];
@@ -242,8 +244,10 @@
           $day = intval($matches[$daypos]);
           $month = intval($matches[$monthpos]);
           $year = $matches[3];
-          if ('0000' === $year)
-            $year_handle_short = FALSE;
+          if ('0000' === $year) {
+            $year_handle_short = false;
+          }
+
           $year = intval($year);
         }
         else if ($incomplete) {
@@ -252,32 +256,37 @@
             $matched = 1;
             $month = intval($matches[1]);
             $year = $matches[2];
-            if ('0000' === $year)
-              $year_handle_short = FALSE;
-            $year = intval($year);
-          }
-          if (preg_match('/^[[:blank:]]*([0-9]+)[[:blank:]]*$/', $date, $matches)) {
-            $matched = 1;
-            $day = NULL;
-            $month = NULL;
-            $year = $matches[1];
-            if ('0000' === $year)
-              $year_handle_short = FALSE;
+            if ('0000' === $year) {
+              $year_handle_short = false;
+            }
+
             $year = intval($year);
           }
 
+          if (preg_match('/^[[:blank:]]*([0-9]+)[[:blank:]]*$/', $date, $matches)) {
+            $matched = 1;
+            $day = null;
+            $month = null;
+            $year = $matches[1];
+            if ('0000' === $year) {
+              $year_handle_short = false;
+            }
+
+            $year = intval($year);
+          }
         }
 
         if ($matched) {
           if ($year_handle_short && $year < 100) {
             $now = getdate();
             $current_century = $now['year'] - $now['year'] % 100;
-            if (gettype($century_window) == 'integer') {
+            if (is_int($century_window)) {
               // if $century_window is a two-digit, set it so it will never be in the future
               if ($century_window < 100) {
                 $century_window += $current_century;
-                if ($century_window > $now['year'])
+                if ($century_window > $now['year']) {
                   $century_window -= 100;
+                }
               }
 
               // now set the year so it will be greater or equal $century_window
@@ -286,14 +295,17 @@
               $century_window_century = $century_window - $century_window % 100;
               $year += ($year < $century_window % 100 ? $century_window_century + 100 : $century_window_century);
             }
-            else if (gettype($century_window) == 'string') {
+            else if (is_string($century_window)) {
               $year += $current_century;
-              if ($century_window == 'future' && $year < $now['year'])
+              if ($century_window == 'future' && $year < $now['year']) {
                 $year += 100;
-              else if ($century_window == 'past' && $year > $now['year'])
+              }
+              else if ($century_window == 'past' && $year > $now['year']) {
                 $year -= 100;
+              }
             }
           }
+
           $hour = 0; $min = 0;
 
           if (!empty($timestr)) {
@@ -304,8 +316,11 @@
               $min = intval($timematches[2]);
             }
           }
-          return ['year' => $year, 'month' => $month, 'day' => isset($day) ? $day : NULL,
-                       'hour' => $hour, 'min' => $min];
+
+          return [
+            'year' => $year, 'month' => $month, 'day' => isset($day) ? $day : null,
+            'hour' => $hour, 'min' => $min,
+          ];
         }
       }
     }  // parse
@@ -313,11 +328,12 @@
     function format_iso ($datetime) {
       return sprintf('%04d-%02d-%02d %02d:%02d:%02d',
                      $datetime['year'], $datetime['month'], $datetime['day'],
-                     $datetime['hour'], $datetime ['min'], isset($datetime ['sec']) ? $datetime ['sec'] : 0);
+                     $datetime['hour'], $datetime['min'],
+                     isset($datetime ['sec']) ? $datetime['sec'] : 0);
     }
 
-    function validate ($date, $incomplete = FALSE) {
-      $valid = TRUE;
+    function validate ($date, $incomplete = false) {
+      $valid = true;
       $invalid = '';
 
       if (isset($date)) {
@@ -326,8 +342,9 @@
         $month = intval($date['month']);
         if ($month < 1 || $month > 12) {
           $invalid = 'datetime_invalid_month';
-          $valid = FALSE;
+          $valid = false;
         }
+
         if ($valid) {
           $day = intval($date['day']);
           if ($day >= 1 && $day <= 31) {
@@ -337,15 +354,15 @@
                      && !($year % 4 == 0 && ($year % 100 != 0 || $year % 400 == 0))
                      )
               ) {
-                 $valid = FALSE;
+                 $valid = false;
               }
             }
             else if ($day == 31
               && ($month == 4 || $month == 6 || $month == 9 || $month == 11))
-              $valid = FALSE;
+              $valid = false;
           }
           else
-            $valid = FALSE;
+            $valid = false;
 
           if (!$valid) {
             $invalid = 'datetime_invalid_day';
@@ -355,17 +372,17 @@
           $hour = intval($date['hour']);
           $min  = intval($date['min']);
           if ($hour < 0 || $hour > 23 || $min < 0 || $min > 59 ) {
-            $valid = FALSE; $invalid = 'datetime_invalid_time';
+            $valid = false; $invalid = 'datetime_invalid_time';
           }
         }
       }
       else {
-        $valid = FALSE;
+        $valid = false;
         $invalid = 'datetime_invalid_format';
       }
+
       return $valid;
     } // validate
-
   } // DateTimeParser
 
   class Field
@@ -378,10 +395,6 @@
       }
     }
 
-    function Field ($field = '') {
-      self::__construct($field);
-    }
-
     function sql_value ($datatype, $value) {
       switch ($datatype) {
         case 'date':
@@ -390,6 +403,7 @@
                    : sprintf("'%04d-%02d-%02d'",
                              $value['year'], $value['month'], $value['day']);
           break;
+
         case 'datetime':
           $encoded = empty($value)
                    ? 'NULL'
@@ -401,6 +415,7 @@
                              isset($value['min']) ? $value['min'] : 0,
                              isset($value['sec']) ? $value['sec'] : 0);
           break;
+
         case 'timestamp14':
         case 'timestamp':
           $encoded = isset($value) && '' !== $value
@@ -411,16 +426,19 @@
                              isset($value['hour']) ? $value['hour'] : 0,
                              isset($value['min']) ? $value['min'] : 0,
                              isset($value['sec']) ? $value['sec'] : 0)
-                   : 0; // NULL - which would be the clean way, may lead to current-date due to timestamp auto-update
+                   : 0; // null - which would be the clean way, may lead to current-date due to timestamp auto-update
           break;
+
         case 'char':
         case 'varchar':
           if (is_array($value)) {
             $value = implode(', ', $value);
           }
+
           $encoded = isset($value) && (chop($value) != '')
-                   ? "'" . addslashes($value) . "'" : 'NULL';
+            ? "'" . addslashes($value) . "'" : 'NULL';
           break;
+
         case 'bitmap' :
           if (is_array($value)) {
             $newval = 0;
@@ -437,8 +455,10 @@
           }
           break;
         default:
-          $encoded = isset($value) && (chop($value) != '') ? $value : 'NULL';
+          $encoded = isset($value) && (chop($value) != '')
+            ? $value : 'NULL';
       }
+
       return $encoded;
     }
 
@@ -455,14 +475,14 @@
     }
 
     function get ($key) {
-      // echo 'Field::get '.$this->field['name'].' '.$key.'->'.$this->field[$key].'<br>';
+      // echo 'Field::get ' . $this->field['name'] . ' ' . $key . '->' . $this->field[$key] . '<br>';
       if (array_key_exists($key, $this->field)) {
         return $this->field[$key];
       }
     }
 
     function set ($key, $val) {
-      // echo "Field::set $key -> $val: ".'<br>';
+      // echo "Field::set $key -> $val: " . '<br>';
       $this->field[$key] = $val;
     }
   }
@@ -500,17 +520,20 @@
       $this->_set_fieldvalue($this->fields[$name], 'value', $val);
     }
 
-    function set_field ($name, $field) {  // set_field($name, $field in Field) -> $field
+    function set_field ($name, $field) {
+      // set_field($name, $field in Field) -> $field
       $field->set('name', $name);
+
       return $this->fields[$name] = $field;
     }
 
     function get_value ($name) {
       $fields = $this->fields;
-      if (isset($fields[$name]))
+
+      if (isset($fields[$name])) {
         return $fields[$name]->value();
-      else
-        ; // TODO: Emit warning
+      }
+      // TODO: Emit warning
     }
 
     function add_fields ($fields) {
@@ -526,9 +549,11 @@
     function remove_field ($name) {
       if (isset($this->fields[$name])) {
         unset($this->fields[$name]);
-        return TRUE;
+
+        return true;
       }
-      return FALSE;
+
+      return false;
     }
 
     function get_fieldnames () {
@@ -548,9 +573,10 @@
     }
   }
 
-  class RecordSQL extends Record
+  class RecordSQL
+  extends Record
   {
-    private static $RESERVED = ['usage', 'condition'];
+    private static $RESERVED = [ 'usage', 'condition', 'lead' ];
 
     var $params;
 
@@ -560,8 +586,10 @@
 
     function sql_decode ($type, $value) {
       switch ($type) {
-        default: $encoded = $value;
+        default:
+          $encoded = $value;
       }
+
       return $encoded;
     }
 
@@ -581,7 +609,7 @@
           $where = ' WHERE ' . $args['where'];
         }
         else {
-          die('RecordSQL->fetch(array()) has no where-clause');
+          die('RecordSQL->fetch([]) has no where-clause');
         }
 
         if (isset($args['orderby'])) {
@@ -595,7 +623,7 @@
 
       foreach ($this->fields as $name => $thisfield) {
         if (!isset($thisfield)) {
-          $skip = TRUE;
+          $skip = true;
         }
         else if (isset($fields)) {
           $skip = !in_array($name, $fields);
@@ -604,6 +632,7 @@
           $nodbfield = $thisfield->get('nodbfield');
           $skip = isset($nodbfield) && $nodbfield;
         }
+
         if (!$skip) {
           $dbfield = $thisfield->get('datafieldname');
           if (!isset($dbfield) || empty($dbfield)) {
@@ -616,6 +645,7 @@
           }
         }
       }
+
       if (!isset($where)) {
         return -2;
       }
@@ -683,7 +713,6 @@
                         $hour = $matches[1]; $min = $matches[2];
                       }
                     }
-
                   }
                 }
               }
@@ -697,8 +726,10 @@
                 {
                   $matched = 1;
                   $year  = intval($matches[1]);
-                  if ($year < 1900)
+                  if ($year < 1900) {
                     $year += 1900;
+                  }
+
                   $month = $matches[2];
                   $day   = $matches[3];
                   $hour = '00'; $min = '00';
@@ -709,37 +740,47 @@
                   }
                 }
               }
+
               if ($matched) {
                 if (intval($month) != 0 || intval($day) != 0 || intval($year) != 0) {
                   $value = $datetime_style;
                   if ($thisfield->get('incomplete')) {
-                    if ($day == 0)
+                    if ($day == 0) {
                       $value = preg_replace('/D+[\.\/]*/i', '', $value);
-                    if ($month == 0)
+                    }
+
+                    if ($month == 0) {
                       $value = preg_replace('/M+[\.\/]*/i', '', $value);
+                    }
                   }
                   $value = preg_replace(['/(M+)/i', '/(D+)/i', '/(Y+)/i'],
                                         [sprintf("%02d", $month), sprintf("%02d", $day), sprintf("%02d", $year)], $value);
                 }
-                else
+                else {
                   $value = '';
-
-                if ($thisfield->get('type') == 'datetime') {
-                  if (!empty($hour) || !empty($min))
-                    $value .= " $hour:$min";
                 }
 
-                $this->set_fieldvalue($name, 'value_internal',
-                                      ['year' => $year, 'month' => $month, 'day' => $day,
-                                            'hour' => $hour, 'min' => $min]);
+                // format timeparts
+                if ($thisfield->get('type') == 'datetime') {
+                  if (!empty($hour) || !empty($min)) {
+                    $value .= " $hour:$min";
+                  }
+                }
+
+                $this->set_fieldvalue($name, 'value_internal', [
+                  'year' => $year, 'month' => $month, 'day' => $day,
+                  'hour' => $hour, 'min' => $min,
+                ]);
               }
           }
+
           $this->set_value($name, $value);
         }
+
         return 1;
       }
-      else
-        return 0;
+
+      return 0;
     }
 
     function insertupdate ($table, $fieldnames, $keyname, $keyvalue) {
@@ -748,7 +789,7 @@
         return -1;
       }
 
-      $update = FALSE;
+      $update = false;
       if (isset($keyvalue)) {
         $dbconn->query("SELECT COUNT(*) AS count_exists FROM $table WHERE $keyname = $keyvalue");
         $update = $dbconn->next_record() && $dbconn->Record['count_exists'];
@@ -779,6 +820,7 @@
         $fields[] = in_array($name, self::$RESERVED) ? "`$name`" : $name;
         $values[] = $thisfield->sql_value($thisfield->get('datatype'), $value);
       }
+
       if (count($fields) == 0) {
         return -1;
       }
@@ -789,8 +831,10 @@
           if ($i != 0) {
             $querystr .= ', ';
           }
+
           $querystr .= $fields[$i] . '=' . $values[$i];
         }
+
         $querystr .= " WHERE $keyname=$keyvalue";
       }
       else {
@@ -870,6 +914,7 @@
               if (!isset($value)) {
                 $value = $thisfield->value();
               }
+
               $dbfield = $thisfield->get('datafieldname');
               $column = !empty($dbfield) ? $dbfield : $name;
               if (in_array($column, self::$RESERVED)) {
@@ -882,29 +927,33 @@
           }
         }
       }
+
       if ($update) {
         $querystr = "UPDATE $tables SET ";
         for ($i = 0; $i < count($fields); $i++) {
           if ($i != 0) {
             $querystr .= ', ';
           }
+
           $querystr .= $fields[$i] . '=' . $values[$i];
         }
+
         $querystr .= $where;
 
         if (is_array($args) && !empty($args['orderby'])) {
           // so only the first record gets changed
           $querystr .= ' ORDER BY ' . $args['orderby'] . ' LIMIT 1';
         }
-
       }
       else {
         $querystr = "INSERT INTO $tables (" . join(', ', $fields) . ")"
                   . " VALUES (" . join(', ', $values) . ")";
       }
+
       if (count($fields) == 0) {
         return -1;
       }
+
 // var_dump($querystr);
       $dbconn->query($querystr);
       if ($update) {
@@ -933,9 +982,12 @@
           $where = ' WHERE ' . $args['where'];
         }
         else {
-          die ('RecordSQL->fetch(array()) has no where-clause');
+          die ('RecordSQL->fetch([]) has no where-clause');
         }
-        $tables = isset($args['tables']) ? $args['tables'] : $this->params['tables'];
+
+        $tables = isset($args['tables'])
+          ? $args['tables']
+          : $this->params['tables'];
       }
       else {
         $tables = $this->params['tables'];
@@ -950,6 +1002,7 @@
           $where = " $name=" . $thisfield->sql_value($thisfield->get('datatype'), $args);
         }
       }
+
       if (!isset($where)) {
         return -2;
       }
@@ -971,11 +1024,6 @@
       die('Form is an abstract class. Instantiate a derived class (e.g FormHTML instead)');
     }
 
-    // legacy constructor
-    function Form ($record = '') {
-      self::__construct($record);
-    }
-
     // accessor function
     function set_record ($record, $name = '') {
       return $this->record = $record;
@@ -989,15 +1037,17 @@
       // TODO: allow hierarchic names like record1.id
       // TODO: return a reference to $this->fields[$name] (PHP4)
 
-      if (gettype($this->record) == 'NULL')
+      if (gettype($this->record) == 'NULL') {
         return;
+      }
 
       return $this->record->get_field($name);
     }
   }
 
   /* FormField wraps around Field */
-  class FormField extends Field
+  class FormField
+  extends Field
   {
     var $form;
     var $name;
@@ -1010,10 +1060,6 @@
       }
 
       $this->name = $name;
-    }
-
-    function FormField ($form, $name) {
-      self::__construct($form, $name);
     }
 
     // utility functions
@@ -1030,8 +1076,8 @@
         return $txt;
       }
 
-      $match = ['/&(?!\#x?\d+;)/s', '/</s', '/>/s', '/"/s'];
-      $replace = ['&amp;', '&lt;', '&gt;', '&quot;'];
+      $match = [ '/&(?!\#x?\d+;)/s', '/</s', '/>/s', '/"/s' ];
+      $replace = [ '&amp;', '&lt;', '&gt;', '&quot;' ];
 
       return preg_replace($match, $replace, $txt, -1);
     }
@@ -1043,17 +1089,21 @@
 
     function value ($val = '') {
       $value = $this->get('value');
+
       return $value;
     }
 
     function get ($key) {
-      if (isset($this->field[$key]))
+      if (isset($this->field[$key])) {
         return $this->field[$key];
+      }
 
       // pass the call on to the appropriate record-field
       /* // dbu 2000-08-17 php3 didn't like this code
-      if (isset($this->form) && isset($this->form->record->fields[$this->name]))
-        return $this->form->record->fields[$this->name]->get($key); */
+      if (isset($this->form) && isset($this->form->record->fields[$this->name])) {
+        return $this->form->record->fields[$this->name]->get($key);
+      }
+      */
 
       // try this ugly bit of code instead
       if (isset($this->form)) {
@@ -1061,8 +1111,10 @@
         $record = $form->record;
         if (isset($record)) {
           $field = $record->fields[$this->name];
-          if (isset($field))
+
+          if (isset($field)) {
             return $field->get($key);
+          }
         }
       }
     }
@@ -1089,6 +1141,7 @@
       else if ($this->get('datatype') == 'decimal') {
         if ($non_empty && !preg_match('/^\s*([+-]?((([0-9]+\.?)|([0-9]*\.[0-9]+))))\s*$/', $this->value())) {
           $invalid[$this->name] = 'decimal_invalid';
+
           return 0;
         }
       }
@@ -1104,11 +1157,13 @@
           $invalid[$this->name] = 'nonempty_required';
         }
       }
+
       return $valid;
     }
   }
 
-  class FormFieldText extends FormField
+  class FormFieldText
+  extends FormField
   {
     var $DEFAULT_SIZE = 32;
     var $DEFAULT_SIZE_INT = 7;
@@ -1119,36 +1174,38 @@
       $this->name = $name;
     }
 
-    function FormFieldText ($form, $name) {
-      self::__construct($form, $name);
-    }
-
     function show ($params = '') {
-      $prepend  = gettype($params) == 'array' && isset($params['prepend']) ? $params['prepend'] : '';
+      $prepend = is_array($params) && isset($params['prepend']) ? $params['prepend'] : '';
 
       $datatype = $this->get('datatype');
-      $attrnames = ['id', 'class', 'size', 'maxlength', 'disabled', 'readonly'];
+      $attrnames = [ 'id', 'class', 'size', 'maxlength', 'disabled', 'readonly' ];
       $attrs = [];
       for ($i = 0; $i < count($attrnames); $i++) {
         $val = $this->get($attrnames[$i]);
-        if (in_array($attrnames[$i], ['disabled', 'readonly']) && isset($val)) {
-          $val = $val ? $attrnames[$i] : NULL;
+        if (in_array($attrnames[$i], [ 'disabled', 'readonly' ]) && isset($val)) {
+          $val = $val ? $attrnames[$i] : null;
         }
+
         if (!isset($val) && $attrnames[$i] == 'size') {
           switch ($datatype) {
             case 'int':
                 $val = $this->DEFAULT_SIZE_INT;
                 break;
+
             case 'decimal':
                 $val = $this->DEFAULT_SIZE_DECIMAL;
                 break;
+
             default:
                 $val = $this->DEFAULT_SIZE;
           }
         }
-        if (isset($val))
+
+        if (isset($val)) {
           $attrs[] = $attrnames[$i] . '="' . $val . '"';
+        }
       }
+
       // add additional attrs from params
       if (is_array($params)) {
         // var_dump($params);
@@ -1171,11 +1228,13 @@
           }
         }
       }
-      $current_value = $this->value();
-      if (!isset($current_value))
-        $current_value = $this->get('default');
 
-      $current_value = '"'.$this->htmlspecialchars($current_value).'"';
+      $current_value = $this->value();
+      if (!isset($current_value)) {
+        $current_value = $this->get('default');
+      }
+
+      $current_value = '"' . $this->htmlspecialchars($current_value) . '"';
 
       return '<input type="text" name="' . $prepend . $this->name() . '" '
             . 'value=' . $current_value
@@ -1185,49 +1244,54 @@
     }
   }
 
-  class FormFieldTextarea extends FormField
+  class FormFieldTextarea
+  extends FormField
   {
     function __construct ($form, $name) {
       $this->form = $form;
       $this->name = $name;
     }
 
-    function FormFieldTextarea ($form, $name) {
-      self::__construct($form, $name);
-    }
-
     function show ($params = '') {
-      $prepend = gettype($params) == 'array' && isset($params['prepend']) ? $params['prepend'] : '';
-      $defaults = ['rows' => 4, 'cols' => 30, 'wrap' => 'virtual'];
-      foreach (['id', 'disabled', 'readonly'] as $name) {
+      $prepend = is_array($params) && isset($params['prepend']) ? $params['prepend'] : '';
+      $defaults = [ 'rows' => 4, 'cols' => 30, 'wrap' => 'virtual' ];
+      foreach ([ 'id', 'disabled', 'maxlength', 'readonly' ] as $name) {
         $val = $this->get($name);
-        if (in_array($name, ['disabled', 'readonly']) && isset($val)) {
-          $val = $val ? $name : NULL;
+        if (in_array($name, [ 'disabled', 'readonly' ]) && isset($val)) {
+          $val = $val ? $name : null;
         }
-        if (isset($val))
+        if (isset($val)) {
           $defaults[$name] = $val;
-      }
-      if (gettype($params) == 'array') {
-        foreach ($params as $attrname => $value) {
-          if ($attrname != 'prepend')
-            $defaults[$attrname] = $value;
         }
       }
+
+      if (is_array($params)) {
+        foreach ($params as $attrname => $value) {
+          if ($attrname != 'prepend') {
+            $defaults[$attrname] = $value;
+          }
+        }
+      }
+
       $attrs = [];
       foreach ($defaults as $attrname => $default) {
         $val = $this->get($attrname);
         $attrs[] = $attrname . '="' . (isset($val) ? $val : $default) . '"';
       }
-      $attrnames = ['id'];
+
+      $attrnames = [ 'id', 'class' ];
       for ($i = 0; $i < count($attrnames); $i++) {
         $val = $this->get($attrnames[$i]);
-        if (isset($val))
+        if (isset($val)) {
           $attrs[] = $attrnames[$i] . '="' . $val . '"';
+        }
       }
 
       $current_value = $this->value();
-      if (!isset($current_value))
+      if (!isset($current_value)) {
         $current_value = $this->get('default');
+      }
+
       return '<textarea name="' . $prepend . $this->name() . '"'
              . (count($attrs) > 0 ? ' '.join(' ', $attrs) : '')
              . '>'
@@ -1236,18 +1300,15 @@
     }
   }
 
-  class FormFieldEmail extends FormFieldText
+  class FormFieldEmail
+  extends FormFieldText
   {
     var $VALIDATE_LEVEL = 2;
-    var $USE_ZEND_VALIDATOR = FALSE;
+    var $USE_ZEND_VALIDATOR = false;
 
     function __construct ($form, $name) {
       $this->form = $form;
       $this->name = $name;
-    }
-
-    function FormFieldEmail ($form, $name) {
-      self::__construct($form, $name);
     }
 
     function validate (&$invalid) {
@@ -1272,11 +1333,13 @@
         $valid = 0;
         $invalid[$this->name()] = 'nonempty_required';
       }
+
       return $valid;
     } // validate
   }
 
-  class FormFieldDatetime extends FormFieldText
+  class FormFieldDatetime
+  extends FormFieldText
   {
     var $DEFAULT_SIZE = 16;
     var $datetime_parser;
@@ -1286,14 +1349,11 @@
       $this->name = $name;
     }
 
-    function FormFieldDatetime ($form, $name) {
-      self::__construct($form, $name);
-    }
-
     function parse_datetime ($datetime_string, $datetime_style = '', $century_window = 50) {
       if (!isset($datetimeparser[$datetime_style])) {
         $datetimeparser[$datetime_style] = new DateTimeParser($datetime_style);
       }
+
       return $datetimeparser[$datetime_style]->parse($datetime_string, $century_window);
     }
 
@@ -1311,6 +1371,7 @@
             $invalid[$this->name] = 'datetime_invalid_month';
             $valid = 0;
           }
+
           if ($valid) {
             $day = intval($date['day']);
             if ($day >= 1 && $day <= 31) {
@@ -1324,15 +1385,19 @@
                 }
               }
               else if ($day == 31
-                && ($month == 4 || $month == 6 || $month == 9 || $month == 11))
+                && ($month == 4 || $month == 6 || $month == 9 || $month == 11)) {
                 $valid = 0;
+              }
             }
-            else
+            else {
               $valid = 0;
+            }
 
-            if (!$valid)
+            if (!$valid) {
               $invalid[$this->name] = 'datetime_invalid_day';
+            }
           }
+
           if ($valid) {
             $hour = intval($date['hour']);
             $min  = intval($date['min']);
@@ -1348,30 +1413,38 @@
       }
       else {
         $valid = $null;
-        if (!$valid)
+        if (!$valid) {
           $invalid[$this->name] = 'nonempty_required';
+        }
       }
 
       return $valid;
     }
 
     function show ($params = '') {
-      $prepend = gettype($params) == 'array' && isset($params['prepend']) ? $params['prepend'] : '';
+      $prepend = is_array($params) && isset($params['prepend'])
+        ? $params['prepend']
+        : '';
 
-      $attrnames = ['id', 'size', 'maxlength', 'disabled', 'readonly'];
+      $attrnames = [ 'id', 'size', 'maxlength', 'disabled', 'readonly' ];
       $attrs = [];
       for ($i = 0; $i < count($attrnames); $i++) {
         $val = $this->get($attrnames[$i]);
-        if (in_array($attrnames[$i], ['disabled', 'readonly']) && isset($val)) {
-          $val = $val ? $attrnames[$i] : NULL;
+        if (in_array($attrnames[$i], [ 'disabled', 'readonly' ]) && isset($val)) {
+          $val = $val ? $attrnames[$i] : null;
         }
-        if (!isset($val) && $attrnames[$i] == 'size')
+
+        if (!isset($val) && $attrnames[$i] == 'size') {
           $val = $this->DEFAULT_SIZE;
-        if (isset($val))
+        }
+
+        if (isset($val)) {
           $attrs[] = $attrnames[$i] . '="' . $val . '"';
+        }
       }
+
       // add additional attrs from params
-      if (gettype($params) == 'array') {
+      if (is_array($params)) {
         // var_dump($params);
         $attrnames = array_keys($params);
         for ($i = 0; $i < count($attrnames); $i++) {
@@ -1390,15 +1463,19 @@
       }
 
       $current_value = $this->value();
-      if (!isset($current_value))
+      if (!isset($current_value)) {
         $current_value = $this->get('default');
-      return '<input type="text" name="' . $prepend . $this->name() . '" ' .
-              'value="' . $current_value . '"' . (count($attrs) > 0 ? ' ' . join(' ', $attrs) :
-'') . ' />';
+      }
+
+      return '<input type="text" name="' . $prepend . $this->name() . '"'
+           . ' value="' . $current_value . '"'
+           . (count($attrs) > 0 ? ' ' . join(' ', $attrs) : '')
+           . ' />';
     }
   } // class FormFieldDateTime
 
-  class FormFieldDate extends FormFieldText
+  class FormFieldDate
+  extends FormFieldText
   {
     var $DEFAULT_SIZE = 12;
     var $datetime_parser;
@@ -1408,13 +1485,11 @@
       $this->name = $name;
     }
 
-    function FormFieldDate ($form, $name) {
-      self::__construct($form, $name);
-    }
-
     function parse_datetime ($datetime_string, $datetime_style = '', $century_window = 50) {
-      if (!isset($datetimeparser[$datetime_style]))
+      if (!isset($datetimeparser[$datetime_style])) {
         $datetimeparser[$datetime_style] = new DateTimeParser($datetime_style);
+      }
+
       return $datetimeparser[$datetime_style]->parse($datetime_string, $century_window, $this->get('incomplete'));
     }
 
@@ -1453,14 +1528,18 @@
                 }
                 else if ($day == 31
                   && ($month == 4 || $month == 6 || $month == 9 || $month == 11))
+                {
                   $valid = 0;
+                }
               }
-              else
+              else {
                 $valid = 0;
+              }
             }
 
-            if (!$valid)
+            if (!$valid) {
               $invalid[$this->name] = 'datetime_invalid_day';
+            }
             else if ($incomplete && isset($day) && $day > 0 && 0 == $month) {
               $invalid[$this->name] = 'datetime_invalid_month';
               $valid = 0;
@@ -1474,8 +1553,9 @@
       }
       else {
         $valid = $null;
-        if (!$valid)
+        if (!$valid) {
           $invalid[$this->name] = 'nonempty_required';
+        }
       }
 
       return $valid;
@@ -1484,8 +1564,10 @@
     function showAsSelect ($params) {
       static $now;
 
-      $prepend = gettype($params) == 'array' && isset($params['prepend']) ? $params['prepend'] : '';
-      $name = $prepend.$this->name();
+      $prepend = is_array($params) && isset($params['prepend'])
+        ? $params['prepend']
+        : '';
+      $name = $prepend . $this->name();
       $may_null = $this->get('null');
       if (isset($may_null) && $may_null) {
         $days[] = '<option value="">DD</option>';
@@ -1494,40 +1576,59 @@
       }
 
       $preset = $this->value_internal();
-      for ($i = 1; $i <= 31; $i++)
+      for ($i = 1; $i <= 31; $i++) {
         $days[] = '<option' . ($i == $preset['day'] ? ' selected="selected"' : '') . '>' . $i . '</option>';
+      }
 
-      if (!isset($now))
-        $now = localtime(time(), TRUE);
+      if (!isset($now)) {
+        $now = localtime(time(), true);
+      }
 
-      if (isset($params['year_from']))
+      if (isset($params['year_from'])) {
         $first_year = $params['year_from'];
-      else
+      }
+      else {
         $first_year = $now['tm_year'] + 1900;
+      }
 
-      if (isset($params['year_to']))
+      if (isset($params['year_to'])) {
         $last_year = $params['year_to'];
-      else
+      }
+      else {
         $last_year = $first_year + 1;
+      }
 
       if ($preset['year'] != 0) {
-        if ($first_year > $preset['year'])
+        if ($first_year > $preset['year']) {
           $first_year = $preset['year'];
-        else if ($last_year < $preset['year'])
+        }
+        else if ($last_year < $preset['year']) {
           $last_year = $preset['year'];
+        }
       }
+
       for ($i = $first_year; $i <= $last_year; $i++) {
-        $selected = FALSE;
+        $selected = false;
         if (($preset['year'] != 0 && $i == $preset['year'])
             || (!($preset['year'] != 0) && $i == $now['tm_year'] + 1900 && !(isset($may_null) && $may_null)))
-          $selected = TRUE;
+        {
+          $selected = true;
+        }
 
-        $years[] = '<option value="' . $i . '"' . ($selected ? ' selected="selected"' : '') . '>' . $i . '</option>';
+        $years[] = '<option value="' . $i . '"'
+          . ($selected ? ' selected="selected"' : '')
+          . '>'
+          . $i
+          . '</option>';
       }
 
       for ($i = 1; $i <= 12; $i++) {
         $month = strftime('%b', mktime(0, 0, 0, $i, 1, $first_year));
-        $months[] = '<option value="' . $i . '"' . ($i == $preset['month'] ? ' selected="selected"' : '') . '>' . $month . '</option>';
+        $months[] = '<option value="' . $i . '"'
+          . ($i == $preset['month'] ? ' selected="selected"' : '')
+          . '>'
+          . $month
+          . '</option>';
       }
 
       return '<select name="' . $name . '[]">' . implode($months) . '</select>'
@@ -1538,25 +1639,33 @@
     function show ($params = '') {
       $pulldown_style = is_array($params) && isset($params['pulldown']) && $params['pulldown'];
 
-      if ($pulldown_style)
+      if ($pulldown_style) {
         return $this->showAsSelect($params);
+      }
 
-      $prepend = gettype($params) == 'array' && isset($params['prepend']) ? $params['prepend'] : '';
+      $prepend = is_array($params) && isset($params['prepend'])
+        ? $params['prepend']
+        : '';
 
-      $attrnames = ['id', 'size', 'maxlength', 'disabled', 'readonly'];
+      $attrnames = [ 'id', 'size', 'maxlength', 'disabled', 'readonly', 'style' ];
       $attrs = [];
       for ($i = 0; $i < count($attrnames); $i++) {
         $val = $this->get($attrnames[$i]);
-        if (in_array($attrnames[$i], ['disabled', 'readonly']) && isset($val)) {
-          $val = $val ? $attrnames[$i] : NULL;
+        if (in_array($attrnames[$i], [ 'disabled', 'readonly' ]) && isset($val)) {
+          $val = $val ? $attrnames[$i] : null;
         }
-        if (!isset($val) && $attrnames[$i] == 'size')
+
+        if (!isset($val) && $attrnames[$i] == 'size') {
           $val = $this->DEFAULT_SIZE;
-        if (isset($val))
+        }
+
+        if (isset($val)) {
           $attrs[] = $attrnames[$i] . '="' . $val . '"';
+        }
       }
+
       // add additional attrs from params
-      if (gettype($params) == 'array') {
+      if (is_array($params)) {
         // var_dump($params);
         $attrnames = array_keys($params);
         for ($i = 0; $i < count($attrnames); $i++) {
@@ -1574,30 +1683,29 @@
           }
         }
       }
+
       return '<input type="text" name="' . $prepend . $this->name() . '" ' .
-              'value="' . $this->value() . '"' . (count($attrs) > 0 ? ' ' . join(' ', $attrs) :
-'') . ' />';
+              'value="' . $this->value() . '"'
+          . (count($attrs) > 0 ? ' ' . join(' ', $attrs) : '')
+          . ' />';
     }
   } // class FormFieldDate
 
-
-  class FormFieldSelect extends FormField
+  class FormFieldSelect
+  extends FormField
   {
-    var $multiple = FALSE;
+    var $multiple = false;
 
     function __construct ($form, $name) {
       if (gettype($form) == 'object') {
         $this->form = $form;
       }
+
       $this->name = $name;
     }
 
-    function FormFieldSelect ($form, $name) {
-      self::__construct($form, $name);
-    }
-
     function show ($args = '') {
-      $args_isarray = gettype($args) == 'array';
+      $args_isarray = is_array($args);
 
       $prepend = $args_isarray && isset($args['prepend']) ? $args['prepend'] : '';
       $options = $args_isarray && isset($args['options']) ? $args['options'] : $this->get('options');
@@ -1606,24 +1714,29 @@
       $attrs = [];
       if (isset($options) && is_array($options)) {
         $val = $this->value();
-        if (!isset($val))
+        if (!isset($val)) {
           $val = $this->get('default');
-        $val_isarray = gettype($val) == 'array';
-        if ($this->multiple && !$val_isarray && !empty($val)) {
-          $val = preg_split('/\,\s*/', $val);
-          $val_isarray = TRUE;
         }
 
-        $size = $args_isarray && isset($args['size']) ? $args['size'] : $this->get('size');
-        $size = isset($size) ? ' size="' . $this->htmlspecialchars($size) . '"' : '';
+        $val_isarray = is_array($val);
+        if ($this->multiple && !$val_isarray && !empty($val)) {
+          $val = preg_split('/\,\s*/', $val);
+          $val_isarray = true;
+        }
 
-        $attrnames = ['id', 'class', 'disabled', 'data-placeholder'];
+        $size = $args_isarray && isset($args['size'])
+          ? $args['size'] : $this->get('size');
+        $size = isset($size)
+          ? ' size="' . $this->htmlspecialchars($size) . '"' : '';
+
+        $attrnames = [ 'id', 'class', 'disabled', 'data-placeholder' ];
         $attrs = [];
         for ($i = 0; $i < count($attrnames); $i++) {
           $attrval = $this->get($attrnames[$i]);
           if ($attrnames[$i] == 'disabled') {
-            $attrval = isset($attrval) && $attrval ? $attrnames[$i] : NULL;
+            $attrval = isset($attrval) && $attrval ? $attrnames[$i] : null;
           }
+
           if (isset($attrval)) {
             $attrs[] = $attrnames[$i] . '="' . $attrval . '"';
           }
@@ -1654,6 +1767,7 @@
             }
           }
         }
+
         $name = $prepend . $this->name();
         if ($this->multiple) {
           $attrs[] = 'multiple="multiple"';
@@ -1666,65 +1780,76 @@
              . (isset($attrs) && count($attrs) > 0
                 ? ' ' . join(' ', $attrs) : '')
              . '>';
+
         for ($i = 0; $i < count($options); $i++) {
           $value = $options[$i];
           $label = $labels[$i];
-          if ($label === FALSE) { // special value to mark an not selectable element <-> invert key <-> value
+          if ($label === false) {
+            // special value to mark an not selectable element <-> invert key <-> value
             $label = $value;
             $value = '';
           }
-          else if (!isset($label))
+          else if (!isset($label)) {
             $label = $options[$i];
+          }
 
           $selected = ($val_isarray ? in_array($options[$i], $val) : $options[$i] == $val) ? ' selected="selected"' : '';
-          $disabled = 'boolean' == gettype($labels[$i]) ? ' disabled="disabled"' : '';
-          $ret .= '<option value="'.$this->htmlspecialchars($value).'"'.$selected.$disabled.'>'
-                  .$this->htmlspecialchars($label).'</option>';
+          $disabled = is_bool($labels[$i]) ? ' disabled="disabled"' : '';
+          $ret .= '<option value="' . $this->htmlspecialchars($value) . '"'
+                . $selected . $disabled . '>'
+                . $this->htmlspecialchars($label)
+                . '</option>';
         }
+
         $ret .= '</select>';
+
         return $ret;
       }
     }
   }
 
-  class FormFieldSelectMultiple extends FormFieldSelect
+  class FormFieldSelectMultiple
+  extends FormFieldSelect
   {
-    var $multiple = TRUE;
+    var $multiple = true;
 
     // utility functions
     function not_empty ($val) {
-      if (!isset($val) || 'array' != gettype($val))
+      if (!isset($val) || !is_array($val)) {
         return parent::not_empty($val);
+      }
+
       return count($val) > 0;
     }
-
   }
 
-  class FormFieldHidden extends FormField
+  class FormFieldHidden
+  extends FormField
   {
     function __construct ($form, $name) {
-      if (gettype($form) == 'object') {
+      if (is_object($form)) {
         $this->form = $form;
       }
+
       $this->name = $name;
     }
 
-    function FormFieldHidden ($form, $name) {
-      self::__construct($form, $name);
-    }
-
     function show ($params = '') {
-      $prepend = gettype($params) == 'array' && isset($params['prepend']) ? $params['prepend'] : '';
+      $prepend = is_array($params) && isset($params['prepend'])
+        ? $params['prepend']
+        : '';
 
-      $attrnames = ['id'];
-      $attrs     = [];
+      $attrnames = [ 'id' ];
+      $attrs = [];
       for ($i = 0; $i < count($attrnames); $i++) {
         $val = $this->get($attrnames[$i]);
-        if (isset($val))
+        if (isset($val)) {
           $attrs[count($attrs)] = $attrnames[$i] . '="' . $val . '"';
+        }
       }
+
       // add additional attrs from params
-      if (gettype($params) == 'array') {
+      if (is_array($params)) {
         // var_dump($params);
         $attrnames = array_keys($params);
         for ($i = 0; $i < count($attrnames); $i++) {
@@ -1737,18 +1862,19 @@
       }
 
       $current_value = $this->value();
-      if (!isset($current_value))
+      if (!isset($current_value)) {
         $current_value = $this->get('default');
+      }
 
       return '<input type="hidden" name="' . $prepend . $this->name()
            . '" value="' . $this->htmlspecialchars($current_value) . '"'
            . (count($attrs) > 0 ? ' ' . join(' ', $attrs) : '')
            . ' />';
     }
-
   }
 
-  class FormFieldPassword extends FormField
+  class FormFieldPassword
+  extends FormField
   {
     var $DEFAULT_SIZE = 32;
 
@@ -1757,25 +1883,23 @@
       $this->name = $name;
     }
 
-    function FormFieldPassword ($form, $name) {
-      self::__construct($form, $name);
-    }
-
     function show ($params = '') {
-      $prepend = gettype($params) == 'array' && isset($params['prepend']) ? $params['prepend'] : '';
-      $attrnames = ['size', 'maxlength'];
-      $attrs     = [];
+      $prepend = is_array($params) && isset($params['prepend'])
+        ? $params['prepend'] : '';
+      $attrnames = [ 'size', 'maxlength' ];
+      $attrs = [];
       for ($i = 0; $i < count($attrnames); $i++) {
         $val = $this->get($attrnames[$i]);
         if (!isset($val) && $attrnames[$i] == 'size') {
           $val = $this->DEFAULT_SIZE;
         }
+
         if (isset($val)) {
           $attrs[count($attrs)] = $attrnames[$i] . '="' . $val . '"';
         }
       }
 
-      if (gettype($params) == 'array') {
+      if (is_array($params)) {
         // var_dump($params);
         $attrnames = array_keys($params);
         for ($i = 0; $i < count($attrnames); $i++) {
@@ -1793,28 +1917,25 @@
         }
       }
 
-      return '<input type="password" name="' . $prepend . $this->name() . '" '
-           . 'value="' . $this->value() . '"'
-           . (count($attrs) > 0 ? ' ' . join(' ', $attrs) : '')
-           . ' />';
+      return '<input type="password" name="' . $prepend . $this->name() . '"'
+          . ' value="' . $this->value() . '"'
+          . (count($attrs) > 0 ? ' ' . join(' ', $attrs) : '')
+          . ' />';
     }
   }
 
-  class FormFieldCheckbox extends FormField
+  class FormFieldCheckbox
+  extends FormField
   {
+    var $show_hidden = 1;
 
     function __construct ($form, $name) {
       $this->form = $form;
       $this->name = $name;
-      $this->show_hidden = 1;
-    }
-
-    function FormFieldCheckbox ($form, $name) {
-      self::__construct($form, $name);
     }
 
     function show ($which = -1, $args = '') {
-      $args_isarray = gettype($args) == 'array';
+      $args_isarray = is_array($args);
 
       $join = $args_isarray
         ? (isset($args['join']) ? $args['join'] : '<br />')
@@ -1825,17 +1946,18 @@
       // label might have class and style
       $label_attrs = '';
       if ($args_isarray && isset($args['label_class'])) {
-        $label_attrs = ' class="'.$this->htmlspecialchars($args['label_class']).'"';
+        $label_attrs = ' class="' . $this->htmlspecialchars($args['label_class']) . '"';
       }
 
-      $readonly =  $args_isarray  && isset($args['readonly']) ? $args['readonly'] : FALSE;
+      $readonly =  $args_isarray  && isset($args['readonly']) ? $args['readonly'] : false;
 
-      $name = $prepend.$this->name();
+      $name = $prepend . $this->name();
       $ret = '';
       if ($this->show_hidden) {
         $this->show_hidden = 0;
         $ret = '<input type="hidden" name="' . $name . '[]" value="0" />';
       }
+
       $show = [];
       $labels = $this->get('labels');
       if (isset($labels) && is_array($labels)) {
@@ -1846,7 +1968,7 @@
 
         // labels can be key/value-pairs or just a list
         if (array_keys($labels) === range(0, count($labels) - 1)) {
-          // plain array, transform array('label1', 'label2', ..) => array(1^I => 'labelI');
+          // plain array, transform [ 'label1', 'label2', .. ] => [ 1^I => 'labelI' ];
           for ($i = 0; $i < count($labels); $i++) {
             $labels_new[1 << $i] = $labels[$i];
           }
@@ -1867,24 +1989,21 @@
           }
         }
       }
+
       return $ret . join($join, $show);
     }
   }
 
-  class FormFieldRadio extends FormField
+  class FormFieldRadio
+  extends FormField
   {
-
     function __construct ($form, $name) {
       $this->form = $form;
       $this->name = $name;
     }
 
-    function FormFieldRadio ($form, $name) {
-      self::__construct($form, $name);
-    }
-
     function show ($which = '', $args = ' ') {
-      $args_isarray = gettype($args) == 'array';
+      $args_isarray = is_array($args);
 
       $join = $args_isarray
         ? (isset($args['join']) ? $args['join'] : '<br />')
@@ -1916,11 +2035,11 @@
             $values[] = $value;
           }
         }
-        else if (gettype($which) == 'string') {
+        else if (is_string($which)) {
           // show just one
           $values[] = $which;
         }
-        else if (gettype($which) == 'array') {
+        else if (is_array($which)) {
           // show a list
           $values = $which;
         }
@@ -1936,13 +2055,16 @@
               . '</label>';
         }
       }
+
       return join($join, $show);
     }
   }
 
-  class FormHTML extends Form
+  class FormHTML
+  extends Form
   {
     var $params;
+    var $fields = [];
     var $invalid;
 
     function __construct ($params, $record = '') {
@@ -1951,10 +2073,6 @@
       if (!(gettype($record) == 'string' && $record == '')) {
         $this->record = $record;
       }
-    }
-
-    function FormHTML ($params, $record = '') {
-      self::__construct($params, $record);
     }
 
     function invalid () {
@@ -1992,6 +2110,7 @@
         // set default language
         $lang = 'en';
       }
+
       if (!isset($error_msg[$lang][$err_name])) {
         // set default error
         $err_name = 'unknown';
@@ -2004,11 +2123,12 @@
       if (!isset($this->record)) {
         return;
       }
+
       return $this->record->get_value($field);
     }
 
     function set_value ($field, $value) {
-      $this->set_values([$field => $value]);
+      $this->set_values([ $field => $value ]);
     }
 
     function set_property ($fieldname, $property, $value) {
@@ -2023,12 +2143,13 @@
         $datetime_style = $this->params['datetime_style'];
       }
       else {
-        $datetime_style = NULL;
+        $datetime_style = null;
       }
 
       if (!isset($this->record)) {
         return;
       }
+
       $prepend = is_array($params) && isset($params['prepend'])
         ? $params['prepend'] : '';
 
@@ -2037,6 +2158,7 @@
           if (is_string($val)) {
             $val = rtrim($val);
           }
+
           if ($prepend != '') {
             if (preg_match("/^$prepend/", $name)) {
               $name = preg_replace("/^$prepend/", '', $name);
@@ -2045,7 +2167,9 @@
               continue;
             }
           }
+
           $thisfield = $this->field($name);
+
           if (isset($thisfield)) {
             switch ($thisfield->get('type')) {
               case 'date' :
@@ -2058,6 +2182,7 @@
                     $parser = new DateTimeParser();
                     $format = $parser->datestyle;
                   }
+
                   $format = preg_replace('/[D]+/', '%02d', $format);
                   $format = preg_replace('/[M]+/', '%02d', $format);
                   $format = preg_replace('/[Y]+/', '%04d', $format);
@@ -2067,14 +2192,17 @@
                     ? ''
                     : sprintf($format, $val[0], $val[1], $val[2]);
                 }
+
                 $this->record->set_value($name, $val);
                 $century_window = $thisfield->get('century_window');
                 $datetime_internal = isset($century_window)
                   ? $thisfield->parse_datetime($val, $datetime_style, $century_window)
-                    : $thisfield->parse_datetime($val, $datetime_style);
+                  : $thisfield->parse_datetime($val, $datetime_style);
+
                 if (isset($datetime_internal)) {
                   $this->record->set_fieldvalue($name, 'value_internal', $datetime_internal);
                 }
+
                 break;
 
               case 'checkbox' :
@@ -2115,9 +2243,10 @@
     }
 
     function clear_values ($fieldnames = '') {
-      if (gettype($fieldnames) != 'array') {
+      if (!is_array($fieldnames)) {
         $fieldnames = $this->record_get_fieldnames();
       }
+
       for ($i = 0; $i < count($fieldnames); $i++) {
         $field = $this->set_value($fieldnames[$i], '');
       }
@@ -2142,6 +2271,7 @@
           }
         }
       }
+
       return $success;
     }
 
@@ -2153,7 +2283,7 @@
         $datetime_style = $this->params['datetime_style'];
       }
       else {
-        $datetime_style = NULL;
+        $datetime_style = null;
       }
 
       return $this->record->fetch($args, $datetime_style);
@@ -2196,51 +2326,66 @@
     }
 
     function show_submit ($label = '') {
-      $value = trim($label) != '' ? ' value="'.$label.'"' : '';
+      $value = trim($label) != '' ? ' value="' . $label . '"' : '';
+
       return '<input type="submit"' . $value . ' />';
     }
 
     function field ($name) {
       // TODO allow hierarchic names like record1.id
-      if (gettype($this->record) == 'NULL')
+      if (gettype($this->record) == 'NULL') {
         return;
+      }
+
       if (!isset($this->fields[$name])) { // wrap a FormField around the basic field
         $field = $this->record->get_field($name);
         if (!isset($field)) {
           return;
         }
+
         switch ($field->get('type')) {
           case 'hidden':
             $this->fields[$name] = new FormFieldHidden($this, $name);
             break;
+
           case 'password':
             $this->fields[$name] = new FormFieldPassword($this, $name);
             break;
+
           case 'email':
             $this->fields[$name] = new FormFieldEmail($this, $name);
             break;
+
           case 'date':
             $this->fields[$name] = new FormFieldDate($this, $name);
             break;
+
           case 'datetime':
             $this->fields[$name] = new FormFieldDatetime($this, $name);
             break;
+
           case 'select':
-            $this->fields[$name] = $field->get('multiple') ? new FormFieldSelectMultiple($this, $name) : new FormFieldSelect($this, $name);
+            $this->fields[$name] = $field->get('multiple')
+              ? new FormFieldSelectMultiple($this, $name) : new FormFieldSelect($this, $name);
             break;
+
           case 'checkbox':
             $this->fields[$name] = new FormFieldCheckbox($this, $name);
             break;
+
           case 'radio':
             $this->fields[$name] = new FormFieldRadio($this, $name);
             break;
+
           case 'textarea':
             $this->fields[$name] = new FormFieldTextarea($this, $name);
             break;
+
           default:
             $this->fields[$name] = new FormFieldText($this, $name);
         }
       }
+
       return $this->fields[$name];
     }
   }
