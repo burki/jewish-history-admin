@@ -1,7 +1,7 @@
 <?php
-/* 
+/*
 	PhpRtf Lite
-	Copyright 2007-2008 Denis Slaveckij <info@phprtf.com>  	
+	Copyright 2007-2008 Denis Slaveckij <info@phprtf.com>
 
 	This file is part of PhpRtf Lite.
 
@@ -25,102 +25,102 @@
  * @todo Exception, then columns widths override paper width.
  */
 class Section extends Container {
-        
-	/**#@+ 
+
+	/**#@+
 	 * Internal use.
 	 * @access public
-	 */ 	
+	 */
 	var $bordered;
-	  
-	var $first = false;	
-	
+
+	var $first = false;
+
 	var $alignment;
-	
-	var $oddEvenDifferent;  	
-	/**#@-*/	
-	
-	/**#@+ 	 
+
+	var $oddEvenDifferent;
+	/**#@-*/
+
+	/**#@+
 	 * @access private
-	 */ 
+	 */
 	var $columnCount = 1;
-	
+
 	var $columnsWidths;
-	
+
 	var $noBreak = false;
-	
+
 	var $lineBetweenColumns = false;
-	
+
 	var $spaceBetweenColumns;
-	 
-	var $paperWidth;  	
-	
+
+	var $paperWidth;
+
 	var $paperHeight;
-	  	
+
 	var $marginLeft;
-	
+
 	var $marginRight;
-	
+
 	var $marginTop;
-	
+
 	var $marginBottom;
-	
+
 	var $gutter;
-	  	
-	var $mirrorMargins;	
-	/**#@-*/	
-		
+
+	var $mirrorMargins;
+	/**#@-*/
+
 	/**
      * Sets the paper width of pages in section.
      * @access public
      * @param float $paperWidth Paper width
-     */  	
-  	function setPaperWidth($paperWidth) {	    
+     */
+  	function setPaperWidth($paperWidth) {
 	    $this->paperWidth = $paperWidth;
 	}
-	
+
 	/**
-     * Sets the paper height of pages in section.   
+     * Sets the paper height of pages in section.
      * @access public
      * @param float $paperHeight Paper height
-     */  	
-  	function setPaperHeight($paperHeight) {	    
+     */
+  	function setPaperHeight($paperHeight) {
 	    $this->paperHeight = $paperHeight;
 	}
-	
+
 	/**
-     * Sets the margins of pages in section.    
+     * Sets the margins of pages in section.
      * @access public
      * @param float $marginLeft Margin left
      * @param float $marginTop Margin top
      * @param float $marginRight Margin right
      * @param float $marginBottom Margin bottom
      */
-	function setMargins($marginLeft, $marginTop, $marginRight, $marginBottom) {	  
-		$this->marginLeft = $marginLeft;  
+	function setMargins($marginLeft, $marginTop, $marginRight, $marginBottom) {
+		$this->marginLeft = $marginLeft;
 		$this->marginTop = $marginTop;
 		$this->marginRight = $marginRight;
 		$this->marginBottom = $marginBottom;
 	}
-	
+
 	/**
-     * Sets the gutter width. <br>   
+     * Sets the gutter width. <br>
      * NOTICE: OpenOficce doesn't understant.
      * @access public
      * @param float $gutter Gutter width
-     */  	
-  	function setGutter($gutter) {	    
+     */
+  	function setGutter($gutter) {
 	    $this->gutter = $gutter;
 	}
-	
+
 	/**
-     * Sets the margin definitions on left and right pages.    
+     * Sets the margin definitions on left and right pages.
      * Notice: OpenOficce doesn't Understant.
      * @access public
-     */  	
-  	function setMirrorMargins() {	    
+     */
+  	function setMirrorMargins() {
 	    $this->mirrorMargins = true;
-	}	
-	
+	}
+
 	/**
 	 * Gets width of page layout.
 	 * @return float
@@ -130,10 +130,10 @@ class Section extends Container {
 		$paperWidth = !empty($this->paperWidth) ? $this->paperWidth : $this->rtf->paperWidth;
 		$marginLeft = !empty($this->marginLeft) ? $this->marginLeft : $this->rtf->marginLeft;
 		$marginRight = !empty($this->marginRight) ? $this->marginRight : $this->rtf->marginRight;
-	  	
+
 		return ($paperWidth - $marginLeft - $marginRight);
 	}
-	
+
 	/**
      * Sets borders of section pages.
      * @param BorderFormat &$borderFormat
@@ -141,35 +141,35 @@ class Section extends Container {
      * @param boolean $top If false, top border is not set (default true)
      * @param boolean $right If false, right border is not set (default true)
      * @param boolean $bottom If false, bottom border is not set (default true)
-     * @access public    
-     */	
-	function setBorders(&$borderFormat, $left = true, $top = true, $right = true, $bottom = true) {	  
-		if (empty($this->bordered)) {		  
+     * @access public
+     */
+	function setBorders(&$borderFormat, $left = true, $top = true, $right = true, $bottom = true) {
+		if (empty($this->bordered)) {
 		  	$this->bordered = new Bordered();
 		}
-		
+
 		$this->bordered->setBorders($borderFormat, $left, $top, $right, $bottom);
 	}
-		 	
+
 	/**
 	 * Sets number of columns in section.
 	 * @access public
 	 * @param integer $columnsCount Number of columns
 	 */
-	function setColumnsCount($columnsCount) {	  
+	function setColumnsCount($columnsCount) {
 	  	$this->columnsCount = $columnsCount;
 	  	unSet($this->columnsWidths);
 	}
-	
+
 	/**
 	 * Sets space (width) between columns.
 	 * @access public
 	 * @param float $spaceBetweenColumns Space between columns
 	 */
-	function setSpaceBetweenColumns($spaceBetweenColumns) {		
+	function setSpaceBetweenColumns($spaceBetweenColumns) {
 		$this->spaceBetweenColumns = $spaceBetweenColumns;
 	}
-	
+
 	/**
 	 * Sets section columns with different widths. <br>
 	 * If you use this function, you shouldn't use {@see SetColumnsNumber}.
@@ -177,30 +177,30 @@ class Section extends Container {
 	 * @param array $columnsWidths Array with columns widths
 	 * @todo Check if columns width sum doesn't overload paper width.
 	 */
-	function setColumns($columnsWidths) {	  
-	  	if (is_array($columnsWidths)) {		    
+	function setColumns($columnsWidths) {
+	  	if (is_array($columnsWidths)) {
 			$this->columnsCount = count($columnsWidths);
-			$this->columnsWidths = $columnsWidths; 
+			$this->columnsWidths = $columnsWidths;
 		}
 	}
-	
+
 	/**
 	 * Sets no section break.
 	 * If footnotes are use in different sections, Word always will break sections.
 	 * @access public
 	 */
-	function setNoBreak() {	  
+	function setNoBreak() {
 	  	$this->noBreak = true;
 	}
-	
+
 	/**
 	 * Sets line between columns.
-	 * @access public	
+	 * @access public
 	 */
-	function setLineBetweenColumns() {	  
-	 	$this->lineBetweenColumns = true;	
-	}		 
-		
+	function setLineBetweenColumns() {
+	 	$this->lineBetweenColumns = true;
+	}
+
 	/**
 	 * Sets vertical alignment of text of section.
 	 * @param string $alignment Possible values: <br>
@@ -211,80 +211,80 @@ class Section extends Container {
 	 * @todo bottom justify don't work
 	 * @accces public
 	 */
-	function setVerticalAlignment($alignment) {	  
-	  	switch ($alignment) {		    
-		    default: 		    
+	function setVerticalAlignment($alignment) {
+	  	switch ($alignment) {
+		    default:
 		    	$this->alignment = "\vertalt ";
 		    break;
-		    
-		    case 'center':		    	
+
+		    case 'center':
 		    	$this->alignment = "\vertalc ";
 		    break;
-		    
-		    case 'bottom':		    	
+
+		    case 'bottom':
 		    	$this->alignment = "\vertalb ";
-		    break;		    
-		    
-		    case 'justify':		    	
+		    break;
+
+		    case 'justify':
 		    	$this->alignment = "\vertalj ";
 		    break;
 		}
 	}
-		
+
 	/**
 	 * Creates header for section pages.
 	 * @param $type Possible values: <br>
 	 * 'all' => all pages (different odd and even headers/footers must be not set) <br>
 	 * 'left' => left pages (different odd and even headers/footers must be set) <br>
 	 * 'right' => right pages (different odd and even headers/footers must be set) 	<br>
-	 * 'first' => first page  	 
+	 * 'first' => first page
 	 * @access public
 	 * @return Header
 	 */
 	function &addHeader($type = 'all') {
 	  	if (empty($this->rtf->oddEvenDifferent) && $type == 'all') {
 		    $header = new Header($this->rtf, $type);
-		} else if (!empty($this->rtf->oddEvenDifferent) 
-						&& ($type == 'left' || $type == 'right')) {		  
-		  	$header = new Header($this->rtf, $type);	
+		} else if (!empty($this->rtf->oddEvenDifferent)
+						&& ($type == 'left' || $type == 'right')) {
+		  	$header = new Header($this->rtf, $type);
 		} else if ($type == 'first') {
-		  	$header = new Header($this->rtf, $type);	
+		  	$header = new Header($this->rtf, $type);
 		  	$this->titlepg = 1;
-		} else {			
+		} else {
 		  	return;
-		}		 
+		}
 
 		$this->headers[$type] = &$header;
-		return $header;		
-	} 	
-	
+		return $header;
+	}
+
 	/**
 	 * Creates footer for section pages.
 	 * @param $type Possible values: <br>
 	 * 'all' => all pages (different odd and even headers/footers must be not set) <br>
 	 * 'left' => left pages (different odd and even headers/footers must be set) <br>
 	 * 'right' => right pages (different odd and even headers/footers must be set) 	<br>
-	 * 'first' => first page  	 
+	 * 'first' => first page
 	 * @access public
 	 * @return Footer
 	 */
 	function &addFooter($type = 'all') {
 	  	if (empty($this->rtf->oddEvenDifferent) && $type == 'all') {
 		    $footer = new Footer($this->rtf, $type);
-		} else if (!empty($this->rtf->oddEvenDifferent) 
-						&& ($type == 'left' || $type == 'right')) {		  
-		  	$footer = new Footer($this->rtf, $type);	
+		} else if (!empty($this->rtf->oddEvenDifferent)
+						&& ($type == 'left' || $type == 'right')) {
+		  	$footer = new Footer($this->rtf, $type);
 		} else if ($type == 'first') {
-		  	$footer = new Footer($this->rtf, $type);	
+		  	$footer = new Footer($this->rtf, $type);
 		  	$this->titlepg = 1;
-		} else {				
+		} else {
 		  	return;
-		}		 
+		}
 
 		$this->footers[$type] = &$footer;
-		return $footer;		
-	} 
-	
+		return $footer;
+	}
+
 	/**
 	 * Breaks page.
 	 * @since 0.2.0/ This method is used instead of using "page" tag in Container::writeText method.
@@ -293,126 +293,126 @@ class Section extends Container {
 	function insertPageBreak() {
 		$this->elements[] = "\\page";
 	}
-		
-	/** 
+
+	/**
 	 * Gets rtf code of section. Internal use.
 	 * @return string
 	 * @access public
 	 */
-	function getContent() {	  
+	function getContent() {
 	  	$content = '';
-	  		  	
-	  	if (empty($this->first)) {	
+
+	  	if (empty($this->first)) {
 			$content .= '\sect \sectd ';
-		}		
-				
+		}
+
 		//headers
 		if (!empty($this->headers)) {
-			foreach ($this->headers as $value) {		  
+			foreach ($this->headers as $value) {
 			  	$content .= $value->getContent();
 			}
-		} else {
-		  	foreach ($this->rtf->headers as $value) {		  
+		} else if (!empty($this->rtf->headers)) {
+		  	foreach ($this->rtf->headers as $value) {
 			  	$content .= $value->getContent();
 			}
 		}
-		
+
 		//footers
 		if (!empty($this->footers)) {
-			foreach ($this->footers as $value) {		  
+			foreach ($this->footers as $value) {
 			  	$content .= $value->getContent();
 			}
-		} else {
-		  	foreach ($this->rtf->footers as $value) {		  
+		} else if (!empty($this->rtf->footers)) {
+		  	foreach ($this->rtf->footers as $value) {
 			  	$content .= $value->getContent();
 			}
 		}
-		
+
 		//borders
 		if (!empty($this->bordered)) {
 			$content .= $this->bordered->getContent($this->rtf, '\pg');
-		} else if (!empty($this->rtf->bordered)) {	
+		} else if (!empty($this->rtf->bordered)) {
 			$content .= $this->rtf->bordered->getContent($this->rtf, '\pg');
-		}		
-	  	
+		}
+
 	  	//section properties
-	  	if (!empty($this->noBreak)) {		
-			$content .= '\sbknone '; 	
+	  	if (!empty($this->noBreak)) {
+			$content .= '\sbknone ';
 		}
-	  	
-	  	if (!empty($this->columnsCount)) {		    
-		 	$content .= '\cols'.$this->columnsCount.' '; 
+
+	  	if (!empty($this->columnsCount)) {
+		 	$content .= '\cols'.$this->columnsCount.' ';
 		}
-		
-		if (empty($this->columnsWidths)) {				
-			if (!empty($this->spaceBetweenColumns)) {			  
+
+		if (empty($this->columnsWidths)) {
+			if (!empty($this->spaceBetweenColumns)) {
 			  	$content .= '\colsx'.round($this->spaceBetweenColumns * TWIPS_IN_CM).' ';
-			}			
-		} else {		  
+			}
+		} else {
 		  	$width = 0;
-		  	foreach ($this->columnsWidths as $value) {		  	  
+		  	foreach ($this->columnsWidths as $value) {
 		  	  	$width += $value * TWIPS_IN_CM;
 		  	}
-		  	
-		  	$printableWidth = ($this->rtf->paperWidth - $this->rtf->marginLeft - $this->rtf->marginRight);		  	
+
+		  	$printableWidth = ($this->rtf->paperWidth - $this->rtf->marginLeft - $this->rtf->marginRight);
 		  	$space = round(($printableWidth * TWIPS_IN_CM - $width) / (count($this->columnsWidths) - 1));
-		  			  	
+
 			$i = 1;
 		  	foreach ($this->columnsWidths as $key => $value) {
-				$content .= '\colno'.$i.'\colw'.($value * TWIPS_IN_CM);				
-				if (!empty($this->columnsWidths[$key])) {				  
+				$content .= '\colno'.$i.'\colw'.($value * TWIPS_IN_CM);
+				if (!empty($this->columnsWidths[$key])) {
 				 	$content .= '\colsr'.$space;
 				}
 			  	$i ++;
-			}		  
+			}
 			$content .= ' ';
 		}
-					
-		if (!empty($this->lineBetweenColumns)) {		  
+
+		if (!empty($this->lineBetweenColumns)) {
 		  	$content .= '\linebetcol ';
 		}
-				
-		/*---Page part---*/				
-		if (isSet($this->paperWidth)) {		  
+
+		/*---Page part---*/
+		if (isSet($this->paperWidth)) {
 		  	$content .= '\pgwsxn'.round($this->paperWidth * TWIPS_IN_CM).' ';
 		}
-		
-		if (isSet($this->paperHeight)) {		  
+
+		if (isSet($this->paperHeight)) {
 		  	$content .= '\pghsxn'.round($this->paperHeight * TWIPS_IN_CM).' ';
-		} 
-		
-		if (isSet($this->marginLeft)) {		  
+		}
+
+		if (isSet($this->marginLeft)) {
 		  	$content .= '\marglsxn'.round($this->marginLeft * TWIPS_IN_CM).' ';
-		} 
-		
-		if (isSet($this->marginRight)) {		  
+		}
+
+		if (isSet($this->marginRight)) {
 		  	$content .= '\margrsxn'.round($this->marginRight * TWIPS_IN_CM).' ';
 		}
-		
-		if (isSet($this->marginTop)) {		  
+
+		if (isSet($this->marginTop)) {
 		  	$content .= '\margtsxn'.round($this->marginTop * TWIPS_IN_CM).' ';
 		}
-		
-		if (isSet($this->marginBottom)) {		  
+
+		if (isSet($this->marginBottom)) {
 		  	$content .= '\margbsxn'.round($this->marginBottom * TWIPS_IN_CM ).' ';
 		}
-		
-		if (isSet($this->gutter)) {		  	
-			$content .= '\guttersxn'.round($this->gutter * TWIPS_IN_CM).' '; 
+
+		if (isSet($this->gutter)) {
+			$content .= '\guttersxn'.round($this->gutter * TWIPS_IN_CM).' ';
 		}
-		
-		if (!empty($this->mirrorMargins)) {		  	
-			$content .= '\margmirsxn '; 
-		}				
-		
-		//vertical alignment				
-		if (!empty($this->alignment)) {		  
-		  	$content .= $this->alignment;	  
-		}			
-		
-	  	$content .= "\r\n".parent::getContent()."\r\n";	  	
-	  	
+
+		if (!empty($this->mirrorMargins)) {
+			$content .= '\margmirsxn ';
+		}
+
+		//vertical alignment
+		if (!empty($this->alignment)) {
+		  	$content .= $this->alignment;
+		}
+
+	  	$content .= "\r\n".parent::getContent()."\r\n";
+
 	  	return $content;
-	}  
+	}
 }
 ?>
