@@ -211,6 +211,10 @@ class PageDisplayBase
   }
 
   function formatText ($txt) {
+    if (is_null($txt)) {
+      return;
+    }
+
     $encoder = $this->instantiateEncoder(false);
 
     return preg_replace('/\n/', '<br />',
@@ -218,6 +222,10 @@ class PageDisplayBase
   }
 
   function convertToPlain ($txt) {
+    if (is_null($txt)) {
+      return;
+    }
+
     $encoder = @Text_Wiki_CmsCode::factory('CmsCode');
     if ('utf-8' == $this->charset) {
       $encoder->setFormatConf('Plain', 'charset', 'UTF-8');
@@ -229,6 +237,10 @@ class PageDisplayBase
   }
 
   function formatParagraphs ($txt, $options = '') {
+    if (is_null($txt)) {
+      return;
+    }
+
     // $txt = $this->htmlSpecialchars ($txt);
     $encoder = $this->instantiateEncoder(true);
 

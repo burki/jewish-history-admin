@@ -28,6 +28,7 @@ extends PageDisplayBase
   var $span_class = ''; // 'cn';
   var $xls_data = [];
   var $images;
+  var $upload_results;
 
   function __construct (&$page) {
     global $RIGHTS_REFEREE, $RIGHTS_EDITOR;

@@ -4,9 +4,9 @@
  *
  * Base-Class for managing messages
  *
- * (c) 2007-2023 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2024 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2023-04-20 dbu
+ * Version: 2024-03-12 dbu
  *
  * Changes:
  *
@@ -241,6 +241,8 @@ extends DisplayBackend
       'IF(0 = published + 0, Message.changed, published)',
     ],
   ];
+
+  var $type;
 
   var $status_options = [
     '-59' => 'eingegangen',

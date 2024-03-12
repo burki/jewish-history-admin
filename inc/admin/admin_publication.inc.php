@@ -4,9 +4,9 @@
  *
  * Class for managing publications (sources)
  *
- * (c) 2007-2022 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2024 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2022-09-00 dbu
+ * Version: 2024-03-12 dbu
  *
  * Changes:
  *
@@ -174,6 +174,9 @@ extends DisplayBackend
   var $status_options;
   var $status_default = '-99';
   var $status_deleted = '-1';
+  var $status_translation_options;
+  var $view_options;
+  var $translator_options;
 
   var $condition = [
     [ 'name' => 'search', 'method' => 'buildLikeCondition', 'args' => 'title,author,editor' ],
@@ -199,9 +202,7 @@ extends DisplayBackend
   var $view_after_edit = true;
 
   function __construct (&$page) {
-    global $STATUS_SOURCE_OPTIONS;
-
-    $this->status_options = $this->view_options['status'] = $STATUS_SOURCE_OPTIONS;
+    $this->status_options = $this->view_options['status'] = $GLOBALS['STATUS_SOURCE_OPTIONS'];
     parent::__construct($page);
 
     $this->condition[] = [

@@ -5,7 +5,7 @@
   *
   * Author  : Daniel Burckhardt, daniel.burckhardt@sur-gmbh.ch
   *
-  * Version : 2019-01-31 dbu
+  * Version : 2023-11-01 dbu
   *
   * interfaces still not completely finalized,
   * but much better than just plain copy/paste
@@ -18,6 +18,9 @@ class ImageUploadHandler
 {
   var $item_id;
   var $type;
+  var $img_titles;
+  var $img_forms;
+  var $img_images;
 
   function __construct ($item_id, $type) {
     $this->item_id = $item_id;

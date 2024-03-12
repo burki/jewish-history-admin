@@ -4,9 +4,9 @@
  *
  * Manage the articles
  *
- * (c) 2009-2023 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2024 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2023-04-20 dbu
+ * Version: 2024-03-12 dbu
  *
  * Changes:
  *
@@ -95,12 +95,15 @@ extends DisplayMessage
   // var $show_xls_export = true;
   var $status_options;
   var $status_default = '-99';
+  var $status_translation_options;
+  var $section_options;
+  var $editor_options;
+  var $referee_options;
+  var $translator_options;
 
   function __construct (&$page) {
-    global $MESSAGE_ARTICLE, $STATUS_OPTIONS;
-
-    $this->status_options = $STATUS_OPTIONS;
-    $this->type = $MESSAGE_ARTICLE;
+    $this->status_options = $GLOBALS['STATUS_OPTIONS'];
+    $this->type = $GLOBALS['MESSAGE_ARTICLE'];
     $this->messages['item_new'] = tr('New Article');
     parent::__construct($page);
 
