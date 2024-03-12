@@ -22,7 +22,7 @@
 
         "swiftmailer/swiftmailer": "^5.4",
 
-        "shardj/zf1-future": "^1.22",
+        "shardj/zf1-future": "^1.24",
         "cocur/slugify": "~1.0",
 
         "sabre/xml": "@stable",
@@ -37,15 +37,16 @@
         "pear/pear_exception": "*",
         "pear/text_wiki": "dev-master",
 
-        "spatie/simple-excel": "^1.2",
+        "spatie/simple-excel": "^1.13",
         "nette/php-generator": "^3.2",
 
         "hedii/zotero-api": "dev-master#c296090a23e557bd7b38c7f10132ada6bc333631",
-        "sabre/dav": "~3.0",
+        "sabre/dav": "^3.0",
 
         "symfony/process": "3.4.*",
         "loilo/fuse": "@stable",
         "albertofem/rsync-lib": "1.0.0",
+
         "dshafik/php7-mysql-shim": "dev-master"
     },
 
