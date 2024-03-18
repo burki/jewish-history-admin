@@ -4,9 +4,9 @@
  *
  * Methods to fetch files from remote
  *
- * (c) 2019 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2019-2024 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2019-02-19 dbu
+ * Version: 2024-03-18 dbu
  *
  *
  */
@@ -18,7 +18,7 @@ class RsyncService
 {
     static function parseList($res)
     {
-        $lines = preg_split('/$\R?^/m', $res);
+        $lines = preg_split('/$\R?^/m', rtrim($res));
 
         $utc = new DateTimeZone('Europe/Berlin'); // Hidrive doesn't seem to report in UTC
 
