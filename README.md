@@ -61,3 +61,9 @@ Create a proper database and create the table-structure
 Insert an initial user with administrator privs into the empty table
 
     INSERT INTO User (email, privs) VALUES ('my@example.com', 0x02 | 0x04);
+
+
+Make uploads writable by the Web Server
+
+    sudo setfacl -R -m u:www-data:rwX ./htdocs/uploads
+    sudo setfacl -dR -m u:www-data:rwX ./htdocs/uploads
