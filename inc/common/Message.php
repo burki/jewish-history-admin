@@ -4,9 +4,9 @@
  *
  * Build multilingual (mail) messages with placeholders
  *
- * (c) 2008-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2022 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-07-23 dbu
+ * Version: 2022-07-02 dbu
  *
  * Changes:
  *
@@ -50,7 +50,7 @@ class Message
         $body = false;
         $subject = false;
 
-        $languages = [$this->lang];
+        $languages = [ $this->lang ];
         if ('en_US' != $this->lang) {
             $languages[] = 'en_US'; // add fallback language
         }
@@ -72,16 +72,16 @@ class Message
             $subject = $matches[1];
             array_shift($lines);
         }
+
         // $template = implode(PHP_EOL, $lines);
         $template = implode('', $lines);
-
 
         // fill in template
         $body = preg_replace_callback('|\%([a-z_0-9]+)\%|',
                                     [$this->messagePlaceholder, 'replace'],
                                     $template);
 
-        return [$subject, $body];
+        return [ $subject, $body ];
     }
 
     function build () {
@@ -92,9 +92,10 @@ class Message
             // put this after buildBody, so specific subject can override generic one
             $subject = $this->options['subject'];
         }
+
         $subject = $this->buildSubject($subject);
 
-        return [$subject, $body];
+        return [ $subject, $body ];
     }
 
     function buildFrom () {
@@ -313,14 +314,15 @@ class MessagePlaceholder
                              . ' ' . $user['fname'];
                     }
                 }
-                if (empty($ret))
+
+                if (empty($ret)) {
                     $ret = Page::gettext('Dear user', $this->message->lang);
-                /* var_dump($ret);
-                exit; */
+                }
+
                 break;
 
             case 'your_account_linked':
-                $ret = '[' . $this->message->page->buildLinkFull(['pn' => 'account']) . ' your account]';
+                $ret = '[' . $this->message->page->buildLinkFull([ 'pn' => 'account' ]) . ' your account]';
                 break;
 
             case 'site':

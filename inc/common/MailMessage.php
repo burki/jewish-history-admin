@@ -4,9 +4,9 @@
  *
  * lightweight wrapper around Swift-Mailer 5.x
  *
- * (c) 2007-2019 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2022 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2019-02-07 dbu
+ * Version: 2022-07-02 dbu
  *
  * Changes:
  *
@@ -197,6 +197,7 @@ class MailMessage
 
         if (!defined('MAIL_SEND') || !MAIL_SEND) {
             $count = $this->printOnly();
+
             return $count;
         }
 
@@ -209,6 +210,7 @@ class MailMessage
                         break;
                     }
                 }
+
                 if (0 == $matched) {
                     $this->removeTo($to);
                     $this->addToBlocked($to);
