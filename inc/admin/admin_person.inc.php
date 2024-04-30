@@ -6,7 +6,7 @@
  *
  * (c) 2009-2024 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2024-01-10 dbu
+ * Version: 2024-04-30 dbu
  *
  * TODO:
  *
@@ -122,6 +122,7 @@ extends DisplayBackend
     'created' => 'Created',
     'status' => ''
   ];
+  var $view_options = [];
   var $page_size = 50;
   var $search_fulltext = null;
   var $view_after_edit = true;
@@ -134,6 +135,7 @@ extends DisplayBackend
 
     if ('xls' == $page->display) {
       $this->cols_listing_count = count($this->fields_listing) - 1;
+      $this->page_size = -1;
     }
 
     if ($page->lang() != 'en_US') {
@@ -143,7 +145,8 @@ extends DisplayBackend
     $this->messages['item_new'] = tr('New Person');
     $this->search_fulltext = $this->page->getPostValue('fulltext');
     if (!isset($this->search_fulltext)) {
-      $this->search_fulltext = $this->page->getSessionValue('fulltext');
+      // (int) conversion so it is displayed even when not in session
+      $this->search_fulltext = (int)$this->page->getSessionValue('fulltext');
     }
     $this->page->setSessionValue('fulltext', $this->search_fulltext);
 
@@ -419,7 +422,6 @@ EOT;
     $this->script_ready[] = <<<EOT
 
     jQuery('#gnd').autocomplete({
-      // source: availablePnds,
       type: 'post',
       source: './admin_ws.php?pn=person&action=lookupGnd&_debug=1',
       minChars: 2,
@@ -433,7 +435,8 @@ EOT;
           output.html('<img src="./media/ajax-loader.gif" alt="running" />');
         }
       },
-      response: function(event,ui) { // was open
+      response: function(event,ui) {
+        // was open
         var output = jQuery('#spinner');
         if (null != output) {
           output.html('');
@@ -506,7 +509,7 @@ EOT;
 
 
         $GND_LINKS = [
-          'https://d-nb.info/gnd/%s' => 'Deutsche Nationalbibliothek',
+          // 'https://d-nb.info/gnd/%s' => 'Deutsche Nationalbibliothek',
         ];
         $rows['gnd']['value'] = '<ul><li>';
 
@@ -526,11 +529,12 @@ EOT;
         }
 
         $rows['gnd']['value'] .= '</ul>';
+        $url_pndaks = 'https://juedische-geschichte-online.net/lod-resolver/seealso/entityfacts/gnd';
 
         $this->script_code .= <<<EOT
           var service = new SeeAlsoCollection();
           service.services = {
-            'pndaks' : new SeeAlsoService('http://beacon.findbuch.de/seealso/pnd-aks/')
+            'pndaks' : new SeeAlsoService('{$url_pndaks}')
           };
           service.views = {
             'seealso-ul' : new SeeAlsoUL({

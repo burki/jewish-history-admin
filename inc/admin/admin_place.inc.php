@@ -4,9 +4,9 @@
  *
  * Manage the Place-table
  *
- * (c) 2015-2023 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2015-2024 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2023-12-12 dbu
+ * Version: 2024-04-30 dbu
  *
  * TODO:
  *
@@ -158,6 +158,7 @@ extends DisplayBackend
 
     if ('xls' == $page->display) {
       $this->cols_listing_count = count($this->fields_listing) - 1;
+      $this->page_size = -1;
     }
 
     if ($page->lang() != 'en_US') {

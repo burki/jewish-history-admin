@@ -118,7 +118,7 @@ extends DisplayBackend
   var $search_fulltext = null;
   var $view_after_edit = true;
   var $show_xls_export = true;
-  var $xls_name = 'orte';
+  var $xls_name = 'ereignisse';
 
   function __construct (&$page, $workflow = null) {
     $workflow = new EventFlow($page); // deleting may be merging
@@ -126,6 +126,7 @@ extends DisplayBackend
 
     if ('xls' == $page->display) {
       $this->cols_listing_count = count($this->fields_listing) - 1;
+      $this->page_size = -1;
     }
 
     if ($page->lang() != 'en_US') {

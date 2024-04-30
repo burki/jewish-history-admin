@@ -6,7 +6,7 @@
  *
  * (c) 2006-2024 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2024-01-10 dbu
+ * Version: 2024-04-30 dbu
  *
  * Changes:
  *
@@ -14,6 +14,7 @@
 
 require_once INC_PATH . 'common/tablemanager.inc.php';
 require_once INC_PATH . 'admin/common.inc.php';
+require_once INC_PATH . 'admin/export_xls.inc.php';
 
 class AuthorFlow
 extends TableManagerFlow
@@ -140,6 +141,8 @@ extends TableManagerQueryConditionBuilder
 class DisplayAuthor
 extends DisplayTable
 {
+  use ExportXls;
+
   var $table = 'User';
   var $fields_listing = [
     'User.id AS id', 'lastname', 'firstname', 'email',

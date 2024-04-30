@@ -4,9 +4,9 @@
  *
  * Base-Class for backend
  *
- * (c) 2007-2020 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2024 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2020-08-05 dbu
+ * Version: 2024-04-30 dbu
  *
  * Changes:
  *
@@ -14,6 +14,7 @@
 
 require_once INC_PATH . 'common/tablemanager.inc.php';
 require_once INC_PATH . 'common/image_upload_handler.inc.php';
+require_once INC_PATH . 'admin/export_xls.inc.php';
 
 // small helper function
 function array_merge_at ($array1, $array2, $after_field = null) {
@@ -266,6 +267,8 @@ extends ImageUploadHandler
 class DisplayBackend
 extends DisplayTable
 {
+  use ExportXls;
+
   var $listing_default_action = TABLEMANAGER_EDIT;
   var $datetime_style = 'DD.MM.YYYY';
   var $status_deleted = '-1';

@@ -4,9 +4,9 @@
  *
  * Manage the organization-table
  *
- * (c) 2016-2019 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2016-2024 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2019-01-31 dbu
+ * Version: 2024-04-30 dbu
  *
  * TODO:
  *
@@ -128,7 +128,7 @@ extends DisplayBackend
   var $search_fulltext = null;
   var $view_after_edit = true;
   var $show_xls_export = true;
-  var $xls_name = 'orte';
+  var $xls_name = 'organisationen';
 
   function __construct (&$page, $workflow = null) {
     $workflow = new OrganizationFlow($page); // deleting may be merging
@@ -136,6 +136,7 @@ extends DisplayBackend
 
     if ('xls' == $page->display) {
       $this->cols_listing_count = count($this->fields_listing) - 1;
+      $this->page_size = -1;
     }
 
     if ($page->lang() != 'en_US') {

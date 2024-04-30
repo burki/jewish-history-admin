@@ -4,9 +4,9 @@
  *
  * Class for managing holding institutions
  *
- * (c) 2008-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2024 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-09-14 dbu
+ * Version: 2024-04-30 dbu
  *
  * Changes:
  *
@@ -14,6 +14,7 @@
 
 require_once INC_PATH . 'common/tablemanager.inc.php';
 require_once INC_PATH . 'admin/common.inc.php';
+require_once INC_PATH . 'admin/export_xls.inc.php';
 
 class PublisherFlow
 extends TableManagerFlow
@@ -57,10 +58,18 @@ extends TableManagerRecord
 class DisplayPublisher
 extends DisplayTable
 {
+  use ExportXls;
+
   var $page_size = 30;
-  var $show_xls_export = true;
   var $table = 'Publisher';
-  var $fields_listing = [ 'id', 'name', 'place', /* 'status' */ ];
+  var $fields_listing = [
+      'id',
+      'name',
+      'place',
+      'gnd',
+      'created',
+      /* 'status' */
+  ];
   var $listing_default_action = TABLEMANAGER_VIEW;
 
   var $condition = [
@@ -70,7 +79,14 @@ extends DisplayTable
   ];
   var $order = [ [ 'name' ] ];
   var $view_after_edit = true;
-  var $cols_listing = [ 'name' => 'Name', 'place' => 'Place' ];
+  var $cols_listing = [
+    'name' => 'Name',
+    'place' => 'Place',
+    'gnd' => 'GND',
+    'created' => 'Created',
+  ];
+  var $show_xls_export = true;
+  var $xls_name = 'archive';
 
   function __construct (&$page, $workflow = '') {
     parent::__construct($page, $workflow);
@@ -349,19 +365,6 @@ EOT;
 
     return $ret;
   } // buildSearchBar
-
-  function buildListingRow (&$row) {
-    if ('xls' == $this->page->display) {
-      $xls_row = [];
-      for ($i = 0; $i < $this->cols_listing_count; $i++) {
-        $xls_row[] = $row[$i];
-      }
-      $this->xls_data[] = $xls_row;
-    }
-    else {
-      return parent::buildListingRow($row);
-    }
-  }
 
   function buildMerge () {
     global $STATUS_REMOVED;

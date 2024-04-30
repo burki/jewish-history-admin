@@ -4,9 +4,9 @@
  *
  * Base Display class for Admin-pages
  *
- * (c) 2006-2023 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2024 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2023-08-06 dbu
+ * Version: 2024-04-30 dbu
  *
  * Changes:
  *
@@ -633,7 +633,7 @@ EOT;
       // generate excel file
       $xls = new Excel_XML;
       $xls->addArray($this->xls_data);
-      $xls->generateXML('liste');
+      $xls->generateXML(property_exists($this, 'xls_name') ? $this->xls_name : 'liste');
 
       exit;
     }

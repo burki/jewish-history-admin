@@ -6,7 +6,7 @@
  *
  * (c) 2009-2024 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2024-03-12 dbu
+ * Version: 2024-04-30 dbu
  *
  * Changes:
  *
@@ -754,26 +754,6 @@ EOT;
     $options['referee'] = 'Referee';
 
     return parent::buildSearchFields($options);
-  }
-
-  function buildListingRow (&$row) {
-    if ('xls' == $this->page->display) {
-      $xls_row = [];
-      for ($i = 0; $i < $this->cols_listing_count; $i++) {
-        $val = $row[$i];
-        if (count($this->cols_listing) - 2 == $i && isset($val)) {
-          $val = $this->status_options[$val];
-        }
-
-        $xls_row[] = $val;
-      }
-
-      $this->xls_data[] = $xls_row;
-
-      return;
-    }
-
-    return parent::buildListingRow($row);
   }
 
   function getImageDescriptions () {
