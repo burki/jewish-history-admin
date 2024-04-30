@@ -204,7 +204,7 @@ extends RecordSQL
   }
 }
 
-class DisplayTable 
+class DisplayTable
 extends PageDisplay
 {
   var $step;
@@ -792,7 +792,7 @@ extends PageDisplay
     }
     else {
       // just query - the calling method will fetch the rows
-      $this->active_conn = new DB();
+      $this->active_conn = $this->page->dbconn;
       $this->active_conn->query($querystr);
     }
   }
