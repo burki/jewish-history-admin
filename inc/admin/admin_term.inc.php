@@ -4,9 +4,9 @@
  *
  * Class for managing Thesauri-Terms
  *
- * (c) 2013-2023 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2013-2024 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2023-04-20 dbu
+ * Version: 2024-05-27 dbu
  *
  * Changes:
  *
@@ -60,6 +60,7 @@ extends DisplayTable
       new Field([ 'name' => 'changed_by', 'type' => 'hidden', 'datatype' => 'int', 'value' => $this->page->user['id'] ]),
       new Field([ 'name' => 'category', 'type' => 'hidden', 'value' => $category, 'datatype' => 'char' ]),
       new Field([ 'name' => 'name', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255 ]),
+      new Field([ 'name' => 'term_code', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 255, 'null' => true ]),
     ]);
 
     return $record;
@@ -82,6 +83,7 @@ extends DisplayTable
                            $this->htmlSpecialchars(tr($THESAURI[$category])))
       ],
       'name' => [ 'label' => 'Term' ],
+      'term_code' => [ 'label' => 'Term Code' ],
 
       isset($this->form) ? $this->form->show_submit(tr('Save')) : false
     ];

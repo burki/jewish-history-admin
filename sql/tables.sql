@@ -52,6 +52,7 @@ CREATE TABLE Term (
   category      VARCHAR(20) NOT NULL,           #
   id_parent     INT NULL,                       # for hierarchical trees
   ord           INT NOT NULL DEFAULT 0,         # order of keyword with category/id_parent
+  term_code     VARCHAR(255) NULL,              #
   name          VARCHAR(255) NOT NULL,          #
   created       DATETIME,                       # when it was created
   created_by    INT NULL,                       # ref to User.id: who created the entry
