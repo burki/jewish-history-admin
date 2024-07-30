@@ -5,7 +5,7 @@
   *
   * Author  : Daniel Burckhardt, daniel.burckhardt@sur-gmbh.ch
   *
-  * Version : 2023-06-06 dbu
+  * Version : 2024-07-30 dbu
   *
   *
   */
@@ -18,7 +18,13 @@ extends ImageUploadHandler
   public function buildEntry($view, $img_name, $params_self)
   {
     require_once INC_PATH . 'common/PresentationService.php';
-    $presentationService = new PresentationService(new DB_Presentation());
+
+    $options = [];
+    if (defined('PREFIX')) {
+      $options['prefix'] = PREFIX;
+    }
+
+    $presentationService = new PresentationService(new DB_Presentation(), $options);
 
     $item_id = $this->item_id;
     $type = $this->type;
@@ -122,12 +128,12 @@ extends ImageUploadHandler
                                                          [ 'delete_img' => $img_name ]));
 
         $ret = '<p><div style="margin-right: 2em; margin-bottom: 1em; float: left;">' . $img_tag . '</div>'
-                    . sprintf('[<a href="%s">%s</a>]<br clear="left" />',
-                              htmlspecialchars($url_delete),
-                              $view->htmlSpecialchars(tr('delete')))
-                    . '</p>'
-                    . (!empty($caption) ? '<p>' . $view->formatText($caption) . '</p>' : '')
-                    ;
+             . sprintf('[<a href="%s">%s</a>]<br clear="left" />',
+                       htmlspecialchars($url_delete),
+                       $view->htmlSpecialchars(tr('delete')))
+             . '</p>'
+             . (!empty($caption) ? '<p>' . $view->formatText($caption) . '</p>' : '')
+            ;
       }
     }
 

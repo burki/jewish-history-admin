@@ -52,6 +52,13 @@ define('RSYNC_REMOTE_PUBLISHED', '/public/jgo/TEI/TEI_veröffentlicht/');
 define('RSYNC_REMOTE_UNPUBLISHED', '/public/jgo/TEI/TEI_final/');
 */
 
+/*
+define('PREFIX', 'jgo:'); // defaults to 'jgo:'
+
+define('URL_PRESENTATION_DE', 'https://schluesseldokumente.net');
+define('URL_PRESENTATION_EN', 'https://keydocuments.net');
+*/
+
 $URL_REWRITE = []; // no rewrite rules
 
 define('OUTPUT_COMPRESS', false); // set to true to use output compression

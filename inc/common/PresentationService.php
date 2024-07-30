@@ -52,6 +52,10 @@ class PresentationService
             self::$LANG_SETTINGS = array_replace_recursive(self::$LANG_SETTINGS, $options['lang_settings']);
         }
 
+        if (array_key_exists('prefix', $options)) {
+            self::$PREFIX = $options['prefix'];
+        }
+
         if (is_null(self::$PRESENTATION_ROOT_DIR)) {
             // TODO: check options
             $presentation = realpath(INC_PATH . '/../../presentation'); // guess from default structure

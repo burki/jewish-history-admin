@@ -4,9 +4,9 @@
  *
  * Update article and source
  *
- * (c) 2019-2020 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2019-2024 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2020-08-05 dbu
+ * Version: 2024-07-30 dbu
  *
  * Changes:
  *
@@ -105,6 +105,11 @@ extends DisplayBackend
     require_once INC_PATH . 'common/PresentationService.php';
 
     $options = [];
+
+    if (defined('PREFIX')) {
+      $options['prefix'] = PREFIX;
+    }
+
     if (defined('URL_PRESENTATION_DE') || defined('URL_PRESENTATION_EN')) {
       $lang_settings = [];
 
