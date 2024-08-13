@@ -6,9 +6,9 @@
  *
  * machine dependent stuff like hardwired paths, db-logins and passwords
  *
- * (c) 2008-2023 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2024 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2023-08-06 dbu
+ * Version: 2024-08-13 dbu
  *
  * Changes:
  */
@@ -157,6 +157,8 @@ extends DB
 
 class ZoteroApiFactory
 {
+  const GROUP_ID = '301118'; // adjust for non-keydocuments group
+
   static $apiKey = 'ZOTERO-API-KEY';
 
   public static function getInstance()

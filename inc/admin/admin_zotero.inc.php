@@ -4,9 +4,9 @@
  *
  * Sync Zotero Items
  *
- * (c) 2016-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2016-2024 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-07-23 dbu
+ * Version: 2024-08-12 dbu
  *
  * Changes:
  *
@@ -58,7 +58,6 @@ extends DisplayBackend
   ];
 
   const API_PAGE_SIZE = 20;
-  const GROUP_ID = '301118';
 
   function __construct (&$page, $workflow = null) {
     $workflow = new ZoteroFlow($page); // only list and sync
@@ -80,7 +79,7 @@ extends DisplayBackend
       $querystr = sprintf("SELECT MAX(zoteroModified) AS maxModified FROM Zotero WHERE status <> %d",
                           STATUS_DELETED);
       $dbconn->query($querystr);
-      if ($dbconn->next_record()) {
+      if ($dbconn->next_record() && !is_null($dbconn->Record['maxModified'])) {
         $maxModified = join('T', explode(' ', $dbconn->Record['maxModified'])) . 'Z';
       }
     }
@@ -89,7 +88,7 @@ extends DisplayBackend
     $start = 0;
     $continue = true;
     while ($continue) {
-      $request = $api->group(self::GROUP_ID)
+      $request = $api->group(ZoteroApiFactory::GROUP_ID)
           ->items()
           ->sortBy('dateModified')
           ->direction(is_null($maxModified) ? 'asc' : 'desc')
