@@ -1,3 +1,8 @@
+# TODO: Switch to
+# COLLATE utf8mb4_unicode_520_ci
+#   or once we are on MySQL 8 everywhere:
+# COLLATE utf8mb4_0900_ai_ci
+# see https://www.coderedcorp.com/blog/guide-to-mysql-charsets-collations/
 CREATE TABLE User (
   id int(11) NOT NULL auto_increment,
   status int(11) NOT NULL DEFAULT 0,
