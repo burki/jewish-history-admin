@@ -6,7 +6,7 @@
  *
  * (c) 2019-2024 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2024-03-18 dbu
+ * Version: 2024-08-12 dbu
  *
  *
  */
@@ -16,13 +16,19 @@ use AFM\Rsync\Command;
 
 class RsyncService
 {
+    var $options = [];
+
     static function parseList($res)
     {
+        $files = [];
+
+        if (is_null($res)) {
+            return $files;
+        }
+
         $lines = preg_split('/$\R?^/m', rtrim($res));
 
         $utc = new DateTimeZone('Europe/Berlin'); // Hidrive doesn't seem to report in UTC
-
-        $files = [];
 
         foreach ($lines as $line) {
             $parts = preg_split('/\s+/', $line, 5);
@@ -90,6 +96,7 @@ class RsyncService
     function executeCommand($command)
     {
         $cmdString = (string)$command;
+
 
         $res = `$cmdString`;
 
