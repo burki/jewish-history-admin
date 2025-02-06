@@ -6,7 +6,7 @@
  *
  * (c) 2015-2024 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2024-04-30 dbu
+ * Version: 2024-08-29 dbu
  *
  * TODO:
  *
@@ -79,12 +79,16 @@ extends TableManagerRecord
 
   function fetch ($args, $datetime_style = '') {
     $fetched = parent::fetch($args, $datetime_style);
+
     if ($fetched) {
-      $alternateName = json_decode($this->get_value('alternateName'), true);
-      if (isset($alternateName) && false !== $alternateName) {
-        foreach ($this->languages as $language) {
-          if (array_key_exists($language, $alternateName)) {
-            $this->set_value('name_variant_' . $language, $alternateName[$language]);
+      $alternateName = $this->get_value('alternateName');
+      if (!is_null($alternateName)) {
+        $alternateName = json_decode($value, true);
+        if (isset($alternateName) && false !== $alternateName) {
+          foreach ($this->languages as $language) {
+            if (array_key_exists($language, $alternateName)) {
+              $this->set_value('name_variant_' . $language, $alternateName[$language]);
+            }
           }
         }
       }

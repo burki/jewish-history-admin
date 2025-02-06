@@ -4,9 +4,9 @@
  *
  * Manage the event-table
  *
- * (c) 2016-2019 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2016-2024 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2019-01-31 dbu
+ * Version: 2024-08-29 dbu
  *
  * TODO:
  *
@@ -76,10 +76,13 @@ extends TableManagerRecord
 
     if ($fetched) {
       foreach ($this->localizedFields as $db_field => $form_field) {
-        $values = json_decode($this->get_value($db_field), true);
-        foreach ($this->languages as $language) {
-          if (isset($values) && false !== $values && array_key_exists($language, $values)) {
-            $this->set_value($form_field . '_' . $language, $values[$language]);
+        $value = $this->get_value($db_field);
+        if (!is_null($value)) {
+          $values = json_decode($value, true);
+          foreach ($this->languages as $language) {
+            if (isset($values) && false !== $values && array_key_exists($language, $values)) {
+              $this->set_value($form_field . '_' . $language, $values[$language]);
+            }
           }
         }
       }
