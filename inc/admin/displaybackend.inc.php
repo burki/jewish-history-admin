@@ -4,9 +4,9 @@
  *
  * Base-Class for backend
  *
- * (c) 2007-2024 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2025 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2024-04-30 dbu
+ * Version: 2025-02-06 dbu
  *
  * Changes:
  *
@@ -85,10 +85,11 @@ extends Sabre\Xml\Reader
     $this->collected[] = $output;
   }
 
-  function parse()
+  function parse(): array
   {
     $this->collected = [];
     parent::parse();
+
     return $this->collected;
   }
 

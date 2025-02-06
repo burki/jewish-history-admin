@@ -25,7 +25,7 @@
         "shardj/zf1-future": "^1.24",
         "cocur/slugify": "~1.0",
 
-        "sabre/xml": "@stable",
+        "sabre/xml": "^4.0",
 
         "kriswallsmith/buzz": "0.16.*",
 
@@ -41,7 +41,6 @@
         "nette/php-generator": "^3.2",
 
         "hedii/zotero-api": "dev-master#c296090a23e557bd7b38c7f10132ada6bc333631",
-        "sabre/dav": "^3.0",
 
         "symfony/process": "3.4.*",
         "loilo/fuse": "@stable",
