@@ -28,36 +28,26 @@ class Client
              . '/ege-webservice/Conversions/'
              . implode('/', [ urlencode($mime_from), urlencode($mime_to) ]);
 
-        $request = new \Buzz\Message\Form\FormRequest();
-        $request->fromUrl($uri);
-        $request->setHeaders([ 'Accept' => '*' . '/*' ]);
-        $request->setMethod('POST');
-        // TODO: maybe switch to Guzzle: https://github.com/guzzle/guzzle/issues/768
-        // FormUpload is needed since this is the only way that Buzz\FormRequest::isMultipart() sends true
-        /*
-        private function isMultipart()
-        {
-            foreach ($this->fields as $name => $value) {
-                if (is_object($value) && $value instanceof FormUploadInterface) {
-                    return true;
-                }
-            }
+        // $uri = 'https://echo.free.beeceptor.com'; // for debugging
 
-            return false;
-        }
-        */
+        $headers = [ 'Accept' => '*' . '/*' ];
 
-        $request->setField('upload', new FormUpload(realpath($fname)));
+        $client = new \GuzzleHttp\Client();
+        $response = $client->post($uri, [
+            'headers' => $headers,
+            'multipart' => [
+                [
+                    'name'     => 'upload',
+                    'contents' => file_get_contents($fname),
+                    'filename' => basename($fname),
+                    'headers'  => [ 'Content-Type' => 'text/xml' ],
+                ],
+            ],
+        ]);
 
-        $client = new \Buzz\Client\Curl();
-
-        $response = new \Buzz\Message\Response();
-
-        $client->send($request, $response);
-
-        if ($response->isSuccessful()) {
-            $content_type = $response->getHeader('Content-Type');
-            $content_disposition = $response->getHeader('Content-Disposition');
+        if ('OK' == $response->getReasonPhrase()) {
+            $content_type = $response->getHeader('Content-Type')[0];
+            $content_disposition = $response->getHeader('Content-Disposition')[0];
             if (!empty($content_disposition)
                 && preg_match('/filename\="([^"]+)"/', $content_disposition, $matches))
             {
@@ -74,7 +64,7 @@ class Client
             }
 
             header('Content-Type' . ': ' . $content_type);
-            echo $response->getContent();
+            echo $response->getBody();
         }
     }
 }

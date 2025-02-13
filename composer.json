@@ -27,8 +27,6 @@
 
         "sabre/xml": "^4.0",
 
-        "kriswallsmith/buzz": "0.16.*",
-
         "semsol/arc2": "^2.5",
         "sweetrdf/easyrdf": "^1.8",
         "ml/json-ld": "^1.0",
