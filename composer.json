@@ -40,7 +40,7 @@
 
         "hedii/zotero-api": "dev-master#c296090a23e557bd7b38c7f10132ada6bc333631",
 
-        "symfony/process": "3.4.*",
+        "symfony/process": "6.4.*",
         "loilo/fuse": "@stable",
         "albertofem/rsync-lib": "1.0.0",
 
