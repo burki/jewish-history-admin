@@ -4,9 +4,9 @@
  *
  * Trait for xls-Export
  *
- * (c) 2007-2024 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2025 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2024-04-30 dbu
+ * Version: 2025-02-13 dbu
  *
  * Changes:
  *
@@ -14,7 +14,7 @@
 
 trait ExportXls
 {
-   function escapeXls ($str) {
+  function escapeXls ($str) {
     if (is_null($str)) {
       return '';
     }
