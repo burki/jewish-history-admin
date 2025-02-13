@@ -4,9 +4,9 @@
  *
  * Methods to check/update sources and articles in the frontend
  *
- * (c) 2019-2023 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2019-2025 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2023-08-03 dbu
+ * Version: 2025-02-13 dbu
  *
  *
  */
@@ -67,6 +67,10 @@ class PresentationService
 
     function lookupArticleInfoFromFname($fname)
     {
+        if (is_null($fname)) {
+            return false;
+        }
+
         $info = null;
 
         if (preg_match('/(.*)_final\.xml$/i', $fname, $matches)) {
