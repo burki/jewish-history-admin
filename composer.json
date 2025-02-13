@@ -23,7 +23,7 @@
         "swiftmailer/swiftmailer": "^5.4",
 
         "shardj/zf1-future": "^1.24",
-        "cocur/slugify": "~1.0",
+        "cocur/slugify": "^4.0",
 
         "sabre/xml": "^4.0",
 
