@@ -4,9 +4,9 @@
  *
  * Manage the Person-table
  *
- * (c) 2009-2024 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2025 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2024-08-29 dbu
+ * Version: 2025-02-13 dbu
  *
  * TODO:
  *
@@ -99,9 +99,8 @@ extends DisplayBackend
     "CONCAT(IFNULL(CONCAT(familyName, ', '), ''), IFNULL(givenName, '')) AS name",
     "CONCAT(IFNULL(YEAR(birthdate), ''), IF(deathdate IS NOT NULL, CONCAT('-', YEAR(deathdate)), '')) AS lifespan",
     'person.gnd AS gnd',
-    /* 'COUNT(DISTINCT Item.id) AS count',
-    'COUNT(DISTINCT Media.id) AS how_many_media',
-    */
+    // 'COUNT(DISTINCT Item.id) AS count',
+    // 'COUNT(DISTINCT Media.id) AS how_many_media',
     'person.created_at AS created',
     'person.status AS status',
   ];
@@ -138,7 +137,9 @@ extends DisplayBackend
     parent::__construct($page, $workflow);
 
     if ('xls' == $page->display) {
-      $this->cols_listing_count = count($this->fields_listing) - 1;
+      $this->fields_listing[count($this->fields_listing)-1] = 'JSON_UNQUOTE(person.description->"$.de") AS description_de';
+      $this->fields_listing[] = 'person.url AS url';
+      $this->cols_listing_count = count($this->fields_listing);
       $this->page_size = -1;
     }
 
