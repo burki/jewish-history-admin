@@ -55,7 +55,6 @@ class Client
 
         $client->send($request, $response);
 
-        $client->send($request, $response);
         if ($response->isSuccessful()) {
             $content_type = $response->getHeader('Content-Type');
             $content_disposition = $response->getHeader('Content-Disposition');
