@@ -8,6 +8,8 @@ use \Buzz\Message\Form\FormUpload;
 
 class Client
 {
+    protected $server;
+
     // default is https://oxgarage.tei-c.org
     // temporary work-around was https://oxgarage-paderborn.tei-c.org
     // prod has dns issues, added ip to /etc/hosts
