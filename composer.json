@@ -13,7 +13,15 @@
         },
         {
             "type": "vcs",
-            "url": "https://github.com/burki/Text_Wiki.git"
+            "url": "https://github.com/burki/Text_Wiki"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/burki/php7-mysql-shim"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/Furex/PHP-MySQLi-Database-Class"
         }
     ],
 
@@ -27,6 +35,7 @@
 
         "sabre/xml": "^4.0",
 
+        "thingengineer/mysqli-database-class": "dev-master#c14716f as 2.9.5",
         "semsol/arc2": "^2.5",
         "sweetrdf/easyrdf": "^1.8",
         "ml/json-ld": "^1.0",
