@@ -4,9 +4,9 @@
  *
  * Sync Zotero Items
  *
- * (c) 2016-2024 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2016-2025 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2024-08-12 dbu
+ * Version: 2025-03-06 dbu
  *
  * Changes:
  *
@@ -223,7 +223,7 @@ extends DisplayBackend
     $ret = [];
     $api = ZoteroApiFactory::getInstance();
     foreach ($collectionIds as $collectionId) {
-      $request = $api->group(self::GROUP_ID)
+      $request = $api->group(ZoteroApiFactory::GROUP_ID)
           ->collections($collectionId);
 
       $response = $request->send();
@@ -242,7 +242,7 @@ extends DisplayBackend
 
   function checkItem ($itemId) {
     $api = ZoteroApiFactory::getInstance();
-    $request = $api->group(self::GROUP_ID)
+    $request = $api->group(ZoteroApiFactory::GROUP_ID)
             ->items($itemId);
     try {
       $response = $request->send();
