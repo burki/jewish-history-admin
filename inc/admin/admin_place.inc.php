@@ -4,9 +4,9 @@
  *
  * Manage the Place-table
  *
- * (c) 2015-2024 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2015-2025 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2024-08-29 dbu
+ * Version: 2025-03-08 dbu
  *
  * TODO:
  *
@@ -83,7 +83,7 @@ extends TableManagerRecord
     if ($fetched) {
       $alternateName = $this->get_value('alternateName');
       if (!is_null($alternateName)) {
-        $alternateName = json_decode($value, true);
+        $alternateName = json_decode($alternateName, true);
         if (isset($alternateName) && false !== $alternateName) {
           foreach ($this->languages as $language) {
             if (array_key_exists($language, $alternateName)) {
