@@ -4,9 +4,9 @@
  *
  * support-code for http://juedische-geschichte-online.net/admin/admin.php
  *
- * (c) 2008-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2025 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-08-24 dbu
+ * Version: 2025-03-06 dbu
  *
  * Changes:
  *
@@ -18,7 +18,7 @@ define('INC_PATH', '../inc/');
 include_once INC_PATH . 'local.inc.php';
 include_once INC_PATH . 'sitesettings.inc.php';
 
-$response = NULL;
+$response = null;
 
 if (array_key_exists('pn', $_REQUEST)
    && in_array($_REQUEST['pn'], [ 'user', 'publication', 'article', 'person', 'place' ]))
@@ -31,7 +31,7 @@ if (array_key_exists('pn', $_REQUEST)
   $response = $handler->buildResponse();
 }
 
-if ($response !== NULL) {
+if ($response !== null) {
   if ($response instanceof JsonResponse) {
     $response->sendJson();
   }
