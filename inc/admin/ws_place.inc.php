@@ -39,7 +39,39 @@ extends WsHandler
 
     if (!empty($tgn)) {
       $place = GettyPlaceData::fetchByIdentifier('tgn:' . $tgn);
-      if (!is_null($place) && !empty($place->latitude) && !empty($place->longitude)) {
+      if (!is_null($place)) {
+        $sparqlClient =  new \EasyRdf\Sparql\Client('https://query.wikidata.org/sparql');
+
+        // first look for an exact match
+        $query = <<<EOT
+        SELECT ?place ?placeLabel ?gndId ?geonamesId
+        WHERE {
+          BIND('{$tgn}' AS ?tgnId)
+          ?place wdt:P1667 ?tgnId.
+          OPTIONAL { ?place wdt:P227 ?gndId. }
+          OPTIONAL { ?place wdt:P1566 ?geonamesId. }
+          SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de,en". }
+        }
+EOT;
+        $result = $sparqlClient->query($query);
+        foreach ($result as $row) {
+          // qid is the last part of the URI
+          $uri_parts = explode('/', (string) $row->place);
+          $qid = array_pop($uri_parts);
+          $gnd = property_exists($row, 'gndId') ? (string) $row->gndId : null;
+          $geonames = property_exists($row, 'geonamesId') ? (string) $row->geonamesId : null;
+
+          $label = sprintf('%s (%s, %s)',
+                           $row->placeLabel, $qid,
+                           $geonames);
+          $ret[] = [
+            'value' => $qid,
+            'label' => $label,
+          ];
+        }
+      }
+
+      if (empty($ret) && !empty($place->latitude) && !empty($place->longitude)) {
         // for geospatial, see
         // https://addshore.com/2016/05/geospatial-search-for-wikidata-query-service/
         //
@@ -76,9 +108,6 @@ SELECT DISTINCT ?place ?placeLabel ?placeType ?placeTypeLabel ?geonamesId ?locat
     }
 } ORDER BY ASC(?dist)
 EOT;
-
-        $sparqlClient =  new \EasyRdf\Sparql\Client('https://query.wikidata.org/sparql');
-
         $result = $sparqlClient->query($query);
         $candidates = [];
         foreach ($result as $row) {
