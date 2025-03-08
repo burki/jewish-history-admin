@@ -4,9 +4,9 @@
  *
  * Try to determine Person GND from Lastname, Firstname
  *
- * (c) 2015-2023 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2015-2025 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2023-04-20 dbu
+ * Version: 2025-03-08 dbu
  *
  *
  */
@@ -134,23 +134,35 @@ class GettyPlaceData
 
         $place->setValuesFromResource($values, $resource, [ 'parentString' => 'parentPath'],
                                      'gvp');
-        $uri = $resource->get('gvp:broaderPreferred')->getUri();
-        if (preg_match('/'
+        $broaderPreferred = $resource->get('gvp:broaderPreferred');
+        if (!is_null($broaderPreferred) && preg_match('/'
                        . preg_quote('http://vocab.getty.edu/tgn/', '/')
                        . '(\d+)/',
-                       $uri, $matches))
+                       $broaderPreferred->getUri(), $matches))
         {
             $values['tgn_parent'] = $matches[1];
         }
 
         $placeTypePreferred = $resource->get('gvp:placeTypePreferred')->getUri();
         switch ($placeTypePreferred) {
+            case 'http://vocab.getty.edu/aat/300386699':
+                $values['type'] = 'root';
+                break;
+
+            case 'http://vocab.getty.edu/aat/300128176':
+                $values['type'] = 'continent';
+                break;
+
             case 'http://vocab.getty.edu/aat/300128207':
                 $values['type'] = 'nation';
                 break;
 
             case 'http://vocab.getty.edu/aat/300387506':
                 $values['type'] = 'country';
+                break;
+
+            case 'http://vocab.getty.edu/aat/300387081':
+                $values['type'] = 'national district';
                 break;
 
             case 'http://vocab.getty.edu/aat/300008347':
