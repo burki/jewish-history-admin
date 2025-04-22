@@ -5,7 +5,7 @@
   *
   * Author  : Daniel Burckhardt, daniel.burckhardt@sur-gmbh.ch
   *
-  * Version : 2024-07-30 dbu
+  * Version : 2025-04-22 dbu
   *
   *
   */
@@ -59,9 +59,10 @@ extends ImageUploadHandler
         $img_tag .= sprintf(' <a href="%s">%s</a> ',
                            htmlspecialchars(BASE_PATH . 'xml.php?format=docx&media_id=' . $img['media_id']),
                            $view->formatText('Word-Export'));
-        $img_tag .= sprintf('<a href="%s" target="_blank">%s</a>%s',
+        $img_tag .= sprintf('<a href="%s" download%s>%s</a>%s',
                            htmlspecialchars($img_url),
-                           $view->formatText(true || empty($caption) ? 'XML-Datei' : $caption),
+                           !empty($img['original_name']) ? '="' . htmlspecialchars($img['original_name']) . '"' : '',
+                           $view->formatText('XML-Datei'),
                            !empty($img['original_name']) ? ' [' . $view->formatText($img['original_name']) . ']' : '');
 
         if (false !== $presentationService->lookupArticle($item_id, $img['original_name'])) {
