@@ -177,6 +177,18 @@ class GettyPlaceData
                 $values['type'] = 'historical region';
                 break;
 
+            case 'http://vocab.getty.edu/aat/300387139':
+                $values['type'] = 'occupied territory';
+                break;
+
+            case 'http://vocab.getty.edu/aat/300008791':
+                $values['type'] = 'island';
+                break;
+
+            case 'http://vocab.getty.edu/aat/300386831':
+                $values['type'] = 'mountain range';
+                break;
+
             default:
                 die('TODO: handle place type ' . $placeTypePreferred);
         }

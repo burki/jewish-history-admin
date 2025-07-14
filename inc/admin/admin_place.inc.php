@@ -225,6 +225,7 @@ extends DisplayBackend
       'former group of political entitites' => tr('Former group of political entitites'),
       'former primary political entity' => tr('Former primary political entity'),
       'deserted settlement' => tr('Deserted Settlement'),
+      'occupied territory' => tr('Occupied territory'),
       'ocean' => tr('Ocean'),
       'sea' => tr('Sea'),
       'peninsula' => tr('Peninsula'),
@@ -232,6 +233,7 @@ extends DisplayBackend
       'river' => tr('River'),
       'stream' => tr('Stream'),
       'channel' => tr('Channel'),
+      'mountain range' => tr('Mountain range'),
       'association' => tr('Association'),
       'miscellaneous' => tr('Miscellaneous'),
     ];
