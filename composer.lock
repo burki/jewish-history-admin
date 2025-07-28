@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2db96e20b9bc7d98d66495a3225cc471",
+    "content-hash": "baa13c2042e0fe479462531557cdd1de",
     "packages": [
         {
             "name": "albertofem/rsync-lib",
@@ -1686,17 +1686,17 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/burki/Text_Wiki.git",
-                "reference": "e509183a2783bbea2c2fe98efcde965d4427329c"
+                "url": "https://github.com/pear/Text_Wiki.git",
+                "reference": "4f4564d327037baa5421d37f8928bb69822f4f21"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/burki/Text_Wiki/zipball/e509183a2783bbea2c2fe98efcde965d4427329c",
-                "reference": "e509183a2783bbea2c2fe98efcde965d4427329c",
+                "url": "https://api.github.com/repos/pear/Text_Wiki/zipball/4f4564d327037baa5421d37f8928bb69822f4f21",
+                "reference": "4f4564d327037baa5421d37f8928bb69822f4f21",
                 "shasum": ""
             },
             "require": {
-                "pear/pear_exception": "*"
+                "pear/pear_exception": "^1"
             },
             "require-dev": {
                 "phpunit/phpunit": "*"
@@ -1712,7 +1712,7 @@
                 "./"
             ],
             "license": [
-                "LGPL"
+                "LGPL-2.1-or-later"
             ],
             "authors": [
                 {
@@ -1736,7 +1736,7 @@
                 "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=Text_Wiki",
                 "source": "https://github.com/pear/Text_Wiki"
             },
-            "time": "2023-03-27T12:20:53+00:00"
+            "time": "2025-07-20T01:02:21+00:00"
         },
         {
             "name": "psr/cache",
