@@ -4,9 +4,9 @@
  *
  * Class for managing communication
  *
- * (c) 2008-2024 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2025 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2024-01-24 dbu
+ * Version: 2025-04-28 dbu
  *
  * Changes:
  *
@@ -155,6 +155,27 @@ extends DisplayTable
 
             // check if there is a locale-specific
             $locale = preg_replace('/_.*/', '', $this->page->lang());
+            if ($_GET['mode'] == 'imprimatur_sent'
+                && !empty($this->defaults['message_id']))
+            {
+              $querystr = sprintf("SELECT lang"
+                                  . " FROM Message"
+                                  . " WHERE Message.id = %d",
+                                  $this->defaults['message_id']);
+
+              $dbconn->query($querystr);
+              if ($dbconn->next_record()) {
+                switch ($dbconn->Record['lang']) {
+                  case 'ger':
+                    $locale = 'de';
+                    break;
+
+                  case 'eng':
+                    $locale = 'en';
+                    break;
+                }
+              }
+            }
 
             if (!empty($locale)) {
               $fname_template_localized = $fname_base . '_' . $SITE['key'] . '.' . $locale . '.txt';
