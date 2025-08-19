@@ -35,8 +35,7 @@
 
         "sabre/xml": "^4.0",
 
-        "thingengineer/mysqli-database-class": "dev-master#c14716f as 2.9.5",
-        "semsol/arc2": "^2.5",
+        "semsol/arc2": "^3.0",
         "sweetrdf/easyrdf": "^1.8",
         "ml/json-ld": "^1.0",
 
