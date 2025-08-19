@@ -2,11 +2,11 @@
 /*
  * admin_ws.php
  *
- * support-code for http://juedische-geschichte-online.net/admin/admin.php
+ * support-code for https://juedische-geschichte-online.net/admin/admin.php
  *
  * (c) 2008-2025 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2025-03-06 dbu
+ * Version: 2025-08-19 dbu
  *
  * Changes:
  *
@@ -21,7 +21,7 @@ include_once INC_PATH . 'sitesettings.inc.php';
 $response = null;
 
 if (array_key_exists('pn', $_REQUEST)
-   && in_array($_REQUEST['pn'], [ 'user', 'publication', 'article', 'person', 'place' ]))
+   && in_array($_REQUEST['pn'], [ 'user', 'publication', 'article', 'person', 'organization', 'place' ]))
 {
   // here we know that we have a valid $request
   include_once INC_PATH . 'admin/wshandler.inc.php';

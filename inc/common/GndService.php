@@ -1,13 +1,14 @@
 <?php
+
 /*
  * GndService.php
  *
- * Lookup Person by Name
+ * Lookup Person / CorporateBody by Name
  * Fetch Information by GND
  *
- * (c) 2010-2023 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2010-2024 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2023-04-20 dbu
+ * Version: 2024-05-29 dbu
  *
  * Changes:
  *
@@ -31,7 +32,7 @@
  *
  */
 
-if (!function_exists('is_is_associative')) {
+if (!function_exists('is_associative')) {
     // see https://stackoverflow.com/questions/173400/how-to-check-if-php-array-is-associative-or-sequential
     // for alternative implementations
     function is_associative($array) {
@@ -453,6 +454,8 @@ exit; */
 
     var $gnd;
     var $preferredName;
+    var $forename;
+    var $surname;
     var $academicDegree;
     var $biographicalInformation;
     var $dateOfBirth;
@@ -460,4 +463,155 @@ exit; */
     var $placeOfActivity;
     var $dateOfDeath;
     var $placeOfDeath;
+}
+
+class CorporateBodyData
+{
+    private static $RDFParser = null;
+
+    private static function getRDFParser()
+    {
+        if (!isset(self::$RDFParser)) {
+            self::$RDFParser = ARC2::getRDFParser();
+        }
+
+        return self::$RDFParser;
+    }
+
+    protected static function normalizeString($str)
+    {
+        if (! class_exists("\Normalizer", false)) {
+            return $str;
+        }
+
+        return normalizer_normalize($str);
+    }
+
+    /*
+     */
+    static function fetchGeographicLocation($uri)
+    {
+        $parser = self::getRDFParser();
+        if (preg_match('/d\-nb\.info\/gnd\/([^\/]*)$/', $uri, $matches)) {
+            $url = sprintf('https://d-nb.info/gnd/%s/about/lds', $matches[1]);
+        }
+        $parser->parse($url);
+        $triples = $parser->getTriples();
+        $index = \ARC2::getSimpleIndex($triples, true) ; /* true -> flat version */
+
+        if (isset($index[$uri]['https://d-nb.info/standards/elementset/gnd#preferredNameForThePlaceOrGeographicName'])) {
+            return self::normalizeString($index[$uri]['https://d-nb.info/standards/elementset/gnd#preferredNameForThePlaceOrGeographicName'][0]);
+        }
+
+        if (isset($index[$uri]['preferredNameForThePlaceOrGeographicName'])) {
+            return self::normalizeString($index[$uri]['preferredNameForThePlaceOrGeographicName'][0]);
+        }
+
+        foreach ($triples as $triple) {
+            if ('sameAs' == $triple['p']) {
+                if (preg_match('/d\-nb\.info/', $triple['o']) && $triple['o'] != $uri) {
+                    return self::fetchGeographicLocation($triple['o']);
+                }
+            }
+        }
+    }
+
+    static function fetchByGnd($gnd)
+    {
+        $parser = self::getRDFParser();
+        $url = sprintf('https://d-nb.info/gnd/%s/about/lds', $gnd);
+        $parser->parse($url);
+        $triples = $parser->getTriples();
+        $index = ARC2::getSimpleIndex($triples, false) ; /* false -> non-flat version */
+        /* var_dump($triples);
+        exit; */
+        $data = new CorporateBodyData();
+        $data->gnd = $gnd;
+        foreach ($triples as $triple) {
+            switch ($triple['p']) {
+                case 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type':
+                    $data->isDifferentiated = true; // 'https://d-nb.info/standards/elementset/gnd#DifferentiatedPerson' == $triple['o'];
+                    break;
+
+                case 'https://d-nb.info/standards/elementset/gnd#dateOfEstablishment':
+                    $data->dateOfEstablishment = $triple['o'];
+                    break;
+
+                    /*
+                    case 'https://d-nb.info/standards/elementset/gnd#placeOfBirth':
+                        $placeOfBirth = self::fetchGeographicLocation($triple['o']);
+                        if (!empty($placeOfBirth))
+                            $this->placeOfBirth = $placeOfBirth;
+                        break;
+                    */
+
+                case 'https://d-nb.info/standards/elementset/gnd#placeOfBusiness':
+                    $placeOfBusiness = self::fetchGeographicLocation($triple['o']);
+                    if (!empty($placeOfBusiness)) {
+                        $data->placeOfBusiness = $placeOfBusiness;
+                    }
+                    break;
+
+                case 'https://d-nb.info/standards/elementset/gnd#dateOfTermination':
+                    $data->dateOfTermination = $triple['o'];
+                    break;
+
+                    /*
+                    case 'https://d-nb.info/standards/elementset/gnd#placeOfDeath':
+                        $placeOfDeath = self::fetchGeographicLocation($triple['o']);
+                        if (!empty($placeOfDeath))
+                            $this->placeOfDeath = $placeOfDeath;
+                        break;
+                    */
+
+                case 'https://d-nb.info/standards/elementset/gnd#preferredNameForTheCorporateBody':
+                    if (!isset($data->preferredName) && 'literal' == $triple['o_type']) {
+                        $data->preferredName = self::normalizeString($triple['o']);
+                    }
+                    /*
+                    else if ('bnode' == $triple['o_type']) {
+                        $nameRecord = $index[$triple['o']];
+                        $this->preferredName = array($nameRecord['https://d-nb.info/standards/elementset/gnd#surname'][0]['value'],
+                                                    $nameRecord['https://d-nb.info/standards/elementset/gnd#forename'][0]['value']);
+                        // var_dump($index[$triple['o']]);
+                    }
+                    */
+                    break;
+
+                case 'https://d-nb.info/standards/elementset/gnd#homepage':
+                    $data->homepage = $triple['o'];
+                    break;
+
+                case 'https://d-nb.info/standards/elementset/gnd#biographicalOrHistoricalInformation':
+                    $data->biographicalInformation = self::normalizeString($triple['o']);
+                    break;
+
+                case 'https://d-nb.info/standards/elementset/gnd#variantNameForTheCorporateBody':
+                    // var_dump($triple);
+                    break;
+
+                case 'https://d-nb.info/standards/elementset/gnd#hierarchicalSuperiorOfTheCorporateBody':
+                case 'https://d-nb.info/standards/elementset/gnd#precedingCorporateBody':
+                    break;
+
+                default:
+                    if (!empty($triple['o'])) {
+                        // var_dump($triple);
+                    }
+                    // var_dump($triple['p']);
+
+            }
+        }
+
+        return $data;
+    }
+
+    var $preferredName;
+    var $dateOfEstablishment;
+    // var $placeOfBirth;
+    var $placeOfBusiness;
+    var $dateOfTermination;
+    // var $placeOfDeath;
+    var $homepage;
+    var $gnd;
 }
