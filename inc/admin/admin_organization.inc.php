@@ -4,9 +4,9 @@
  *
  * Manage the organization-table
  *
- * (c) 2016-2024 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2025 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2024-08-29 dbu
+ * Version: 2025-08-19 dbu
  *
  * TODO:
  *
@@ -27,6 +27,7 @@ extends TableManagerFlow
 
   function init ($page) {
     $ret = parent::init($page);
+
     if (TABLEMANAGER_DELETE == $ret) {
       $dbconn = new DB_Presentation();
       foreach (self::$TABLES_RELATED as $from_where) {
@@ -78,7 +79,7 @@ extends TableManagerRecord
       foreach ($this->localizedFields as $db_field => $form_field) {
         $value = $this->get_value($db_field);
         if (!is_null($value)) {
-          $values = json_decode($this->get_value($db_field), true);
+          $values = json_decode($value, true);
           foreach ($this->languages as $language) {
             if (isset($values) && false !== $values && array_key_exists($language, $values)) {
               $this->set_value($form_field . '_' . $language, $values[$language]);
@@ -100,9 +101,8 @@ extends DisplayBackend
     'organization.id AS id',
     "organization.name AS name",
     'organization.gnd AS gnd',
-    /* 'COUNT(DISTINCT Item.id) AS count',
-    'COUNT(DISTINCT Media.id) AS how_many_media',
-    */
+    // 'COUNT(DISTINCT Item.id) AS count',
+    // 'COUNT(DISTINCT Media.id) AS how_many_media',
     'organization.created_at AS created',
     'organization.status AS status',
   ];
@@ -113,10 +113,10 @@ extends DisplayBackend
   var $group_by_listing = 'organization.id';
   var $distinct_listing = true;
   var $order = [
-    'name' => [ 'name', 'name DESC' ],
+    'name' => [ 'name, id', 'name DESC, id DESC' ],
     // 'count' => [ 'count DESC', 'count' ],
     // 'how_many_media' => [ 'how_many_media DESC', 'how_many_media' ],
-    'created' => [ 'created_at DESC, organization.id desc', 'created_at, organization.id' ],
+    'created' => [ 'created_at DESC, organization.id DESC', 'created_at, organization.id' ],
   ];
   var $cols_listing = [
     'name' => 'Name',
@@ -149,7 +149,8 @@ extends DisplayBackend
     $this->messages['item_new'] = tr('New Organization');
     $this->search_fulltext = $this->page->getPostValue('fulltext');
     if (!isset($this->search_fulltext)) {
-      $this->search_fulltext = $this->page->getSessionValue('fulltext');
+      // (int) conversion so it is displayed even when not in session
+      $this->search_fulltext = (int)$this->page->getSessionValue('fulltext');
     }
     $this->page->setSessionValue('fulltext', $this->search_fulltext);
 
@@ -211,7 +212,7 @@ extends DisplayBackend
     if ($this->page->isAdminUser()) {
       // admins may publish organization
       $record->add_fields([
-        new Field(['name' => 'status', 'type' => 'hidden', 'value' => 0, 'noupdate' => !$this->is_internal, 'null' => true ]),
+        new Field([ 'name' => 'status', 'type' => 'hidden', 'value' => 0, 'noupdate' => !$this->is_internal, 'null' => true ]),
       ]);
     }
 
@@ -220,9 +221,9 @@ extends DisplayBackend
 
   function getEditRows ($mode = 'edit') {
     $gnd_search = '';
-    if (false && 'edit' == $mode) {
-      $gnd_search = sprintf('<input value="GND Anfrage nach Name, Vorname" type="button" onclick="%s" /><span id="spinner"></span><br />',
-                            "jQuery('#gnd').autocomplete('enable');jQuery('#gnd').autocomplete('search', jQuery('#lastname').val() + ', ' + jQuery('#firstname').val())");
+    if ('edit' == $mode) {
+      $gnd_search = sprintf('<input value="GND Anfrage nach Name" type="button" onclick="%s" /><span id="spinner"></span><br />',
+                            "jQuery('#gnd').autocomplete('enable');jQuery('#gnd').autocomplete('search', jQuery('#name').val())");
     }
 
     $rows = [
@@ -236,7 +237,6 @@ extends DisplayBackend
         'label' => 'Englischer Name',
         'description' => "Please enter additional names or spellings",
       ],
-
       'gnd' => [
         'label' => 'GND-Nr',
         'description' => 'Identifikator der Gemeinsamen Normdatei, vgl. http://de.wikipedia.org/wiki/Hilfe:GND',
@@ -257,15 +257,18 @@ extends DisplayBackend
       'description_de' => [ 'label' => 'Short Description (de)' ],
       'description_en' => [ 'label' => 'Short Description (en)' ],
 
+      /*
       '<hr noshade="noshade" />',
-      // 'comment_internal' => [ 'label' => 'Internal notes and comments' ],
+      'comment_internal' => [ 'label' => 'Internal notes and comments' ],
+      */
+
       (isset($this->form) ? $this->form->show_submit(tr('Store')) : ''),
     ];
 
     if ('edit' == $mode) {
       $this->script_url[] = 'script/moment.min.js';
 
-      // for chosen and TGN-Calls
+      // for chosen and GND-Calls
       $this->script_code .= <<<EOT
 
     function showHideFields (show, hide) {
@@ -281,31 +284,32 @@ extends DisplayBackend
 
 EOT;
 
-/*
     $this->script_ready[] = <<<EOT
 
-    jQuery('#tgn').autocomplete({
-      // source: availablePnds,
+    jQuery('#gnd').autocomplete({
       type: 'post',
-      source: './admin_ws.php?pn=place&action=lookupTgn&_debug=1',
+      source: './admin_ws.php?pn=organization&action=lookupGnd&_debug=1',
       minChars: 2,
       search: function(event, ui) {
-        if (jQuery('#tgn').autocomplete('option', 'disabled'))
+        if (jQuery('#gnd').autocomplete('option', 'disabled')) {
           return false;
+        }
 
         var output = jQuery('#spinner');
         if (null != output) {
           output.html('<img src="./media/ajax-loader.gif" alt="running" />');
         }
       },
-      response: function(event,ui) { // was open
+      response: function(event,ui) {
+        // was open
         var output = jQuery('#spinner');
         if (null != output) {
           output.html('');
         }
       },
       focus: function(event, ui) {
-        jQuery('#tgn').val(ui.item.value);
+        jQuery('#gnd').val(ui.item.value);
+
         return false;
       },
       change: function(event, ui) {
@@ -315,38 +319,41 @@ EOT;
         }
       },
       select: function(event, ui) {
-        jQuery('#tgn').val(ui.item.value);
-                // try to fetch more info by tgn
-                jQuery.ajax({ url: './admin_ws.php?pn=place&action=fetchPlaceByTgn&_debug=1',
-                              data: { tgn: ui.item.value },
-                              dataType: 'json',
-                              success: function (data) {
-                                var mapping = {dateOfBirth: 'birthdate',
-                                               placeOfBirth: 'birthplace',
-                                               placeOfResidence: 'actionplace',
-                                               dateOfDeath: 'deathdate',
-                                               placeOfDeath: 'deathplace',
-                                               academicTitle: 'title',
-                                               biographicalInformation: 'occupation'};
-                                for (key in mapping) {
-                                  if (null != data[key]) {
-                                    var field = jQuery('#' + mapping[key]);
-                                    if (null != field) {
-                                      var val = data[key];
-                                      if (val != null && ('dateOfBirth' == key || 'dateOfDeath' == key)) {
-                                        var parts = val.split(/\-/);
-                                        val = val.split(/\-/).reverse().join('.');
-                                      }
-                                      field.val(val);
-                                    }
-                                  }
-                                }
-                              }});
+        jQuery('#gnd').val(ui.item.value);
+
+        // try to fetch more info by gnd
+        jQuery.ajax({
+          url: './admin_ws.php?pn=organization&action=fetchInfoByGnd&_debug=1',
+          data: { gnd: ui.item.value },
+          dataType: 'json',
+          success: function (data) {
+            var mapping = {
+              preferredName: 'name',
+              dateOfEstablishment: 'foundingDate',
+              dateOfTermination: 'dissolutionDate',
+              homepage: 'url'
+            };
+
+            for (key in mapping) {
+              if (null != data[key]) {
+                var field = jQuery('#' + mapping[key]);
+                if (null != field) {
+                  var val = data[key];
+                  if (val != null && ('dateOfEstablishment' == key || 'dateOfTermination' == key)) {
+                    var parts = val.split(/\-/);
+                    val = val.split(/\-/).reverse().join('.');
+                  }
+                  field.val(val);
+                }
+              }
+            }
+          }
+        });
 
         return false;
       },
       close: function(event, ui) {
-        jQuery('#tgn').autocomplete('disable');
+        jQuery('#gnd').autocomplete('disable');
         var output = jQuery('#spinner');
         if (null != output) {
           output.html('');
@@ -356,16 +363,15 @@ EOT;
     })
     .autocomplete('disable');
 EOT;
-*/
     }
     else {
       $gnd = $this->record->get_value('gnd');
-      if (false && !empty($gnd)) {
+      if (!empty($gnd)) {
         $this->script_url[] = 'script/seealso.js';
 
 
         $GND_LINKS = [
-          'http://d-nb.info/tgn/%s' => 'Deutsche Nationalbibliothek',
+          // 'https://d-nb.info/tgn/%s' => 'Deutsche Nationalbibliothek',
         ];
         $rows['gnd']['value'] = '<ul><li>';
 
@@ -383,20 +389,26 @@ EOT;
         if (count($external) > 0) {
           $rows['gnd']['value'] .= implode('', $external);
         }
+
         $rows['gnd']['value'] .= '</ul>';
+        $url_pndaks = 'https://juedische-geschichte-online.net/lod-resolver/seealso/entityfacts/gnd';
 
         $this->script_code .= <<<EOT
           var service = new SeeAlsoCollection();
           service.services = {
-            'pndaks' : new SeeAlsoService('http://beacon.findbuch.de/seealso/pnd-aks/')
+            'pndaks' : new SeeAlsoService('{$url_pndaks}')
           };
-          service.views = { 'seealso-ul' : new SeeAlsoUL({ /* preHTML : '<h3>Externe Angebote</h3>', */
-                                                            linkTarget: '_blank',
-                                                            maxItems: 100 }) };
+          service.views = {
+            'seealso-ul' : new SeeAlsoUL({
+              /* preHTML : '<h3>Externe Angebote</h3>', */
+              linkTarget: '_blank',
+              maxItems: 100
+            })
+          };
           service.replaceTagsOnLoad();
 
 EOT;
-          $rows['gnd']['value'] .= $ret = <<<EOT
+          $rows['gnd']['value'] .= <<<EOT
   <div title="$gnd" class="pndaks seealso-ul"></div>
 EOT;
 
@@ -415,7 +427,7 @@ EOT;
   function buildViewFooter ($found = true) {
     $gnd = $this->record->get_value('gnd');
     $publications = !empty($gnd)
-      ? $this->buildRelatedPublications('http://vocab.getty.edu/gnd/' . $gnd)
+      ? $this->buildRelatedPublications('http://d-nb.info/gnd/' . $gnd)
       : '';
 
     return $publications . parent::buildViewFooter($found);
@@ -423,115 +435,6 @@ EOT;
 
   function buildViewAdditional (&$record, $uploadHandler) {
     return '';
-    require_once INC_PATH . '/common/displayhelper.inc.php';
-
-    $ret = '';
-
-    $dbconn = Database::getAdapter();
-
-    $works = '';
-    $querystr = "SELECT Item.id, Item.title, creatordate, earliestdate, latestdate, displaydate, Collection.name AS collection"
-              . " FROM Item"
-              . " LEFT OUTER JOIN Collection ON Collection.id=Item.collection"
-              . " LEFT OUTER JOIN ItemPlace ON ItemOrganization.id_item=Item.id"
-              . sprintf(" WHERE ItemOrganization.id_person=%d AND Item.status >= 0", $record->get_value('id'))
-              . " ORDER BY earliestdate, displaydate, Item.title, Item.id";
-
-    $stmt = $dbconn->query($querystr);
-    if (false !== $stmt) {
-      $params = ['pn' => 'item'];
-      while ($row = $stmt->fetch()) {
-        if (!empty($works)) {
-          $works .= '<br />';
-        }
-        else {
-          $works = '<h3>' . $this->htmlSpecialchars(tr('Works')) . '</h3>';
-        }
-        $params['view'] = $row['id'];
-        $works .= sprintf('<a href="%s">%s</a> %s (%s)',
-                          htmlspecialchars($this->page->buildLink($params)),
-                          $this->formatText($row['title']),
-                          ItemDisplayHelper::buildDisplayDate($this, $row),
-                          $this->formatText($row['collection']));
-      }
-    }
-
-    if (!empty($works)) {
-      $ret .= '<br style="clear: both" />' . $works;
-    }
-
-    $exhibitions = '';
-    $querystr = "SELECT Exhibition.id, Exhibition.title, startdate, enddate, Location.name AS location"
-              . " FROM Exhibition"
-              . " LEFT OUTER JOIN Location ON Location.id=Exhibition.id_location"
-              . " LEFT OUTER JOIN ExhibitionPlace ON ExhibitionOrganization.id_exhibition=Exhibition.id"
-              . sprintf(" WHERE ExhibitionOrganization.id_person=%d AND Exhibition.status >= 0",
-                        $record->get_value('id'))
-              . " ORDER BY startdate, enddate, Exhibition.title, Exhibition.id";
-
-    $stmt = $dbconn->query($querystr);
-    if (false !== $stmt) {
-      $params = ['pn' => 'exhibition'];
-      while ($row = $stmt->fetch()) {
-        if (!empty($exhibitions)) {
-          $exhibitions .= '<br />';
-        }
-        else {
-          $exhibitions = '<h3>' . $this->htmlSpecialchars(tr('Exhibitions')) . '</h3>';
-        }
-        $params['view'] = $row['id'];
-        $exhibitions .= sprintf('<a href="%s">%s</a> %s (%s)',
-                                htmlspecialchars($this->page->buildLink($params)),
-                                $this->formatText($row['title']),
-                                $this->formatDateRange($row['startdate'],
-                                                       $row['enddate']),
-                                $this->formatText($row['location']));
-      }
-    }
-
-    if (!empty($exhibitions)) {
-      $ret .= '<br style="clear: both" />' . $exhibitions;
-    }
-
-    $publications = '';
-    $querystr = "SELECT Publication.id"
-              . " FROM Publication"
-              . " LEFT OUTER JOIN PublicationPlace ON PublicationOrganization.id_publication=Publication.id"
-              . sprintf(" WHERE PublicationOrganization.id_person=%d AND Publication.status >= 0",
-                        $record->get_value('id'))
-              . " ORDER BY IFNULL(author,editor), YEAR(publication_date)";
-
-    $stmt = $dbconn->query($querystr);
-    if (false !== $stmt) {
-      $params = ['pn' => 'publication'];
-      require_once INC_PATH . '/common/biblioservice.inc.php';
-      $biblio_client = BiblioService::getInstance();
-
-      while ($row = $stmt->fetch()) {
-        if (!empty($publications)) {
-          $publications .= '<br />';
-        }
-        else {
-          $publications = '<h3>' . $this->htmlSpecialchars(tr('Publications')) . '</h3>';
-        }
-        $params['view'] = $row['id'];
-        $citation = $biblio_client->buildCitation($row['id'],
-                                                  ['person_delimiter' => '/',
-                                                        'person_suffix' => ',',
-                                                        'title_suffix' => ',',
-                                                        'publisher_suppress' => true,
-                                                        ]);
-        $publications .= sprintf('<a href="%s">%s</a>',
-                                 htmlspecialchars($this->page->buildLink($params)),
-                                 $citation);
-      }
-    }
-
-    if (!empty($publications)) {
-      $ret .= '<br style="clear: both" />' . $publications;
-    }
-
-    return $ret . parent::buildViewAdditional($record, $uploadHandler);
   }
 
   function buildSearchBar () {
@@ -645,7 +548,7 @@ EOT;
 
         $params_replace = ['pn' => $this->page->name, 'delete' => $id];
         // show replacements
-        $querystr = sprintf("SELECT id, name, UNIX_TIMESTAMP(created) AS created_timestamp FROM Place WHERE id<>%d AND status >= 0 ORDER BY name, status DESC, created DESC",
+        $querystr = sprintf("SELECT id, name, UNIX_TIMESTAMP(created) AS created_timestamp FROM Organization WHERE id<>%d AND status >= 0 ORDER BY name, status DESC, created DESC",
                             $id);
         $dbconn->query($querystr);
         $replace = '';
@@ -683,7 +586,6 @@ EOT;
 
     return parent::buildListingCell($row, $col_index, $val);
   }
-
 
   function buildContent () {
     if (OrganizationFlow::MERGE == $this->step) {

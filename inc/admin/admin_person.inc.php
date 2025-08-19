@@ -2,11 +2,11 @@
 /*
  * admin_person.inc.php
  *
- * Manage the Person-table
+ * Manage the person-table
  *
  * (c) 2009-2025 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2025-02-13 dbu
+ * Version: 2025-08-19 dbu
  *
  * TODO:
  *
@@ -52,7 +52,9 @@ class PersonRecord
 extends TableManagerRecord
 {
   var $languages = [ 'de', 'en' ];
-  var $localizedFields = [ 'description' => 'description' ];
+  var $localizedFields = [
+    'description' => 'description',
+  ];
 
   function store ($args = '') {
     foreach ($this->localizedFields as $db_field => $form_field) {
@@ -114,7 +116,7 @@ extends DisplayBackend
     'name' => [ 'name, id', 'name DESC, id DESC' ],
     // 'count' => [ 'count DESC', 'count' ],
     // 'how_many_media' => [ 'how_many_media DESC', 'how_many_media' ],
-    'created' => [ 'created_at DESC, person.id desc', 'created_at, person.id' ],
+    'created' => [ 'created_at DESC, person.id DESC', 'created_at, person.id' ],
   ];
   var $cols_listing = [
     'name' => 'Name',
@@ -316,7 +318,7 @@ EOT;
     ]);
 
     if ($this->page->isAdminUser()) {
-      // admins may publish People
+      // admins may publish person
       $record->add_fields([
         new Field([ 'name' => 'status', 'type' => 'hidden', 'value' => 0, 'noupdate' => !$this->is_internal, 'null' => true ]),
       ]);
@@ -582,7 +584,7 @@ EOT;
 
   function buildSearchBar () {
     $ret = sprintf('<form action="%s" method="post" name="search">',
-                   htmlspecialchars($this->page->buildLink(['pn' => $this->page->name, 'page_id' => 0])));
+                   htmlspecialchars($this->page->buildLink([ 'pn' => $this->page->name, 'page_id' => 0 ])));
 
     $search = sprintf('<input type="text" name="search" value="%s" size="40" />',
                       $this->htmlSpecialchars(array_key_exists('search', $this->search) ?  $this->search['search'] : ''));
