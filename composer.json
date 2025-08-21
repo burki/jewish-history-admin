@@ -17,6 +17,10 @@
         },
         {
             "type": "vcs",
+            "url": "https://github.com/burki/minimal-mark"
+        },
+        {
+            "type": "vcs",
             "url": "https://github.com/burki/php7-mysql-shim"
         }
     ],
@@ -38,6 +42,7 @@
         "pear/pear-core-minimal": "*",
         "pear/pear_exception": "*",
         "pear/text_wiki": "dev-master",
+        "mmz-potsdam/minimal-mark": "dev-master",
 
         "spatie/simple-excel": "^3.7",
         "nette/php-generator": "^3.2",

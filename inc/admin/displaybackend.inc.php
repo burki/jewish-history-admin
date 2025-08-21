@@ -6,7 +6,7 @@
  *
  * (c) 2007-2025 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2025-02-06 dbu
+ * Version: 2025-08-21 dbu
  *
  * Changes:
  *
@@ -486,6 +486,15 @@ EOT;
     return '<div id="previewOverlay"><iframe id="previewOverlayFrame" src="" frameBorder="0" width="100%" height="100%"></iframe></div>';
   }
 
+  function formatMarkdown ($text) {
+    static $converter = null;
+    if (is_null($converter)) {
+      $converter = new \MinimalMark\MinimalMarkConverter();
+    }
+
+    return $converter->convert($text);
+  }
+
   function renderView ($record, $rows) {
     $ret = '';
     if (!empty($this->page->msg)) {
@@ -500,14 +509,27 @@ EOT;
         }
         else {
           $label = isset($row_descr['label']) ? tr($row_descr['label']).':' : '';
-          // var_dump($row_descr);
+          $format = isset($row_descr['format']) ? $row_descr['format'] : 'text';
+
           if (isset($row_descr['fields'])) {
             $value = '';
             foreach ($row_descr['fields'] as $field) {
               $field_value = $record->get_value($field);
-              $field_value = array_key_exists('format', $row_descr) && 'p' == $row_descr['format']
-                ? $this->formatParagraphs($field_value) : $this->formatText($field_value);
-              $value .= (!empty($value) ? ' ' : '').$field_value;
+              switch ($format) {
+                case 'p':
+                  $field_value = $this->formatParagraphs($field_value);
+                  break;
+
+                case 'markdown':
+                  $field_value = $this->formatMarkdown($field_value);
+                  break;
+
+                case 'text':
+                default:
+                  $field_value = $this->formatText($field_value);
+              }
+
+              $value .= (!empty($value) ? ' ' : '') . $field_value;
             }
           }
           else if (isset($row_descr['value'])) {
@@ -524,8 +546,20 @@ EOT;
               }
               $field_value = implode(', ', $values);
             }
-            $value = isset($row_descr['format']) && 'p' == $row_descr['format']
-                ? $this->formatParagraphs($field_value) : $this->formatText($field_value);
+
+            switch ($format) {
+              case 'p':
+                $value = $this->formatParagraphs($field_value);
+                break;
+
+              case 'markdown':
+                $value = $this->formatMarkdown($field_value);
+                break;
+
+              case 'text':
+              default:
+                $value = $this->formatText($field_value);
+            }
           }
 
           $fields[] = [ $label, $value ];

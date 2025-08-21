@@ -396,8 +396,8 @@ EOT;
       'url' => [ 'label' => 'Homepage' ],
 
       '<hr noshade="noshade" />',
-      'description_de' => [ 'label' => 'Short Bio (de)' ],
-      'description_en' => [ 'label' => 'Short Bio (en)' ],
+      'description_de' => [ 'label' => 'Short Bio (de)', 'format' => 'markdown' ],
+      'description_en' => [ 'label' => 'Short Bio (en)', 'format' => 'markdown' ],
 
       /*
       '<hr noshade="noshade" />',
