@@ -18,10 +18,6 @@
         {
             "type": "vcs",
             "url": "https://github.com/burki/php7-mysql-shim"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/Furex/PHP-MySQLi-Database-Class"
         }
     ],
 
