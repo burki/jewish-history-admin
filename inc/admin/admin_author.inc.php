@@ -4,22 +4,22 @@
  *
  * Manage the authors
  *
- * (c) 2006-2024 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2025 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2024-04-30 dbu
+ * Version: 2025-08-21 dbu
  *
  * Changes:
  *
  */
 
-require_once INC_PATH . 'common/tablemanager.inc.php';
+require_once INC_PATH . 'admin/displaybackend.inc.php';
 require_once INC_PATH . 'admin/common.inc.php';
 require_once INC_PATH . 'admin/export_xls.inc.php';
 
 class AuthorFlow
 extends TableManagerFlow
 {
-  const MERGE    = 1010;
+  const MERGE = 1010;
 
   static $TABLES_RELATED = [
     'editor' => [ 'Message' ],
@@ -139,7 +139,7 @@ extends TableManagerQueryConditionBuilder
 }
 
 class DisplayAuthor
-extends DisplayTable
+extends DisplayBackend
 {
   use ExportXls;
 
@@ -444,8 +444,8 @@ EOT;
       'fax' => [ 'label' => 'Fax' ],
       '<hr noshade="noshade" />',
       'url' => [ 'label' => 'Homepage' ],
-      'description_de' => [ 'label' => 'Public CV (de)' ],
-      'description' => [ 'label' => 'Public CV (en)' ],
+      'description_de' => [ 'label' => 'Public CV (de)', 'format' => 'markdown' ],
+      'description' => [ 'label' => 'Public CV (en)', 'format' => 'markdown' ],
       '<hr noshade="noshade" />',
       // 'supervisor' => [ 'label' => 'Supervisor' ],
       'areas' => [ 'label' => 'Areas of interest' ],
@@ -635,10 +635,12 @@ EOT;
       </script>
       <a title="Clear search fields" href="javascript:clear_search();"><img src="$url_clear" border="0" /></a>
 EOT;
-    $search .= ' <input class="submit" type="submit" value="' . tr('Search') . '" />';
+    $search .= sprintf(' <input class="submit" type="submit" value="%s" />',
+                       $this->htmlSpecialchars(tr('Search')));
 
-    $ret .= sprintf('<tr><td colspan="%d" nowrap="nowrap">', $this->cols_listing_count + 1)
-            .$search.'</td></tr>';
+    $ret .= sprintf('<tr><td colspan="%d" nowrap="nowrap">%s</td></tr>',
+                    $this->cols_listing_count + 1,
+                    $search);
 
     $ret .= '</form>';
 
@@ -760,7 +762,7 @@ EOT;
             }
             else {
               $record_new->set_value($fieldname,
-                                     $new . utf8_encode("\n\n=== aus gelöschtem Eintrag übernommen:\n")
+                                     $new . "\n\n=== aus gelÃ¶schtem Eintrag Ã¼bernommen:\n"
                                      . $old);
             }
             $store = true;

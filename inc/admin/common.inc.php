@@ -180,7 +180,7 @@ function writeMultibyte (&$sheet, $row, $col, $str, $format = 0) {
 }
 
 function strip_specialchars($txt) {
-  $match = ['/í/s', '/[ìî]/s', '/ó/s'];
+  $match = [ '/‚Äô/s', '/[‚Äú‚Äù]/s', '/‚Äî/s' ];
   $replace = ["'", '"', '-'];
 
   return preg_replace($match, $replace, $txt, -1);
@@ -334,7 +334,12 @@ class AuthorListing
            ? '<span class="listingLabel">' . tr($label) . '</span> '
            : '';
 
-    $ret .= ($format_entry ? $view->formatText($entry) : $entry);
+    if (is_string($format_entry) && 'markdown' === $format_entry) {
+      $ret .= $view->formatMarkdown($entry);
+    }
+    else {
+      $ret .= ($format_entry ? $view->formatText($entry) : $entry);
+    }
 
     return $ret;
   }
@@ -492,7 +497,7 @@ class AuthorListing
           $value = $this->record[$field];
         }
 
-        $public[] = $this->buildEntry($view, $value, $label, !in_array($field, [ 'url', 'gnd' ]));
+        $public[] = $this->buildEntry($view, $value, $label, in_array($field, [ 'url', 'gnd' ]) ? false : 'markdown');
       }
     }
 
@@ -578,12 +583,11 @@ class AuthorListing
       }
     }
     else {
-      global $MAIL_SETTINGS;
       /*
       // just a general text
       $ret .= $this->buildSection($view, 'Review suggestion')
         .tr('If you have a suggestion for a review, please contact us at')
-        .' '.'<a href="mailto:'.$MAIL_SETTINGS['assistance'].'">'
+        .' '.'<a href="mailto:'.$GLOBALS['MAIL_SETTINGS']['assistance'].'">'
         .$MAIL_SETTINGS['assistance'].'</a>.';
         */
     }
