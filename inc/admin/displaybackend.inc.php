@@ -6,7 +6,7 @@
  *
  * (c) 2007-2025 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2025-08-21 dbu
+ * Version: 2025-08-28 dbu
  *
  * Changes:
  *
@@ -488,6 +488,11 @@ EOT;
 
   function formatMarkdown ($text) {
     static $converter = null;
+
+    if (is_null($text)) {
+      return '';
+    }
+
     if (is_null($converter)) {
       $converter = new \MinimalMark\MinimalMarkConverter();
     }
