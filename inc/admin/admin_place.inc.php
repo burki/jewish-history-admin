@@ -6,7 +6,7 @@
  *
  * (c) 2015-2025 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2025-03-08 dbu
+ * Version: 2025-11-07 dbu
  *
  * TODO:
  *
@@ -490,6 +490,13 @@ EOT;
         $rows['wikidata']['value'] = sprintf('<a href="https://www.wikidata.org/wiki/%s" target="_blank">%s</a>',
                                              $this->htmlSpecialchars($wikidata),
                                              $this->htmlSpecialchars($wikidata));
+      }
+
+      $geonames = $this->record->get_value('geonames');
+      if (!empty($geonames)) {
+        $rows['geonames']['value'] = sprintf('<a href="https://www.geonames.org/%s" target="_blank">%s</a>',
+                                             $this->htmlSpecialchars($geonames),
+                                             $this->htmlSpecialchars($geonames));
       }
     }
 
