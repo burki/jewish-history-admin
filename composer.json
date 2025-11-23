@@ -3,6 +3,11 @@
        "vendor-dir": "lib/",
         "platform": {
             "php": "8.1.0"
+        },
+       "audit": {
+            "ignore": {
+                "PKSA-tzjk-yn1s-49ds": ""
+            }
         }
     },
 
