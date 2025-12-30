@@ -21,7 +21,8 @@ class Client
 
     public function convert($fname,
                             $mime_to = 'docx:application:vnd.openxmlformats-officedocument.wordprocessingml.document',
-                            $mime_from = 'TEI:text:xml')
+                            $mime_from = 'TEI:text:xml',
+                            $streamToClient = true)
 
     {
         $uri = $this->server
@@ -46,25 +47,32 @@ class Client
         ]);
 
         if ('OK' == $response->getReasonPhrase()) {
-            $content_type = $response->getHeader('Content-Type')[0];
-            $content_disposition = $response->getHeader('Content-Disposition')[0];
-            if (!empty($content_disposition)
-                && preg_match('/filename\="([^"]+)"/', $content_disposition, $matches))
-            {
-                $parts = explode('/', $matches[1]);
-                $last = end($parts);
-                $parts = explode('\\', $last);
-                $last = end($parts);
-                if (!empty($last)) {
-                    $content_disposition = preg_replace('/filename\="([^"]+)"/',
-                                                        'filename="' . $last . '"',
-                                                        $content_disposition);
-                    header('Content-Disposition' . ': ' . $content_disposition);
+            if ($streamToClient) {
+                $content_type = $response->getHeader('Content-Type')[0];
+                $content_disposition = $response->getHeader('Content-Disposition')[0];
+                if (!empty($content_disposition)
+                    && preg_match('/filename\="([^"]+)"/', $content_disposition, $matches))
+                {
+                    $parts = explode('/', $matches[1]);
+                    $last = end($parts);
+                    $parts = explode('\\', $last);
+                    $last = end($parts);
+                    if (!empty($last)) {
+                        $content_disposition = preg_replace('/filename\="([^"]+)"/',
+                                                            'filename="' . $last . '"',
+                                                            $content_disposition);
+                        header('Content-Disposition' . ': ' . $content_disposition);
+                    }
                 }
+
+                header('Content-Type' . ': ' . $content_type);
+
+                echo $response->getBody();
+
+                return;
             }
 
-            header('Content-Type' . ': ' . $content_type);
-            echo $response->getBody();
+			return $response->getBody();
         }
     }
 }
