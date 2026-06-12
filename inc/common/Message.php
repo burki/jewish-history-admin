@@ -5,9 +5,9 @@
  *
  * Build multilingual (mail) messages with placeholders
  *
- * (c) 2008-2022 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2026 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2022-07-02 dbu
+ * Version: 2026-06-12 dbu
  *
  * Changes:
  *
@@ -25,6 +25,7 @@ class Message
     var $lang = 'en_US';
     var $id_to;
     var $options = [];
+    var $messagePlaceholder;
 
     function __construct($page, $type, $id_to = null, $options = [], $lang = null)
     {

@@ -5,9 +5,9 @@
  *
  * Base-Class for backend
  *
- * (c) 2007-2025 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2026 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2025-08-28 dbu
+ * Version: 2026-06-12 dbu
  *
  * Changes:
  *
@@ -78,8 +78,10 @@ class CollectingReader extends Sabre\Xml\Reader
         // schematypens="http://relaxng.org/ns/structure/1.0"?\>
         $source = preg_replace('/<\?xml\-model [\s\S]*?\?>/', '', $source);
 
-        parent::xml($source, $encoding, $options);
+        return parent::xml($source, $encoding, $options);
     }
+
+    var $collected = [];
 
     function collect($output)
     {
@@ -284,6 +286,7 @@ class DisplayBackend extends DisplayTable
     var $listing_default_action = TABLEMANAGER_EDIT;
     var $datetime_style = 'DD.MM.YYYY';
     var $status_deleted = '-1';
+    var $view_options = [];
 
     function __construct($page, $workflow = '')
     {

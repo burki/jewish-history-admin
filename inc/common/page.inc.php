@@ -35,6 +35,8 @@ class Page
     static $languages = [ 'de_DE' => 'deutsch', 'en_US' => 'english' ];
     static $lang = 'en_US';
     static $locale = null;
+    static $USER_TABLE_ADDITIONAL = [];
+
     private static $init_lang = null;
 
     protected $gettext_utf8_encode = false;
@@ -471,7 +473,7 @@ class Page
             while ($dbconn->next_record() && (-1 == $issue || $issue == $dbconn->Record['issue'])) {
                 $issue = $dbconn->Record['issue'];
                 $name = $dbconn->Record['name'];
-                $flags |= $dbconn->Record['flags']; // TODO: koennte man vermutlich auch über SUM(flags) GROUP BY id_location/issue hinkriegen
+                $flags |= $dbconn->Record['flags']; // TODO: koennte man vermutlich auch ï¿½ber SUM(flags) GROUP BY id_location/issue hinkriegen
             }
             $locations[] = ['id' => $id_location, 'name' => $name, 'flags' => $flags, 'issue' => $issue];
         }
@@ -658,7 +660,7 @@ class Page
                 $args = explode('&', $options);
                 $options = [];
                 for ($i = 0; $i < count($args); $i++) {
-                    $keyval = split('=', $args[$i], 2);
+                    $keyval = explode('=', $args[$i], 2);
                     $options[$keyval[0]] = count($keyval) == 2 ? $keyval[1] : '';
                 }
             }

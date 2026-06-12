@@ -5,9 +5,9 @@
  *
  * Manage the Landmark-table
  *
- * (c) 2018-2024 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2018-2026 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2024-08-29 dbu
+ * Version: 2026-06-12 dbu
  *
  * TODO:
  *
@@ -222,7 +222,7 @@ class DisplayLandmark extends DisplayBackend
             new Field([ 'name' => 'description_en', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => true, 'nodbfield' => true ]),
 
             new Field([ 'name' => 'country_code', 'id' => 'country', 'type' => 'select', 'datatype' => 'char', 'null' => true, 'options' => array_keys($countries_ordered), 'labels' => array_values($countries_ordered),
-                'data-placeholder' => $label_select_country, 'null' => true ]),
+                'data-placeholder' => $label_select_country ]),
 
             new Field([ 'name' => 'geo', 'id' => 'geo', 'type' => 'text', 'size' => 60, 'datatype' => 'char', 'maxlength' => 255, 'null' => false ]),
 

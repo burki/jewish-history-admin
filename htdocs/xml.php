@@ -5,15 +5,15 @@
  *
  * show transformed XML
  *
- * (c) 2015-2019 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2015-2026 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2019-01-30 dbu
+ * Version: 2026-06-12 dbu
  *
  * Changes:
  */
 
 // a bunch of common include-files
-define('INC_PATH', '../inc/');
+define('INC_PATH', realpath(__DIR__ . '/../inc/')  . DIRECTORY_SEPARATOR);
 
 // setup all server specific paths and settings
 require_once INC_PATH . 'local.inc.php';

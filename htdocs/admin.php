@@ -3,18 +3,19 @@
 /*
  * admin.php
  *
- * Back-end for http://juedische-geschichte-online.net/
+ * Back-end https://juedische-geschichte-online.net/admin/
  *
- * (c) 2008-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2026 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-05-22 dbu
+ * Version: 2018-06-12 dbu
  *
  * Changes:
  *
  */
 
 // local includes
-define('INC_PATH', '../inc/');
+define('INC_PATH', realpath(__DIR__ . '/../inc/')  . DIRECTORY_SEPARATOR);
+
 require_once INC_PATH . 'local.inc.php';
 require_once INC_PATH . 'sitesettings.inc.php';
 

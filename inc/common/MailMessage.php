@@ -5,9 +5,9 @@
  *
  * lightweight wrapper around Swift-Mailer 5.x
  *
- * (c) 2007-2022 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2026 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2022-07-02 dbu
+ * Version: 2026-06-12 dbu
  *
  * Changes:
  *
@@ -18,6 +18,7 @@ require_once VENDOR_PATH . '/swiftmailer/swiftmailer/lib/swift_init.php';
 class MailerFactory
 {
     var $mailer = null;
+    var $config;
 
     function __construct($config)
     {

@@ -796,9 +796,10 @@ class DisplayTable extends PageDisplay
                 $rows[] = $dbconn->Record;
             }
 
+            $count = -1;
             if ($this->sql_calc_found_rows) {
                 $querystr = "SELECT FOUND_ROWS() AS found_rows";
-                $result = $dbconn->query($querystr);
+                $dbconn->query($querystr);
                 if ($dbconn->next_record()) {
                     $count = $dbconn->Record['found_rows'];
                 }
@@ -806,7 +807,10 @@ class DisplayTable extends PageDisplay
             $dbconn->free();
 
             // calc some stuff for paged resultsets
-            $page_count = $count >= 0 ? intval($count / $page_size) + ($count % $page_size > 0 ? 1 : 0) : -1;
+            $page_count = $count >= 0
+                ? intval($count / $page_size) + ($count % $page_size > 0 ? 1 : 0)
+                : -1;
+
             if ($page_id < $page_count) {
                 $this->paging['page_id'] = $page_id;
             }

@@ -8,12 +8,10 @@
  *
  * $Id: db_mysql.inc,v 1.24 1999/10/27 13:17:34 kk Exp $
  *
+ * Requires https://github.com/burki/php7-mysql-shim
+ * on modern PHP versions
+ *
  */
-
-if (!function_exists('\mysql_connect')) {
-    // include php7-mysql-shim
-    require_once 'mysql.php';
-};
 
 class DB_Sql
 {
@@ -22,6 +20,7 @@ class DB_Sql
     var $Database = "";
     var $User     = "";
     var $Password = "";
+    var $Charset  = ""; // e.g. utf8 or latin1
 
     /* public: configuration parameters */
     var $Auto_Free     = 0;     ## Set to 1 for automatic mysql_free_result()
@@ -198,15 +197,19 @@ class DB_Sql
         if ($this->Debug) {
             printf("Debug: query = %s<br>\n", $Query_String);
         }
+
         if ($this->Select_Before_Query) {
             !@mysql_select_db($this->Database, $this->Link_ID);
         }
+
         if (self::$Benchmark) {
-            $time_begin = microtime_float();
+            $time_begin = microtime(true);
         }
+
         $this->Query_ID = @mysql_query($Query_String, $this->Link_ID);
+
         if (self::$Benchmark) {
-            self::$Benchmark_Queries[] = (microtime_float() - $time_begin) . ': ' . $Query_String;
+            self::$Benchmark_Queries[] = (microtime(true) - $time_begin) . ': ' . $Query_String;
         }
 
         $this->Row   = 0;
@@ -255,7 +258,7 @@ class DB_Sql
              * desireable behaviour.
              */
             @mysql_data_seek($this->Query_ID, $this->num_rows());
-            $this->Row = $this->num_rows;
+            $this->Row = $this->num_rows();
             return 0;
         }
 
@@ -269,7 +272,7 @@ class DB_Sql
 
         $query = "lock tables ";
         if (is_array($table)) {
-            while ([$key, $value] = each($table)) {
+            foreach($table as $key => $value) {
                 if ($key == "read" && $key != 0) {
                     $query .= "$value read, ";
                 }

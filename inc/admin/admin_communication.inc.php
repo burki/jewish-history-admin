@@ -262,7 +262,6 @@ class DisplayCommunication extends DisplayTable
 
         // Section
         $sect = $rtf->addSection();
-        $null = null;
         // Write utf-8 encoded text.
         // Text is from file. But you can use another resouce: db, sockets and other
 

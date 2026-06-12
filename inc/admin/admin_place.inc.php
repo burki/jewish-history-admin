@@ -7,7 +7,7 @@
  *
  * (c) 2015-2026 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2026-05-27 dbu
+ * Version: 2026-06-12 dbu
  *
  * TODO:
  *
@@ -264,7 +264,7 @@ class DisplayPlace extends DisplayBackend
             new Field([ 'name' => 'name_variant_en', 'type' => 'text', 'datatype' => 'char', 'size' => 40, 'null' => true, 'nodbfield' => true ]),
 
             new Field([ 'name' => 'country_code', 'id' => 'country', 'type' => 'select', 'datatype' => 'char', 'null' => true, 'options' => array_keys($countries_ordered), 'labels' => array_values($countries_ordered),
-                'data-placeholder' => $label_select_country, 'null' => true ]),
+                'data-placeholder' => $label_select_country ]),
 
             new Field([ 'name' => 'tgn', 'id' => 'tgn', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => true ]),
             // new Field([ 'name' => 'tgn_parent', 'id' => 'tgn_parent', 'type' => 'hidden', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => true ]),

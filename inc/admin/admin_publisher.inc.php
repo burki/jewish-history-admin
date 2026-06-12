@@ -3,11 +3,11 @@
 /*
  * admin_publisher.inc.php
  *
- * Class for managing holding institutions
+ * Class for managing publishers
  *
- * (c) 2008-2024 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2026 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2024-04-30 dbu
+ * Version: 2026-06-12 dbu
  *
  * Changes:
  *
@@ -161,7 +161,7 @@ class DisplayPublisher extends DisplayTable
             new Field([ 'name' => 'zip', 'type' => 'text', 'datatype' => 'char', 'size' => 8, 'maxlength' => 8, 'null' => true ]),
             new Field([ 'name' => 'country', 'type' => 'select', 'datatype' => 'char', 'null' => true,
                 'options' => array_keys($countries_ordered),
-                'labels' => array_values($countries_ordered), 'default' => 'DE', 'null' => true ]),
+                'labels' => array_values($countries_ordered), 'default' => 'DE' ]),
 
             new Field(['name' => 'phone', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 40, 'null' => true ]),
             new Field(['name' => 'fax', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 40, 'null' => true ]),

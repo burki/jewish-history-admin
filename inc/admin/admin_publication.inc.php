@@ -5,9 +5,9 @@
  *
  * Class for managing publications (sources)
  *
- * (c) 2007-2024 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2007-2026 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2024-03-12 dbu
+ * Version: 2026-06-12 dbu
  *
  * Changes:
  *
@@ -65,7 +65,7 @@ class PublicationRecord extends TableManagerRecord
 
                     $handle = fopen($fullname, "wb");
                     if (fwrite($handle, $contents) === false) {
-                        $ret .= "<p>Error writing $fullname.</p>";
+                        $ret = "<p>Error writing $fullname.</p>";
                     }
                     fclose($handle);
                     if (file_exists($fullname)) {

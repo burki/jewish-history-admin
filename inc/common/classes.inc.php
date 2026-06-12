@@ -5,17 +5,18 @@ class Countries
     static $countries;
     static $from_db = COUNTRIES_FROM_DB;
 
-    static function getAll()
+    static function getAll($dbconn = null)
     {
         if (isset(self::$countries)) {
             return self::$countries;
         }
 
         if (self::$from_db) {
+            if (!isset($dbconn)) {
+                $dbconn = new DB();
+            }
             $querystr = "SELECT cc, name FROM Country ORDER BY name";
-            $dbconn = &$this->page->dbconn;
             $dbconn->query($querystr);
-            $countries = [];
             while ($dbconn->next_record()) {
                 self::$countries[$dbconn->Record['cc']] = $dbconn->Record['name'];
             }
@@ -69,11 +70,10 @@ class Languages
 
         if (self::$from_db) {
             if (!isset($dbconn)) {
-                $dbconn = Dbconn::getAdaptor();
+                $dbconn = new DB();
             }
 
             $querystr = "SELECT iso639_2, name FROM Languages ORDER BY name";
-            $countries = [];
             $stmt = $dbconn->query($querystr);
             while ($stmt !== false && $row = $stmt->fetch()) {
                 self::$languages[$lang][$row['iso639_2']] = $row['name'];
@@ -115,55 +115,12 @@ class Languages
 
         return self::$languages[$iso639_2] ?? $iso639_2;
     }
-
-    static function guess($text)
-    {
-        require_once 'PEAR.php';
-        require_once 'Text/LanguageDetect.php';
-
-        $l = new Text_LanguageDetect();
-        $l->_data_dir = realpath(dirname(__FILE__) . '/../../lib/data/'); // since we didn't install cleanly by pear
-
-        $q = utf8_encode($text);
-        $len = $l->utf8strlen($q);
-        if ($len < 20) {
-            return;
-        }
-
-        $result = $l->detectConfidence($q);
-
-        if (@PEAR::isError($result)) {
-            // echo $result->getMessage();
-        }
-        else if ($result == null) {
-            //  echo "Text_LanguageDetect cannot identify this piece of text. <br /><br />\n";
-        }
-        else {
-            switch ($result['language']) {
-                /* case 'German':
-                  $ret = 'ger';
-                  break; */
-                default:
-                    $languages = self::getAll();
-                    foreach ($languages as $key => $name) {
-                        if (preg_match('/(.+);/', $name, $matches)) {
-                            // Stuff like 'Spanish; Castilian'
-                            $name = $matches[1];
-                        }
-                        if (strtolower($name) == $result['language']) {
-                            return $key;
-                        }
-                    }
-                    // echo 'TODO: detected ' . $result['language'];
-                    //         echo "Text_LanguageDetect thinks this text is written in <b>{$result['language']}</b> ({$result['similarity']}, {$result['confidence']})<br /><br />\n";
-            }
-        }
-    }
 }
 
 class MysqlFulltextSimpleParser
 {
     var $min_length = 0; // you might have to turn this up to ft_min_word_len
+    var $output = '';
 
     /**
      * Callback function (or mode / state), called by the Lexer. This one

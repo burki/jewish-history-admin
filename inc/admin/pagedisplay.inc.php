@@ -29,6 +29,7 @@ class PageDisplay extends PageDisplayBase
     var $xls_data = [];
     var $images;
     var $upload_results;
+    var $form;
 
     function __construct(&$page)
     {

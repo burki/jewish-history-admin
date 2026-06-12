@@ -5,9 +5,9 @@
  *
  * Manage the authors
  *
- * (c) 2006-2025 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2006-2026 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2025-08-21 dbu
+ * Version: 2026-06-12 dbu
  *
  * Changes:
  *
@@ -286,7 +286,7 @@ class DisplayAuthor extends DisplayBackend
             new Field([ 'name' => 'address', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 5, 'null' => true ]),
             new Field([ 'name' => 'place', 'type' => 'text', 'size' => 30, 'datatype' => 'char', 'maxlength' => 80, 'null' => true ]),
             new Field([ 'name' => 'zip', 'type' => 'text', 'datatype' => 'char', 'size' => 8, 'maxlength' => 8, 'null' => true ]),
-            new Field([ 'name' => 'country', 'type' => 'select', 'datatype' => 'char', 'null' => true, 'options' => array_keys($countries_ordered), 'labels' => array_values($countries_ordered), 'default' => 'DE', 'null' => true ]),
+            new Field([ 'name' => 'country', 'type' => 'select', 'datatype' => 'char', 'null' => true, 'options' => array_keys($countries_ordered), 'labels' => array_values($countries_ordered), 'default' => 'DE' ]),
 
             new Field([ 'name' => 'phone', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 40, 'null' => true ]),
             new Field([ 'name' => 'fax', 'type' => 'text', 'size' => 40, 'datatype' => 'char', 'maxlength' => 40, 'null' => true ]),

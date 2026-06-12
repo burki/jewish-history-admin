@@ -84,7 +84,7 @@ class MessageQueryConditionBuilder extends TableManagerQueryConditionBuilder
 
 class DisplayMessageFlow extends DisplayBackendFlow {}
 
-class MessageRecord extends TablemanagerRecord
+class MessageRecord extends TableManagerRecord
 {
     var $datetime_style = '';
     var $users = [];
