@@ -352,7 +352,7 @@ CREATE TABLE Zotero (
   zoteroVersion INT NOT NULL DEFAULT 0,
   zoteroData    LONGTEXT NOT NULL,
 
-  corresp       VARCHAR(127),
+  corresp       VARCHAR(255),
 
   itemType      VARCHAR(127) NOT NULL,          #
   flags         INT DEFAULT 0,                  #
