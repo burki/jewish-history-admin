@@ -1,7 +1,5 @@
-# TODO: Switch to
-# COLLATE utf8mb4_unicode_520_ci
-#   or once we are on MySQL 8 everywhere:
-# COLLATE utf8mb4_0900_ai_ci
+
+# For COLLATE utf8mb4_0900_ai_ci
 # see https://www.coderedcorp.com/blog/guide-to-mysql-charsets-collations/
 CREATE TABLE User (
     id              INT(11) NOT NULL auto_increment,
@@ -48,7 +46,7 @@ CREATE TABLE User (
     privs           INT DEFAULT 0,
     access          DATETIME NULL,
     PRIMARY KEY  (id)
-) ENGINE=MyISAM CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=MyISAM CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 #INSERT INTO User (email, privs) VALUES ('daniel.burckhardt@sur-gmbh.ch', 6);
 
 CREATE TABLE Term (
@@ -63,7 +61,7 @@ CREATE TABLE Term (
     created_by      INT NULL,                       # ref to User.id: who created the entry
     changed         DATETIME NULL,                  # when it was changed
     changed_by      INT NULL                        #
-) ENGINE=MyISAM CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=MyISAM CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 
 CREATE TABLE Message (
     id              INT AUTO_INCREMENT PRIMARY KEY, # unique id
@@ -115,14 +113,14 @@ CREATE TABLE Message (
     changed_by      INT NULL,                       # ref to User.id: who created the entry
     created         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, # when it was created
     created_by      INT NULL                        # ref to User.id: who created the entry
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 CREATE INDEX MessageTypePublish ON Message (type, published);
 
 CREATE TABLE MessageUser (
     message_id      INT NOT NULL REFERENCES Message.id,  # to which message it belongs
     user_id         INT NOT NULL REFERENCES User.id,
     ord             INT NOT NULL DEFAULT 0          # Order for multiple User for one Message
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 CREATE UNIQUE INDEX idxMessageUser ON MessageUser(message_id, user_id);
 
 CREATE TABLE Publisher (
@@ -157,7 +155,7 @@ CREATE TABLE Publisher (
     changed_by      INT NULL,                       # ref to User.id: who created the entry
     created         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, # when it was created
     created_by      INT NULL                        # ref to User.id: who created the entry
-) ENGINE=MyISAM CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=MyISAM CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 
 CREATE TABLE Communication (
     id              INT AUTO_INCREMENT PRIMARY KEY, # unique id
@@ -181,7 +179,7 @@ CREATE TABLE Communication (
     changed_by      INT NULL,                       # ref to User.id: who created the entry
     created         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, # when it was created
     created_by      INT NULL                        # ref to User.id: who created the entry
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 
 CREATE TABLE Publication (
     id              INT AUTO_INCREMENT PRIMARY KEY, # unique id
@@ -228,13 +226,13 @@ CREATE TABLE Publication (
     changed_by      INT NULL,                       # ref to User.id: who created the entry
     created         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, # when it was created
     created_by      INT NULL                        # ref to User.id: who created the entry
-) ENGINE=MyISAM CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=MyISAM CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 
 CREATE TABLE MessagePublication (
     message_id      INT NOT NULL REFERENCES Message.id,      # to which Message it belongs
     publication_id  INT NOT NULL REFERENCES Publication.id,
     ord             INT NOT NULL DEFAULT 0          # Order for multiple Publications for one Item
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 CREATE UNIQUE INDEX idxMessagePublication ON MessagePublication(message_id, publication_id);
 
 CREATE TABLE Media (
@@ -254,7 +252,7 @@ CREATE TABLE Media (
     copyright       VARCHAR(255),                   # copyright
     original_name   VARCHAR(255) NULL,              # the original file name
     additional      TEXT NULL
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 CREATE Index MediaItemName ON Media(item_id, name);
 
 CREATE TABLE MediaEntity (
@@ -262,7 +260,7 @@ CREATE TABLE MediaEntity (
     uri             VARCHAR(255) NOT NULL,          # link to Entity
     type            INT DEFAULT 0,                  # to what $TYPE_ ({PERSON|PLACE}) it belongs
     num             INT NOT NULL DEFAULT 1          # how often it appears
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 CREATE UNIQUE INDEX idxMediaEntityUri ON MediaEntity (media_id, uri(127));
 
 CREATE TABLE Person (
@@ -312,7 +310,7 @@ CREATE TABLE Person (
     created_by      INT NULL,                       # ref to User.id: who created the entry
     changed         DATETIME NULL,                  # when it was changed
     changed_by      INT NULL                        #
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 #CREATE FULLTEXT INDEX idxPersonFullTEXT ON Person (firstname, lastname);
 
 CREATE TABLE Place (
@@ -342,7 +340,7 @@ CREATE TABLE Place (
     created_by      INT NULL,                       # ref to User.id: who created the entry
     changed         DATETIME NULL,                  # when it was changed
     changed_by      INT NULL                        #
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 
 CREATE TABLE Zotero (
     id              INT AUTO_INCREMENT PRIMARY KEY, # unique id
@@ -386,4 +384,4 @@ CREATE TABLE Zotero (
     changed_by      INT NULL,                       # ref to User.id: who created the entry
     created         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, # when it was created
     created_by      INT NULL                        # ref to User.id: who created the entry
-) ENGINE=MyISAM CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=MyISAM CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
