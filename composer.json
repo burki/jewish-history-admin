@@ -58,7 +58,9 @@
         "dshafik/php7-mysql-shim": "dev-master"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.95"
+        "friendsofphp/php-cs-fixer": "^3.95",
+        "phpstan/phpstan": "^2.2"
+
     },
     "autoload": {
         "psr-4": { "OxGarage\\": "lib/OxGarage/" }
