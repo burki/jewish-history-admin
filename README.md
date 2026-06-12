@@ -1,4 +1,4 @@
-Legacy back-end <https://jewish-history-online.net>
+Legacy back-end <https://keydocuments.net>
 ===================================================
 
 This is the code for the back-end of the site. It is an old code base
@@ -8,14 +8,14 @@ new project due to its age.
 
 You may use it in parts or adjust it to your own needs.
 If you have any questions or find this code helpful, please contact us at
-    <https://jewish-history-online.net/contact>
+    <https://keydocuments.net/contact>
 
 License
 -------
     Code for the back-end of the Digital Source Edition
         Key Documents of German-Jewish History
 
-        (C) 2018-2023 Daniel Burckhardt
+        (C) 2018-2026 Daniel Burckhardt
 
 
     This program is free software: you can redistribute it and/or modify
