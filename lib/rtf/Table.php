@@ -53,7 +53,7 @@ class Table
      * Constructor. Internal use.
      * @access public
      */
-    function Table(&$container, $alignment = 'left')
+    function __construct(&$container, $alignment = 'left')
     {
         $this->rtf = &$container->rtf;
         $this->container = &$container;
@@ -214,15 +214,17 @@ class Table
      * @param mix $parFormat
      * @param float $width Default 0. If 0 image is displayed by it's height.
      * @param float $height Default 0. If 0 image is displayed by it' width. If boths parameters are 0, image is displayed as is.
-     * @return Image
+     * @return Image|null
      * @access public
      */
     function &addImageToCell($row, $column, $fileName, &$parFormat, $width = 0, $height = 0)
     {
         if ($this->checkIfCellExists($row, $column)) {
             $cell = &$this->getCell($row, $column);
-            $cell->addImage($fileName, $parFormat, $width, $height);
+            return $cell->addImage($fileName, $parFormat, $width, $height);
         }
+
+        return null;
     }
 
     /** @access private */

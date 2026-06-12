@@ -39,7 +39,7 @@ class Header extends Container
      * @param string $type
      * @access public
      */
-    function Header(&$rtf, $type)
+    function __construct(&$rtf, $type)
     {
         $this->rtf = &$rtf;
 

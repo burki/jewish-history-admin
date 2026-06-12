@@ -65,7 +65,7 @@ class Image
      * @param flaot $height
      * @access public
      */
-    function Image(&$rtf, $fileName, &$parFormat, $width = 0, $height = 0)
+    function __construct(&$rtf, $fileName, &$parFormat, $width = 0, $height = 0)
     {
         $this->rtf = &$rtf;
         $this->parFormat = &$parFormat;

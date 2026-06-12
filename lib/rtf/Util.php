@@ -32,7 +32,7 @@ class Util
      * @access public
      * @static
      */
-    function formatColor($color)
+    static function formatColor($color)
     {
         if (strlen($color) == 7 & substr($color, 0, 1) == '#') {
             return '\red' . hexdec(substr($color, 1, 2)) . '\green' . hexdec(substr($color, 3, 2)) . '\blue' . hexdec(substr($color, 5, 2));

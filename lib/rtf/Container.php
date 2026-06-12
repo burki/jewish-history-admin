@@ -22,7 +22,7 @@
 
 
 /**
- * Atstract class of container.
+ * Abstract class of container.
  * @abstract
  * @package Rtf
  */
@@ -41,7 +41,7 @@ class Container
     var $emptyPar = false;
     /**#@-*/
 
-    function Container(&$rtf)
+    function __construct(&$rtf)
     {
         $this->rtf = &$rtf;
     }

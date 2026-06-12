@@ -58,7 +58,7 @@ class ParFormat
      * 'justify'- justify alignment
      * @access public
      */
-    function ParFormat($alignment = 'left')
+    function __construct($alignment = 'left')
     {
         switch ($alignment) {
             case 'left':
