@@ -1,4 +1,5 @@
 <?php
+
 /*
  * sitesettings.inc.php
  *
@@ -53,22 +54,26 @@ $RIGHTS_ADMIN = 0x04;   // these can handle restricted system settings
 define('STATUS_DELETED', -1); // reserved value in the database
 define('STATUS_USER_DELETED', -100); // -1 stands for rejected
 
-define('MYSQL_REGEX_WORD_BEGIN',
-       defined('ICU_REGEX') && ICU_REGEX
+define(
+    'MYSQL_REGEX_WORD_BEGIN',
+    defined('ICU_REGEX') && ICU_REGEX
        ? '\\b'
-       : '[[:<:]]');
+       : '[[:<:]]'
+);
 
-define('MYSQL_REGEX_WORD_END',
-        defined('ICU_REGEX') && ICU_REGEX
+define(
+    'MYSQL_REGEX_WORD_END',
+    defined('ICU_REGEX') && ICU_REGEX
         ? '\\b'
-        : '[[:>:]]');
+        : '[[:>:]]'
+);
 
 // settings for mails that are sent through php
 // should wrap this into a mail/configuration class
 define('MAIL_LINELENGTH', 72);
 
 $SITE = [
-  'pagetitle' => SITE_TITLE,
+    'pagetitle' => SITE_TITLE,
 ];
 if (defined('SITE_KEY')) {
     $SITE['key'] = SITE_KEY;
@@ -89,55 +94,60 @@ $GLOBALS['THESAURI'] = [
 
 if (!isset($GLOBALS['COMMUNICATION_ATTACHMENTS'])) {
     $GLOBALS['COMMUNICATION_ATTACHMENTS'] = [
-      'IGdJ_Schluesseldokumente_Guidelines.pdf',
-      'IGdJ_Schluesseldokumente_Redaktionsmodell.pdf',
+        'IGdJ_Schluesseldokumente_Guidelines.pdf',
+        'IGdJ_Schluesseldokumente_Redaktionsmodell.pdf',
     ];
 }
 
 $MAIL_SETTINGS = [
-  'from'                 => 'burckhardtd@geschichte.hu-berlin.de',
-  // 'from_communication'   => 'burckhardtd@geschichte.hu-berlin.de', // don't use users from for communication
-  'reply_to'             => 'burckhardtd@geschichte.hu-berlin.de',
-  'assistance'           => 'burckhardtd@geschichte.hu-berlin.de',
-  // 'return_path'          => 'daniel.burckhardt@sur-gmbh.ch',
+    'from'                 => 'burckhardtd@geschichte.hu-berlin.de',
+    // 'from_communication'   => 'burckhardtd@geschichte.hu-berlin.de', // don't use users from for communication
+    'reply_to'             => 'burckhardtd@geschichte.hu-berlin.de',
+    'assistance'           => 'burckhardtd@geschichte.hu-berlin.de',
+    // 'return_path'          => 'daniel.burckhardt@sur-gmbh.ch',
 
-  'bcc_passwordrecover'  => 'burckhardtd@geschichte.hu-berlin.de',
-  'technical_assistance' => 'burckhardtd@geschichte.hu-berlin.de',
+    'bcc_passwordrecover'  => 'burckhardtd@geschichte.hu-berlin.de',
+    'technical_assistance' => 'burckhardtd@geschichte.hu-berlin.de',
 
-  // notification
-  'change_notify'        => 'burckhardtd@geschichte.hu-berlin.de',
-  'bcc_change_notify'    => 'burckhardtd@geschichte.hu-berlin.de',
+    // notification
+    'change_notify'        => 'burckhardtd@geschichte.hu-berlin.de',
+    'bcc_change_notify'    => 'burckhardtd@geschichte.hu-berlin.de',
 
-  // further stuff
-  'subject_prepend'      => SITE_TITLE . ' - ',
+    // further stuff
+    'subject_prepend'      => SITE_TITLE . ' - ',
 ];
 
-function compute_bytes ($val) {
+function compute_bytes($val)
+{
     if (empty($val)) {
-      return 0;
+        return 0;
     }
 
     $val = trim($val);
-    $last = $val[strlen($val)-1];
+    $last = $val[strlen($val) - 1];
     switch (strtolower($last)) {
-      // The 'G' modifier is available since PHP 5.1.0
-      case 'g':
-        $val = rtrim($val, $last);
-        $val *= 1024;
-      case 'm':
-        $val = rtrim($val, $last);
-        $val *= 1024;
-      case 'k':
-        $val = rtrim($val, $last);
-        $val *= 1024;
+        // The 'G' modifier is available since PHP 5.1.0
+        case 'g':
+            $val = rtrim($val, $last);
+            $val *= 1024;
+            // no break
+        case 'm':
+            $val = rtrim($val, $last);
+            $val *= 1024;
+            // no break
+        case 'k':
+            $val = rtrim($val, $last);
+            $val *= 1024;
     }
 
     return $val;
 }
 
 if (!defined('UPLOAD_MAX_FILE_SIZE')) {
-    define('UPLOAD_MAX_FILE_SIZE',
-           compute_bytes(ini_get('upload_max_filesize')));
+    define(
+        'UPLOAD_MAX_FILE_SIZE',
+        compute_bytes(ini_get('upload_max_filesize'))
+    );
 }
 
 $MEDIA_EXTENSIONS = [
@@ -242,9 +252,9 @@ $UPLOAD_TRANSLATE = [
 ];
 
 $JAVASCRIPT_CONFIRMDELETE = <<<EOT
-    function confirmDelete(txt, url) {
-      if (confirm(txt)) {
-        window.location.href = url;
-      }
-    }
-EOT;
+        function confirmDelete(txt, url) {
+          if (confirm(txt)) {
+            window.location.href = url;
+          }
+        }
+    EOT;

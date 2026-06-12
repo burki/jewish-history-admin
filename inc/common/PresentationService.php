@@ -1,4 +1,5 @@
 <?php
+
 /*
  * PresentationService.php
  *
@@ -40,8 +41,12 @@ class PresentationService
      */
     static function buildArticleUid($id, $type)
     {
-        return sprintf('%s%s-%d',
-                       self::$PREFIX, $type, $id);
+        return sprintf(
+            '%s%s-%d',
+            self::$PREFIX,
+            $type,
+            $id
+        );
     }
 
     function __construct($dbconn, $options = [])
@@ -122,10 +127,13 @@ class PresentationService
         }
 
         $uid = self::buildArticleUid($id, $info['type']);
-        $querystr = sprintf("SELECT status"
+        $querystr = sprintf(
+            "SELECT status"
                             . " FROM article"
                             . " WHERE uid='%s' AND language='%s' AND status <> -1",
-                            $uid, $info['lang']);
+            $uid,
+            $info['lang']
+        );
         $this->dbconn->query($querystr);
         if ($this->dbconn->next_record()) {
             $info['status'] = $this->dbconn->Record['status'];
@@ -160,8 +168,12 @@ class PresentationService
         $fnameParts = [
             self::$PRESENTATION_ROOT_DIR,
             self::$TEI_PATH,
-            sprintf('%s-%05d.%s.tei',
-                    $matches[1], $matches[2], self::$LANG_SETTINGS[$lang]['locale']),
+            sprintf(
+                '%s-%05d.%s.tei',
+                $matches[1],
+                $matches[2],
+                self::$LANG_SETTINGS[$lang]['locale']
+            ),
         ];
 
         return implode('/', $fnameParts);
@@ -214,8 +226,10 @@ class PresentationService
 
         return [
             $phpBinaryPath,
-            sprintf('%s/bin/console',
-                    self::$PRESENTATION_ROOT_DIR),
+            sprintf(
+                '%s/bin/console',
+                self::$PRESENTATION_ROOT_DIR
+            ),
             'article:refresh',
             $this->buildTeiFname($type, $uid, $lang),
         ];

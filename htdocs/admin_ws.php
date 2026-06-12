@@ -1,4 +1,5 @@
 <?php
+
 /*
  * admin_ws.php
  *
@@ -21,21 +22,20 @@ include_once INC_PATH . 'sitesettings.inc.php';
 $response = null;
 
 if (array_key_exists('pn', $_REQUEST)
-   && in_array($_REQUEST['pn'], [ 'user', 'publication', 'article', 'person', 'organization', 'place' ]))
-{
-  // here we know that we have a valid $request
-  include_once INC_PATH . 'admin/wshandler.inc.php';
-  include_once INC_PATH . 'admin/ws_' . $_REQUEST['pn'] . '.inc.php';
+   && in_array($_REQUEST['pn'], [ 'user', 'publication', 'article', 'person', 'organization', 'place' ])) {
+    // here we know that we have a valid $request
+    include_once INC_PATH . 'admin/wshandler.inc.php';
+    include_once INC_PATH . 'admin/ws_' . $_REQUEST['pn'] . '.inc.php';
 
-  $handler = WsHandlerFactory::getInstance($_REQUEST['pn']);
-  $response = $handler->buildResponse();
+    $handler = WsHandlerFactory::getInstance($_REQUEST['pn']);
+    $response = $handler->buildResponse();
 }
 
 if ($response !== null) {
-  if ($response instanceof JsonResponse) {
-    $response->sendJson();
-  }
-  else {
-    $response->send();
-  }
+    if ($response instanceof JsonResponse) {
+        $response->sendJson();
+    }
+    else {
+        $response->send();
+    }
 }

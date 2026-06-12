@@ -1,4 +1,5 @@
 <?php
+
 // vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
 /**
  * BBCode: extension of base Text_Wiki text conversion handler
@@ -31,8 +32,8 @@
  * @link       http://pear.php.net/package/Text_Wiki
  * @see        Text_Wiki::Text_Wiki()
  */
-class Text_Wiki_CmsCode extends Text_Wiki {
-
+class Text_Wiki_CmsCode extends Text_Wiki
+{
     /**
      * The default list of rules, in order, to apply to the source text.
      *
@@ -41,49 +42,49 @@ class Text_Wiki_CmsCode extends Text_Wiki {
      */
     var $rules = [
         'Prefilter',
-//      'Delimiter',
-//        'Code',
-//        'Plugin',
-//        'Function',
-//        'Html',
+        //      'Delimiter',
+        //        'Code',
+        //        'Plugin',
+        //        'Function',
+        //        'Html',
         'Raw',
-//        'Preformatted',
-//        'Include',
-//        'Embed',
-//        'Page',
-//        'Anchor',
-//        'Heading',
-//        'Toc',
-//        'Titlebar',
-//        'Horiz',
-//        'Break',
-//        'Blockquote',
-//        'List',
-//        'Deflist',
-//        'Table',
-//        'Box',
-//        'Image',
-//        'Smiley',
-//        'Phplookup',
-//        'Center',
+        //        'Preformatted',
+        //        'Include',
+        //        'Embed',
+        //        'Page',
+        //        'Anchor',
+        //        'Heading',
+        //        'Toc',
+        //        'Titlebar',
+        //        'Horiz',
+        //        'Break',
+        //        'Blockquote',
+        //        'List',
+        //        'Deflist',
+        //        'Table',
+        //        'Box',
+        //        'Image',
+        //        'Smiley',
+        //        'Phplookup',
+        //        'Center',
         'Newline',
         'Paragraph',
         'Url',
-//        'Freelink',
-//        'Colortext',
-//        'Font',
-//        'Strong',
+        //        'Freelink',
+        //        'Colortext',
+        //        'Font',
+        //        'Strong',
         'Bold',
-//        'Emphasis',
+        //        'Emphasis',
         'Italic',
-//        'Underline',
-//        'Tt',
+        //        'Underline',
+        //        'Tt',
         'Superscript', // <sup> works, will need to check flash support
         'Subscript', // <sub> works, will need to check flash support
-//        'Specialchar',
-//        'Revise',
-//        'Interwiki',
-//        'Tighten'
+        //        'Specialchar',
+        //        'Revise',
+        //        'Interwiki',
+        //        'Tighten'
     ];
 
     /**
@@ -104,6 +105,6 @@ class Text_Wiki_CmsCode extends Text_Wiki {
 
     function Text_Wiki_CmsCode($rules = null)
     {
-		self::__construct($rules);
+        self::__construct($rules);
     }
 }

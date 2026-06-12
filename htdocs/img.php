@@ -23,7 +23,7 @@ require_once INC_PATH . 'sitesettings.inc.php';
 
 $url = $width = $height = $caption = '';
 foreach ([ 'url', 'width', 'height', 'caption' ] as $key) {
-  $$key = array_key_exists($key, $_GET) ? $_GET[$key] : '';
+    $$key = array_key_exists($key, $_GET) ? $_GET[$key] : '';
 }
 
 $url_large = !isset($_GET['large']) || $_GET['large']

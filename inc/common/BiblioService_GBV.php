@@ -1,4 +1,5 @@
 <?php
+
 /*
  * BiblioService_GBV.php
  *
@@ -24,7 +25,8 @@ require_once INC_PATH . 'common/biblioservice.inc.php';
 
 // see http://de3.php.net/ucfirst
 if (!function_exists('mb_ucfirst') && function_exists('mb_substr')) {
-    function mb_ucfirst($string) {
+    function mb_ucfirst($string)
+    {
         mb_internal_encoding('UTF-8');
         $string = mb_strtoupper(mb_substr($string, 0, 1)) . mb_substr($string, 1);
 
@@ -33,7 +35,8 @@ if (!function_exists('mb_ucfirst') && function_exists('mb_substr')) {
 }
 
 if (!function_exists('mb_lcfirst') && function_exists('mb_substr')) {
-    function mb_lcfirst($string) {
+    function mb_lcfirst($string)
+    {
         mb_internal_encoding('UTF-8');
         $string = mb_strtolower(mb_substr($string, 0, 1)) . mb_substr($string, 1);
 
@@ -159,28 +162,30 @@ class BiblioService_GBV
         return $feedContent;
     }
 
-    private function setResponseFromSubfields ($field, &$response, $keymap) {
+    private function setResponseFromSubfields($field, &$response, $keymap)
+    {
         $field->registerXPathNamespace('srw', 'info:srw/schema/5/picaXML-v1.0');
         $subfields = $field->xpath('srw:subfield');
         foreach ($subfields as $subfield) {
-            $code = (string)$subfield->attributes()->code;
-            if ('' !== (string)$subfield && array_key_exists($code, $keymap)) {
+            $code = (string) $subfield->attributes()->code;
+            if ('' !== (string) $subfield && array_key_exists($code, $keymap)) {
                 if (isset($response[$keymap[$code]])) {
                     // append
                     if (is_string($response[$keymap[$code]])) {
                         $response[$keymap[$code]] = [ $response[$keymap[$code]] ];
                     }
 
-                    $response[$keymap[$code]][] = (string)$subfield;
+                    $response[$keymap[$code]][] = (string) $subfield;
                 }
                 else {
-                    $response[$keymap[$code]] = (string)$subfield;
+                    $response[$keymap[$code]] = (string) $subfield;
                 }
             }
         }
     }
 
-    private function buildRecord ($record) {
+    private function buildRecord($record)
+    {
         $response = [];
 
         $record->registerXPathNamespace('srw', 'info:srw/schema/5/picaXML-v1.0');
@@ -343,7 +348,8 @@ class BiblioService_GBV
         return $response;
     }
 
-    public function searchRetrieve($query, $params = []) {
+    public function searchRetrieve($query, $params = [])
+    {
         if (is_string($query)) {
             // TODO: check if it is an isbn
             $query = 'pica.isb=' . preg_replace('/[^0-9X]/', '', $query);
@@ -371,13 +377,13 @@ class BiblioService_GBV
             $result->registerXPathNamespace('zs', 'http://www.loc.gov/zing/srw/');
             $result->registerXPathNamespace('srw', 'info:srw/schema/5/picaXML-v1.0');
 
-            list($count) = $result->xpath('//zs:numberOfRecords[1]');
+            [$count] = $result->xpath('//zs:numberOfRecords[1]');
             if (!isset($count)) {
                 return;
             }
 
             $results = [];
-            if ((int)$count <= 0) {
+            if ((int) $count <= 0) {
                 return $results;
             }
 

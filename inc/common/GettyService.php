@@ -1,4 +1,5 @@
 <?php
+
 /*
  * GettyService.php
  *
@@ -46,7 +47,8 @@ class GettyPlaceData
     /**
      * easyrdf-Helper Stuff
      */
-    protected function setValuesFromResource (&$values, $resource, $propertyMap, $prefix = '') {
+    protected function setValuesFromResource(&$values, $resource, $propertyMap, $prefix = '')
+    {
         foreach ($propertyMap as $src => $target) {
             $key = $src;
             if (is_int($src)) {
@@ -85,7 +87,8 @@ class GettyPlaceData
     }
 
     //
-    static function fetchByIdentifier ($tgn_id) {
+    static function fetchByIdentifier($tgn_id)
+    {
         $parts = preg_split('/\:/', $tgn_id, 2);
         $url = sprintf('http://vocab.getty.edu/%s/%s', $parts[0], $parts[1]);
 
@@ -115,8 +118,10 @@ class GettyPlaceData
             }
             foreach ($prefLabels as $prefLabel) {
                 if ($prefLabel instanceof \EasyRdf\Resource) {
-                    $subgraph = $place->executeRdfQuery($prefLabel->getUri(),
-                                                        ['Accept' => 'application/rdf+xml']);
+                    $subgraph = $place->executeRdfQuery(
+                        $prefLabel->getUri(),
+                        ['Accept' => 'application/rdf+xml']
+                    );
                     $subresource = $subgraph->resource($prefLabel->getUri());
                     $preferredName = $subresource->get('gvp:term')->getValue();
                     $values['preferredName'] = $preferredName;
@@ -132,14 +137,20 @@ class GettyPlaceData
             }
         }
 
-        $place->setValuesFromResource($values, $resource, [ 'parentString' => 'parentPath'],
-                                     'gvp');
+        $place->setValuesFromResource(
+            $values,
+            $resource,
+            [ 'parentString' => 'parentPath'],
+            'gvp'
+        );
         $broaderPreferred = $resource->get('gvp:broaderPreferred');
-        if (!is_null($broaderPreferred) && preg_match('/'
+        if (!is_null($broaderPreferred) && preg_match(
+            '/'
                        . preg_quote('http://vocab.getty.edu/tgn/', '/')
                        . '(\d+)/',
-                       $broaderPreferred->getUri(), $matches))
-        {
+            $broaderPreferred->getUri(),
+            $matches
+        )) {
             $values['tgn_parent'] = $matches[1];
         }
 
@@ -195,9 +206,12 @@ class GettyPlaceData
 
         $schemaPlace = $resource->get('foaf:focus');
         if (isset($schemaPlace)) {
-            $place->setValuesFromResource($values, $schemaPlace,
-                                         ['lat' => 'latitude', 'long' => 'longitude'],
-                                         'geo');
+            $place->setValuesFromResource(
+                $values,
+                $schemaPlace,
+                ['lat' => 'latitude', 'long' => 'longitude'],
+                'geo'
+            );
 
         }
         // echo $schemaPlace->dump();

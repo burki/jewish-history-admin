@@ -1,4 +1,5 @@
 <?php
+
 /*
  * adminpage.inc.php
  *
@@ -14,14 +15,14 @@
 
 require_once INC_PATH . 'common/page.inc.php';
 
-class AdminPage
-extends Page
+class AdminPage extends Page
 {
     protected $gettext_utf8_encode = false;
     var $display = 'admin';
     var $embed = false;
 
-    function init ($pn) {
+    function init($pn)
+    {
         $ret = parent::init($pn);
 
         // now get and set the view
@@ -43,19 +44,22 @@ extends Page
         return $ret;
     }
 
-    function authenticate () {
+    function authenticate()
+    {
         switch ($this->name) {
             case 'pwd': // anonymous pages
                 break;
 
             default:
                 // access to logged in people
-                if (empty($this->user))
+                if (empty($this->user)) {
                     $this->include = 'login';
+                }
         }
     }
 
-    function isAdminUser () {
+    function isAdminUser()
+    {
         return isset($this->user['privs'])
             && 0 != ($this->user['privs'] & $GLOBALS['RIGHTS_ADMIN']);
     }

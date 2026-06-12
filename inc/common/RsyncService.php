@@ -1,4 +1,5 @@
 <?php
+
 /*
  * RsyncService.php
  *
@@ -45,7 +46,7 @@ class RsyncService
             $date->setTimezone($utc);
 
             $files[$fname] = [
-                'size' => (int)str_replace(',', '', $parts[1]),
+                'size' => (int) str_replace(',', '', $parts[1]),
                 'privs' => $parts[0],
                 'mtime' => $date->getTimeStamp(),
             ];
@@ -88,14 +89,14 @@ class RsyncService
         $ssh->addArgument('o', 'UserKnownHostsFile=/dev/null');
         $ssh->addArgument('o', 'LogLevel=ERROR'); // https://superuser.com/a/1328919
 
-        $command->addArgument('e', str_replace("'", '', (string)$ssh->getCommand()));
+        $command->addArgument('e', str_replace("'", '', (string) $ssh->getCommand()));
 
         return $command;
     }
 
     function executeCommand($command)
     {
-        $cmdString = (string)$command;
+        $cmdString = (string) $command;
 
 
         $res = `$cmdString`;
@@ -116,7 +117,7 @@ class RsyncService
     {
         $command = $this->buildCommand($origin, $target);
 
-        exec((string)$command, $output, $retval);
+        exec((string) $command, $output, $retval);
 
         return $retval;
     }

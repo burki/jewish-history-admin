@@ -1,4 +1,5 @@
 <?php
+
 /*
  * messages_update.php
  *
@@ -20,29 +21,30 @@ use Spatie\SimpleExcel\SimpleExcelReader;
 
 class MessagesApplication extends Zend_Application
 {
-    function run() {
+    function run()
+    {
         $pathToFile = INC_PATH . '/messages/messages.xlsx';
 
         $GETTEXT_MESSAGES = [];
 
         SimpleExcelReader::create($pathToFile)->getRows()
-           ->each(function($rowProperties) use (& $GETTEXT_MESSAGES) {
-                // process the row
-                $src = null;
+           ->each(function ($rowProperties) use (& $GETTEXT_MESSAGES) {
+               // process the row
+               $src = null;
 
-                foreach ($rowProperties as $locale => $val) {
-                    if ('' == $locale) {
-                        $src = $val;
-                    }
-                    else if (!is_null($src) && !empty($val)) {
-                        if (!array_key_exists($locale, $GETTEXT_MESSAGES)) {
-                            $GETTEXT_MESSAGES[$locale] = [];
-                        }
+               foreach ($rowProperties as $locale => $val) {
+                   if ('' == $locale) {
+                       $src = $val;
+                   }
+                   else if (!is_null($src) && !empty($val)) {
+                       if (!array_key_exists($locale, $GETTEXT_MESSAGES)) {
+                           $GETTEXT_MESSAGES[$locale] = [];
+                       }
 
-                        $GETTEXT_MESSAGES[$locale][$src] = $val;
-                    }
-                }
-            });
+                       $GETTEXT_MESSAGES[$locale][$src] = $val;
+                   }
+               }
+           });
 
         foreach ($GETTEXT_MESSAGES as $locale => $messages) {
             if (empty($messages)) {
@@ -50,12 +52,12 @@ class MessagesApplication extends Zend_Application
             }
 
             // alternative: $messages_str = var_export($messages);
-            $dumper = new \Nette\PhpGenerator\Dumper;
+            $dumper = new \Nette\PhpGenerator\Dumper();
             $messages_str = $dumper->dump($messages);
 
             $content = <<<EOT
-\$GETTEXT_MESSAGES = {$messages_str};
-EOT;
+                \$GETTEXT_MESSAGES = {$messages_str};
+                EOT;
 
             file_put_contents(INC_PATH . '/messages/' . $locale . '.inc.php', '<' . '?php' . "\n" . $content);
         }

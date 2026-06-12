@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ISBN
  *
@@ -93,9 +94,7 @@ define('ISBN_DEFAULT_PRINT_LANG_SPECIFIC_PREFIX', '');
  * @link      http://isbn.lastflood.com/
  * @since     Class available since Release 0.1.3
  */
-class ISBN_Exception Extends PEAR_Exception
-{
-}
+class ISBN_Exception extends PEAR_Exception {}
 // }}}
 
 // {{{ ISBN
@@ -152,7 +151,7 @@ class ISBN
     function __construct($isbn = '', $ver = ISBN_DEFAULT_INPUTVERSION)
     {
         /* validate & handle optional isbn parameter */
-        if (is_string($isbn) == false ) {
+        if (is_string($isbn) == false) {
             throw new ISBN_Exception('ISBN parameter must be a string');
         }
         if (strlen($isbn) == 0) {
@@ -175,7 +174,8 @@ class ISBN
             $verguess = self::_isbnVersionGuess($isbn);
             if (self::_isbnVersionIsValid($verguess)) {
                 $ver = $verguess;
-            } else {
+            }
+            else {
                 /* throw new ISBN_Exception(
                  *'ISBN Version couldn\'t determined.');
                  */
@@ -194,7 +194,8 @@ class ISBN
 
         try {
             $this->setISBN($isbn);
-        } catch(Exception $e) {
+        }
+        catch (Exception $e) {
             /* the isbn is invalid and not set, sothat this
              * ISBN object will be set to a blank value. */
             $this->setISBN('');
@@ -280,9 +281,11 @@ class ISBN
         $l = strlen($isbnn);
         if ($l == 10) {
             $body =  substr($isbnn, 0, -1);
-        } elseif ($l == 13) {
+        }
+        elseif ($l == 13) {
             $body =  substr($isbnn, 3, -1);
-        } else {
+        }
+        else {
             return false;
         }
         /* verify */
@@ -312,10 +315,11 @@ class ISBN
      *
      * @access private
      */
-    private static function _isbnBodyParts($isbnbody,
-                                           &$registrationgroup,
-                                           &$isbnsubbody)
-    {
+    private static function _isbnBodyParts(
+        $isbnbody,
+        &$registrationgroup,
+        &$isbnsubbody
+    ) {
         /* validate input (should not be needed, @access private) */
         $r = settype($isbnbody, 'string');
         if ($r === false) {
@@ -376,18 +380,19 @@ class ISBN
      *
      * @access private
      */
-    private static function _isbnSubbodyParts($isbnsubbody,
-                                              $groupid,
-                                              &$registrant,
-                                              &$publication)
-    {
+    private static function _isbnSubbodyParts(
+        $isbnsubbody,
+        $groupid,
+        &$registrant,
+        &$publication
+    ) {
         /* validate input (should not be needed, @access private) */
         $r = settype($isbnsubbody, 'string');
         if ($r === false) {
             return false;
         }
         $l = strlen($isbnsubbody);
-        if ( $l < 1 || $l > 8) {
+        if ($l < 1 || $l > 8) {
             return false;
         }
         if (ctype_digit($isbnsubbody) === false) {
@@ -483,8 +488,8 @@ class ISBN
             /* compare and fire if matched */
             $comparec = substr($isbnsubbody, 0, $l);
 
-            if (strcmp($fromto[0], $comparec) < 1 &&
-                strcmp($fromto[1], $comparec) > -1) {
+            if (strcmp($fromto[0], $comparec) < 1
+                && strcmp($fromto[1], $comparec) > -1) {
                 return $l;
             }
         }
@@ -533,14 +538,15 @@ class ISBN
     private static function _getISBN10Groups()
     {
         /* check if data has been already loaded */
-        if (sizeof(self::$varISBN10Groups) > 0 ) {
-                return self::$varISBN10Groups;
+        if (sizeof(self::$varISBN10Groups) > 0) {
+            return self::$varISBN10Groups;
         }
 
         /* load external data */
         try {
             $t = file_get_contents('data/groups.csv', true, null);
-        } catch(Exception $e) {
+        }
+        catch (Exception $e) {
             throw new ISBN_Exception(
                 'Unable to read ISBN Groups Data file.'
             );
@@ -564,7 +570,8 @@ class ISBN
                 /* edit+ mature: sanitize external
                    data */
                 $groups[$index] = [$tlp[1],$tlp[2]];
-            } else {
+            }
+            else {
                 throw new ISBN_Exception(
                     'ISBN Groups Data is malformed on line #' . $line .
                     ' (' . sizeof($tlp) . ').'
@@ -573,7 +580,7 @@ class ISBN
         }
 
         /* verify minimum */
-        if (sizeof($groups) == 0 ) {
+        if (sizeof($groups) == 0) {
             throw new ISBN_Exception(
                 'ISBN Groups Data does not contain any valid data.'
             );
@@ -606,16 +613,16 @@ class ISBN
     // }}}
 
     // {{{ _checkdigitISBN10()
-     /**
-     * Calculate checkdigit of an ISBN-10 string (ISBN-Body)
-     * as documented on pp.4-5 2001 handbook.
-     *
-     * @param string $isbnbody ISBN-Body
-     *
-     * @return string|false Checkdigit [0-9,X] or false if failed
-     *
-     * @access private
-     */
+    /**
+    * Calculate checkdigit of an ISBN-10 string (ISBN-Body)
+    * as documented on pp.4-5 2001 handbook.
+    *
+    * @param string $isbnbody ISBN-Body
+    *
+    * @return string|false Checkdigit [0-9,X] or false if failed
+    *
+    * @access private
+    */
     private static function _checkdigitISBN10($isbnbody)
     {
         /* The check digit is the last digit of an ISBN. It is calculated
@@ -648,17 +655,17 @@ class ISBN
     // }}}
 
     // {{{ _checkdigitISBN13()
-     /**
-     * Calculate checkdigit of an ISBN-13 string (Prefix + ISBN-Body)
-     * as documented on pp.10-11 2005 handbook.
-     *
-     * @param string $isbnbody ISBN-Body
-     * @param string $prefix   EAN-Prefix (Default 978 for ISBN13-978)
-     *
-     * @return string|false Checkdigit [0-9] or false if failed
-     *
-     * @access private
-     */
+    /**
+    * Calculate checkdigit of an ISBN-13 string (Prefix + ISBN-Body)
+    * as documented on pp.10-11 2005 handbook.
+    *
+    * @param string $isbnbody ISBN-Body
+    * @param string $prefix   EAN-Prefix (Default 978 for ISBN13-978)
+    *
+    * @return string|false Checkdigit [0-9] or false if failed
+    *
+    * @access private
+    */
     private static function _checkdigitISBN13($isbnbody, $prefix = '978')
     {
         $prefixandisbnbody = $prefix . $isbnbody;
@@ -736,104 +743,112 @@ class ISBN
         /* normalzied ISBN and Version available, it's ok now
          * to perform indepth checks per version */
         switch ($ver) {
-        case ISBN_VERSION_ISBN_10:
+            case ISBN_VERSION_ISBN_10:
 
-            /* check syntax against checkdigit */
-            $isbnbody = self::_extractISBNBody($isbnn);
-            $check    = self::_extractCheckdigit($isbnn);
-            if ($check === false) {
+                /* check syntax against checkdigit */
+                $isbnbody = self::_extractISBNBody($isbnn);
+                $check    = self::_extractCheckdigit($isbnn);
+                if ($check === false) {
+                    return false;
+                }
+                $checkdigit = self::_checkdigitISBN10($isbnbody);
+                if ($checkdigit === false) {
+                    return false;
+                }
+                if ($checkdigit !== $check) {
+                    return false;
+                }
+
+                /* check registrationgroup validity */
+                $registrationgroup = false;
+                $subbody           = false;
+
+                $r = self::_isbnBodyParts($isbnbody, $registrationgroup, $subbody);
+                if ($r == false) {
+                    return false;
+                }
+
+                /* check for undefined registrationgroup */
+                if (strlen($registrationgroup) == 0) {
+                    return false;
+                }
+
+                /* check registrant validity */
+                $groupid     = intval($registrationgroup);
+                $registrant  = false;
+                $publication = false;
+
+                $r = self::_isbnSubbodyParts(
+                    $subbody,
+                    $groupid,
+                    $registrant,
+                    $publication
+                );
+                if ($r == false) {
+                    return false;
+                }
+                return true;
+
+            case ISBN_VERSION_ISBN_13:
+            case ISBN_VERSION_ISBN_13_978:
+
+                /* validate EAN Prefix */
+                $ean = self::_extractEANPrefix($isbnn);
+                if ($ean !== '978') {
+                    return false;
+                }
+
+                /* check syntax against checkdigit */
+                $isbnbody = self::_extractISBNBody($isbnn);
+                $check    = self::_extractCheckdigit($isbnn);
+                if ($check === false) {
+                    return false;
+                }
+                $checkdigit = self::_checkdigitISBN13($isbnbody);
+                if ($checkdigit === false) {
+                    return false;
+                }
+                if ($check !== $checkdigit) {
+                    return false;
+                }
+
+                /* validate group */
+                $isbnbody = self::_extractISBNBody($isbnn);
+                if ($isbnbody === false) {
+                    return false;
+                }
+
+                $registrationgroup = false;
+                $subbody           = false;
+
+                $r = self::_isbnBodyParts($isbnbody, $registrationgroup, $subbody);
+                if ($r === false) {
+                    return false;
+                }
+
+                /* check for undefined registrationgroup */
+                if (strlen($registrationgroup) == 0) {
+                    return false;
+                }
+
+                /* validate publisher */
+                $registrant  = false;
+                $publication = false;
+
+                $r = self::_isbnSubbodyParts(
+                    $subbody,
+                    $registrationgroup,
+                    $registrant,
+                    $publication
+                );
+                if ($r === false) {
+                    return false;
+                }
+                return $ver;
+
+            case ISBN_VERSION_ISBN_13_979:
+                /* not yet standarized */
                 return false;
-            }
-            $checkdigit = self::_checkdigitISBN10($isbnbody);
-            if ($checkdigit === false) {
-                return false;
-            }
-            if ($checkdigit !== $check) {
-                return false;
-            }
-
-            /* check registrationgroup validity */
-            $registrationgroup = false;
-            $subbody           = false;
-
-            $r = self::_isbnBodyParts($isbnbody, $registrationgroup, $subbody);
-            if ($r == false) {
-                return false;
-            }
-
-            /* check for undefined registrationgroup */
-            if (strlen($registrationgroup) == 0) {
-                return false;
-            }
-
-            /* check registrant validity */
-            $groupid     = intval($registrationgroup);
-            $registrant  = false;
-            $publication = false;
-
-            $r = self::_isbnSubbodyParts($subbody, $groupid,
-                                         $registrant, $publication);
-            if ($r == false) {
-                return false;
-            }
-            return true;
-
-        case ISBN_VERSION_ISBN_13:
-        case ISBN_VERSION_ISBN_13_978:
-
-            /* validate EAN Prefix */
-            $ean = self::_extractEANPrefix($isbnn);
-            if ($ean !== '978') {
-                return false;
-            }
-
-            /* check syntax against checkdigit */
-            $isbnbody = self::_extractISBNBody($isbnn);
-            $check    = self::_extractCheckdigit($isbnn);
-            if ($check === false) {
-                return false;
-            }
-            $checkdigit = self::_checkdigitISBN13($isbnbody);
-            if ($checkdigit === false) {
-                return false;
-            }
-            if ($check !== $checkdigit) {
-                return false;
-            }
-
-            /* validate group */
-            $isbnbody = self::_extractISBNBody($isbnn);
-            if ($isbnbody === false) {
-                return false;
-            }
-
-            $registrationgroup = false;
-            $subbody           = false;
-
-            $r = self::_isbnBodyParts($isbnbody, $registrationgroup, $subbody);
-            if ($r === false) {
-                return false;
-            }
-
-            /* check for undefined registrationgroup */
-            if (strlen($registrationgroup) == 0) {
-                return false;
-            }
-
-            /* validate publisher */
-            $registrant  = false;
-            $publication = false;
-
-            $r = self::_isbnSubbodyParts($subbody, $registrationgroup,
-                                         $registrant, $publication);
-            if ($r === false) {
-                return false;
-            }
-            return $ver;
-
-        case ISBN_VERSION_ISBN_13_979:
-            /* not yet standarized */
-            return false;
 
         }
         return false;
@@ -855,9 +870,10 @@ class ISBN
         if ($isbn === false) {
             return ISBN_VERSION_NONE;
         }
-        if ( strlen($isbn) == 10) {
+        if (strlen($isbn) == 10) {
             return ISBN_VERSION_ISBN_10;
-        } else {
+        }
+        else {
             return ISBN_VERSION_ISBN_13;
         }
     }
@@ -879,16 +895,16 @@ class ISBN
             return false;
         }
         switch ($ver) {
-        case ISBN_VERSION_NONE:
-        case ISBN_VERSION_UNKNOWN:
-        case ISBN_VERSION_ISBN_10:
-        case ISBN_VERSION_ISBN_13:
-        case ISBN_VERSION_ISBN_13_978:
-        case ISBN_VERSION_ISBN_13_979:
-            return true;
+            case ISBN_VERSION_NONE:
+            case ISBN_VERSION_UNKNOWN:
+            case ISBN_VERSION_ISBN_10:
+            case ISBN_VERSION_ISBN_13:
+            case ISBN_VERSION_ISBN_13_978:
+            case ISBN_VERSION_ISBN_13_979:
+                return true;
 
-        default:
-            return false;
+            default:
+                return false;
 
         }
     }
@@ -912,11 +928,11 @@ class ISBN
         }
 
         switch ($ver) {
-        case ISBN_VERSION_ISBN_10:
-        case ISBN_VERSION_ISBN_13_978:
-            return true;
-        default:
-            return false;
+            case ISBN_VERSION_ISBN_10:
+            case ISBN_VERSION_ISBN_13_978:
+                return true;
+            default:
+                return false;
         }
     }
     // }}}
@@ -977,11 +993,13 @@ class ISBN
         $l = strlen($isbn);
         if ($l != 10 && $l != 13) {
             return false;
-        } elseif ($l == 10) {
+        }
+        elseif ($l == 10) {
             if (!preg_match('/^[0-9]{9}[0-9X]$/', $isbn)) {
                 return false;
             }
-        } elseif ($l == 13) {
+        }
+        elseif ($l == 13) {
             if (!ctype_digit($isbn)) {
                 return false;
             }
@@ -1005,7 +1023,7 @@ class ISBN
     {
         $lang = strtoupper(ISBN_DEFAULT_PRINT_LANG_SPECIFIC_PREFIX);
         $l    = strlen($lang);
-        if ($l > 0 ) {
+        if ($l > 0) {
             if (substr($isbn, 0, $l) == $lang) {
                 $isbn = substr($isbn, $l);
             }
@@ -1025,9 +1043,11 @@ class ISBN
      *
      * @return string|false converted ISBN Number or false if conversion failed
      */
-    public static function convert($isbnin, $verfrom = ISBN_VERSION_ISBN_10,
-                                   $verto = ISBN_VERSION_ISBN_13)
-    {
+    public static function convert(
+        $isbnin,
+        $verfrom = ISBN_VERSION_ISBN_10,
+        $verto = ISBN_VERSION_ISBN_13
+    ) {
         /* validate input */
         if (!self::_isbnVersionIsValid($verfrom)) {
             return false;
@@ -1042,27 +1062,27 @@ class ISBN
         /* normalize input */
         $isbnn = self::_normaliseISBN($isbnin);
         /* input is ok now, let's convert */
-        switch(true) {
-        case $verfrom == ISBN_VERSION_ISBN_10 && $verto == ISBN_VERSION_ISBN_13:
-            /* convert 10 to 13 */
-            $isbnbody = self::_extractISBNBody($isbnn);
-            if ($isbnbody === false) {
-                return false;
-            }
-            $isbnout = '978' . $isbnbody . self::_checkdigitISBN13($isbnbody);
-            return $isbnout;
-        case $verfrom == ISBN_VERSION_ISBN_13 && $verto == ISBN_VERSION_ISBN_10:
-            /* convert 13 to 10 */
-            $isbnbody = self::_extractISBNBody($isbnn);
-            if ($isbnbody === false) {
-                return false;
-            }
-            $isbnout = $isbnbody . self::_checkdigitISBN10($isbnbody);
-            return $isbnout;
-        case $verfrom == $verto:
-            /* version is the same so there is no need to convert */
-            /* hej, praktisch! */
-            return $isbnn;
+        switch (true) {
+            case $verfrom == ISBN_VERSION_ISBN_10 && $verto == ISBN_VERSION_ISBN_13:
+                /* convert 10 to 13 */
+                $isbnbody = self::_extractISBNBody($isbnn);
+                if ($isbnbody === false) {
+                    return false;
+                }
+                $isbnout = '978' . $isbnbody . self::_checkdigitISBN13($isbnbody);
+                return $isbnout;
+            case $verfrom == ISBN_VERSION_ISBN_13 && $verto == ISBN_VERSION_ISBN_10:
+                /* convert 13 to 10 */
+                $isbnbody = self::_extractISBNBody($isbnn);
+                if ($isbnbody === false) {
+                    return false;
+                }
+                $isbnout = $isbnbody . self::_checkdigitISBN10($isbnbody);
+                return $isbnout;
+            case $verfrom == $verto:
+                /* version is the same so there is no need to convert */
+                /* hej, praktisch! */
+                return $isbnn;
         }
         return false;
     }
@@ -1080,13 +1100,13 @@ class ISBN
         $check = false;
 
         switch ($ver) {
-        case ISBN_VERSION_ISBN_10:
-            $check = self::_checkdigitISBN10($this->_getISBNBody());
-            break;
+            case ISBN_VERSION_ISBN_10:
+                $check = self::_checkdigitISBN10($this->_getISBNBody());
+                break;
 
-        case ISBN_VERSION_ISBN_13:
-            $check = self::_checkdigitISBN13($this->_getISBNBody());
-            break;
+            case ISBN_VERSION_ISBN_13:
+                $check = self::_checkdigitISBN13($this->_getISBNBody());
+                break;
 
         }
 
@@ -1103,7 +1123,7 @@ class ISBN
     public function getEAN()
     {
         $ver = $this->getVersion();
-        if ($ver === false ) {
+        if ($ver === false) {
             return false;
         }
         if ($ver == ISBN_VERSION_ISBN_13_978) {
@@ -1149,7 +1169,7 @@ class ISBN
         }
         $testbody  = substr($group . '000000000', 0, 9);
         $testgroup = self::_extractGroup($testbody);
-        if ($testgroup === false ) {
+        if ($testgroup === false) {
             throw new ISBN_Exception('Invalid Group');
         }
         if ($testgroup != $group) {
@@ -1168,14 +1188,14 @@ class ISBN
     public function getISBN()
     {
         $ver = $this->getVersion();
-        if ($ver === false ) {
+        if ($ver === false) {
             return '';
         }
 
         $isbn = '';
 
         $r = self::_isbnVersionIsValid($ver);
-        if ($r === false ) {
+        if ($r === false) {
             return $isbn;
         }
 
@@ -1213,38 +1233,40 @@ class ISBN
      */
     public function getISBNDisplayable($format = '')
     {
-        if ( strlen($format)==0 ) {
+        if (strlen($format) == 0) {
             $format = 'iv:='; //edit $this->ISBNFormatstring;
         }
         $format = substr($format . '    ', 0, 4);
 
         $ver = $this->getVersion();
-        if ($ver === false ) {
+        if ($ver === false) {
             return '';
         }
 
         $isbn = '';
 
         $r = self::_isbnVersionIsValid($ver);
-        if ($r === false ) {
+        if ($r === false) {
             return $isbn;
         }
 
         if ($format[0] == 'i') {
             $isbn .= ISBN_DEFAULT_PRINT_LANG_SPECIFIC_PREFIX;
-            if (strlen($isbn)) $isbn .= ' ';
+            if (strlen($isbn)) {
+                $isbn .= ' ';
+            }
         }
 
         if ($format[1] == 'i' || $format[1] == 'v') {
             $isbn .= 'ISBN';
             if ($format[1] == 'v') {
                 switch ($ver) {
-                case ISBN_VERSION_ISBN_10:
-                    $isbn .= '-10';
-                    break;
-                case ISBN_VERSION_ISBN_13:
-                    $isbn .= '-13';
-                    break;
+                    case ISBN_VERSION_ISBN_10:
+                        $isbn .= '-10';
+                        break;
+                    case ISBN_VERSION_ISBN_13:
+                        $isbn .= '-13';
+                        break;
                 }
             }
         }
@@ -1296,7 +1318,8 @@ class ISBN
             $this->isbn_group     = '';
             $this->isbn_publisher = '';
             $this->isbn_title     = '';
-        } else {
+        }
+        else {
             $isbnn = self::_normaliseISBN($isbn);
             $ver   = self::_getVersion($isbnn);
             if ($ver === false) {
@@ -1304,10 +1327,11 @@ class ISBN
             }
             if ($ver != $this->ver and $this->ver !== ISBN_VERSION_NONE) {
                 throw new ISBN_Exception(
-                  'ISBN Version of passed ISBN (' . $ver . ') '.
+                    'ISBN Version of passed ISBN (' . $ver . ') ' .
                   'does not match existing (' . $this->ver . ').'
                 );
-            } elseif ($this->ver === ISBN_VERSION_NONE) {
+            }
+            elseif ($this->ver === ISBN_VERSION_NONE) {
                 $this->ver = $ver;
             }
             $body = self::_extractISBNBody($isbnn);
@@ -1316,9 +1340,11 @@ class ISBN
             }
             try {
                 $this->_setISBNBody($body);
-            } catch (ISBN_Exception $e) {
+            }
+            catch (ISBN_Exception $e) {
                 throw new ISBN_Exception(
-                    'Invalid ISBN (invalid body "' . $body . '")', $e
+                    'Invalid ISBN (invalid body "' . $body . '")',
+                    $e
                 );
             }
         }
@@ -1376,15 +1402,18 @@ class ISBN
 
         try {
             $this->_setGroup($group);
-        } catch (ISBN_Exception $e) {
+        }
+        catch (ISBN_Exception $e) {
             throw new Exception('Invalid Body: Group is invalid', $e);
         }
 
         try {
             $this->_setISBNSubbody($subbody);
-        } catch (ISBN_Exception $e) {
+        }
+        catch (ISBN_Exception $e) {
             throw new ISBN_Exception(
-                'Invalid Body: Subbody is invalid (' . $e->getMessage() . ')', $e
+                'Invalid Body: Subbody is invalid (' . $e->getMessage() . ')',
+                $e
             );
         }
     }
@@ -1424,7 +1453,7 @@ class ISBN
             throw new ISBN_Exception('Wrong Vartype');
         }
         $l = strlen($subbody);
-        if ( $l < 4 || $l > 8) {
+        if ($l < 4 || $l > 8) {
             throw new ISBN_Exception('Not a Subbody by length');
         }
         /* validate by setting apart */
@@ -1542,4 +1571,3 @@ class ISBN
     // }}}
 
 }
-?>

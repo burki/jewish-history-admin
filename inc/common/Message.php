@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Message.php
  *
@@ -25,15 +26,17 @@ class Message
     var $id_to;
     var $options = [];
 
-    function __construct ($page, $type, $id_to = null, $options = [], $lang = null) {
+    function __construct($page, $type, $id_to = null, $options = [], $lang = null)
+    {
         $this->page = $page;
         $this->type = $type;
         $this->id_to = $id_to;
-        $this->lang = isset($lang) ? $lang : $page->lang();
+        $this->lang = $lang ?? $page->lang();
         $this->options = $options;
     }
 
-    function buildSubject ($subject = false) {
+    function buildSubject($subject = false)
+    {
         if (!$subject) {
             if (array_key_exists($this->type, self::$SUBJECTS)) {
                 $subject = self::$SUBJECTS[$this->type];
@@ -46,7 +49,8 @@ class Message
         return Page::gettext($subject, $this->lang);
     }
 
-    function buildBody () {
+    function buildBody()
+    {
         $body = false;
         $subject = false;
 
@@ -77,17 +81,20 @@ class Message
         $template = implode('', $lines);
 
         // fill in template
-        $body = preg_replace_callback('|\%([a-z_0-9]+)\%|',
-                                    [$this->messagePlaceholder, 'replace'],
-                                    $template);
+        $body = preg_replace_callback(
+            '|\%([a-z_0-9]+)\%|',
+            [$this->messagePlaceholder, 'replace'],
+            $template
+        );
 
         return [ $subject, $body ];
     }
 
-    function build () {
+    function build()
+    {
         $this->messagePlaceholder = MessagePlaceholder::getInstance($this);
 
-        list($subject, $body) = $this->buildBody();
+        [$subject, $body] = $this->buildBody();
         if (isset($this->options['subject'])) {
             // put this after buildBody, so specific subject can override generic one
             $subject = $this->options['subject'];
@@ -98,7 +105,8 @@ class Message
         return [ $subject, $body ];
     }
 
-    function buildFrom () {
+    function buildFrom()
+    {
         if (isset($this->options['from'])) {
             return $this->options['from'];
         }
@@ -112,7 +120,8 @@ class Message
         return $from;
     }
 
-    function fetchUser ($id) {
+    function fetchUser($id)
+    {
         static $_users = [];
 
         if (!isset($_users[$id])) {
@@ -127,10 +136,11 @@ class Message
             }
         }
 
-        return isset($_users[$id]) ? $_users[$id] : null;
+        return $_users[$id] ?? null;
     }
 
-    function buildRecipients () {
+    function buildRecipients()
+    {
         $recipients = [];
 
         if (isset($this->options['recipients'])) {
@@ -147,19 +157,20 @@ class Message
         return $recipients;
     }
 
-    function buildMultipartMessage ($subject, $body) {
+    function buildMultipartMessage($subject, $body)
+    {
         // generate html and plain-text version
         $display = new PageDisplayBase($this->page);
         $display->charset = 'utf-8';
         $body_plain = $display->convertToPlain($body);
         $body_html = $display->formatParagraphs($body);
         $body_html = <<<EOT
-<html>
-<head><meta http-equiv="content-type" content="text/html; charset={$display->charset}" /></head>
-<body>$body_html
-</body>
-</html>
-EOT;
+            <html>
+            <head><meta http-equiv="content-type" content="text/html; charset={$display->charset}" /></head>
+            <body>$body_html
+            </body>
+            </html>
+            EOT;
 
         $mail = new MailMessage($subject);
         $mail->attachPlain($body_plain);
@@ -168,10 +179,11 @@ EOT;
         return $mail;
     }
 
-    function send () {
+    function send()
+    {
         require_once INC_PATH . 'common/MailMessage.php';
 
-        list($subject, $body) = $this->build();
+        [$subject, $body] = $this->build();
         if (false === $body) {
             return false;
         }
@@ -190,12 +202,15 @@ EOT;
 
             $mail->setFrom($this->buildFrom());
             $mail->addTo($recipients['to']);
-            if (isset($recipients['cc']))
+            if (isset($recipients['cc'])) {
                 $mail->addCc($recipients['cc']);
-            if (isset($recipients['bcc']))
+            }
+            if (isset($recipients['bcc'])) {
                 $mail->addBcc($recipients['bcc']);
-            if (isset($this->options['reply-to']))
+            }
+            if (isset($this->options['reply-to'])) {
                 $mail->setReplyTo($this->options['reply-to']);
+            }
 
             if (isset($this->options['attachements']) && is_array($this->options['attachements'])) {
                 foreach ($this->options['attachements'] as $a) {
@@ -218,12 +233,12 @@ EOT;
     }
 }
 
-class StyledMessage
-extends Message
+class StyledMessage extends Message
 {
     var $title;
 
-    function buildMultipartMessage ($subject, $body, $recipients = []) {
+    function buildMultipartMessage($subject, $body, $recipients = [])
+    {
         // generate html and plain-text version
 
         $display = new PageDisplayBase($this->page);
@@ -241,17 +256,20 @@ extends Message
 <body bgcolor="#FFFFFF" marginwidth="4" marginheight="4" leftmargin="4"
 topmargin="4">'
                    . '<table cellspacing="4" cellpadding="4" border="0">'
-                   . '<tr><td><font face="Arial,Helvetica,sans-serif" size="4" color="#b10c17">'. $title_html . '</font></td></tr>'
+                   . '<tr><td><font face="Arial,Helvetica,sans-serif" size="4" color="#b10c17">' . $title_html . '</font></td></tr>'
                    . '<tr><td bgcolor="#FFFFFF"><font face="Arial,Helvetica,sans-serif">'
                    . $body_html
                    . '</font></td><tr>'
                    . (!empty($recipients['to'])
-                      ? sprintf('<tr><td align="center"><font face="Verdana,Arial,sans-serif" color="#666" style="font-size:xx-small;">%s</font></td></tr>',
-                                sprintf($footer,
-                                        $recipients['to'],
-                                        $this->page->buildLinkFull([]),
-                                        $this->page->site_description['title']
-                                        ))
+                      ? sprintf(
+                          '<tr><td align="center"><font face="Verdana,Arial,sans-serif" color="#666" style="font-size:xx-small;">%s</font></td></tr>',
+                          sprintf(
+                              $footer,
+                              $recipients['to'],
+                              $this->page->buildLinkFull([]),
+                              $this->page->site_description['title']
+                          )
+                      )
                       : '')
                    . '</table>'
                    . '</body></html>';
@@ -269,8 +287,9 @@ topmargin="4">'
         catch (Exception $e) {
             ; // ignore - url will be embedded
         } */
-        foreach ($replace as $key => $value)
+        foreach ($replace as $key => $value) {
             $body_html = preg_replace('/' . preg_quote($key, '/') . '/', $value, $body_html);
+        }
 
         $mail->attachHtml($body_html);
 
@@ -282,7 +301,8 @@ class MessagePlaceholder
 {
     var $message;
 
-    static function getInstance ($message) {
+    static function getInstance($message)
+    {
         switch ($message->lang) {
             case 'de_DE':
             case 'de_CH':
@@ -290,20 +310,23 @@ class MessagePlaceholder
                 break;
 
             default:
-                return new MessagePlaceholder ($message);
+                return new MessagePlaceholder($message);
                 break;
         }
     }
 
-    protected function __construct ($message) {
+    protected function __construct($message)
+    {
         $this->message = $message;
     }
 
-    protected function fetchUser ($id) {
+    protected function fetchUser($id)
+    {
         return $this->message->fetchUser($id);
     }
 
-    function replace ($matches) {
+    function replace($matches)
+    {
         $ret = '';
         switch ($matches[1]) {
             case 'salutation_name':
@@ -345,22 +368,23 @@ class MessagePlaceholder
     }
 }
 
-class MessagePlaceholderGerman
-extends MessagePlaceholder
+class MessagePlaceholderGerman extends MessagePlaceholder
 {
-    function replace ($matches) {
+    function replace($matches)
+    {
         $ret = '';
         switch ($matches[1]) {
             case 'salutation_name':
-              if (isset($this->message->id_to)) {
-                $user = $this->fetchUser($this->message->id_to);
-                if (isset($user)) {
-                    $ret = ('F' == $user['sex'] ? 'Sehr geehrte Frau' : 'Sehr geehrter Herr')
-                         . ' ' . $user['name'];
-                    break;
+                if (isset($this->message->id_to)) {
+                    $user = $this->fetchUser($this->message->id_to);
+                    if (isset($user)) {
+                        $ret = ('F' == $user['sex'] ? 'Sehr geehrte Frau' : 'Sehr geehrter Herr')
+                             . ' ' . $user['name'];
+                        break;
+                    }
                 }
-              }
 
+                // no break
             default:
                 $ret = parent::replace($matches);
         }

@@ -1,9 +1,10 @@
 <?php
-/* 
-	PhpRtf Lite
-	Copyright 2007-2008 Denis Slaveckij <info@phprtf.com>  	
 
-	This file is part of PhpRtf Lite.
+/*
+    PhpRtf Lite
+    Copyright 2007-2008 Denis Slaveckij <info@phprtf.com>
+
+    This file is part of PhpRtf Lite.
 
     PhpRtf Lite is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
@@ -23,64 +24,66 @@
  * Class for creating footers of document.
  * @package Rtf
  */
-class Footer extends Container {
-  	  	
-  	/**#@+ @access private */  
-	var $type;	
-	
-	var $headery;
-	/**#@-*/ 
-  	
-  	/**
-  	 * Constructor. Internal use.
-  	 * @param Rtf &$rtf
-  	 * @param string $type
-  	 * @access public
-  	 */
-  	function Footer(&$rtf, $type) {	    
-	    $this->rtf = &$rtf;	
-	    
-	    switch ($type) {		  
-			case 'all': 			
-				$this->type = 'footer'; 
-			break;
-			
-			case 'left': 			
-				$this->type = 'footerl'; 
-			break;
-			
-			case 'right': 			
-				$this->type = 'footerr'; 
-			break;
-			
-			case 'first': 			
-				$this->type = 'footerf'; 
-			break;
-		}	    
-	}
+class Footer extends Container
+{
+    /**#@+ @access private */
+    var $type;
 
-	
-	/**
-	 * Set footer position from page bottom.
-	 * @param float $height
-	 * @access public 
-	 */
-	function setPosition($height) {	  
-	  	$this->footery = $height;
-	}  	  	
-  	  	
-	/**
-	 * Gets rtf code of footer. Internal use.
-	 * @return string
-	 * @access public 
-	 */	
-	function getContent() {	
-	  	$content = isSet($this->footery) ? '\footery'.round(TWIPS_IN_CM * $this->footery).' ' : '';	    
-		$content .= '{\\'.$this->type.' ';						
-		$content .= parent::getContent();
-		$content .= '\par ';
-		$content .= '}';
-		return $content."\r\n";
-	}		
+    var $headery;
+    /**#@-*/
+
+    /**
+     * Constructor. Internal use.
+     * @param Rtf &$rtf
+     * @param string $type
+     * @access public
+     */
+    function Footer(&$rtf, $type)
+    {
+        $this->rtf = &$rtf;
+
+        switch ($type) {
+            case 'all':
+                $this->type = 'footer';
+                break;
+
+            case 'left':
+                $this->type = 'footerl';
+                break;
+
+            case 'right':
+                $this->type = 'footerr';
+                break;
+
+            case 'first':
+                $this->type = 'footerf';
+                break;
+        }
+    }
+
+
+    /**
+     * Set footer position from page bottom.
+     * @param float $height
+     * @access public
+     */
+    function setPosition($height)
+    {
+        $this->footery = $height;
+    }
+
+    /**
+     * Gets rtf code of footer. Internal use.
+     * @return string
+     * @access public
+     */
+    function getContent()
+    {
+        $content = isset($this->footery) ? '\footery' . round(TWIPS_IN_CM * $this->footery) . ' ' : '';
+        $content .= '{\\' . $this->type . ' ';
+        $content .= parent::getContent();
+        $content .= '\par ';
+        $content .= '}';
+        return $content . "\r\n";
+    }
 }
-?>

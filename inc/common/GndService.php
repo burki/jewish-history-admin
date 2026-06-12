@@ -35,7 +35,8 @@
 if (!function_exists('is_associative')) {
     // see https://stackoverflow.com/questions/173400/how-to-check-if-php-array-is-associative-or-sequential
     // for alternative implementations
-    function is_associative($array) {
+    function is_associative($array)
+    {
         if (!is_array($array) || empty($array)) {
             return false;
         }
@@ -48,7 +49,8 @@ if (!function_exists('is_associative')) {
 
 class GndService
 {
-    protected function getLobidResults ($query, $baseUrl = 'https://lobid.org/gnd/search') {
+    protected function getLobidResults($query, $baseUrl = 'https://lobid.org/gnd/search')
+    {
         $querystring = http_build_query($query);
 
         $url = $baseUrl . '?' . $querystring;
@@ -63,7 +65,8 @@ class GndService
         return json_decode($response->getBody(), true);
     }
 
-    protected function processLobidResults ($entries, $expectedType = 'DifferentiatedPerson') {
+    protected function processLobidResults($entries, $expectedType = 'DifferentiatedPerson')
+    {
         $results = [];
 
         foreach ($entries['member'] as $entry) {
@@ -142,7 +145,8 @@ class GndService
         return $results;
     }
 
-    function lookupPersonByName ($fullname) {
+    function lookupPersonByName($fullname)
+    {
         $persons = [];
 
         $nameParts = preg_split('/[,\s]+/', $fullname);
@@ -154,8 +158,8 @@ class GndService
         //  '+' . $namePart
         $queryStrict = [
             'q' => implode(' ', array_map(function ($namePart) {
-                    return '+' . $namePart;
-                }, $nameParts)),
+                return '+' . $namePart;
+            }, $nameParts)),
             'filter' => '+(type:DifferentiatedPerson)',
             'size' => 15,
         ];
@@ -169,8 +173,8 @@ class GndService
         if (count($persons) < 10) {
             $query = [
                 'q' => implode(' ', array_map(function ($namePart) {
-                        return '+' . $namePart . '*';
-                    }, $nameParts)),
+                    return '+' . $namePart . '*';
+                }, $nameParts)),
                 'filter' => '+(type:DifferentiatedPerson)',
                 'size' => 15,
             ];
@@ -192,11 +196,13 @@ class GndService
     /*
      * Legacy
      */
-    function lookupByName ($fullname) {
+    function lookupByName($fullname)
+    {
         return $this->lookupPersonByName($fullname);
     }
 
-    function lookupOrganizationByName ($name, $limit = 20) {
+    function lookupOrganizationByName($name, $limit = 20)
+    {
         // try exact match first
         $query = [
             'q' => '"' . $name . '"',
@@ -223,38 +229,38 @@ class GndService
         $name_escaped = addslashes($name);
         $phrase_escaped = '"' . $name_escaped . '"'; // TODO: put this at top if matches
         $query = <<<EOT
-# Text search for corporate bodies (pretty output)
-#
-# Uses diverse literal properties, brings the best match on top
-# of the list
-PREFIX  gndo:   <http://d-nb.info/standards/elementset/gnd#>
-PREFIX  text:   <http://jena.apache.org/text#>
-#
-SELECT DISTINCT
-    ?gndId ?corp (?name as ?corpLabel)
-    (?placeName as ?placeLabel) ?dateOfEstablishment ?dateOfTermination
-WHERE {
-    # limit number of results to $limit
-    (?corp ?score) text:query ('{$name_escaped}' $limit) .
-    ?corp a gndo:CorporateBody ;
-        gndo:preferredNameForTheCorporateBody ?name ;
-        gndo:gndIdentifier ?gndId.
+            # Text search for corporate bodies (pretty output)
+            #
+            # Uses diverse literal properties, brings the best match on top
+            # of the list
+            PREFIX  gndo:   <http://d-nb.info/standards/elementset/gnd#>
+            PREFIX  text:   <http://jena.apache.org/text#>
+            #
+            SELECT DISTINCT
+                ?gndId ?corp (?name as ?corpLabel)
+                (?placeName as ?placeLabel) ?dateOfEstablishment ?dateOfTermination
+            WHERE {
+                # limit number of results to $limit
+                (?corp ?score) text:query ('{$name_escaped}' $limit) .
+                ?corp a gndo:CorporateBody ;
+                    gndo:preferredNameForTheCorporateBody ?name ;
+                    gndo:gndIdentifier ?gndId.
 
-    OPTIONAL {
-        ?corp gndo:placeOfBusiness ?place.
-        ?place gndo:preferredNameForThePlaceOrGeographicName ?placeName
-    }.
+                OPTIONAL {
+                    ?corp gndo:placeOfBusiness ?place.
+                    ?place gndo:preferredNameForThePlaceOrGeographicName ?placeName
+                }.
 
-    OPTIONAL {
-        ?corp gndo:dateOfEstablishment ?dateOfEstablishment
-    }.
+                OPTIONAL {
+                    ?corp gndo:dateOfEstablishment ?dateOfEstablishment
+                }.
 
-    OPTIONAL {
-        ?corp gndo:dateOfTermination ?dateOfTermination
-    }.
-}
-ORDER BY DESC(?score)
-EOT;
+                OPTIONAL {
+                    ?corp gndo:dateOfTermination ?dateOfTermination
+                }.
+            }
+            ORDER BY DESC(?score)
+            EOT;
 
         $sparql = new \EasyRdf\Sparql\Client('http://zbw.eu/beta/sparql/gnd/query');
 
@@ -275,7 +281,8 @@ EOT;
         return $matches;
     }
 
-    static function isGnd ($number) {
+    static function isGnd($number)
+    {
         if (!preg_match('/^[0-9]+x?$/i', $number)) {
             return false;
         }
@@ -295,7 +302,8 @@ EOT;
         return $checkdigit == $normalized[strlen($normalized) - 1];
     }
 
-    static function getCheckdigit ($gnd) {
+    static function getCheckdigit($gnd)
+    {
         // calculate the checkdigit mod-11
         if (strlen($gnd) != 10) {
             return false;
@@ -305,13 +313,12 @@ EOT;
          * space using a lop, but this keeps it very clear what the math
          * involved is
          */
-        $checkdigit = 11 - ( ( 10 * substr($gnd,0,1) + 9 * substr($gnd,1,1) + 8 * substr($gnd,2,1) + 7 * substr($gnd,3,1) + 6 * substr($gnd,4,1) + 5 * substr($gnd,5,1) + 4 * substr($gnd,6,1) + 3 * substr($gnd,7,1) + 2 * substr($gnd,8,1) ) % 11);
+        $checkdigit = 11 - ((10 * substr($gnd, 0, 1) + 9 * substr($gnd, 1, 1) + 8 * substr($gnd, 2, 1) + 7 * substr($gnd, 3, 1) + 6 * substr($gnd, 4, 1) + 5 * substr($gnd, 5, 1) + 4 * substr($gnd, 6, 1) + 3 * substr($gnd, 7, 1) + 2 * substr($gnd, 8, 1)) % 11);
         /*
          * convert the numeric check value
          * into the single char version
          */
-        switch ( $checkdigit )
-        {
+        switch ($checkdigit) {
             case 10:
                 $checkdigit = "X";
                 break;
@@ -329,7 +336,8 @@ class BiographicalData
 {
     private static $RDFParser = null;
 
-    private static function getRDFParser () {
+    private static function getRDFParser()
+    {
         if (!isset(self::$RDFParser)) {
             self::$RDFParser = ARC2::getRDFParser();
         }
@@ -337,7 +345,8 @@ class BiographicalData
         return self::$RDFParser;
     }
 
-    static function fetchGeographicLocation ($url) {
+    static function fetchGeographicLocation($url)
+    {
         $parser = self::getRDFParser();
         $parser->parse($url . '/about/lds');
         $triples = $parser->getTriples();
@@ -347,7 +356,8 @@ class BiographicalData
         }
     }
 
-    static function fetchByGnd ($gnd) {
+    static function fetchByGnd($gnd)
+    {
         $parser = self::getRDFParser();
         $url = sprintf('https://d-nb.info/gnd/%s/about/lds', $gnd);
         $parser->parse($url);
@@ -357,8 +367,8 @@ class BiographicalData
         }
 
         $index = ARC2::getSimpleIndex($triples, false) ; /* false -> non-flat version */
-/* var_dump($triples);
-exit; */
+        /* var_dump($triples);
+        exit; */
         $bio = new BiographicalData();
         $bio->gnd = $gnd;
         foreach ($triples as $triple) {

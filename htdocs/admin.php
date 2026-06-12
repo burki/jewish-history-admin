@@ -1,4 +1,5 @@
 <?php
+
 /*
  * admin.php
  *
@@ -20,7 +21,7 @@ require_once INC_PATH . 'sitesettings.inc.php';
 require_once INC_PATH . 'admin/adminpage.inc.php';
 
 $page = new AdminPage(new DB(), $SITE_DESCRIPTION);
-$page->init(array_key_exists('pn', $_REQUEST) ? $_REQUEST['pn'] : NULL);
+$page->init(array_key_exists('pn', $_REQUEST) ? $_REQUEST['pn'] : null);
 
 // from here on, $page->include is defined
 

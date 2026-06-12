@@ -1,4 +1,5 @@
 <?php
+
 /*
  * biblioservice.inc.php
  *
@@ -29,16 +30,18 @@ class BiblioService_Amazon
 
     var $stores = [];
 
-    static function getService ($store = 'US') {
+    static function getService($store = 'US')
+    {
         if (!isset(self::$ws[$store])) {
-          // TODO: get AMAZON_API_KEY from ini-framework
-          self::$ws[$store] = new Zend_Service_Amazon(AMAZON_API_KEY, $store, AMAZON_SECRET_KEY);
+            // TODO: get AMAZON_API_KEY from ini-framework
+            self::$ws[$store] = new Zend_Service_Amazon(AMAZON_API_KEY, $store, AMAZON_SECRET_KEY);
         }
 
         return self::$ws[$store];
     }
 
-    static function buildTitleSubtitle ($fulltitle) {
+    static function buildTitleSubtitle($fulltitle)
+    {
         $parts = preg_split('/(\:|\.)\s+/', $fulltitle, 2);
 
         if (count($parts) == 2) {
@@ -48,7 +51,8 @@ class BiblioService_Amazon
         return [ $parts[0], '' ];
     }
 
-    function __construct ($stores = []) {
+    function __construct($stores = [])
+    {
         if (0 == count($stores)) {
             $stores = [ 'DE', 'US' ];
         }
@@ -56,7 +60,8 @@ class BiblioService_Amazon
         $this->stores = $stores;
     }
 
-    function itemLookup ($isbn) {
+    function itemLookup($isbn)
+    {
         $success = false;
         $response = null;
 
@@ -81,7 +86,7 @@ class BiblioService_Amazon
                 $result = $ws->itemLookup($isbn_query, $params);
                 $success = true;
 
-                list($title, $subtitle) = self::buildTitleSubtitle($result->Title);
+                [$title, $subtitle] = self::buildTitleSubtitle($result->Title);
                 $response = [ 'isbn' => $isbn, 'title' => $title, 'subtitle' => $subtitle ];
 
                 // name fields
@@ -90,13 +95,13 @@ class BiblioService_Amazon
                         $value = $result->$field;
                         if ('array' == gettype($value)) {
                             for ($i = 0; $i < count($value); $i++) {
-                                list($surname, $given) = BiblioService::buildSurnameGiven($value[$i]);
+                                [$surname, $given] = BiblioService::buildSurnameGiven($value[$i]);
                                 $value[$i] = $surname . (!empty($given) ? ', ' . $given : '');
                             }
                             $fullname = implode('; ', $value);
                         }
                         else {
-                            list($surname, $given) = BiblioService::buildSurnameGiven($value);
+                            [$surname, $given] = BiblioService::buildSurnameGiven($value);
                             $fullname = $surname . (!empty($given) ? ', ' . $given : '');
                         }
 
@@ -172,33 +177,38 @@ class BiblioService_Amazon
 class BiblioService
 {
     // helper function
-    static function validateIsbn ($isbn, $version = null) {
-        return ISBN::validate($isbn, isset($version) ? $version : ISBN_VERSION_UNKNOWN);
+    static function validateIsbn($isbn, $version = null)
+    {
+        return ISBN::validate($isbn, $version ?? ISBN_VERSION_UNKNOWN);
     }
 
-    static function normalizeIsbn ($isbn, $publication_year = -1) {
+    static function normalizeIsbn($isbn, $publication_year = -1)
+    {
         $isbn = strtoupper($isbn);
         $isbn = preg_replace('/[^0-9X]/', '', $isbn);
         if ($publication_year > 0 && ISBN::validate($isbn)) {
             $version = ISBN::guessVersion($isbn);
-            if ($publication_year <= 2006 && ISBN_VERSION_ISBN_10 != $version)
+            if ($publication_year <= 2006 && ISBN_VERSION_ISBN_10 != $version) {
                 $isbn = ISBN::convert($isbn, $version, ISBN_VERSION_ISBN_10);
-            else if ($publication_year > 2006 && ISBN_VERSION_ISBN_10 == $version)
+            }
+            else if ($publication_year > 2006 && ISBN_VERSION_ISBN_10 == $version) {
                 $isbn = ISBN::convert($isbn, $version, ISBN_VERSION_ISBN_13);
+            }
         }
 
         return $isbn;
     }
 
-    static function buildSurnameGiven ($name) {
+    static function buildSurnameGiven($name)
+    {
         $parts = preg_split('/\s+/', trim($name));
 
         # if the last part is roman numeral, append to but last
         if (count($parts) > 1
             && (preg_match('/^[IVX]+$/', $parts[count($parts) - 1])
                 || preg_match('/^(Jr|Sr)\.$/', $parts[count($parts) - 1]))) {
-                $parts[count($parts) - 2] .=  ' ' . $parts[count($parts) - 1];
-                array_pop($parts);
+            $parts[count($parts) - 2] .=  ' ' . $parts[count($parts) - 1];
+            array_pop($parts);
         }
 
         if (count($parts) == 1) {
@@ -212,9 +222,9 @@ class BiblioService
 
         // 3 or more parts - decide which are given names
         $given = [ $parts[0] ]; // the first is always given
-        $surname = [ $parts[count($parts) -1] ]; // and the last surname
+        $surname = [ $parts[count($parts) - 1] ]; // and the last surname
         // decide where we file the others
-        for ($i = 1; $i < count($parts) -1; $i++) {
+        for ($i = 1; $i < count($parts) - 1; $i++) {
             if (!self::isGiven($parts[$i])) {
                 $surname = array_slice($parts, $i);
                 break;
@@ -225,7 +235,8 @@ class BiblioService
         return [ implode(' ', $surname), implode(' ', $given) ];
     }
 
-    static function isGiven ($name) {
+    static function isGiven($name)
+    {
         static $GIVEN = null;
 
         if (preg_match('/^(of|to|y)$/', $name)
@@ -252,14 +263,15 @@ class BiblioService
     }
 
     // private - external need to call BiblioService::getInstance()
-    private function __construct () {
+    private function __construct() {}
+
+    static function getInstance()
+    {
+        return new BiblioService();
     }
 
-    static function getInstance () {
-        return new BiblioService ();
-    }
-
-    protected function _prepareOptions($options, $defaultOptions) {
+    protected function _prepareOptions($options, $defaultOptions)
+    {
         if (!isset($options)) {
             $options = [];
         }
@@ -267,16 +279,18 @@ class BiblioService
         return array_merge($defaultOptions, $options);
     }
 
-    private function getDbConn () {
+    private function getDbConn()
+    {
         static $dbconn = null;
         if (!isset($dbconn)) {
-            $dbconn = new DB;
+            $dbconn = new DB();
         }
 
         return $dbconn;
     }
 
-    function buildCitation ($identifier, $options = null) {
+    function buildCitation($identifier, $options = null)
+    {
         if (preg_match('/^\d+$/', $identifier)) {
             $dbconn = $this->getDbConn();
             $querystr = "SELECT isbn FROM Publication WHERE id=" . $identifier;
@@ -289,22 +303,22 @@ class BiblioService
 
         $record = $this->fetchByIsbn($identifier);
         if (isset($record)) {
-            $ret = isset($record['author']) ? $record['author'] : $record['editor'] . ' (Hrsg.)';
-            $ret .= ': '.$record['title'];
+            $ret = $record['author'] ?? $record['editor'] . ' (Hrsg.)';
+            $ret .= ': ' . $record['title'];
 
             $publisher_place_year = '';
             if (!empty($record['place'])) {
-              $publisher_place_year = $record['place'];
+                $publisher_place_year = $record['place'];
             }
 
             if (!empty($record['publisher'])) {
-              $publisher_place_year .= (!empty($publisher_place_year) ? ': ' : '')
-                . $record['publisher'];
+                $publisher_place_year .= (!empty($publisher_place_year) ? ': ' : '')
+                  . $record['publisher'];
             }
 
             if (!empty($record['publication_date'])) {
-              $publisher_place_year .= (!empty($publisher_place_year) ? ' ' : '')
-                . $record['publication_date'];
+                $publisher_place_year .= (!empty($publisher_place_year) ? ' ' : '')
+                  . $record['publication_date'];
             }
 
             $isbn = new ISBN($identifier);
@@ -315,7 +329,8 @@ class BiblioService
         }
     }
 
-    function fetchByIsbn ($isbn, $options = null) {
+    function fetchByIsbn($isbn, $options = null)
+    {
         // cache_external: 1 - overwrite, 0 - insert if not exists, -1: don't cache
         static $defaultOptions = [
             'from_db' => true,
@@ -351,13 +366,15 @@ class BiblioService
         }
 
         if ($options['from_db']) {
-            $querystr = sprintf("SELECT Publication.ID AS source_id, Publication.isbn AS isbn, title, author, editor, publication_date, binding, publisher, Publisher.name AS publisher_name, Publication.place AS place, listprice"
+            $querystr = sprintf(
+                "SELECT Publication.ID AS source_id, Publication.isbn AS isbn, title, author, editor, publication_date, binding, publisher, Publisher.name AS publisher_name, Publication.place AS place, listprice"
                                 . " FROM Publication"
                                 . " LEFT OUTER JOIN Publisher ON publisher_id=Publisher.id AND Publisher.status >= 0"
                                 . " WHERE Publication.isbn IN (%s) AND Publication.status <> %d AND Publisher.status >= 0 ORDER BY Publication.isbn='%s' DESC LIMIT 1",
-                                implode(', ', $isbns_sql),
-                                STATUS_DELETED,
-                                $dbconn->escape_string($isbn));
+                implode(', ', $isbns_sql),
+                STATUS_DELETED,
+                $dbconn->escape_string($isbn)
+            );
             $dbconn->query($querystr);
             if ($dbconn->next_record()) {
                 $ret = $dbconn->Record;
@@ -402,8 +419,11 @@ class BiblioService
                 if (false && $options['cache_external'] >= 0) {
                     // TODO: insert/update the $response into the database
                     // TODO: do proper utf8-handling
-                    $querystr = sprintf("SELECT id FROM Publication WHERE isbn IN(%s) AND status >= 0 ORDER BY isbn='%s' DESC LIMIT 1",
-                                implode(', ', $isbns_sql), $dbconn->escape_string($isbn));
+                    $querystr = sprintf(
+                        "SELECT id FROM Publication WHERE isbn IN(%s) AND status >= 0 ORDER BY isbn='%s' DESC LIMIT 1",
+                        implode(', ', $isbns_sql),
+                        $dbconn->escape_string($isbn)
+                    );
                     $dbconn->query($querystr);
                     $update = false;
                     if ($dbconn->next_record()) {

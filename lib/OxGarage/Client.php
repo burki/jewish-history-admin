@@ -2,9 +2,8 @@
 
 namespace OxGarage;
 
-use \Buzz\Message\Form\FormRequest;
-use \Buzz\Message\Form\FormUpload;
-
+use Buzz\Message\Form\FormRequest;
+use Buzz\Message\Form\FormUpload;
 
 class Client
 {
@@ -19,12 +18,12 @@ class Client
         $this->server = $server;
     }
 
-    public function convert($fname,
-                            $mime_to = 'docx:application:vnd.openxmlformats-officedocument.wordprocessingml.document',
-                            $mime_from = 'TEI:text:xml',
-                            $streamToClient = true)
-
-    {
+    public function convert(
+        $fname,
+        $mime_to = 'docx:application:vnd.openxmlformats-officedocument.wordprocessingml.document',
+        $mime_from = 'TEI:text:xml',
+        $streamToClient = true
+    ) {
         $uri = $this->server
              . '/ege-webservice/Conversions/'
              . implode('/', [ urlencode($mime_from), urlencode($mime_to) ]);
@@ -51,16 +50,17 @@ class Client
                 $content_type = $response->getHeader('Content-Type')[0];
                 $content_disposition = $response->getHeader('Content-Disposition')[0];
                 if (!empty($content_disposition)
-                    && preg_match('/filename\="([^"]+)"/', $content_disposition, $matches))
-                {
+                    && preg_match('/filename\="([^"]+)"/', $content_disposition, $matches)) {
                     $parts = explode('/', $matches[1]);
                     $last = end($parts);
                     $parts = explode('\\', $last);
                     $last = end($parts);
                     if (!empty($last)) {
-                        $content_disposition = preg_replace('/filename\="([^"]+)"/',
-                                                            'filename="' . $last . '"',
-                                                            $content_disposition);
+                        $content_disposition = preg_replace(
+                            '/filename\="([^"]+)"/',
+                            'filename="' . $last . '"',
+                            $content_disposition
+                        );
                         header('Content-Disposition' . ': ' . $content_disposition);
                     }
                 }
@@ -72,7 +72,7 @@ class Client
                 return;
             }
 
-			return $response->getBody();
+            return $response->getBody();
         }
     }
 }

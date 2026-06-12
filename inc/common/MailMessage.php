@@ -1,4 +1,5 @@
 <?php
+
 /*
  * MailMessage.php
  *
@@ -18,12 +19,14 @@ class MailerFactory
 {
     var $mailer = null;
 
-    function __construct ($config) {
+    function __construct($config)
+    {
         $this->config = $config;
 
         if (PHP_OS == 'WINNT' || defined('SMTP_HOST')) {
             if (!defined('SMTP_HOST')) {
-                throw new Exception('MailerFactory::__construct: You have to define SMTP_HOST on Windows Systems');;
+                throw new Exception('MailerFactory::__construct: You have to define SMTP_HOST on Windows Systems');
+                ;
             }
 
             $transport = Swift_SmtpTransport::newInstance(SMTP_HOST);
@@ -48,18 +51,20 @@ class MailerFactory
             }
         }
         else {
-          $transport = Swift_MailTransport::newInstance();
+            $transport = Swift_MailTransport::newInstance();
         }
 
         // Create the Mailer using your created Transport
         $this->mailer = Swift_Mailer::newInstance($transport);
     }
 
-    function getConfig () {
+    function getConfig()
+    {
         return $this->config;
     }
 
-    function getInstance () {
+    function getInstance()
+    {
         return $this->mailer;
     }
 }
@@ -74,7 +79,8 @@ class MailMessage
     public $from;
     public $line_width = -1; // uses format=flowed
 
-    private static function getSwift () {
+    private static function getSwift()
+    {
         if (!isset(self::$swift)) {
             $mailer_factory = new MailerFactory(self::$mailer_config);
 
@@ -84,7 +90,8 @@ class MailMessage
         return self::$swift;
     }
 
-    public function __construct ($subject, $body_plain = '') {
+    public function __construct($subject, $body_plain = '')
+    {
         $this->message = Swift_Message::newInstance()
             ->setSubject($subject);
 
@@ -96,27 +103,33 @@ class MailMessage
         }
     }
 
-    public function buildAddress ($email, $name) {
+    public function buildAddress($email, $name)
+    {
         return new Swift_Address($email, $name);
     }
 
-    public function addTo ($address) {
+    public function addTo($address)
+    {
         return $this->message->addTo($address);
     }
 
-    public function addCc ($address) {
+    public function addCc($address)
+    {
         return $this->message->addCc($address);
     }
 
-    public function addBcc ($address) {
+    public function addBcc($address)
+    {
         return $this->message->addBcc($address);
     }
 
-    public function removeTo ($address) {
+    public function removeTo($address)
+    {
         return $this->message->removeTo($address);
     }
 
-    public function addToBlocked ($address) {
+    public function addToBlocked($address)
+    {
         if (!isset($this->blocked)) {
             $this->blocked = new Swift_RecipientList();
         }
@@ -124,43 +137,52 @@ class MailMessage
         return $this->blocked->addTo($address);
     }
 
-    public function setFrom ($address) {
+    public function setFrom($address)
+    {
         $this->message->setFrom($address);
     }
 
-    public function setReplyTo ($address) {
+    public function setReplyTo($address)
+    {
         $this->message->setReplyTo($address);
     }
 
-    public function setHeader ($name, $value) {
+    public function setHeader($name, $value)
+    {
         $headers = $this->message->getHeaders();
         if (isset($headers)) {
             return $headers->addTextHeader($name, $value);
         }
     }
 
-    public function attachPlain ($body_plain) {
+    public function attachPlain($body_plain)
+    {
         $this->message->addPart($body_plain, 'text/plain', 'utf-8')
             ->setMaxLineLength($this->line_width + 1);
     }
 
-    public function attachHtml ($body_html) {
+    public function attachHtml($body_html)
+    {
         $this->message->addPart($body_html, 'text/html', 'utf-8');
     }
 
-    public function attach ($child, $id = null) {
+    public function attach($child, $id = null)
+    {
         return $this->message->attach($child, $id);
     }
 
-    public function embed ($child, $id = null) {
+    public function embed($child, $id = null)
+    {
         return $this->message->embed($child, $id);
     }
 
-    public function setMaxLineLength ($len) {
+    public function setMaxLineLength($len)
+    {
         return $this->message->setMaxLineLength($len);
     }
 
-    public function printOnly ($recipient_list = null, $comment = null) {
+    public function printOnly($recipient_list = null, $comment = null)
+    {
         if ($recipient_list == null) {
             $recipient_list = $this->message->getTo();
         }
@@ -192,7 +214,8 @@ class MailMessage
         return count($recipients);
     }
 
-    public function send () {
+    public function send()
+    {
         global $MAIL_WHITELIST;
 
         if (!defined('MAIL_SEND') || !MAIL_SEND) {
@@ -240,7 +263,8 @@ class MailMessage
         return $sent;
     }
 
-    static function mail ($to, $subject, $message, $from = null) {
+    static function mail($to, $subject, $message, $from = null)
+    {
         $mail = new MailMessage($subject, $message);
         $mail->addTo($to);
         if (isset($from)) {
