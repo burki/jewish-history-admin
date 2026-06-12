@@ -3,12 +3,12 @@
 /*
  * db_forms.php
  *
- * Requires: phplib-database classes
+ * Requires: phplib-database classes, "egulias/email-validator"
  * Author  : Daniel Burckhardt, daniel.burckhardt@sur-gmbh.ch
  *
- * (c) 2000-2023
+ * (c) 2000-2026
  *
- * Version : 2023-04-20 dbu
+ * Version : 2026-05-12 dbu
  *
  * Changes :
  *
@@ -84,10 +84,13 @@ function _UrlValidate($url, $Level = 1, $Timeout = 1500)
 {
     $fail = 0;
 
-    /* if (!preg_match('!^[a-z]+://!i', $url))
-      $url = 'http://' . $url; */
+    /*
+    if (!preg_match('!^[a-z]+://!i', $url)) {
+        $url = 'http://' . $url;
+    }
+    */
 
-    if (!validateUrlSyntax(trim($url))) {
+    if (filter_var(trim($url), FILTER_VALIDATE_URL)) {
         $fail = 1;
     }
     $Level--;
@@ -98,137 +101,6 @@ function _UrlValidate($url, $Level = 1, $Timeout = 1500)
 
     return $fail;
 }
-
-/************************************************************************
- * http://www.zend.com/codex.php?id=88&single=1
- * This function checks the format of an email address. There are five levels of
- * checking:
- *
- * 1 - Basic format checking. Ensures that:
- *     There is an @ sign with something on the left and something on the right
- *     To the right of the @ sign, there's at least one dot, with something to the left
- *     and right.
- *     To the right of the last dot is either 2 or 3 letters, or the special case "arpa"
- * 2 - The above, plus the letters to the right of the last dot are:
- *     com, net, org, edu, mil, gov, int, arpa or one of the two-letter country codes
- * 3 - The above, plus attempts to check if there is an MX (Mail eXchange) record for the
- *     domain name.
- * 4 - The above, plus attempt to connect to the mail server
- * 5 - The above, plus check to see if there is a response from the mail server. The third
- *     argument to this function is optional, and sets the number of times to loop while
- *     waiting for a response from the mail server. The default is 15000. The actual
- *     waiting time, of course, depends on such things as the speed of your server.
- */
-function _MailValidate($Addr, $Level, $Timeout = 15000)
-{
-    //  Valid Top-Level Domains
-    $gTLDs = "com:net:org:edu:gov:mil:int:arpa:aero:asia:biz:cat:coop:info:museum:name:pro:tel:travel:xxx:nyc:";
-    $CCs   = "ad:ae:af:ag:ai:al:am:an:ao:aq:ar:as:at:au:aw:ax:az:ba:bb:bd:be:bf:" .
-             "bg:bh:bi:bj:bm:bn:bo:br:bs:bt:bv:bw:by:bz:ca:cc:cd:cf:cg:ch:ci:" .
-             "ck:cl:cm:cn:co:cr:cs:cu:cv:cx:cy:cz:de:dj:dk:dm:do:dz:ec:ee:eg:" .
-             "eh:er:es:et:eu:fi:fj:fk:fm:fo:fr:fx:ga:gb:gd:ge:gf:gg:gh:gi:gl:gm:gn:" .
-             "gp:gq:gr:gs:gt:gu:gw:gy:hk:hm:hn:hr:ht:hu:id:ie:il:im:in:io:iq:ir:" .
-             "is:it:je:jm:jo:jp:ke:kg:kh:ki:km:kn:kp:kr:kw:ky:kz:la:lb:lc:li:lk:" .
-             "lr:ls:lt:lu:lv:ly:ma:mc:md:me:mg:mh:mk:ml:mm:mn:mo:mp:mq:mr:ms:mt:" .
-             "mu:mv:mw:mx:my:mz:na:nc:ne:nf:ng:ni:nl:no:np:nr:nt:nu:nz:om:pa:" .
-             "pe:pf:pg:ph:pk:pl:pm:pn:pr:ps:pt:pw:py:qa:re:ro:rs:ru:rw:sa:sb:sc:sd:" .
-             "se:sg:sh:si:sj:sk:sl:sm:sn:so:sr:st:su:sv:sy:sz:tc:td:tf:tg:th:" .
-             "tj:tk:tl:tm:tn:to:tp:tr:tt:tv:tw:tz:ua:ug:uk:um:us:uy:uz:va:vc:ve:" .
-             "vg:vi:vn:vu:wf:ws:ye:yt:yu:za:zm:zr:zw:";
-
-    //  The countries can have their own 'TLDs', e.g. mydomain.com.au
-    $cTLDs = "com:net:org:edu:gov:mil:co:ne:or:ed:go:mi:";
-
-    $fail = 0;
-
-    //  Shift the address to lowercase to simplify checking
-    $Addr = strtolower($Addr);
-
-    //  Split the Address into user and domain parts
-    $UD = explode("@", $Addr);
-    if (count($UD) != 2) {
-        $fail = 1;
-    }
-
-    //  Split the domain part into its Levels
-    if (count($UD) >= 2) {
-        $Levels = explode(".", $UD[1]);
-        $sLevels = count($Levels);
-        if ($sLevels < 2) {
-            $fail = 1;
-        }
-        else {
-
-
-            //  Get the TLD, strip off trailing ] } ) > and check the length
-            $tld = $Levels[$sLevels - 1];
-            $tld = preg_replace("/[>)}]$|]$/", "", $tld);
-            if (strlen($tld) < 2) {
-                $fail = 1;
-            }
-        }
-    }
-
-    $Level--;
-
-    //  If the string after the last dot isn't in the generic TLDs or country codes, it's invalid.
-    if ($Level && !$fail) {
-        $Level--;
-        if (!preg_match('/' . preg_quote($tld, '/') . ":/", $gTLDs)
-            && !preg_match('/' . preg_quote($tld, '/') . ":/", $CCs)) {
-            $fail = 2;
-        }
-    }
-
-    //  If it's a country code, check for a country TLD; add on the domain name.
-    if ($Level && !$fail) {
-        $cd = $sLevels - 2;
-        $domain = $Levels[$cd] . "." . $tld;
-        if (preg_match('/' . preg_quote($Levels[$cd], '/') . ':/', $cTLDs)) {
-            $cd--;
-            $domain = $Levels[$cd] . "." . $domain;
-        }
-    }
-
-    //  See if there's an MX record for the domain
-    if ($Level && !$fail) {
-        $Level--;
-        if (!getmxrr($domain, $mxhosts, $weight)) {
-            $fail = 3;
-        }
-    }
-
-    //  Attempt to connect to port 25 on an MX host
-    if ($Level && !$fail) {
-        $Level--;
-        while (!$sh && [$nul, $mxhost] = each($mxhosts)) {
-            $sh = fsockopen($mxhost, 25);
-        }
-        if (!$sh) {
-            $fail = 4;
-        }
-    }
-
-    //  See if anyone answers
-    if ($Level && !$fail) {
-        $Level--;
-        set_socket_blocking($sh, false);
-        $out = "";
-        $t = 0;
-        while ($t++ < $Timeout && !$out) {
-            $out = fgets($sh, 256);
-        }
-        if (!preg_match("/^220/", $out)) {
-            $fail = 5;
-        }
-    }
-
-    if (isset($sh) && $sh) {
-        fclose($sh);
-    }
-
-    return $fail;
-} // _MailValidate
 
 class DateTimeParser
 {
@@ -272,8 +144,11 @@ class DateTimeParser
             }
             else if (preg_match('/^[[:blank:]]*([0-9]+)[[:blank:]]*[\/\.][[:blank:]]*([0-9]+)[[:blank:]]*[\/\.][[:blank:]]*([0-9]+)[[:blank:]]*$/', $date, $matches)) {
                 $matched = 1;
+
                 $day = intval($matches[$daypos]);
+
                 $month = intval($matches[$monthpos]);
+
                 $year = $matches[3];
                 if ('0000' === $year) {
                     $year_handle_short = false;
@@ -285,7 +160,9 @@ class DateTimeParser
                 // MM.YYYY or YYYY
                 if (preg_match('/^[[:blank:]]*([0-9]+)[[:blank:]]*[\/\.][[:blank:]]*([0-9]+)[[:blank:]]*$/', $date, $matches)) {
                     $matched = 1;
+
                     $month = intval($matches[1]);
+
                     $year = $matches[2];
                     if ('0000' === $year) {
                         $year_handle_short = false;
@@ -296,8 +173,11 @@ class DateTimeParser
 
                 if (preg_match('/^[[:blank:]]*([0-9]+)[[:blank:]]*$/', $date, $matches)) {
                     $matched = 1;
+
                     $day = null;
+
                     $month = null;
+
                     $year = $matches[1];
                     if ('0000' === $year) {
                         $year_handle_short = false;
@@ -413,6 +293,7 @@ class DateTimeParser
                     $invalid = 'datetime_invalid_day';
                 }
             }
+
             if ($valid) {
                 $hour = intval($date['hour']);
                 $min  = intval($date['min']);
@@ -559,12 +440,12 @@ class Record
 
     function get($key)
     {
-        return $data[$key];
+        return $this->data[$key];
     }
 
     function set($key, $val)
     {
-        return $data[$key] = $val;
+        return $this->data[$key] = $val;
     }
 
     function _set_fieldvalue(&$field, $key, $val)
@@ -589,7 +470,6 @@ class Record
 
     function set_field($name, $field)
     {
-        // set_field($name, $field in Field) -> $field
         $field->set('name', $name);
 
         return $this->fields[$name] = $field;
@@ -835,6 +715,7 @@ class RecordSQL extends Record
                                         $value = preg_replace('/M+[\.\/]*/i', '', $value);
                                     }
                                 }
+
                                 $value = preg_replace(
                                     ['/(M+)/i', '/(D+)/i', '/(Y+)/i'],
                                     [sprintf("%02d", $month), sprintf("%02d", $day), sprintf("%02d", $year)],
@@ -947,7 +828,6 @@ class RecordSQL extends Record
         }
 
         $update = 0;
-        unset($fieldlist);
         if (is_array($args)) {
             $fieldlist = $args['fields'];
             $where = ' WHERE ' . $args['where'];
@@ -1402,8 +1282,18 @@ class FormFieldTextarea extends FormField
 
 class FormFieldEmail extends FormFieldText
 {
-    var $VALIDATE_LEVEL = 2;
-    var $USE_ZEND_VALIDATOR = false;
+    static function validateEmail($email, $level = 0)
+    {
+        $validator = new \Egulias\EmailValidator\EmailValidator();
+
+        // TODO: make the following level-dependent through MultipleValidationWithAnd
+        $validation = new \Egulias\EmailValidator\Validation\RFCValidation();
+
+        // TODO: use $validator->hasWarnings() or $validator->getError() for info what went wrong
+        return $validator->isValid($email, $validation);
+    }
+
+    var $VALIDATE_LEVEL = 0;
 
     function __construct($form, $name)
     {
@@ -1417,15 +1307,9 @@ class FormFieldEmail extends FormFieldText
         $null = $this->get('null');
         $null ??= 0;
         if ($this->not_empty($this->value())) {
-            if ($this->USE_ZEND_VALIDATOR) {
-                $validator = new Zend_Validate_EmailAddress(['allow' => Zend_Validate_Hostname::ALLOW_DNS,
-                    'mx'    => true]);
-                if (!$validator->isValid($this->value())) {
-                    $valid = 0;
-                    $invalid[$this->name()] = 'email_nonvalid';
-                }
-            }
-            else if (_MailValidate($this->value(), $this->VALIDATE_LEVEL) != 0) {
+            $result = self::validateEmail($this->value(), $this->VALIDATE_LEVEL);
+            if (!$result) {
+                // for more error details use $validator->hasWarnings() or $validator->getError()
                 $valid = 0;
                 $invalid[$this->name()] = 'email_nonvalid';
             }
@@ -2222,6 +2106,7 @@ class FormHTML extends Form
                 'url_not_allowed'        => "Sie dürfen keine URL in das Adressfeld eintragen. Bitte tragen Sie diese in das Feld 'Homepage (URL)' ein.",
             ],
         ];
+
         if (!isset($error_msg[$lang])) {
             // set default language
             $lang = 'en';
@@ -2314,6 +2199,7 @@ class FormHTML extends Form
                             }
 
                             $this->record->set_value($name, $val);
+
                             $century_window = $thisfield->get('century_window');
                             $datetime_internal = isset($century_window)
                               ? $thisfield->parse_datetime($val, $datetime_style, $century_window)
@@ -2333,9 +2219,11 @@ class FormHTML extends Form
                                 }
                                 $val = $newval;
                             }
+
                             if (isset($val)) {
                                 $this->record->set_value($name, $val);
                             }
+
                             break;
 
                         case 'hidden':
@@ -2346,6 +2234,7 @@ class FormHTML extends Form
                             else if (isset($val)) {
                                 $this->record->set_value($name, $val);
                             }
+
                             break;
 
                         default:
@@ -2365,7 +2254,7 @@ class FormHTML extends Form
     function clear_values($fieldnames = '')
     {
         if (!is_array($fieldnames)) {
-            $fieldnames = $this->record_get_fieldnames();
+            $fieldnames = $this->get_fieldnames();
         }
 
         for ($i = 0; $i < count($fieldnames); $i++) {
@@ -2469,7 +2358,8 @@ class FormHTML extends Form
             return;
         }
 
-        if (!isset($this->fields[$name])) { // wrap a FormField around the basic field
+        if (!isset($this->fields[$name])) {
+            // wrap a FormField around the basic field
             $field = $this->record->get_field($name);
             if (!isset($field)) {
                 return;
