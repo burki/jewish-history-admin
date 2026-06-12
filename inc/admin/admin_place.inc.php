@@ -4,9 +4,9 @@
  *
  * Manage the Place-table
  *
- * (c) 2015-2025 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2015-2026 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2025-11-07 dbu
+ * Version: 2026-05-27 dbu
  *
  * TODO:
  *
@@ -200,11 +200,13 @@ extends DisplayBackend
       '' => '--',
       'root' => tr('World'),
       'continent' => tr('Continent'),
+      'subcontinent' => tr('Subcontinent'),
       'nation' => tr('Nation'),
       'country' => tr('Country'),
       'autonomous republic' => tr('Autonomous Republic'),
       'governorate' => tr('Governorate'),
       'state' => tr('State'),
+      'dependent state' => tr('Dependent State'),
       'national district' => tr('National District'),
       'province' => tr('Province'),
       'region' => tr('Region'),
@@ -224,6 +226,7 @@ extends DisplayBackend
       'historical region' => tr('Historical Region'),
       'former group of political entitites' => tr('Former group of political entitites'),
       'former primary political entity' => tr('Former primary political entity'),
+      'former administrative division' => tr('Former administrative division'),
       'deserted settlement' => tr('Deserted Settlement'),
       'occupied territory' => tr('Occupied territory'),
       'ocean' => tr('Ocean'),
