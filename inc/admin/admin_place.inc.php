@@ -68,6 +68,7 @@ class PlaceRecord extends TableManagerRecord
         if (false == $additional) {
             $additional = [];
         }
+
         foreach ([ 'boundaryCode' ] as $key) {
             $value = $this->get_value($key);
             if (!empty($value)) {
@@ -109,9 +110,9 @@ class PlaceRecord extends TableManagerRecord
                 }
             }
         }
+
         return $fetched;
     }
-
 }
 
 class DisplayPlace extends DisplayBackend
@@ -123,9 +124,10 @@ class DisplayPlace extends DisplayBackend
         "place.type AS type",
         // "parent_path",
         'place.tgn AS tgn',
-        /* 'COUNT(DISTINCT Item.id) AS count',
-      'COUNT(DISTINCT Media.id) AS how_many_media',
-      */
+        /*
+        'COUNT(DISTINCT Item.id) AS count',
+        'COUNT(DISTINCT Media.id) AS how_many_media',
+        */
         'place.created_at AS created',
         'place.status AS status',
     ];
@@ -276,9 +278,9 @@ class DisplayPlace extends DisplayBackend
             new Field([ 'name' => 'boundaryCode', 'type' => 'text', 'datatype' => 'char', 'size' => 40, 'null' => true, 'nodbfield' => true ]),
             new Field([ 'name' => 'additional', 'type' => 'hidden', 'datatype' => 'char', 'null' => true ]),
             /*
-          new Field([ 'name' => 'latitude', 'id' => 'latitude', 'type' => 'hidden', 'datatype' => 'char', 'size' => 15, 'null' => true ]),
-          new Field([ 'name' => 'longitude', 'id' => 'longitude', 'type' => 'hidden', 'datatype' => 'char', 'size' => 15, 'null' => true ]),
-          */
+            new Field([ 'name' => 'latitude', 'id' => 'latitude', 'type' => 'hidden', 'datatype' => 'char', 'size' => 15, 'null' => true ]),
+            new Field([ 'name' => 'longitude', 'id' => 'longitude', 'type' => 'hidden', 'datatype' => 'char', 'size' => 15, 'null' => true ]),
+            */
 
             // new Field([ 'name' => 'comment_internal', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => true ]),
         ]);
@@ -379,62 +381,62 @@ class DisplayPlace extends DisplayBackend
 
             $this->script_ready[] = <<<EOT
                     jQuery('#wikidata').autocomplete({
-                      type: 'post',
-                      source: function (request, response) {
-                        // request.term is the term searched for.
-                        // response is the callback function you must call to update the autocomplete's
-                        // suggestion list.
-                        jQuery.ajax({
-                          url: "./admin_ws.php?pn=place&action=lookupWikidataByTgn&_debug=1",
-                          data: { tgn: request.term },
-                          dataType: "json",
-                          success: response,
-                          error: function () {
-                            response([]);
+                        type: 'post',
+                        source: function (request, response) {
+                            // request.term is the term searched for.
+                            // response is the callback function you must call to update the autocomplete's
+                            // suggestion list.
+                            jQuery.ajax({
+                                url: "./admin_ws.php?pn=place&action=lookupWikidataByTgn&_debug=1",
+                                data: { tgn: request.term },
+                                dataType: "json",
+                                success: response,
+                                error: function () {
+                                    response([]);
+                                }
+                            });
+                        },
+                        minChars: 2,
+                        search: function(event, ui) {
+                            if (jQuery('#wikidata').autocomplete('option', 'disabled')) {
+                                return false;
+                            }
+
+                            var output = jQuery('#spinner');
+                            if (null != output) {
+                                output.html('<img src="./media/ajax-loader.gif" alt="running" />');
+                            }
+                        },
+                        response: function(event,ui) {
+                            // was open
+                            var output = jQuery('#spinner');
+                            if (null != output) {
+                                output.html('');
+                            }
+                        },
+                        focus: function(event, ui) {
+                            jQuery('#wikidata').val(ui.item.value);
+
+                            return false;
+                        },
+                        change: function(event, ui) {
+                            var output = jQuery('#spinner');
+                            if (null != output) {
+                                output.html('');
+                            }
+                        },
+                        select: function(event, ui) {
+                            jQuery('#wikidata').val(ui.item.value);
+
+                            return false;
+                        },
+                        close: function(event, ui) {
+                            jQuery('#wikidata').autocomplete('disable');
+                            var output = jQuery('#spinner');
+                            if (null != output) {
+                                output.html('');
+                            }
                           }
-                        });
-                      },
-                      minChars: 2,
-                      search: function(event, ui) {
-                        if (jQuery('#wikidata').autocomplete('option', 'disabled')) {
-                          return false;
-                        }
-
-                        var output = jQuery('#spinner');
-                        if (null != output) {
-                          output.html('<img src="./media/ajax-loader.gif" alt="running" />');
-                        }
-                      },
-                      response: function(event,ui) {
-                        // was open
-                        var output = jQuery('#spinner');
-                        if (null != output) {
-                          output.html('');
-                        }
-                      },
-                      focus: function(event, ui) {
-                        jQuery('#wikidata').val(ui.item.value);
-
-                        return false;
-                      },
-                      change: function(event, ui) {
-                        var output = jQuery('#spinner');
-                        if (null != output) {
-                          output.html('');
-                        }
-                      },
-                      select: function(event, ui) {
-                        jQuery('#wikidata').val(ui.item.value);
-
-                        return false;
-                      },
-                      close: function(event, ui) {
-                        jQuery('#wikidata').autocomplete('disable');
-                        var output = jQuery('#spinner');
-                        if (null != output) {
-                          output.html('');
-                        }
-                      }
                     })
                     .autocomplete('disable');
 
@@ -444,7 +446,6 @@ class DisplayPlace extends DisplayBackend
             $gnd = $this->record->get_value('gnd');
             if (!empty($gnd)) {
                 $this->script_url[] = 'script/seealso.js';
-
 
                 $PND_LINKS = [
                     'http://d-nb.info/gnd/%s' => 'Deutsche Nationalbibliothek',
@@ -472,24 +473,24 @@ class DisplayPlace extends DisplayBackend
                 $rows['gnd']['value'] .= '</ul>';
 
                 $this->script_code .= <<<EOT
-                              var service = new SeeAlsoCollection();
-                              service.services = {
-                                'pndaks' : new SeeAlsoService('//beacon.findbuch.de/seealso/pnd-aks/')
-                              };
-                              service.views = {
-                                'seealso-ul' : new SeeAlsoUL({
-                                  /* preHTML : '<h3>Externe Angebote</h3>', */
-                                  linkTarget: '_blank',
-                                  maxItems: 100
-                                })
-                              };
-                              service.replaceTagsOnLoad();
+                        var service = new SeeAlsoCollection();
+                        service.services = {
+                            'pndaks' : new SeeAlsoService('//beacon.findbuch.de/seealso/pnd-aks/')
+                        };
+                        service.views = {
+                            'seealso-ul' : new SeeAlsoUL({
+                                /* preHTML : '<h3>Externe Angebote</h3>', */
+                                linkTarget: '_blank',
+                                maxItems: 100
+                            })
+                        };
+                        service.replaceTagsOnLoad();
 
                     EOT;
+
                 $rows['gnd']['value'] .= $ret = <<<EOT
-                      <div title="$gnd" class="pndaks seealso-ul"></div>
+                        <div title="$gnd" class="pndaks seealso-ul"></div>
                     EOT;
-
             }
 
             $tgn = $this->record->get_value('tgn');
@@ -543,125 +544,6 @@ class DisplayPlace extends DisplayBackend
     function buildViewAdditional(&$record, $uploadHandler)
     {
         return '';
-        require_once INC_PATH . '/common/displayhelper.inc.php';
-
-        $ret = '';
-
-        $dbconn = Database::getAdapter();
-
-        $works = '';
-        $querystr = "SELECT Item.id, Item.title, creatordate, earliestdate, latestdate, displaydate, Collection.name AS collection"
-                  . " FROM Item"
-                  . " LEFT OUTER JOIN Collection ON Collection.id=Item.collection"
-                  . " LEFT OUTER JOIN ItemPlace ON ItemPlace.id_item=Item.id"
-                  . sprintf(" WHERE ItemPlace.id_person=%d AND Item.status >= 0", $record->get_value('id'))
-                  . " ORDER BY earliestdate, displaydate, Item.title, Item.id";
-
-        $stmt = $dbconn->query($querystr);
-        if (false !== $stmt) {
-            $params = [ 'pn' => 'item' ];
-            while ($row = $stmt->fetch()) {
-                if (!empty($works)) {
-                    $works .= '<br />';
-                }
-                else {
-                    $works = '<h3>' . $this->htmlSpecialchars(tr('Works')) . '</h3>';
-                }
-                $params['view'] = $row['id'];
-                $works .= sprintf(
-                    '<a href="%s">%s</a> %s (%s)',
-                    htmlspecialchars($this->page->buildLink($params)),
-                    $this->formatText($row['title']),
-                    ItemDisplayHelper::buildDisplayDate($this, $row),
-                    $this->formatText($row['collection'])
-                );
-            }
-        }
-        if (!empty($works)) {
-            $ret .= '<br style="clear: both" />' . $works;
-        }
-
-        $exhibitions = '';
-        $querystr = "SELECT Exhibition.id, Exhibition.title, startdate, enddate, Location.name AS location"
-                  . " FROM Exhibition"
-                  . " LEFT OUTER JOIN Location ON Location.id=Exhibition.id_location"
-                  . " LEFT OUTER JOIN ExhibitionPlace ON ExhibitionPlace.id_exhibition=Exhibition.id"
-                  . sprintf(
-                      " WHERE ExhibitionPlace.id_person=%d AND Exhibition.status >= 0",
-                      $record->get_value('id')
-                  )
-                  . " ORDER BY startdate, enddate, Exhibition.title, Exhibition.id";
-
-        $stmt = $dbconn->query($querystr);
-        if (false !== $stmt) {
-            $params = [ 'pn' => 'exhibition' ];
-            while ($row = $stmt->fetch()) {
-                if (!empty($exhibitions)) {
-                    $exhibitions .= '<br />';
-                }
-                else {
-                    $exhibitions = '<h3>' . $this->htmlSpecialchars(tr('Exhibitions')) . '</h3>';
-                }
-                $params['view'] = $row['id'];
-                $exhibitions .= sprintf(
-                    '<a href="%s">%s</a> %s (%s)',
-                    htmlspecialchars($this->page->buildLink($params)),
-                    $this->formatText($row['title']),
-                    $this->formatDateRange(
-                        $row['startdate'],
-                        $row['enddate']
-                    ),
-                    $this->formatText($row['location'])
-                );
-            }
-        }
-        if (!empty($exhibitions)) {
-            $ret .= '<br style="clear: both" />' . $exhibitions;
-        }
-
-        $publications = '';
-        $querystr = "SELECT Publication.id"
-                  . " FROM Publication"
-                  . " LEFT OUTER JOIN PublicationPlace ON PublicationPlace.id_publication=Publication.id"
-                  . sprintf(
-                      " WHERE PublicationPlace.id_person=%d AND Publication.status >= 0",
-                      $record->get_value('id')
-                  )
-                  . " ORDER BY IFNULL(author,editor), YEAR(publication_date)";
-
-        $stmt = $dbconn->query($querystr);
-        if (false !== $stmt) {
-            $params = [ 'pn' => 'publication' ];
-            require_once INC_PATH . '/common/biblioservice.inc.php';
-            $biblio_client = BiblioService::getInstance();
-
-            while ($row = $stmt->fetch()) {
-                if (!empty($publications)) {
-                    $publications .= '<br />';
-                }
-                else {
-                    $publications = '<h3>' . $this->htmlSpecialchars(tr('Publications')) . '</h3>';
-                }
-                $params['view'] = $row['id'];
-                $citation = $biblio_client->buildCitation($row['id'], [
-                    'person_delimiter' => '/',
-                    'person_suffix' => ',',
-                    'title_suffix' => ',',
-                    'publisher_suppress' => true,
-                ]);
-                $publications .= sprintf(
-                    '<a href="%s">%s</a>',
-                    htmlspecialchars($this->page->buildLink($params)),
-                    $citation
-                );
-            }
-        }
-
-        if (!empty($publications)) {
-            $ret .= '<br style="clear: both" />' . $publications;
-        }
-
-        return $ret . parent::buildViewAdditional($record, $uploadHandler);
     }
 
     function buildSearchBar()
@@ -681,32 +563,33 @@ class DisplayPlace extends DisplayBackend
         // clear the search
         $url_clear = $this->page->BASE_PATH . 'media/clear.gif';
         $search .= <<<EOT
-                  <script>
-                  function clear_search() {
+                <script>
+                function clear_search()
+                {
                     var form = document.forms['search'];
                     if (null != form) {
-                      var textfields = ['search'];
-                      for (var i = 0; i < textfields.length; i++) {
-                        if (null != form.elements[textfields[i]]) {
-                          form.elements[textfields[i]].value = '';
+                        var textfields = ['search'];
+                        for (var i = 0; i < textfields.length; i++) {
+                            if (null != form.elements[textfields[i]]) {
+                                form.elements[textfields[i]].value = '';
+                            }
                         }
-                      }
-                      var selectfields = ['status', 'review'];
-                      for (var i = 0; i < selectfields.length; i++) {
-                        if (null != form.elements[selectfields[i]]) {
-                          form.elements[selectfields[i]].selectedIndex = 0;
+                        var selectfields = ['status', 'review'];
+                        for (var i = 0; i < selectfields.length; i++) {
+                            if (null != form.elements[selectfields[i]]) {
+                                form.elements[selectfields[i]].selectedIndex = 0;
+                            }
                         }
-                      }
-                      var radiofields = ['fulltext'];
-                      for (var i = 0; i < radiofields.length; i++) {
-                        if (null != form.elements[radiofields[i]]) {
-                          form.elements[radiofields[i]][1].checked = false;
+                        var radiofields = ['fulltext'];
+                        for (var i = 0; i < radiofields.length; i++) {
+                            if (null != form.elements[radiofields[i]]) {
+                                form.elements[radiofields[i]][1].checked = false;
+                            }
                         }
-                      }
                     }
-                  }
-                  </script>
-                  <a title="Clear search fields" href="javascript:clear_search();"><img src="$url_clear" border="0" /></a>
+                }
+                </script>
+                <a title="Clear search fields" href="javascript:clear_search();"><img src="$url_clear" border="0" /></a>
             EOT;
         $search .= sprintf(
             ' <input class="submit" type="submit" value="%s" />',
@@ -790,6 +673,7 @@ class DisplayPlace extends DisplayBackend
                     '%s',
                     $record->get_value('name')
                 );
+
                 return sprintf(
                     '%s cannot be deleted since there are entries connected to this place',
                     $orig
