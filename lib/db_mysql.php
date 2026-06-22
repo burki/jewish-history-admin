@@ -272,7 +272,7 @@ class DB_Sql
 
         $query = "lock tables ";
         if (is_array($table)) {
-            foreach($table as $key => $value) {
+            foreach ($table as $key => $value) {
                 if ($key == "read" && $key != 0) {
                     $query .= "$value read, ";
                 }

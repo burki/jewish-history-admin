@@ -13,7 +13,7 @@
  */
 
 // a bunch of common include-files
-define('INC_PATH', realpath(__DIR__ . '/../inc/')  . DIRECTORY_SEPARATOR);
+define('INC_PATH', realpath(__DIR__ . '/../inc/') . DIRECTORY_SEPARATOR);
 
 // setup all server specific paths and settings
 require_once INC_PATH . 'local.inc.php';

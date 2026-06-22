@@ -14,7 +14,7 @@
  */
 
 // local includes
-define('INC_PATH', realpath(__DIR__ . '/../inc/')  . DIRECTORY_SEPARATOR);
+define('INC_PATH', realpath(__DIR__ . '/../inc/') . DIRECTORY_SEPARATOR);
 
 require_once INC_PATH . 'local.inc.php';
 require_once INC_PATH . 'sitesettings.inc.php';
