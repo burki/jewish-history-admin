@@ -5,9 +5,9 @@
  *
  * mail out a link to the password-change page
  *
- * (c) 2009-2018 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2026 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2018-07-23 dbu
+ * Version: 2026-08-22 dbu
  *
  * Changes:
  *
@@ -96,12 +96,10 @@ class DisplayPasswordRecover extends PageDisplay
 
     function processRecoverRequest($login)
     {
-        global $MAIL_SETTINGS;
-
         $mode = SHOW_RECOVERFORM;
 
         $msg = null;
-        if (_MailValidate($login, 2) != 0) {
+        if (!PageDisplayBase::validateEmail($login)) {
             // check if we have a syntactically valid e-mail address
             $msg = tr("You didn't specify a valid e-mail address");
         }
@@ -140,6 +138,7 @@ class DisplayPasswordRecover extends PageDisplay
                         // now we are ready to send the mail
                         $success = $this->sendRecoverMail($email, $login_id, $magic);
                     }
+
                     if ($success) {
                         $this->data['email_sent'] = $email;
                     }
@@ -361,8 +360,8 @@ switch ($display->init()) {
         break;
         /*
         case FORWARD_LOGINFIRST:
-          $page->redirect([ 'pn' => 'admin_first' ]);
-          break;
+            $page->redirect([ 'pn' => 'admin_first' ]);
+            break;
         */
     default:
         $page->setDisplay($display);
