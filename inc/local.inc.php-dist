@@ -1,4 +1,5 @@
 <?php
+
 /*
  * local.inc.php-dist
  *
@@ -71,12 +72,12 @@ define('OUTPUT_COMPRESS', false); // set to true to use output compression
 
 define('MAIL_SEND', true); // only do actual mailings if this is set to true
 
-define('ICU_REGEX', false); // set to true for MySQL 8.0
+define('ICU_REGEX', true); // set to false for MySQL 5.x
 
 $AUTH_METHODS = [
-  'AUTH_LOCAL' => true,                    // authenticate through form against local db
-  // 'AUTH_FORCE' => 'USER'                // force fixed user
-  // 'AUTH_ANONYMOUS' => true,             // browse anonymously
+    'AUTH_LOCAL' => true,                    // authenticate through form against local db
+    // 'AUTH_FORCE' => 'USER'                // force fixed user
+    // 'AUTH_ANONYMOUS' => true,             // browse anonymously
 ];
 
 // define a database-connection class
@@ -84,85 +85,87 @@ require LIB_PATH . 'db_mysql.php';
 
 class DB extends DB_Sql
 {
-  var $Host     = "127.0.0.1";
-  var $Database = "jgo_admin";
-  var $User     = "jgo_admin";
-  var $Password = "SECRET";
-  var $Charset  = "utf8";
-  var $Select_Before_Query = true;
+    var $Host     = "127.0.0.1";
+    var $Database = "jgo_admin";
+    var $User     = "jgo_admin";
+    var $Password = "SECRET";
+    var $Charset  = "utf8";
+    var $Select_Before_Query = true;
 
-  var $repair = []; // Only one repair per table so we don't fall into a loop
+    var $repair = []; // Only one repair per table so we don't fall into a loop
 
-  function last_insert_id() {
-    return mysql_insert_id($this->Link_ID);
-  }
+    function last_insert_id()
+    {
+        return mysql_insert_id($this->Link_ID);
+    }
 
-  /* public: string escaping. */
-  function escape_string($str) {
-    return $this->connect()
-      ? @mysql_real_escape_string($str, $this->Link_ID) // try to use link_id because of charset-issues: http://shiflett.org/archive/184
-      : @mysql_real_escape_string($str);
-  }
+    /* public: string escaping. */
+    function escape_string($str)
+    {
+        return $this->connect()
+          ? @mysql_real_escape_string($str, $this->Link_ID) // try to use link_id because of charset-issues: http://shiflett.org/archive/184
+          : @mysql_real_escape_string($str);
+    }
 
-  // try to catch index-corruption
-  function halt($msg) {
-    $this->Error = @mysql_error($this->Link_ID);
-    $this->Errno = @mysql_errno($this->Link_ID);
-    if ($this->Errno == 1034) {
-      if (preg_match("/Incorrect key file for table: '([^']+)'. Try to repair it/", $this->Error, $matches)) {
-        $table = $matches[1];
-        if (!$this->repair[$table]) {
-          $this->repair[$table] = true;
-          $ignore_user_abort = ignore_user_abort(1); // no one should stop this
-          set_time_limit(300); // give this 5 minutes
-          $querystr = "REPAIR TABLE $table EXTENDED";
-          $this->query($querystr);
-          $success = false;
-          while ($this->next_record()) {
-            if ($this->Record['Msg_type'] == 'status' && $this->Record['Msg_text'] == 'OK') {
-              $success = true;
+    // try to catch index-corruption
+    function halt($msg)
+    {
+        $this->Error = @mysql_error($this->Link_ID);
+        $this->Errno = @mysql_errno($this->Link_ID);
+        if ($this->Errno == 1034) {
+            if (preg_match("/Incorrect key file for table: '([^']+)'. Try to repair it/", $this->Error, $matches)) {
+                $table = $matches[1];
+                if (!$this->repair[$table]) {
+                    $this->repair[$table] = true;
+                    $ignore_user_abort = ignore_user_abort(1); // no one should stop this
+                    set_time_limit(300); // give this 5 minutes
+                    $querystr = "REPAIR TABLE $table EXTENDED";
+                    $this->query($querystr);
+                    $success = false;
+                    while ($this->next_record()) {
+                        if ($this->Record['Msg_type'] == 'status' && $this->Record['Msg_text'] == 'OK') {
+                            $success = true;
+                        }
+                    }
+                    if (!$ignore_user_abort) {
+                        ignore_user_abort($ignore_user_abort); // turn it back on
+                    }
+                    if ($success) {
+                        // Run this query again
+                        $querystr = preg_replace('/^Database error: Invalid SQL:/', '', $msg);
+                        $this->query($querystr);
+                        return;
+                    }
+                }
             }
-          }
-          if (!$ignore_user_abort) {
-            ignore_user_abort($ignore_user_abort); // turn it back on
-          }
-          if ($success) {
-            // Run this query again
-            $querystr = preg_replace('/^Database error: Invalid SQL:/', '', $msg);
-            $this->query($querystr);
-            return;
-          }
         }
-      }
-    }
 
-    if ($this->Halt_On_Error == "no") {
-      return;
-    }
+        if ($this->Halt_On_Error == "no") {
+            return;
+        }
 
-    $this->haltmsg($msg);
+        $this->haltmsg($msg);
 
-    if ($this->Halt_On_Error != "report") {
-      die("Session halted.");
-    }
-  } // halt
+        if ($this->Halt_On_Error != "report") {
+            die("Session halted.");
+        }
+    } // halt
 }
 
-class DB_Presentation
-extends DB
+class DB_Presentation extends DB
 {
-  var $Database = "jgo_presentation";
-  var $User     = "jgo_presentation";
+    var $Database = "jgo_presentation";
+    var $User     = "jgo_presentation";
 }
 
 class ZoteroApiFactory
 {
-  const GROUP_ID = '301118'; // adjust for non-keydocuments group
+    const GROUP_ID = '301118'; // adjust for non-keydocuments group
 
-  static $apiKey = 'ZOTERO-API-KEY';
+    static $apiKey = 'ZOTERO-API-KEY';
 
-  public static function getInstance()
-  {
-    return new \Hedii\ZoteroApi\ZoteroApi(self::$apiKey);
-  }
+    public static function getInstance()
+    {
+        return new \Hedii\ZoteroApi\ZoteroApi(self::$apiKey);
+    }
 }
