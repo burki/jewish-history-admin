@@ -5,9 +5,9 @@
  *
  * Class for managing communication
  *
- * (c) 2008-2025 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2008-2026 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2025-04-28 dbu
+ * Version: 2026-08-22 dbu
  *
  * Changes:
  *
@@ -15,6 +15,8 @@
 
 require_once INC_PATH . 'common/tablemanager.inc.php';
 require_once INC_PATH . 'admin/common.inc.php';
+
+use Symfony\Component\Mime\Part\DataPart;
 
 class DisplayCommunication extends DisplayTable
 {
@@ -663,8 +665,8 @@ class DisplayCommunication extends DisplayTable
 
         // build the message
         $mail = new MailMessage($this->record->get_value('subject'));
-        $mail->attachPlain($this->record->get_value('body'));
-        $mail->attachHtml($this->formatParagraphs($this->record->get_value('body')));
+        $mail->setPlain($this->record->get_value('body'));
+        $mail->setHtml($this->formatParagraphs($this->record->get_value('body')));
 
         foreach ($GLOBALS['COMMUNICATION_ATTACHMENTS'] as $fname) {
             if (0 != (0x02 & $this->record->get_value('flags'))
@@ -683,7 +685,7 @@ class DisplayCommunication extends DisplayTable
                     $fname_full = BASE_FILEPATH . 'data/' . $fname;
                 }
 
-                $attachment = Swift_Attachment::newInstance(
+                $attachment = new DataPart(
                     file_get_contents($fname_full),
                     $fname,
                     'application/pdf'

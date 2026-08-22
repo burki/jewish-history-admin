@@ -3,26 +3,34 @@
 /*
  * MailMessage.php
  *
- * lightweight wrapper around Swift-Mailer 5.x
+ * lightweight wrapper around SymfonyMailer
  *
  * (c) 2007-2026 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2026-06-12 dbu
+ * Version: 2026-08-22 dbu
  *
  * Changes:
  *
  */
 
-require_once VENDOR_PATH . '/swiftmailer/swiftmailer/lib/swift_init.php';
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\DataPart;
 
 class MailerFactory
 {
-    var $mailer = null;
     var $config;
+    var $mailer = null;
+    var $transport = null;
 
     function __construct($config)
     {
         $this->config = $config;
+
+        $transport = null;
 
         if (PHP_OS == 'WINNT' || defined('SMTP_HOST')) {
             if (!defined('SMTP_HOST')) {
@@ -30,38 +38,40 @@ class MailerFactory
                 ;
             }
 
-            $transport = Swift_SmtpTransport::newInstance(SMTP_HOST);
+            $dsn = 'smtp://';
             if (defined('SMTP_USERNAME')) {
-                $transport->setUsername(SMTP_USERNAME);
+                $dsn .= rawurlencode(SMTP_USERNAME);
                 if (defined('SMTP_PASSWORD')) {
-                    $transport->setPassword(SMTP_PASSWORD);
+                    $dsn .= ':' . rawurlencode(SMTP_PASSWORD);
                 }
+                $dsn .= '@';
             }
-
+            $dsn .= SMTP_HOST;
             if (defined('SMTP_PORT')) {
-                $transport->setPort(SMTP_PORT);
+                $dsn .= ':' . SMTP_PORT;
             }
-
             if (defined('SMTP_ENCRYPTION')) {
-                $transport->setEncryption(SMTP_ENCRYPTION);
-                // see https://github.com/swiftmailer/swiftmailer/issues/544
-                $https = [];
-                $https['ssl']['verify_peer'] = false;
-                $https['ssl']['verify_peer_name'] = false;
-                $transport->setStreamOptions($https);
+                $dsn .= '?encryption=' . rawurlencode(SMTP_ENCRYPTION);
             }
+            $transport = Transport::fromDsn($dsn);
         }
-        else {
-            $transport = Swift_MailTransport::newInstance();
+
+        if (is_null($transport)) {
+            $transport = Transport::fromDsn('native://default');
         }
 
         // Create the Mailer using your created Transport
-        $this->mailer = Swift_Mailer::newInstance($transport);
+        $this->mailer = new Mailer($this->transport = $transport);
     }
 
     function getConfig()
     {
         return $this->config;
+    }
+
+    function getTransport()
+    {
+        return $this->transport;
     }
 
     function getInstance()
@@ -72,41 +82,48 @@ class MailerFactory
 
 class MailMessage
 {
-    private static $swift = null;
+    private static $mailer = null;
     public static $mailer_config = [];
 
     public $message;
     public $recipients;
     public $from;
     public $line_width = -1; // uses format=flowed
+    public $blocked = [];  // addresses that are blocked by white-list
 
-    private static function getSwift()
+    private static function getMailer()
     {
-        if (!isset(self::$swift)) {
+        if (!isset(self::$mailer)) {
             $mailer_factory = new MailerFactory(self::$mailer_config);
-
-            self::$swift = $mailer_factory->getInstance();
+            self::$mailer = $mailer_factory->getInstance();
         }
 
-        return self::$swift;
+        return self::$mailer;
+    }
+
+    public static function instantiateAddress(string $address, string $name = '')
+    {
+        return new Address($address, $name);
     }
 
     public function __construct($subject, $body_plain = '')
     {
-        $this->message = Swift_Message::newInstance()
-            ->setSubject($subject);
+        $this->message = (new Email())
+            ->subject($subject);
 
         if (!empty($body_plain)) {
-            $this->message->setBody($body_plain, 'text/plain', 'utf-8');
+            $this->message->text($body_plain);
+
             if ($this->line_width > 0) {
-                $this->message->setMaxLineLength($this->line_width + 1); // CR counts as well
+                $this->message->getHeaders()
+                    ->setMaxLineLength($this->line_width + 1); // CR counts as well
             }
         }
     }
 
     public function buildAddress($email, $name)
     {
-        return new Swift_Address($email, $name);
+        return new Address($email, $name);
     }
 
     public function addTo($address)
@@ -126,26 +143,44 @@ class MailMessage
 
     public function removeTo($address)
     {
-        return $this->message->removeTo($address);
+        $remaining = array_filter(
+            $this->message->getTo(),
+            static fn(Address $recipient) => $recipient->getAddress() !== (string) $address
+        );
+
+        return $this->message->to(...array_values($remaining));
     }
 
     public function addToBlocked($address)
     {
         if (!isset($this->blocked)) {
-            $this->blocked = new Swift_RecipientList();
+            $this->blocked = [];
         }
 
-        return $this->blocked->addTo($address);
+        $this->blocked[] = $address instanceof Address ? $address : new Address($address);
+
+        return $this->blocked[count($this->blocked) - 1];
     }
 
     public function setFrom($address)
     {
-        $this->message->setFrom($address);
+        if (is_array($address)) {
+            $addresses = [];
+            foreach ($address as $email => $name) {
+                $addresses[] = is_int($email) ? $name : new Address($email, $name);
+            }
+
+            $this->message->from(...$addresses);
+
+            return;
+        }
+
+        $this->message->from($address);
     }
 
     public function setReplyTo($address)
     {
-        $this->message->setReplyTo($address);
+        $this->message->replyTo($address);
     }
 
     public function setHeader($name, $value)
@@ -156,30 +191,52 @@ class MailMessage
         }
     }
 
+    public function setPlain($body_plain)
+    {
+        $this->message->text($body_plain)
+            // ->setMaxLineLength($this->line_width + 1)
+        ;
+    }
+
+    public function setHtml($body_html)
+    {
+        $this->message->html($body_html);
+    }
+
     public function attachPlain($body_plain)
     {
-        $this->message->addPart($body_plain, 'text/plain', 'utf-8')
-            ->setMaxLineLength($this->line_width + 1);
+        $this->message->attach($body_plain, null, 'text/plain;charset=utf-8')
+            // ->setMaxLineLength($this->line_width + 1)
+        ;
     }
 
     public function attachHtml($body_html)
     {
-        $this->message->addPart($body_html, 'text/html', 'utf-8');
+        $this->message->attach($body_html, null, 'text/html;utf-8');
     }
 
-    public function attach($child, $id = null)
+    public function attach($body, ?string $contentType = null)
     {
-        return $this->message->attach($child, $id);
+        if ($body instanceof DataPart) {
+            return $this->message->attachPart($body);
+        }
+
+        return $this->message->attach($body, null, $contentType);
+    }
+
+    public function attachFromPath(string $path, ?string $contentType = null)
+    {
+        return $this->message->attachFromPath($path, null, $contentType);
     }
 
     public function embed($child, $id = null)
     {
-        return $this->message->embed($child, $id);
+        return $this->message->addPart($child->asInline());
     }
 
     public function setMaxLineLength($len)
     {
-        return $this->message->setMaxLineLength($len);
+        return $this->message->getHeaders()->setMaxLineLength($len);
     }
 
     public function printOnly($recipient_list = null, $comment = null)
@@ -188,21 +245,13 @@ class MailMessage
             $recipient_list = $this->message->getTo();
         }
 
-        $body = '';
+        $body = $this->message->toString();
 
-        if ('multipart/alternative' == $this->message->getContentType()) {
-            foreach ($this->message->getChildren() as $id => $child) {
-                if ('text/plain' == $child->getContentType()) {
-                    $body = $child->getBody();
-                    break;
-                }
-            }
-        }
-        else {
-            $body = $this->message->getBody();
-        }
+        $recipients = array_map(
+            static fn($recipient) => $recipient instanceof Address ? $recipient->toString() : (string) $recipient,
+            is_array($recipient_list) ? array_values($recipient_list) : []
+        );
 
-        $recipients = array_keys($recipient_list);
         if ($comment) {
             echo "$comment <br/>";
         }
@@ -217,8 +266,6 @@ class MailMessage
 
     public function send()
     {
-        global $MAIL_WHITELIST;
-
         if (!defined('MAIL_SEND') || !MAIL_SEND) {
             $count = $this->printOnly();
 
@@ -226,9 +273,10 @@ class MailMessage
         }
 
         if (isset($MAIL_WHITELIST) && is_array($MAIL_WHITELIST)) {
-            foreach (array_keys($this->message->getTo()) as $to) {
+            foreach ($this->message->getTo() as $recipient) {
+                $to = $recipient->getAddress();
                 $matched = 0;
-                foreach ($MAIL_WHITELIST as $exp) {
+                foreach ($GLOBALS['MAIL_WHITELIST'] as $exp) {
                     if (preg_match($exp, $to) > 0) {
                         $matched = 1;
                         break;
@@ -245,6 +293,7 @@ class MailMessage
         $sent = 0;
         if (isset($this->blocked) && count($this->blocked) > 0) {
             $sent = $this->printOnly($this->blocked, 'Blocked by white-list');
+
             $addresses = $this->message->getTo();
             if (empty($addresses)) {
                 // everything on white-list
@@ -252,12 +301,13 @@ class MailMessage
             }
         }
 
-        $swift_conn = self::getSwift();
+        $mailer = self::getMailer();
 
         try {
-            $sent += $swift_conn->send($this->message, $this->recipients, $this->message->getFrom());
+            $mailer->send($this->message, $this->recipients, $this->message->getFrom());
+            ++$sent;
         }
-        catch (Swift_TransportException $e) {
+        catch (\Exception $e) {
             var_dump($e->getMessage());
         }
 

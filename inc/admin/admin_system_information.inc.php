@@ -110,13 +110,13 @@ class SystemInformationDisplay extends PageDisplay
         $msg = '';
         $success = file_exists($log_dir);
         if ($success) {
-          $success = is_writable($log_dir);
-          if (!$success) {
-            $msg = " not writable";
-          }
+            $success = is_writable($log_dir);
+            if (!$success) {
+                $msg = " not writable";
+            }
         }
         else {
-          $msg = " does not exist";
+            $msg = " does not exist";
         }
 
         $ret .= '<p>' . $this->buildSuccessFail($success) . ' Log directory: ' . $this->htmlSpecialchars($log_dir) . $msg . '</p>';
@@ -155,20 +155,15 @@ class SystemInformationDisplay extends PageDisplay
         $ret .= '<h2>E-Mail Settings</h2>';
         require_once INC_PATH . 'common/MailMessage.php';
         $mailerFactory = new MailerFactory([]);
-        $mailer = $mailerFactory->getInstance();
-        $transport = $mailer->getTransport();
+        $transport = $mailerFactory->getTransport();
 
-        if (isset($transport)) {
+        if (!is_null($transport)) {
             $config = [
                 'class' => get_class($transport),
             ];
 
-            if ('Swift_SmtpTransport' == $config['class']) {
-                foreach ([ 'username', 'host', 'port', 'encryption', 'streamOptions' ] as $key) {
-                    $methodName = 'get' . ucfirst($key);
-                    $config[$key] = $transport->$methodName();
-
-                }
+            if ($transport instanceof \Symfony\Component\Mailer\Transport\Smtp\SmtpTransport) {
+                $config['dsn'] = (string) $transport;
             }
 
             $ret .= $this->buildVariableDisplay($config);

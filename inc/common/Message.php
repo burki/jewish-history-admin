@@ -13,6 +13,8 @@
  *
  */
 
+require_once INC_PATH . '/common/MailMessage.php';
+
 class Message
 {
     static $SUBJECTS = [
@@ -84,7 +86,8 @@ class Message
         // fill in template
         $body = preg_replace_callback(
             '|\%([a-z_0-9]+)\%|',
-            [$this->messagePlaceholder, 'replace'],
+            [
+                $this->messagePlaceholder, 'replace' ],
             $template
         );
 
@@ -182,8 +185,6 @@ class Message
 
     function send()
     {
-        require_once INC_PATH . 'common/MailMessage.php';
-
         [$subject, $body] = $this->build();
         if (false === $body) {
             return false;
@@ -206,28 +207,32 @@ class Message
             if (isset($recipients['cc'])) {
                 $mail->addCc($recipients['cc']);
             }
+
             if (isset($recipients['bcc'])) {
                 $mail->addBcc($recipients['bcc']);
             }
+
             if (isset($this->options['reply-to'])) {
                 $mail->setReplyTo($this->options['reply-to']);
             }
 
             if (isset($this->options['attachements']) && is_array($this->options['attachements'])) {
-                foreach ($this->options['attachements'] as $a) {
-                    //Create the attachment with your data
-                    $attachment = Swift_Attachment::newInstance($a['data'], $a['filename'], $a['mimetype']);
-                    //echo "attaching: " . $a['filename'] . " " . $a['mimetype'] . "<br />";
-                    //Attach it to the message
-                    $mail->attach($attachment);
+                foreach ($this->options['attachements'] as $attachment) {
+                    if (!empty($attachment['filename'])) {
+                        $mail->attachFromPath($attachment['filename'], $attachment['mimetype']);
+                    }
+                    else {
+                        $mail->attach($attachment['data'], $attachment['mimetype']);
+                    }
                 }
             }
 
             return $mail->send();
         }
         catch (Exception $e) {
-            // e.g. Swift_RfcComplianceException: Address in mailbox given [zorro1@freesurf.ch> ] does not comply with RFC 2822
+            // e.g. an invalid address exception: Address in mailbox given [zorro1@freesurf.ch> ] does not comply with RFC 2822
             // TODO: somehow log/return the error
+            var_dump($e->getMessage());
         }
 
         return false;
@@ -276,23 +281,17 @@ topmargin="4">'
                    . '</body></html>';
 
         $mail = new MailMessage($subject);
-        $mail->attachPlain($body_plain);
+        $mail->setPlain($body_plain);
 
         $logo = 'media/logo.jpg';
-        $replace = ['%logo%' => $this->page->BASE_URL . $logo];
+        $replace = [ '%logo%' => $this->page->BASE_URL . $logo ];
 
-        /*
-        try {
-          $replace['%logo%'] = $mail->embed(Swift_Image::fromPath($this->page->BASE_DIR . $logo));
-        }
-        catch (Exception $e) {
-            ; // ignore - url will be embedded
-        } */
+
         foreach ($replace as $key => $value) {
             $body_html = preg_replace('/' . preg_quote($key, '/') . '/', $value, $body_html);
         }
 
-        $mail->attachHtml($body_html);
+        $mail->setHtml($body_html);
 
         return $mail;
     }
