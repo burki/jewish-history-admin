@@ -5,9 +5,9 @@
  *
  * Manage the organization-table
  *
- * (c) 2009-2025 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2026 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2025-08-19 dbu
+ * Version: 2026-08-23 dbu
  *
  * TODO:
  *
@@ -201,13 +201,8 @@ class DisplayOrganization extends DisplayBackend
             new Field([ 'name' => 'description_en', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => true, 'nodbfield' => true ]),
 
             new Field([ 'name' => 'gnd', 'id' => 'gnd', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => true ]),
-            // new Field([ 'name' => 'tgn_parent', 'id' => 'tgn_parent', 'type' => 'hidden', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => true ]),
-            // new Field([ 'name' => 'parent_path', 'id' => 'parent_path', 'type' => 'hidden', 'datatype' => 'char', 'size' => 40, 'null' => true ]),
+            new Field([ 'name' => 'wikidata', 'id' => 'wikidata', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 30, 'null' => true ]),
 
-            /*
-          new Field([ 'name' => 'latitude', 'id' => 'latitude', 'type' => 'hidden', 'datatype' => 'char', 'size' => 15, 'null' => true ]),
-          new Field([ 'name' => 'longitude', 'id' => 'longitude', 'type' => 'hidden', 'datatype' => 'char', 'size' => 15, 'null' => true ]),
-          */
 
             // new Field([ 'name' => 'comment_internal', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => true ]),
         ]);
@@ -258,15 +253,19 @@ class DisplayOrganization extends DisplayBackend
                 'fields' => [ 'dissolutionDate' ],
             ],
 
+            'wikidata' => [
+                'label' => 'Wikidata-QID',
+                'description' => 'Wikidata Identifikator',
+            ],
             'url' => [ 'label' => 'Homepage' ],
 
             'description_de' => [ 'label' => 'Short Description (de)' ],
             'description_en' => [ 'label' => 'Short Description (en)' ],
 
             /*
-          '<hr noshade="noshade" />',
-          'comment_internal' => [ 'label' => 'Internal notes and comments' ],
-          */
+           '<hr noshade="noshade" />',
+           'comment_internal' => [ 'label' => 'Internal notes and comments' ],
+           */
 
             (isset($this->form) ? $this->form->show_submit(tr('Store')) : ''),
         ];
@@ -276,98 +275,97 @@ class DisplayOrganization extends DisplayBackend
 
             // for chosen and GND-Calls
             $this->script_code .= <<<EOT
-
-                    function showHideFields (show, hide) {
-                      for (var i = 0; i < hide.length; i++) {
+                function showHideFields(show, hide)
+                {
+                    for (var i = 0; i < hide.length; i++) {
                         // jQuery('#' + hide[i]).parent().parent().hide();
                         jQuery('#' + hide[i]).parents('.container').hide();
-                      }
-                      for (var i = 0; i < show.length; i++) {
+                    }
+                    for (var i = 0; i < show.length; i++) {
                         // jQuery('#' + show[i]).parent().parent().show();
                         jQuery('#' + show[i]).parents('.container').show();
-                      }
                     }
+                }
 
                 EOT;
 
             $this->script_ready[] = <<<EOT
 
-                    jQuery('#gnd').autocomplete({
-                      type: 'post',
-                      source: './admin_ws.php?pn=organization&action=lookupGnd&_debug=1',
-                      minChars: 2,
-                      search: function(event, ui) {
+                jQuery('#gnd').autocomplete({
+                    type: 'post',
+                    source: './admin_ws.php?pn=organization&action=lookupGnd&_debug=1',
+                    minChars: 2,
+                    search: function(event, ui) {
                         if (jQuery('#gnd').autocomplete('option', 'disabled')) {
-                          return false;
+                            return false;
                         }
 
                         var output = jQuery('#spinner');
                         if (null != output) {
-                          output.html('<img src="./media/ajax-loader.gif" alt="running" />');
+                            output.html('<img src="./media/ajax-loader.gif" alt="running" />');
                         }
-                      },
-                      response: function(event,ui) {
+                    },
+                    response: function(event,ui) {
                         // was open
                         var output = jQuery('#spinner');
                         if (null != output) {
-                          output.html('');
+                            output.html('');
                         }
-                      },
-                      focus: function(event, ui) {
+                    },
+                    focus: function(event, ui) {
                         jQuery('#gnd').val(ui.item.value);
 
                         return false;
-                      },
-                      change: function(event, ui) {
+                    },
+                    change: function(event, ui) {
                         var output = jQuery('#spinner');
                         if (null != output) {
-                          output.html('');
+                            output.html('');
                         }
-                      },
-                      select: function(event, ui) {
+                    },
+                    select: function(event, ui) {
                         jQuery('#gnd').val(ui.item.value);
 
                         // try to fetch more info by gnd
                         jQuery.ajax({
-                          url: './admin_ws.php?pn=organization&action=fetchInfoByGnd&_debug=1',
-                          data: { gnd: ui.item.value },
-                          dataType: 'json',
-                          success: function (data) {
-                            var mapping = {
-                              preferredName: 'name',
-                              dateOfEstablishment: 'foundingDate',
-                              dateOfTermination: 'dissolutionDate',
-                              homepage: 'url'
-                            };
+                            url: './admin_ws.php?pn=organization&action=fetchInfoByGnd&_debug=1',
+                            data: { gnd: ui.item.value },
+                            dataType: 'json',
+                            success: function (data) {
+                                var mapping = {
+                                    preferredName: 'name',
+                                    dateOfEstablishment: 'foundingDate',
+                                    dateOfTermination: 'dissolutionDate',
+                                    homepage: 'url'
+                                };
 
-                            for (key in mapping) {
-                              if (null != data[key]) {
-                                var field = jQuery('#' + mapping[key]);
-                                if (null != field) {
-                                  var val = data[key];
-                                  if (val != null && ('dateOfEstablishment' == key || 'dateOfTermination' == key)) {
-                                    var parts = val.split(/\-/);
-                                    val = val.split(/\-/).reverse().join('.');
-                                  }
-                                  field.val(val);
+                                for (key in mapping) {
+                                    if (null != data[key]) {
+                                        var field = jQuery('#' + mapping[key]);
+                                        if (null != field) {
+                                            var val = data[key];
+                                            if (val != null && ('dateOfEstablishment' == key || 'dateOfTermination' == key)) {
+                                                var parts = val.split(/\-/);
+                                                val = val.split(/\-/).reverse().join('.');
+                                            }
+                                            field.val(val);
+                                        }
+                                    }
                                 }
-                              }
                             }
-                          }
                         });
 
                         return false;
-                      },
-                      close: function(event, ui) {
+                    },
+                    close: function(event, ui) {
                         jQuery('#gnd').autocomplete('disable');
                         var output = jQuery('#spinner');
                         if (null != output) {
-                          output.html('');
+                            output.html('');
                         }
-                      }
-
-                    })
-                    .autocomplete('disable');
+                    }
+                })
+                .autocomplete('disable');
                 EOT;
         }
         else {
@@ -377,7 +375,7 @@ class DisplayOrganization extends DisplayBackend
 
 
                 $GND_LINKS = [
-                    // 'https://d-nb.info/tgn/%s' => 'Deutsche Nationalbibliothek',
+                    // 'https://d-nb.info/gnd/%s' => 'Deutsche Nationalbibliothek',
                 ];
                 $rows['gnd']['value'] = '<ul><li>';
 
@@ -403,24 +401,34 @@ class DisplayOrganization extends DisplayBackend
                 $url_pndaks = 'https://juedische-geschichte-online.net/lod-resolver/seealso/entityfacts/gnd';
 
                 $this->script_code .= <<<EOT
-                              var service = new SeeAlsoCollection();
-                              service.services = {
-                                'pndaks' : new SeeAlsoService('{$url_pndaks}')
-                              };
-                              service.views = {
-                                'seealso-ul' : new SeeAlsoUL({
-                                  /* preHTML : '<h3>Externe Angebote</h3>', */
-                                  linkTarget: '_blank',
-                                  maxItems: 100
-                                })
-                              };
-                              service.replaceTagsOnLoad();
+                    var service = new SeeAlsoCollection();
+                    service.services = {
+                        'pndaks' : new SeeAlsoService('{$url_pndaks}')
+                    };
+                    service.views = {
+                        'seealso-ul' : new SeeAlsoUL({
+                            /* preHTML : '<h3>Externe Angebote</h3>', */
+                            linkTarget: '_blank',
+                            maxItems: 100
+                        })
+                    };
+                    service.replaceTagsOnLoad();
 
                     EOT;
+
                 $rows['gnd']['value'] .= <<<EOT
-                      <div title="$gnd" class="pndaks seealso-ul"></div>
+                    <div title="$gnd" class="pndaks seealso-ul"></div>
                     EOT;
 
+            }
+
+            $wikidata = $this->record->get_value('wikidata');
+            if (!empty($wikidata)) {
+                $rows['wikidata']['value'] = sprintf(
+                    '<a href="https://www.wikidata.org/wiki/%s" target="_blank">%s</a>',
+                    $this->htmlSpecialchars($wikidata),
+                    $this->htmlSpecialchars($wikidata)
+                );
             }
         }
 
@@ -466,30 +474,31 @@ class DisplayOrganization extends DisplayBackend
         // clear the search
         $url_clear = $this->page->BASE_PATH . 'media/clear.gif';
         $search .= <<<EOT
-                  <script>
-                  function clear_search() {
-                    var form = document.forms['search'];
-                    if (null != form) {
-                      var textfields = ['search'];
-                      for (var i = 0; i < textfields.length; i++) {
+            <script>
+            function clear_search()
+            {
+                var form = document.forms['search'];
+                if (null != form) {
+                    var textfields = ['search'];
+                    for (var i = 0; i < textfields.length; i++) {
                         if (null != form.elements[textfields[i]])
-                          form.elements[textfields[i]].value = '';
-                      }
-                      var selectfields = ['status', 'review'];
-                      for (var i = 0; i < selectfields.length; i++) {
+                            form.elements[textfields[i]].value = '';
+                    }
+                    var selectfields = ['status', 'review'];
+                    for (var i = 0; i < selectfields.length; i++) {
                         if (null != form.elements[selectfields[i]])
-                          form.elements[selectfields[i]].selectedIndex = 0;
-                      }
-                      var radiofields = ['fulltext'];
-                      for (var i = 0; i < radiofields.length; i++) {
+                            form.elements[selectfields[i]].selectedIndex = 0;
+                    }
+                    var radiofields = ['fulltext'];
+                    for (var i = 0; i < radiofields.length; i++) {
                         if (null != form.elements[radiofields[i]]) {
                             form.elements[radiofields[i]][1].checked = false;
                         }
-                      }
                     }
-                  }
-                  </script>
-                  <a title="Clear search fields" href="javascript:clear_search();"><img src="$url_clear" border="0" /></a>
+                }
+            }
+            </script>
+            <a title="Clear search fields" href="javascript:clear_search();"><img src="$url_clear" border="0" /></a>
             EOT;
         $search .= sprintf(
             ' <input class="submit" type="submit" value="%s" />',
@@ -594,6 +603,7 @@ class DisplayOrganization extends DisplayBackend
                         $this->htmlSpecialchars($dbconn->Record['name'])
                     );
                 }
+
                 if (!empty($replace)) {
                     $ret = sprintf(
                         '<form method="post" action="%s">',

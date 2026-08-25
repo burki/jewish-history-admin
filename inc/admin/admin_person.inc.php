@@ -5,9 +5,9 @@
  *
  * Manage the person-table
  *
- * (c) 2009-2025 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2009-2026 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2025-08-19 dbu
+ * Version: 2026-08-23 dbu
  *
  * TODO:
  *
@@ -309,8 +309,9 @@ class DisplayPerson extends DisplayBackend
             new Field([ 'name' => 'url', 'type' => 'text', 'datatype' => 'char', 'size' => 65, 'maxlength' => 200, 'null' => true ]),
 
             new Field([ 'name' => 'gnd', 'id' => 'gnd', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => true ]),
+            new Field([ 'name' => 'wikidata', 'id' => 'wikidata', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 30, 'null' => true ]),
             new Field([ 'name' => 'djh', 'id' => 'djh', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 30, 'null' => true ]),
-            new Field([ 'name' => 'stolpersteine', 'id' => 'djh', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => true ]),
+            new Field([ 'name' => 'stolpersteine', 'id' => 'stolpersteine', 'type' => 'text', 'datatype' => 'char', 'size' => 15, 'maxlength' => 11, 'null' => true ]),
 
             new Field([ 'name' => 'description', 'type' => 'hidden', 'datatype' => 'char', 'null' => true ]),
             new Field([ 'name' => 'description_de', 'type' => 'textarea', 'datatype' => 'char', 'cols' => 50, 'rows' => 4, 'null' => true, 'nodbfield' => true ]),
@@ -384,20 +385,24 @@ class DisplayPerson extends DisplayBackend
             '<hr noshade="noshade" />',
 
             /*
-          'study' => [ 'label' => 'Fields of Study' ],
-          'profession' => [
-            'label' => 'Occupational Title',
-            'description' => 'eine normierte Berufs- oder Tätigkeitsbezeichnung aus der SWD, die für die Person besonders charakteristisch ist',
-          ],
-          'jobTitle' => [
-            'label' => 'Job Title',
-            'description' => 'Beruf/Tätigkeitsbezeichnung als freier Text',
-          ],
-          'cv' => [ 'label' => 'CV' ],
+            'study' => [ 'label' => 'Fields of Study' ],
+            'profession' => [
+                'label' => 'Occupational Title',
+                'description' => 'eine normierte Berufs- oder Tätigkeitsbezeichnung aus der SWD, die für die Person besonders charakteristisch ist',
+            ],
+            'jobTitle' => [
+                'label' => 'Job Title',
+                'description' => 'Beruf/Tätigkeitsbezeichnung als freier Text',
+            ],
+            'cv' => [ 'label' => 'CV' ],
 
-          '<hr noshade="noshade" />',
-          */
+            '<hr noshade="noshade" />',
+            */
 
+            'wikidata' => [
+                'label' => 'Wikidata-QID',
+                'description' => 'Wikidata Identifikator',
+            ],
             'djh' => [ 'label' => 'DJH-ID' ],
             'stolpersteine' => [ 'label' => 'Stolpersteine-ID' ],
             'url' => [ 'label' => 'Homepage' ],
@@ -407,9 +412,9 @@ class DisplayPerson extends DisplayBackend
             'description_en' => [ 'label' => 'Short Bio (en)', 'format' => 'markdown' ],
 
             /*
-          '<hr noshade="noshade" />',
-          'comment_internal' => [ 'label' => 'Internal notes and comments' ],
-          */
+            '<hr noshade="noshade" />',
+            'comment_internal' => [ 'label' => 'Internal notes and comments' ],
+            */
 
             (isset($this->form) ? $this->form->show_submit(tr('Store')) : ''),
         ];
@@ -419,101 +424,100 @@ class DisplayPerson extends DisplayBackend
 
             // for chosen and GND-Calls
             $this->script_code .= <<<EOT
-
-                    function showHideFields (show, hide) {
-                      for (var i = 0; i < hide.length; i++) {
+                function showHideFields(show, hide)
+                {
+                    for (var i = 0; i < hide.length; i++) {
                         // jQuery('#' + hide[i]).parent().parent().hide();
                         jQuery('#' + hide[i]).parents('.container').hide();
-                      }
-                      for (var i = 0; i < show.length; i++) {
+                    }
+                    for (var i = 0; i < show.length; i++) {
                         // jQuery('#' + show[i]).parent().parent().show();
                         jQuery('#' + show[i]).parents('.container').show();
-                      }
                     }
+                }
 
                 EOT;
 
             $this->script_ready[] = <<<EOT
 
-                    jQuery('#gnd').autocomplete({
-                      type: 'post',
-                      source: './admin_ws.php?pn=person&action=lookupGnd&_debug=1',
-                      minChars: 2,
-                      search: function(event, ui) {
+                jQuery('#gnd').autocomplete({
+                    type: 'post',
+                    source: './admin_ws.php?pn=person&action=lookupGnd&_debug=1',
+                    minChars: 2,
+                    search: function(event, ui) {
                         if (jQuery('#gnd').autocomplete('option', 'disabled')) {
-                          return false;
+                            return false;
                         }
 
                         var output = jQuery('#spinner');
                         if (null != output) {
-                          output.html('<img src="./media/ajax-loader.gif" alt="running" />');
+                            output.html('<img src="./media/ajax-loader.gif" alt="running" />');
                         }
-                      },
-                      response: function(event,ui) {
+                    },
+                    response: function(event,ui) {
                         // was open
                         var output = jQuery('#spinner');
                         if (null != output) {
-                          output.html('');
+                            output.html('');
                         }
-                      },
-                      focus: function(event, ui) {
+                    },
+                    focus: function(event, ui) {
                         jQuery('#gnd').val(ui.item.value);
 
                         return false;
-                      },
-                      change: function(event, ui) {
+                    },
+                    change: function(event, ui) {
                         var output = jQuery('#spinner');
                         if (null != output) {
-                          output.html('');
+                            output.html('');
                         }
-                      },
-                      select: function(event, ui) {
+                    },
+                    select: function(event, ui) {
                         jQuery('#gnd').val(ui.item.value);
 
                         // try to fetch more info by gnd
                         jQuery.ajax({
-                          url: './admin_ws.php?pn=person&action=fetchBiographyByGnd&_debug=1',
-                          data: { gnd: ui.item.value },
-                          dataType: 'json',
-                          success: function (data) {
-                            var mapping = {
-                              dateOfBirth: 'birthdate',
-                              placeOfBirth: 'birthplace',
-                              placeOfResidence: 'actionplace',
-                              dateOfDeath: 'deathdate',
-                              placeOfDeath: 'deathplace',
-                              academicTitle: 'title',
-                              biographicalInformation: 'occupation'
-                            };
+                            url: './admin_ws.php?pn=person&action=fetchBiographyByGnd&_debug=1',
+                            data: { gnd: ui.item.value },
+                            dataType: 'json',
+                            success: function (data) {
+                                var mapping = {
+                                    dateOfBirth: 'birthdate',
+                                    placeOfBirth: 'birthplace',
+                                    placeOfResidence: 'actionplace',
+                                    dateOfDeath: 'deathdate',
+                                    placeOfDeath: 'deathplace',
+                                    academicTitle: 'title',
+                                    biographicalInformation: 'occupation'
+                                };
 
-                            for (key in mapping) {
-                              if (null != data[key]) {
-                                var field = jQuery('#' + mapping[key]);
-                                if (null != field) {
-                                  var val = data[key];
-                                  if (val != null && ('dateOfBirth' == key || 'dateOfDeath' == key)) {
-                                    var parts = val.split(/\-/);
-                                    val = val.split(/\-/).reverse().join('.');
-                                  }
-                                  field.val(val);
+                                for (key in mapping) {
+                                    if (null != data[key]) {
+                                        var field = jQuery('#' + mapping[key]);
+                                        if (null != field) {
+                                            var val = data[key];
+                                            if (val != null && ('dateOfBirth' == key || 'dateOfDeath' == key)) {
+                                                var parts = val.split(/\-/);
+                                                val = val.split(/\-/).reverse().join('.');
+                                            }
+                                            field.val(val);
+                                        }
+                                    }
                                 }
-                              }
                             }
-                          }
                         });
 
                         return false;
-                      },
-                      close: function(event, ui) {
+                    },
+                    close: function(event, ui) {
                         jQuery('#gnd').autocomplete('disable');
                         var output = jQuery('#spinner');
                         if (null != output) {
-                          output.html('');
+                            output.html('');
                         }
-                      }
-
-                    })
-                    .autocomplete('disable');
+                    }
+                })
+                .autocomplete('disable');
                 EOT;
         }
         else {
@@ -549,24 +553,34 @@ class DisplayPerson extends DisplayBackend
                 $url_pndaks = 'https://juedische-geschichte-online.net/lod-resolver/seealso/entityfacts/gnd';
 
                 $this->script_code .= <<<EOT
-                              var service = new SeeAlsoCollection();
-                              service.services = {
-                                'pndaks' : new SeeAlsoService('{$url_pndaks}')
-                              };
-                              service.views = {
-                                'seealso-ul' : new SeeAlsoUL({
-                                  /* preHTML : '<h3>Externe Angebote</h3>', */
-                                  linkTarget: '_blank',
-                                  maxItems: 100
-                                })
-                              };
-                              service.replaceTagsOnLoad();
+                    var service = new SeeAlsoCollection();
+                    service.services = {
+                        'pndaks' : new SeeAlsoService('{$url_pndaks}')
+                    };
+                    service.views = {
+                        'seealso-ul' : new SeeAlsoUL({
+                            /* preHTML : '<h3>Externe Angebote</h3>', */
+                            linkTarget: '_blank',
+                            maxItems: 100
+                        })
+                    };
+                    service.replaceTagsOnLoad();
 
                     EOT;
+
                 $rows['gnd']['value'] .= <<<EOT
-                      <div title="$gnd" class="pndaks seealso-ul"></div>
+                    <div title="$gnd" class="pndaks seealso-ul"></div>
                     EOT;
 
+            }
+
+            $wikidata = $this->record->get_value('wikidata');
+            if (!empty($wikidata)) {
+                $rows['wikidata']['value'] = sprintf(
+                    '<a href="https://www.wikidata.org/wiki/%s" target="_blank">%s</a>',
+                    $this->htmlSpecialchars($wikidata),
+                    $this->htmlSpecialchars($wikidata)
+                );
             }
         }
 
@@ -612,30 +626,31 @@ class DisplayPerson extends DisplayBackend
         // clear the search
         $url_clear = $this->page->BASE_PATH . 'media/clear.gif';
         $search .= <<<EOT
-                  <script>
-                  function clear_search() {
-                    var form = document.forms['search'];
-                    if (null != form) {
-                      var textfields = ['search'];
-                      for (var i = 0; i < textfields.length; i++) {
+            <script>
+            function clear_search()
+            {
+                var form = document.forms['search'];
+                if (null != form) {
+                    var textfields = ['search'];
+                    for (var i = 0; i < textfields.length; i++) {
                         if (null != form.elements[textfields[i]])
-                          form.elements[textfields[i]].value = '';
-                      }
-                      var selectfields = ['status', 'review'];
-                      for (var i = 0; i < selectfields.length; i++) {
+                            form.elements[textfields[i]].value = '';
+                    }
+                    var selectfields = ['status', 'review'];
+                    for (var i = 0; i < selectfields.length; i++) {
                         if (null != form.elements[selectfields[i]])
-                          form.elements[selectfields[i]].selectedIndex = 0;
-                      }
-                      var radiofields = ['fulltext'];
-                      for (var i = 0; i < radiofields.length; i++) {
+                            form.elements[selectfields[i]].selectedIndex = 0;
+                    }
+                    var radiofields = ['fulltext'];
+                    for (var i = 0; i < radiofields.length; i++) {
                         if (null != form.elements[radiofields[i]]) {
                             form.elements[radiofields[i]][1].checked = false;
                         }
-                      }
                     }
-                  }
-                  </script>
-                  <a title="Clear search fields" href="javascript:clear_search();"><img src="$url_clear" border="0" /></a>
+                }
+            }
+            </script>
+            <a title="Clear search fields" href="javascript:clear_search();"><img src="$url_clear" border="0" /></a>
             EOT;
         $search .= sprintf(
             ' <input class="submit" type="submit" value="%s" />',
