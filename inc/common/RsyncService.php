@@ -5,9 +5,9 @@
  *
  * Methods to fetch files from remote
  *
- * (c) 2019-2024 daniel.burckhardt@sur-gmbh.ch
+ * (c) 2019-2026 daniel.burckhardt@sur-gmbh.ch
  *
- * Version: 2024-08-12 dbu
+ * Version: 2026-11-24 dbu
  *
  *
  */
@@ -99,7 +99,7 @@ class RsyncService
         $cmdString = (string) $command;
 
 
-        $res = `$cmdString`;
+        $res = shell_exec($cmdString);
 
         return $res;
     }
